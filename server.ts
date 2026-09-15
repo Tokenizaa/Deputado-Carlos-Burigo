@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import { db } from './server/db.js';
 import { User } from './src/types.js';
 
@@ -206,6 +205,7 @@ app.get('/sitemap.xml', (_req, res) => {
 
 export async function start() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'spa' });
     app.use(vite.middlewares);
   } else {
