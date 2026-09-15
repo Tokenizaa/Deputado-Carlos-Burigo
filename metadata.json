@@ -1,0 +1,6 @@
+{
+  "name": "Plataforma Carlos Búrigo",
+  "description": "Plataforma oficial de comunicação institucional, atendimento do gabinete parlamentar e presença digital de Carlos Búrigo, Deputado Estadual pelo Rio Grande do Sul (MDB).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

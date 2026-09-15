@@ -1,0 +1,316 @@
+import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
+import { Calendar, Plus, Edit2, Trash2, Clock, MapPin, Lock, Globe, Save } from 'lucide-react';
+import { EventItem } from '../../types';
+
+export const AdminAgendaTab: React.FC = () => {
+  const { events, currentUser, refreshAllData, showToast } = useApp();
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('2026-09-18');
+  const [time, setTime] = useState('09:00');
+  const [location, setLocation] = useState('');
+  const [municipality, setMunicipality] = useState('Caxias do Sul');
+  const [description, setDescription] = useState('');
+  const [visibility, setVisibility] = useState<'publico' | 'interno'>('publico');
+  const [saving, setSaving] = useState(false);
+
+  const startCreate = () => {
+    setIsCreating(true);
+    setEditingEvent(null);
+    setTitle('');
+    setDate('2026-09-20');
+    setTime('10:00');
+    setLocation('Câmara de Vereadores');
+    setMunicipality('Caxias do Sul');
+    setDescription('');
+    setVisibility('publico');
+  };
+
+  const startEdit = (item: EventItem) => {
+    setEditingEvent(item);
+    setIsCreating(false);
+    setTitle(item.title);
+    setDate(item.date);
+    setTime(item.time);
+    setLocation(item.location);
+    setMunicipality(item.municipality);
+    setDescription(item.description);
+    setVisibility(item.visibility);
+  };
+
+  const cancelEdit = () => {
+    setEditingEvent(null);
+    setIsCreating(false);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const url = editingEvent ? `/api/agenda/${editingEvent.id}` : '/api/agenda';
+      const method = editingEvent ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': currentUser.id,
+        },
+        body: JSON.stringify({
+          title,
+          date,
+          time,
+          location,
+          municipality,
+          description,
+          visibility,
+        }),
+      });
+
+      if (res.ok) {
+        showToast(
+          editingEvent ? 'Compromisso atualizado!' : 'Compromisso agendado com sucesso!',
+          'success'
+        );
+        await refreshAllData();
+        cancelEdit();
+      } else {
+        showToast('Erro ao salvar evento', 'error');
+      }
+    } catch (err) {
+      showToast('Erro de conexão.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Excluir este compromisso?')) return;
+    try {
+      const res = await fetch(`/api/agenda/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-user-id': currentUser.id },
+      });
+      if (res.ok) {
+        showToast('Compromisso excluído com sucesso.', 'success');
+        await refreshAllData();
+      }
+    } catch (err) {
+      showToast('Erro de conexão.', 'error');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-stone-900 tracking-tight">
+            Gestão de Agenda & Compromissos
+          </h2>
+          <p className="text-stone-600 text-xs sm:text-sm">
+            Agende audiências, vistorias e reuniões, definindo visibilidade pública ou interna.
+          </p>
+        </div>
+
+        {!isCreating && !editingEvent && (
+          <button
+            onClick={startCreate}
+            className="flex items-center gap-2 bg-[#00A550] hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Novo Compromisso</span>
+          </button>
+        )}
+      </div>
+
+      {(isCreating || editingEvent) && (
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-md space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+            <h3 className="font-bold text-stone-900 text-base">
+              {editingEvent ? 'Editar Compromisso' : 'Agendar Novo Compromisso'}
+            </h3>
+            <button onClick={cancelEdit} className="text-xs text-stone-500 font-bold">
+              Cancelar
+            </button>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-stone-700 mb-1">
+                Título do Compromisso *
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                placeholder="Ex: Reunião com a Diretoria do Hospital Geral"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">Data *</label>
+                <input
+                  type="date"
+                  required
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">Horário *</label>
+                <input
+                  type="text"
+                  required
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                  placeholder="Ex: 14:00 ou 09h30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Visibilidade *
+                </label>
+                <select
+                  value={visibility}
+                  onChange={(e) => setVisibility(e.target.value as 'publico' | 'interno')}
+                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5 font-bold uppercase"
+                >
+                  <option value="publico">Público (Exibido no site)</option>
+                  <option value="interno">Interno do Gabinete (Privado)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">Local / Endereço *</label>
+                <input
+                  type="text"
+                  required
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                  placeholder="Ex: Sala de Reuniões da Prefeitura"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">Município *</label>
+                <input
+                  type="text"
+                  required
+                  value={municipality}
+                  onChange={(e) => setMunicipality(e.target.value)}
+                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                  placeholder="Ex: Caxias do Sul"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-stone-700 mb-1">
+                Pauta / Descrição *
+              </label>
+              <textarea
+                rows={3}
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                placeholder="Objetivo da agenda, participantes e assuntos tratados..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="px-4 py-2 rounded-lg border border-stone-300 text-stone-700 text-xs font-bold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-6 py-2 rounded-lg bg-[#00A550] hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Gravando...' : 'Salvar Compromisso'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Events Table */}
+      <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
+        <table className="min-w-full divide-y divide-stone-200 text-xs">
+          <thead className="bg-stone-50 text-stone-500 font-bold uppercase tracking-wider">
+            <tr>
+              <th className="px-6 py-3 text-left">Data / Hora</th>
+              <th className="px-6 py-3 text-left">Compromisso</th>
+              <th className="px-4 py-3 text-left">Local / Cidade</th>
+              <th className="px-4 py-3 text-left">Visibilidade</th>
+              <th className="px-6 py-3 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-200">
+            {events.map((e) => (
+              <tr key={e.id} className="hover:bg-stone-50 transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="font-bold text-stone-900">{e.date}</div>
+                  <div className="text-stone-500 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-[#00A550]" /> {e.time}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <h4 className="font-bold text-stone-900 text-sm">{e.title}</h4>
+                  <p className="text-stone-500 line-clamp-1">{e.description}</p>
+                </td>
+                <td className="px-4 py-4 text-stone-700 whitespace-nowrap">
+                  <div>{e.location}</div>
+                  <div className="text-stone-500">{e.municipality}</div>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {e.visibility === 'publico' ? (
+                    <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                      <Globe className="w-3 h-3" /> Público
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 bg-stone-200 text-stone-700 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                      <Lock className="w-3 h-3" /> Interno
+                    </span>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-right whitespace-nowrap space-x-2">
+                  <button
+                    onClick={() => startEdit(e)}
+                    className="p-1.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(e.id)}
+                    className="p-1.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
