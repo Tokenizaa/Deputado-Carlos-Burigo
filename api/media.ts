@@ -1,4 +1,4 @@
-import { getPublicMedia } from '../server/supabase.js';
+import { getPublicMedia } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
