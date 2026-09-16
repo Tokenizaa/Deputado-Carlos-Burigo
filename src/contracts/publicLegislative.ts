@@ -27,6 +27,9 @@ export interface PublicLegislativeEventDto {
 
 export interface PublicLegislativeVoteDto {
   id: string;
+  legislativeItemId: string;
+  legislativeCode: string;
+  legislativeTitle?: string;
   sessionName?: string;
   voteDate?: string;
   voterName: string;
