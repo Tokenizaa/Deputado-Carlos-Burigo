@@ -1,17 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import {
   normalizeLegislativeCode,
-  toLegislativeCode,
   toPublicLegislativeItemDto,
   toPublicLegislativeVoteDto,
   toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
-import type {
-  LegislativeItemRow,
-  PublicLegislativeItemDto,
-  PublicLegislativeVoteDto,
-} from './mappers/publicLegislative';
+import type { LegislativeItemRow } from './mappers/publicLegislative';
+import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
+import { extractLegislativeCode } from '../src/contracts/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
@@ -190,7 +187,7 @@ export async function getPublicResults() {
   if (error) throw error;
   return (data ?? [])
     .map((item) => {
-      const legislativeCode = item.title ? item.title.match(/\b(PL|PLC|PEC|RDI|PRS|PLO|LAW)\s+\d+\/\d{4}\b/i)?.[0] : undefined;
+      const legislativeCode = extractLegislativeCode(item.title);
       const legislativeItemId = legislativeCode ? publishedIndex.get(normalizeLegislativeCode(legislativeCode)) : undefined;
       return toPublicResultDto(item, publishedCodes, legislativeItemId);
     })
