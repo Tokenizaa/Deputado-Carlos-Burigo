@@ -1,4 +1,4 @@
-import { getPublicSettings } from '../server/supabase.js';
+import { getPublicSettings } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
