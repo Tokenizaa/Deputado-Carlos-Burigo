@@ -1,1 +1,21 @@
-PLACEHOLDER
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "deputado-carlos-burigo",
+  "main": "./src/worker.ts",
+  // Workers runtime has no process.env; nodejs_compat exposes `process` so
+  // server/supabase.ts module-scope reads fall back to its hardcoded defaults
+  // (same production values as these vars).
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    // SPA fallback: unmatched navigation requests get index.html (React routes).
+    "not_found_handling": "single-page-application",
+    // Guarantee /api/* always hits the Worker, never asset/SPA routing.
+    "run_worker_first": ["/api/*"]
+  },
+  // Public publishable config (publishable key, not a secret).
+  "vars": {
+    "SUPABASE_URL": "https://wktanxbpijurimdjgone.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj"
+  }
+}
