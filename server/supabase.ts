@@ -12,8 +12,7 @@ export const supabaseAdmin = createClient(url, serviceRoleKey, {
 });
 
 async function getPublishedLegislativeCodes() {
-  const { data, error } = await supabaseAdmin
-    .from('legislative_items')
+  const { data, error } = await supabaseAdmin.from('legislative_items')
     .select('type,number,year,status,verification_status')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
@@ -23,8 +22,7 @@ async function getPublishedLegislativeCodes() {
 
 export async function getPublicProjects() {
   const publishedCodes = await getPublishedLegislativeCodes();
-  const { data, error } = await supabaseAdmin
-    .from('projects')
+  const { data, error } = await supabaseAdmin.from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
@@ -37,8 +35,8 @@ export async function getPublicProjects() {
 
 export async function getPublicResults() {
   const publishedCodes = await getPublishedLegislativeCodes();
-  const { data, error } = await supabaseAdmin
-    .from('results').select('id,title,category,description,metrics,municipality,result_date')
+  const { data, error } = await supabaseAdmin.from('results')
+    .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
   return (data ?? []).filter((item) => {
@@ -83,4 +81,18 @@ export async function getPublicMedia() {
     storagePath: item.storage_path, url: item.url, mimeType: item.mime_type,
     createdAt: item.created_at,
   }));
+}
+
+export async function getPublicNews() {
+  const { data, error } = await supabaseAdmin.from('news')
+    .select('*').eq('status', 'published').order('published_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getPublicAgenda() {
+  const { data, error } = await supabaseAdmin.from('events')
+    .select('*').eq('status', 'published').order('start_at', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
 }
