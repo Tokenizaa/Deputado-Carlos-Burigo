@@ -27,4 +27,4 @@ As Functions não usam `db.json` para as leituras públicas migradas. Os dados v
 
 ## Verificação
 
-Após o deploy, validar cada endpoint e a Home em produção. Só considerar a rodada funcionalmente concluída quando as respostas HTTP forem bem-sucedidas e os dados reais do acervo aparecerem na interface.
+O commit desta documentação é posterior à criação das Functions para garantir um novo deploy do estado completo da rodada. Após o deploy, validar cada endpoint e a Home em produção. Só considerar a rodada funcionalmente concluída quando as respostas HTTP forem bem-sucedidas e os dados reais do acervo aparecerem na interface.
