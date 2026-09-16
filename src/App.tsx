@@ -11,12 +11,12 @@ import { NewsDetail } from './components/public/NewsDetail';
 import { AgendaSection } from './components/public/AgendaSection';
 import { MunicipalitiesSection } from './components/public/MunicipalitiesSection';
 import { VideosSection } from './components/public/VideosSection';
+import { MediaHighlightsSection } from './components/public/MediaHighlightsSection';
 import { CitizenPortalView } from './components/citizen/CitizenPortalView';
 import { CitizenProtocolModal } from './components/citizen/CitizenProtocolModal';
 import { ContactView } from './components/public/ContactView';
 import { PrivacyPolicyView } from './components/public/PrivacyPolicyView';
 
-// Admin Components
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminDashboardTab } from './components/admin/AdminDashboardTab';
 import { AdminDemandsTab } from './components/admin/AdminDemandsTab';
@@ -42,14 +42,13 @@ const MainAppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-stone-900 flex flex-col items-center justify-center text-white space-y-4">
         <div className="w-12 h-12 rounded-xl bg-[#00A550] flex items-center justify-center font-black text-lg text-[#E1F200] animate-pulse">
-          15
+          CB
         </div>
-        <p className="text-sm font-bold text-stone-300">Carregando Plataforma Carlos Búrigo...</p>
+        <p className="text-sm font-bold text-stone-300">Carregando portal...</p>
       </div>
     );
   }
 
-  // Admin View
   if (currentView === 'admin') {
     return (
       <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
@@ -71,25 +70,15 @@ const MainAppContent: React.FC = () => {
     );
   }
 
-  // Helper for rendering dynamic blocks on Home
   const homePage = pages.find((p) => p.slug === 'home' || p.id === 'page-home') || pages[0];
   const sortedBlocks = homePage
-    ? [...homePage.blocks]
-        .filter((b) => b.visible !== false && (b as any).active !== false)
-        .sort((a, b) => a.order - b.order)
+    ? [...homePage.blocks].filter((b) => b.visible !== false && (b as any).active !== false).sort((a, b) => a.order - b.order)
     : [];
 
   const renderBlock = (b: PageBlock) => {
     switch (b.type as string) {
       case 'hero':
-        return (
-          <HeroSection
-            key={b.id}
-            customTitle={b.title}
-            customSubtitle={b.subtitle}
-            customContent={b.content}
-          />
-        );
+        return <HeroSection key={b.id} customTitle={b.title} customSubtitle={b.subtitle} customContent={b.content} />;
       case 'trajetoria':
       case 'trajectory':
         return <TrajectorySection key={b.id} />;
@@ -119,18 +108,10 @@ const MainAppContent: React.FC = () => {
         return (
           <section key={b.id} className="py-12 bg-white border-b border-stone-200">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
-              {b.content?.badge && (
-                <span className="text-xs uppercase font-bold text-[#00A550] bg-emerald-50 px-3 py-1 rounded-full">
-                  {b.content.badge}
-                </span>
-              )}
+              {b.content?.badge && <span className="text-xs uppercase font-bold text-[#00A550] bg-emerald-50 px-3 py-1 rounded-full">{b.content.badge}</span>}
               {b.title && <h2 className="text-2xl sm:text-3xl font-black text-stone-900 mt-2">{b.title}</h2>}
               {b.subtitle && <p className="text-stone-600 font-medium mt-1">{b.subtitle}</p>}
-              {b.content?.text && (
-                <div className="mt-4 text-stone-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">
-                  {b.content.text}
-                </div>
-              )}
+              {b.content?.text && <div className="mt-4 text-stone-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">{b.content.text}</div>}
             </div>
           </section>
         );
@@ -140,28 +121,13 @@ const MainAppContent: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  {b.content?.badge && (
-                    <span className="text-xs uppercase font-bold text-[#00A550] bg-white border border-emerald-200 px-3 py-1 rounded-full">
-                      {b.content.badge}
-                    </span>
-                  )}
+                  {b.content?.badge && <span className="text-xs uppercase font-bold text-[#00A550] bg-white border border-emerald-200 px-3 py-1 rounded-full">{b.content.badge}</span>}
                   {b.title && <h2 className="text-2xl sm:text-3xl font-black text-stone-900">{b.title}</h2>}
                   {b.subtitle && <p className="text-stone-600 font-medium">{b.subtitle}</p>}
                   {b.content?.text && <p className="text-stone-700 leading-relaxed text-sm sm:text-base">{b.content.text}</p>}
-                  {b.content?.buttonText && (
-                    <a
-                      href={b.content.buttonLink || '#'}
-                      className="inline-flex items-center gap-2 bg-[#00A550] text-white font-bold px-5 py-2.5 rounded-xl shadow-xs text-sm"
-                    >
-                      {b.content.buttonText}
-                    </a>
-                  )}
+                  {b.content?.buttonText && <a href={b.content.buttonLink || '#'} className="inline-flex items-center gap-2 bg-[#00A550] text-white font-bold px-5 py-2.5 rounded-xl shadow-xs text-sm">{b.content.buttonText}</a>}
                 </div>
-                {b.content?.imageUrl && (
-                  <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200 aspect-4/3">
-                    <img src={b.content.imageUrl} alt={b.title} className="w-full h-full object-cover" />
-                  </div>
-                )}
+                {b.content?.imageUrl && <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200 aspect-4/3"><img src={b.content.imageUrl} alt={b.title} className="w-full h-full object-cover" /></div>}
               </div>
             </div>
           </section>
@@ -170,11 +136,7 @@ const MainAppContent: React.FC = () => {
         return (
           <section key={b.id} className="py-8 bg-white border-b border-stone-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {b.content?.imageUrl && (
-                <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-xs max-h-96">
-                  <img src={b.content.imageUrl} alt={b.title} className="w-full h-full object-cover" />
-                </div>
-              )}
+              {b.content?.imageUrl && <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-xs max-h-96"><img src={b.content.imageUrl} alt={b.title} className="w-full h-full object-cover" /></div>}
               {b.title && <p className="text-xs text-stone-500 text-center mt-2 font-medium">{b.title}</p>}
             </div>
           </section>
@@ -184,31 +146,43 @@ const MainAppContent: React.FC = () => {
     }
   };
 
-  // Public View
+  const renderHome = () => {
+    if (sortedBlocks.length === 0) {
+      return (
+        <>
+          <HeroSection />
+          <MediaHighlightsSection />
+          <TrajectorySection />
+          <ActionsAndProjectsSection />
+          <ResultsSection />
+          <NewsSection limit={3} />
+          <AgendaSection />
+          <MunicipalitiesSection />
+          <VideosSection />
+        </>
+      );
+    }
+
+    let mediaInserted = false;
+    return sortedBlocks.map((block, index) => {
+      const rendered = (
+        <React.Fragment key={block.id}>
+          {renderBlock(block)}
+          {!mediaInserted && (block.type === 'hero' || index === 0) && (
+            <MediaHighlightsSection />
+          )}
+        </React.Fragment>
+      );
+      if (!mediaInserted && (block.type === 'hero' || index === 0)) mediaInserted = true;
+      return rendered;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white">
       <Navbar />
-
       <main className="flex-1">
-        {currentView === 'home' && (
-          <div>
-            {sortedBlocks.length > 0 ? (
-              sortedBlocks.map((b) => renderBlock(b))
-            ) : (
-              <>
-                <HeroSection />
-                <TrajectorySection />
-                <ActionsAndProjectsSection />
-                <ResultsSection />
-                <NewsSection limit={3} />
-                <AgendaSection />
-                <MunicipalitiesSection />
-                <VideosSection />
-              </>
-            )}
-          </div>
-        )}
-
+        {currentView === 'home' && <div>{renderHome()}</div>}
         {currentView === 'trajetoria' && <TrajectorySection />}
         {currentView === 'atuacao' && <ActionsAndProjectsSection />}
         {currentView === 'resultados' && <ResultsSection />}
@@ -221,10 +195,7 @@ const MainAppContent: React.FC = () => {
         {currentView === 'contato' && <ContactView />}
         {currentView === 'privacidade' && <PrivacyPolicyView />}
       </main>
-
       <Footer />
-
-      {/* Persistent Citizen Demand & Protocol Lookup Modal */}
       <CitizenProtocolModal />
     </div>
   );
