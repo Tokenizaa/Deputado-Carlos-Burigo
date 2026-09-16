@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { normalizeLegislativeCode, toPublicProjectDto, toPublicResultDto } from './mappers/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
@@ -22,7 +23,7 @@ async function getPublishedLegislativeCodes() {
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
   if (error) throw error;
-  return new Set((data ?? []).map((item) => `${item.type} ${item.number}/${item.year}`));
+  return new Set((data ?? []).map((item) => normalizeLegislativeCode(`${item.type} ${item.number}/${item.year}`)));
 }
 
 export async function getPublicSettings() {
@@ -64,18 +65,9 @@ export async function getPublicProjects() {
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
-  return (data ?? []).filter((item) => publishedCodes.has(item.code)).map((item) => ({
-    id: item.id,
-    code: item.code,
-    title: item.title,
-    summary: item.summary,
-    detailedDescription: item.detailed_description,
-    theme: item.theme,
-    status: item.status,
-    linkAlrs: item.link_alrs,
-    year: item.year,
-    impacts: Array.isArray(item.impacts) ? item.impacts : [],
-  }));
+  return (data ?? [])
+    .map((item) => toPublicProjectDto(item, publishedCodes))
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicResults() {
@@ -84,18 +76,9 @@ export async function getPublicResults() {
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
-  return (data ?? []).filter((item) => {
-    const match = item.title?.match(/(PL|PLC)\s+\d+\/\d{4}/i);
-    return match ? publishedCodes.has(match[0].toUpperCase()) : false;
-  }).map((item) => ({
-    id: item.id,
-    title: item.title,
-    category: item.category,
-    description: item.description,
-    metrics: item.metrics,
-    municipality: item.municipality,
-    date: item.result_date,
-  }));
+  return (data ?? [])
+    .map((item) => toPublicResultDto(item, publishedCodes))
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicMunicipalities() {
