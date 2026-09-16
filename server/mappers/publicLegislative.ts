@@ -1,7 +1,55 @@
-import type { PublicProjectDto, PublicResultDto } from '../../src/contracts/publicLegislative';
+import type {
+  PublicLegislativeEventDto,
+  PublicLegislativeItemDto,
+  PublicLegislativeRoleDto,
+  PublicLegislativeVoteDto,
+  PublicProjectDto,
+  PublicResultDto,
+} from '../../src/contracts/publicLegislative';
 import { extractLegislativeCode } from '../../src/contracts/publicLegislative';
 
 type PublishedCodeSet = ReadonlySet<string>;
+
+export type LegislativeItemRow = {
+  id: string;
+  type: string;
+  number: number;
+  year: number;
+  title?: string | null;
+  summary?: string | null;
+  status: string;
+  presented_at?: string | null;
+  concluded_at?: string | null;
+  source_url?: string | null;
+  verification_status: string;
+};
+
+type LegislativeEventRow = {
+  id: string;
+  event_type: string;
+  event_date?: string | null;
+  description?: string | null;
+  source_url?: string | null;
+  verification_status: string;
+};
+
+type LegislativeVoteRow = {
+  id: string;
+  session_name?: string | null;
+  vote_date?: string | null;
+  voter_name: string;
+  vote: string;
+  source_url?: string | null;
+  verification_status: string;
+};
+
+type LegislativeRoleRow = {
+  id: string;
+  person_name: string;
+  role: string;
+  source_url?: string | null;
+  verification_status: string;
+};
 
 type ProjectRow = {
   id: string;
@@ -30,7 +78,75 @@ export function normalizeLegislativeCode(code: string): string {
   return code.trim().replace(/\s+/g, ' ').toUpperCase();
 }
 
-export function toPublicProjectDto(row: ProjectRow, publishedCodes: PublishedCodeSet): PublicProjectDto | null {
+export function toLegislativeCode(item: Pick<LegislativeItemRow, 'type' | 'number' | 'year'>): string {
+  return normalizeLegislativeCode(`${item.type} ${item.number}/${item.year}`);
+}
+
+export function toPublicLegislativeEventDto(row: LegislativeEventRow): PublicLegislativeEventDto {
+  return {
+    id: row.id,
+    eventType: row.event_type,
+    eventDate: row.event_date ?? undefined,
+    description: row.description ?? undefined,
+    sourceUrl: row.source_url ?? undefined,
+    verificationStatus: row.verification_status,
+  };
+}
+
+export function toPublicLegislativeVoteDto(row: LegislativeVoteRow): PublicLegislativeVoteDto {
+  return {
+    id: row.id,
+    sessionName: row.session_name ?? undefined,
+    voteDate: row.vote_date ?? undefined,
+    voterName: row.voter_name,
+    vote: row.vote,
+    sourceUrl: row.source_url ?? undefined,
+    verificationStatus: row.verification_status,
+  };
+}
+
+export function toPublicLegislativeRoleDto(row: LegislativeRoleRow): PublicLegislativeRoleDto {
+  return {
+    id: row.id,
+    personName: row.person_name,
+    role: row.role,
+    sourceUrl: row.source_url ?? undefined,
+    verificationStatus: row.verification_status,
+  };
+}
+
+export function toPublicLegislativeItemDto(
+  row: LegislativeItemRow,
+  relations: {
+    events?: LegislativeEventRow[];
+    votes?: LegislativeVoteRow[];
+    roles?: LegislativeRoleRow[];
+  } = {},
+): PublicLegislativeItemDto {
+  return {
+    id: row.id,
+    code: toLegislativeCode(row),
+    type: row.type,
+    number: row.number,
+    year: row.year,
+    title: row.title ?? undefined,
+    summary: row.summary ?? undefined,
+    status: row.status,
+    presentedAt: row.presented_at ?? undefined,
+    concludedAt: row.concluded_at ?? undefined,
+    sourceUrl: row.source_url ?? undefined,
+    verificationStatus: row.verification_status,
+    events: (relations.events ?? []).map(toPublicLegislativeEventDto),
+    votes: (relations.votes ?? []).map(toPublicLegislativeVoteDto),
+    roles: (relations.roles ?? []).map(toPublicLegislativeRoleDto),
+  };
+}
+
+export function toPublicProjectDto(
+  row: ProjectRow,
+  publishedCodes: PublishedCodeSet,
+  legislativeItemId: string,
+): PublicProjectDto | null {
   const legislativeCode = normalizeLegislativeCode(row.code);
   if (!publishedCodes.has(legislativeCode)) return null;
 
@@ -47,10 +163,15 @@ export function toPublicProjectDto(row: ProjectRow, publishedCodes: PublishedCod
     impacts: Array.isArray(row.impacts) ? row.impacts.filter((impact): impact is string => typeof impact === 'string') : [],
     source: 'projects_projection',
     legislativeCode,
+    legislativeItemId,
   };
 }
 
-export function toPublicResultDto(row: ResultRow, publishedCodes: PublishedCodeSet): PublicResultDto | null {
+export function toPublicResultDto(
+  row: ResultRow,
+  publishedCodes: PublishedCodeSet,
+  legislativeItemId?: string,
+): PublicResultDto | null {
   const legislativeCode = extractLegislativeCode(row.title);
   if (!legislativeCode || !publishedCodes.has(legislativeCode)) return null;
 
@@ -64,5 +185,6 @@ export function toPublicResultDto(row: ResultRow, publishedCodes: PublishedCodeS
     date: row.result_date ?? undefined,
     source: 'results_projection',
     legislativeCode,
+    legislativeItemId,
   };
 }
