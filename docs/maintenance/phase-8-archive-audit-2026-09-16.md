@@ -42,12 +42,16 @@ Os registros `UNCONFIRMED` não entram no acervo público canônico.
 - 1 `VERIFIED_PRIMARY` / `CC_BY_3.0`
 - 1 `VERIFIED_PRIMARY` / `RIGHTS_UNKNOWN`
 
+Resultado público canônico após a política: **428** registros.
+
 O registro com `RIGHTS_UNKNOWN` não entra no acervo público canônico.
 
 ### Videos
 
 - 10 `VERIFIED_PRIMARY` / `RIGHTS_OFFICIAL`
 - 13 `FOUND_UNVERIFIED` / `RIGHTS_UNKNOWN`
+
+Resultado público canônico após a política: **10** registros.
 
 Os 13 vídeos não verificados não entram no acervo público canônico.
 
@@ -79,7 +83,7 @@ O contrato canônico separa `documents`, `evidence`, `media` e `videos` da camad
 ## Lacunas restantes
 
 1. O Worker ainda não expõe `/api/documents` e `/api/evidence`.
-2. Os endpoints existentes de mídia/vídeo precisam consumir os mappers canônicos criados nesta fase.
+2. Os endpoints existentes de mídia/vídeo ainda precisam consumir os mappers canônicos criados nesta fase; a proteção de RLS já impede exposição dos registros não verificáveis.
 3. A validação pública do Worker/Cloudflare precisa ser executada após a alteração de RLS.
 
 ## Regra da Phase 8
