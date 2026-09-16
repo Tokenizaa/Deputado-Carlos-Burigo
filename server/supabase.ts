@@ -15,11 +15,11 @@ export const supabaseAdmin = createClient(url, serviceRoleKey, {
 async function getPublishedLegislativeCodes() {
   const { data, error } = await supabaseAdmin
     .from('legislative_items')
-    .select('number,year,status,verification_status')
+    .select('type,number,year,status,verification_status')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
   if (error) throw error;
-  return new Set((data ?? []).map((item) => `${item.number}/${item.year}`));
+  return new Set((data ?? []).map((item) => `${item.type} ${item.number}/${item.year}`));
 }
 
 export async function getPublicProjects() {
@@ -57,7 +57,7 @@ export async function getPublicResults() {
 
   return (data ?? []).filter((item) => {
     const match = item.title?.match(/(PL|PLC)\s+\d+\/\d{4}/i);
-    return match ? publishedCodes.has(match[0].toUpperCase()) : false;
+    return match ? publishedCodes.has(match[0]) : false;
   }).map((item) => ({
     id: item.id,
     title: item.title,
