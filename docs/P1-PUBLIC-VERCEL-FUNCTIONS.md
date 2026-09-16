@@ -15,7 +15,11 @@ Remover a dependência do Express/catch-all para as leituras públicas do portal
 - `/api/agenda`
 - `/api/municipalities`
 
-Cada rota agora é uma Vercel Function independente e reutiliza a camada de dados existente em `server/supabase.ts`.
+Cada rota é uma Vercel Function independente e reutiliza a camada de dados existente em `server/supabase.ts`.
+
+## Contrato
+
+As funções usam a assinatura HTTP `GET(request: Request)` documentada pela Vercel, retornando `Response.json(...)`.
 
 ## Limites
 
@@ -27,4 +31,6 @@ As Functions não usam `db.json` para as leituras públicas migradas. Os dados v
 
 ## Verificação
 
-O commit desta documentação é posterior à criação das Functions para garantir um novo deploy do estado completo da rodada. Após o deploy, validar cada endpoint e a Home em produção. Só considerar a rodada funcionalmente concluída quando as respostas HTTP forem bem-sucedidas e os dados reais do acervo aparecerem na interface.
+O primeiro deploy das Functions revelou que a forma `default handler(Request)` não foi invocada corretamente neste projeto Vite/Vercel. As oito funções foram corrigidas para a assinatura `GET(Request)`. O código está documentado em commits individuais.
+
+A rodada só será considerada funcionalmente concluída após um novo deploy dessa revisão e a validação de todos os endpoints e da Home em produção.
