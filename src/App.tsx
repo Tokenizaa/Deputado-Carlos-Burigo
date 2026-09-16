@@ -146,27 +146,43 @@ const MainAppContent: React.FC = () => {
     }
   };
 
+  const renderHome = () => {
+    if (sortedBlocks.length === 0) {
+      return (
+        <>
+          <HeroSection />
+          <MediaHighlightsSection />
+          <TrajectorySection />
+          <ActionsAndProjectsSection />
+          <ResultsSection />
+          <NewsSection limit={3} />
+          <AgendaSection />
+          <MunicipalitiesSection />
+          <VideosSection />
+        </>
+      );
+    }
+
+    let mediaInserted = false;
+    return sortedBlocks.map((block, index) => {
+      const rendered = (
+        <React.Fragment key={block.id}>
+          {renderBlock(block)}
+          {!mediaInserted && (block.type === 'hero' || index === 0) && (
+            <MediaHighlightsSection />
+          )}
+        </React.Fragment>
+      );
+      if (!mediaInserted && (block.type === 'hero' || index === 0)) mediaInserted = true;
+      return rendered;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white">
       <Navbar />
       <main className="flex-1">
-        {currentView === 'home' && (
-          <div>
-            {sortedBlocks.length > 0 ? sortedBlocks.map((b) => renderBlock(b)) : (
-              <>
-                <HeroSection />
-                <MediaHighlightsSection />
-                <TrajectorySection />
-                <ActionsAndProjectsSection />
-                <ResultsSection />
-                <NewsSection limit={3} />
-                <AgendaSection />
-                <MunicipalitiesSection />
-                <VideosSection />
-              </>
-            )}
-          </div>
-        )}
+        {currentView === 'home' && <div>{renderHome()}</div>}
         {currentView === 'trajetoria' && <TrajectorySection />}
         {currentView === 'atuacao' && <ActionsAndProjectsSection />}
         {currentView === 'resultados' && <ResultsSection />}
