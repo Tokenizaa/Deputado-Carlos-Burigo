@@ -93,13 +93,21 @@ export async function getPublicMunicipalities() {
 
 export async function getPublicVideos() {
   const { data, error } = await supabaseAdmin.from('videos')
-    .select('id,name,title,description,category,url,thumbnail_url,created_at')
-    .order('created_at', { ascending: false });
+    .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status')
+    .eq('status', 'ativo')
+    .order('published_at', { ascending: false, nullsFirst: false });
   if (error) throw error;
   return (data ?? []).map((item) => ({
-    id: item.id, name: item.name, title: item.title, description: item.description,
-    category: item.category, url: item.url, thumbnailUrl: item.thumbnail_url ?? null,
-    createdAt: item.created_at,
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    url: item.url,
+    platform: item.platform,
+    category: item.category,
+    date: item.published_at,
+    thumbnail: item.thumbnail_url ?? '',
+    featured: item.featured,
+    status: item.status,
   }));
 }
 
@@ -118,14 +126,52 @@ export async function getPublicMedia() {
 
 export async function getPublicNews() {
   const { data, error } = await supabaseAdmin.from('news')
-    .select('*').eq('status', 'published').order('published_at', { ascending: false });
+    .select('id,title,slug,summary,content,main_media_id,gallery,video_url,category,municipality,published_at,author_id,status,featured,seo_title,seo_description,social_media_id')
+    .eq('status', 'publicado')
+    .order('published_at', { ascending: false, nullsFirst: false });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((item) => ({
+    id: item.id,
+    title: item.title,
+    slug: item.slug,
+    summary: item.summary,
+    content: item.content,
+    mainImage: item.main_media_id ?? '',
+    gallery: Array.isArray(item.gallery) ? item.gallery : [],
+    videoUrl: item.video_url ?? undefined,
+    category: item.category,
+    municipality: item.municipality ?? undefined,
+    date: item.published_at,
+    author: item.author_id ?? '',
+    status: item.status,
+    featured: item.featured,
+    seoTitle: item.seo_title ?? undefined,
+    seoDescription: item.seo_description ?? undefined,
+    socialImage: item.social_media_id ?? undefined,
+  }));
 }
 
 export async function getPublicAgenda() {
   const { data, error } = await supabaseAdmin.from('events')
-    .select('*').eq('status', 'published').order('start_at', { ascending: true });
+    .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
+    .eq('status', 'publicado')
+    .eq('visibility', 'publico')
+    .order('starts_at', { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((item) => {
+    const start = item.starts_at ? new Date(item.starts_at) : null;
+    return {
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      date: start ? start.toISOString().slice(0, 10) : '',
+      time: start ? start.toISOString().slice(11, 16) : '',
+      location: item.location,
+      municipality: item.municipality,
+      image: item.media_id ?? undefined,
+      link: item.link ?? undefined,
+      participants: item.participants ?? undefined,
+      visibility: item.visibility,
+    };
+  });
 }
