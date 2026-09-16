@@ -25,6 +25,7 @@ interface AppContextType {
   trackingProtocol: string | null;
   isProtocolModalOpen: boolean;
   pages: Page[];
+  adminPages: Page[];
   news: News[];
   events: EventItem[];
   projects: ProjectItem[];
@@ -49,12 +50,23 @@ interface AppContextType {
     pageData: {
       blocks?: PageBlock[];
       title?: string;
+      slug?: string;
       description?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
     }
   ) => Promise<{ success: boolean; data?: Page; error?: string }>;
+  createPage: (pageData: {
+    title: string;
+    slug: string;
+    description?: string;
+    status?: 'publicado' | 'rascunho';
+    blocks?: PageBlock[];
+    publish?: boolean;
+    note?: string;
+  }) => Promise<{ success: boolean; data?: Page; error?: string }>;
+  rollbackPage: (pageId: string, versionId: string) => Promise<{ success: boolean; data?: Page; error?: string }>;
   showToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   refreshAllData: () => Promise<void>;
 }
@@ -74,6 +86,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [allUsers, setAllUsers] = useState<User[]>([]);
 
   const [pages, setPages] = useState<Page[]>([]);
+  const [adminPages, setAdminPages] = useState<Page[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -100,6 +113,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         settingsRes,
         authRes,
         pagesRes,
+        adminPagesRes,
         newsRes,
         eventsRes,
         projectsRes,
@@ -113,6 +127,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/settings').then((r) => r.json()),
         fetch('/api/auth/me', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.json()),
         fetch('/api/pages').then((r) => r.json()),
+        fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
         fetch('/api/news?admin=true').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
         fetch('/api/projects').then((r) => r.json()),
@@ -127,6 +142,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (settingsRes) setSettings(settingsRes);
       if (authRes?.allUsers) setAllUsers(authRes.allUsers);
       if (Array.isArray(pagesRes)) setPages(pagesRes);
+      if (Array.isArray(adminPagesRes)) setAdminPages(adminPagesRes);
       if (Array.isArray(newsRes)) setNews(newsRes);
       if (Array.isArray(eventsRes)) setEvents(eventsRes);
       if (Array.isArray(projectsRes)) setProjects(projectsRes);
@@ -191,6 +207,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     pageData: {
       blocks?: PageBlock[];
       title?: string;
+      slug?: string;
       description?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
@@ -198,37 +215,84 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   ): Promise<{ success: boolean; data?: Page; error?: string }> => {
     try {
-      const res = await fetch(`/api/pages/${pageId}`, {
+      const res = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
         body: JSON.stringify(pageData),
       });
-
+      const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        const errMsg = errJson.error || `Erro HTTP ${res.status} ao atualizar página`;
+        const errMsg = json.error || `Erro HTTP ${res.status} ao atualizar página`;
         showToast(errMsg, 'error');
         return { success: false, error: errMsg };
       }
-
-      const updatedPage: Page = await res.json();
-      setPages((prevPages) => {
-        const found = prevPages.some((p) => p.id === updatedPage.id || p.slug === updatedPage.slug);
-        if (found) {
-          return prevPages.map((p) => (p.id === updatedPage.id || p.slug === updatedPage.slug ? updatedPage : p));
-        }
-        return [...prevPages, updatedPage];
-      });
-
-      showToast(
-        pageData.publish
-          ? 'Página publicada com sucesso! Alterações ao vivo no site.'
-          : 'Alterações da página salvas com sucesso no servidor!',
-        'success'
-      );
+      const updatedPage: Page = json;
+      setAdminPages((prev) => prev.some((p) => p.id === updatedPage.id) ? prev.map((p) => p.id === updatedPage.id ? updatedPage : p) : [updatedPage, ...prev]);
+      if (updatedPage.status === 'publicado') {
+        setPages((prev) => prev.some((p) => p.id === updatedPage.id) ? prev.map((p) => p.id === updatedPage.id ? updatedPage : p) : [updatedPage, ...prev]);
+      }
+      showToast(pageData.publish ? 'Página publicada com sucesso.' : 'Rascunho salvo no Supabase.', 'success');
       return { success: true, data: updatedPage };
     } catch (err: any) {
       const errMsg = err?.message || 'Erro de conexão com o servidor ao salvar página';
+      showToast(errMsg, 'error');
+      return { success: false, error: errMsg };
+    }
+  };
+
+  const createPage = async (pageData: {
+    title: string;
+    slug: string;
+    description?: string;
+    status?: 'publicado' | 'rascunho';
+    blocks?: PageBlock[];
+    publish?: boolean;
+    note?: string;
+  }): Promise<{ success: boolean; data?: Page; error?: string }> => {
+    try {
+      const res = await fetch('/api/admin/pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        body: JSON.stringify(pageData),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errMsg = json.error || `Erro HTTP ${res.status} ao criar página`;
+        showToast(errMsg, 'error');
+        return { success: false, error: errMsg };
+      }
+      const page: Page = json;
+      setAdminPages((prev) => [page, ...prev]);
+      if (page.status === 'publicado') setPages((prev) => [page, ...prev]);
+      showToast('Página criada no Supabase.', 'success');
+      return { success: true, data: page };
+    } catch (err: any) {
+      const errMsg = err?.message || 'Erro de conexão ao criar página';
+      showToast(errMsg, 'error');
+      return { success: false, error: errMsg };
+    }
+  };
+
+  const rollbackPage = async (pageId: string, versionId: string): Promise<{ success: boolean; data?: Page; error?: string }> => {
+    try {
+      const res = await fetch(`/api/admin/pages/${pageId}/rollback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        body: JSON.stringify({ versionId }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errMsg = json.error || 'Falha ao restaurar versão';
+        showToast(errMsg, 'error');
+        return { success: false, error: errMsg };
+      }
+      const page: Page = json;
+      setAdminPages((prev) => prev.map((p) => p.id === page.id ? page : p));
+      if (page.status === 'publicado') setPages((prev) => prev.map((p) => p.id === page.id ? page : p));
+      showToast('Versão restaurada.', 'success');
+      return { success: true, data: page };
+    } catch (err: any) {
+      const errMsg = err?.message || 'Erro de conexão ao restaurar versão';
       showToast(errMsg, 'error');
       return { success: false, error: errMsg };
     }
@@ -242,6 +306,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentUser,
         allUsers,
         pages,
+        adminPages,
         news,
         events,
         projects,
@@ -257,6 +322,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         switchUser,
         updateSettings,
         updatePage,
+        createPage,
+        rollbackPage,
         showToast,
         refreshAllData,
       }}
