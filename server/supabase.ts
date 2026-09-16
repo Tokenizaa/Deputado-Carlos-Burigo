@@ -7,7 +7,6 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url) throw new Error('SUPABASE_URL não configurada.');
 if (!serviceRoleKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY não configurada no servidor.');
 
-// Server-only client. The service-role key MUST never be exposed to the browser.
 export const supabaseAdmin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -30,21 +29,11 @@ export async function getPublicProjects() {
     .order('year', { ascending: false })
     .order('code', { ascending: true });
   if (error) throw error;
-
-  return (data ?? [])
-    .filter((item) => publishedCodes.has(item.code))
-    .map((item) => ({
-      id: item.id,
-      code: item.code,
-      title: item.title,
-      summary: item.summary,
-      detailedDescription: item.detailed_description,
-      theme: item.theme,
-      status: item.status,
-      linkAlrs: item.link_alrs,
-      year: item.year,
-      impacts: Array.isArray(item.impacts) ? item.impacts : [],
-    }));
+  return (data ?? []).filter((item) => publishedCodes.has(item.code)).map((item) => ({
+    id: item.id, code: item.code, title: item.title, summary: item.summary,
+    detailedDescription: item.detailed_description, theme: item.theme, status: item.status,
+    linkAlrs: item.link_alrs, year: item.year, impacts: Array.isArray(item.impacts) ? item.impacts : [],
+  }));
 }
 
 export async function getPublicResults() {
@@ -54,17 +43,23 @@ export async function getPublicResults() {
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
-
   return (data ?? []).filter((item) => {
     const match = item.title?.match(/(PL|PLC)\s+\d+\/\d{4}/i);
-    return match ? publishedCodes.has(match[0]) : false;
+    return match ? publishedCodes.has(match[0].toUpperCase()) : false;
   }).map((item) => ({
-    id: item.id,
-    title: item.title,
-    category: item.category,
-    description: item.description,
-    metrics: item.metrics,
-    municipality: item.municipality,
-    date: item.result_date,
+    id: item.id, title: item.title, category: item.category, description: item.description,
+    metrics: item.metrics, municipality: item.municipality, date: item.result_date,
+  }));
+}
+
+export async function getPublicMunicipalities() {
+  const { data, error } = await supabaseAdmin
+    .from('municipalities')
+    .select('id,name,region,population,key_deliveries')
+    .order('name', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((item) => ({
+    id: item.id, name: item.name, region: item.region, population: item.population,
+    keyDeliveries: Array.isArray(item.key_deliveries) ? item.key_deliveries : [],
   }));
 }
