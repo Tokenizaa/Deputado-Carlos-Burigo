@@ -12,34 +12,53 @@ export const supabaseAdmin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+async function getPublishedLegislativeCodes() {
+  const { data, error } = await supabaseAdmin
+    .from('legislative_items')
+    .select('number,year,status,verification_status')
+    .eq('status', 'PUBLISHED')
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
+  if (error) throw error;
+  return new Set((data ?? []).map((item) => `${item.number}/${item.year}`));
+}
+
 export async function getPublicProjects() {
+  const publishedCodes = await getPublishedLegislativeCodes();
   const { data, error } = await supabaseAdmin
     .from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false })
     .order('code', { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    code: item.code,
-    title: item.title,
-    summary: item.summary,
-    detailedDescription: item.detailed_description,
-    theme: item.theme,
-    status: item.status,
-    linkAlrs: item.link_alrs,
-    year: item.year,
-    impacts: Array.isArray(item.impacts) ? item.impacts : [],
-  }));
+
+  return (data ?? [])
+    .filter((item) => publishedCodes.has(item.code))
+    .map((item) => ({
+      id: item.id,
+      code: item.code,
+      title: item.title,
+      summary: item.summary,
+      detailedDescription: item.detailed_description,
+      theme: item.theme,
+      status: item.status,
+      linkAlrs: item.link_alrs,
+      year: item.year,
+      impacts: Array.isArray(item.impacts) ? item.impacts : [],
+    }));
 }
 
 export async function getPublicResults() {
+  const publishedCodes = await getPublishedLegislativeCodes();
   const { data, error } = await supabaseAdmin
     .from('results')
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
+
+  return (data ?? []).filter((item) => {
+    const match = item.title?.match(/(PL|PLC)\s+\d+\/\d{4}/i);
+    return match ? publishedCodes.has(match[0].toUpperCase()) : false;
+  }).map((item) => ({
     id: item.id,
     title: item.title,
     category: item.category,
