@@ -19,7 +19,18 @@ export async function getPublicProjects() {
     .order('year', { ascending: false })
     .order('code', { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((item) => ({
+    id: item.id,
+    code: item.code,
+    title: item.title,
+    summary: item.summary,
+    detailedDescription: item.detailed_description,
+    theme: item.theme,
+    status: item.status,
+    linkAlrs: item.link_alrs,
+    year: item.year,
+    impacts: Array.isArray(item.impacts) ? item.impacts : [],
+  }));
 }
 
 export async function getPublicResults() {
@@ -28,5 +39,13 @@ export async function getPublicResults() {
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((item) => ({
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    description: item.description,
+    metrics: item.metrics,
+    municipality: item.municipality,
+    date: item.result_date,
+  }));
 }
