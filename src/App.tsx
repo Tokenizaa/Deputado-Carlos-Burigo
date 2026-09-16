@@ -11,12 +11,10 @@ import { NewsDetail } from './components/public/NewsDetail';
 import { AgendaSection } from './components/public/AgendaSection';
 import { MunicipalitiesSection } from './components/public/MunicipalitiesSection';
 import { VideosSection } from './components/public/VideosSection';
-import { MediaHighlightsSection } from './components/public/MediaHighlightsSection';
 import { CitizenPortalView } from './components/citizen/CitizenPortalView';
 import { CitizenProtocolModal } from './components/citizen/CitizenProtocolModal';
 import { ContactView } from './components/public/ContactView';
 import { PrivacyPolicyView } from './components/public/PrivacyPolicyView';
-
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminDashboardTab } from './components/admin/AdminDashboardTab';
 import { AdminDemandsTab } from './components/admin/AdminDemandsTab';
@@ -41,10 +39,8 @@ const MainAppContent: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-stone-900 flex flex-col items-center justify-center text-white space-y-4">
-        <div className="w-12 h-12 rounded-xl bg-[#00A550] flex items-center justify-center font-black text-lg text-[#E1F200] animate-pulse">
-          CB
-        </div>
-        <p className="text-sm font-bold text-stone-300">Carregando portal...</p>
+        <div className="w-12 h-12 rounded-xl bg-[#00A550] flex items-center justify-center font-black text-lg text-[#E1F200] animate-pulse">15</div>
+        <p className="text-sm font-bold text-stone-300">Carregando Plataforma Carlos Búrigo...</p>
       </div>
     );
   }
@@ -77,33 +73,23 @@ const MainAppContent: React.FC = () => {
 
   const renderBlock = (b: PageBlock) => {
     switch (b.type as string) {
-      case 'hero':
-        return <HeroSection key={b.id} customTitle={b.title} customSubtitle={b.subtitle} customContent={b.content} />;
+      case 'hero': return <HeroSection key={b.id} customTitle={b.title} customSubtitle={b.subtitle} customContent={b.content} />;
       case 'trajetoria':
-      case 'trajectory':
-        return <TrajectorySection key={b.id} />;
+      case 'trajectory': return <TrajectorySection key={b.id} />;
       case 'projetos':
-      case 'projects':
-        return <ActionsAndProjectsSection key={b.id} />;
+      case 'projects': return <ActionsAndProjectsSection key={b.id} />;
       case 'resultados':
-      case 'results':
-        return <ResultsSection key={b.id} />;
+      case 'results': return <ResultsSection key={b.id} />;
       case 'noticias':
-      case 'news':
-        return <NewsSection key={b.id} limit={3} />;
-      case 'agenda':
-        return <AgendaSection key={b.id} />;
+      case 'news': return <NewsSection key={b.id} limit={3} />;
+      case 'agenda': return <AgendaSection key={b.id} />;
       case 'municipios':
-      case 'municipalities':
-        return <MunicipalitiesSection key={b.id} />;
-      case 'videos':
-        return <VideosSection key={b.id} />;
+      case 'municipalities': return <MunicipalitiesSection key={b.id} />;
+      case 'videos': return <VideosSection key={b.id} />;
       case 'cta_cidadao':
-      case 'citizen_cta':
-        return <CitizenPortalView key={b.id} />;
+      case 'citizen_cta': return <CitizenPortalView key={b.id} />;
       case 'contato':
-      case 'contact':
-        return <ContactView key={b.id} />;
+      case 'contact': return <ContactView key={b.id} />;
       case 'text':
         return (
           <section key={b.id} className="py-12 bg-white border-b border-stone-200">
@@ -141,48 +127,28 @@ const MainAppContent: React.FC = () => {
             </div>
           </section>
         );
-      default:
-        return null;
+      default: return null;
     }
-  };
-
-  const renderHome = () => {
-    if (sortedBlocks.length === 0) {
-      return (
-        <>
-          <HeroSection />
-          <MediaHighlightsSection />
-          <TrajectorySection />
-          <ActionsAndProjectsSection />
-          <ResultsSection />
-          <NewsSection limit={3} />
-          <AgendaSection />
-          <MunicipalitiesSection />
-          <VideosSection />
-        </>
-      );
-    }
-
-    let mediaInserted = false;
-    return sortedBlocks.map((block, index) => {
-      const rendered = (
-        <React.Fragment key={block.id}>
-          {renderBlock(block)}
-          {!mediaInserted && (block.type === 'hero' || index === 0) && (
-            <MediaHighlightsSection />
-          )}
-        </React.Fragment>
-      );
-      if (!mediaInserted && (block.type === 'hero' || index === 0)) mediaInserted = true;
-      return rendered;
-    });
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white">
       <Navbar />
       <main className="flex-1">
-        {currentView === 'home' && <div>{renderHome()}</div>}
+        {currentView === 'home' && (
+          <div>
+            {sortedBlocks.length > 0 ? sortedBlocks.map((b) => renderBlock(b)) : <>
+              <HeroSection />
+              <TrajectorySection />
+              <ActionsAndProjectsSection />
+              <ResultsSection />
+              <NewsSection limit={3} />
+              <AgendaSection />
+              <MunicipalitiesSection />
+              <VideosSection />
+            </>}
+          </div>
+        )}
         {currentView === 'trajetoria' && <TrajectorySection />}
         {currentView === 'atuacao' && <ActionsAndProjectsSection />}
         {currentView === 'resultados' && <ResultsSection />}
@@ -202,11 +168,7 @@ const MainAppContent: React.FC = () => {
 };
 
 export function App() {
-  return (
-    <AppProvider>
-      <MainAppContent />
-    </AppProvider>
-  );
+  return <AppProvider><MainAppContent /></AppProvider>;
 }
 
 export default App;
