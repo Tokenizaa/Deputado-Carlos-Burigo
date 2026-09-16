@@ -1,6 +1,6 @@
 import { getPublicMedia } from '../server/supabase.js';
 
-export default async function handler(_req: Request) {
+export async function GET(_request: Request) {
   try {
     return Response.json(await getPublicMedia());
   } catch (error) {
