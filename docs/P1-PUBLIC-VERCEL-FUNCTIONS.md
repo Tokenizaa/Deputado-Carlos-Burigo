@@ -29,10 +29,18 @@ Esta rodada não remove o Express das rotas administrativas, autenticação, dem
 
 As Functions não usam `db.json` para as leituras públicas migradas. Os dados vêm do Supabase através dos adaptadores existentes.
 
+## Runtime e segurança
+
+A primeira execução em produção retornou `FUNCTION_INVOCATION_FAILED`. A análise do build mostrou que `api/server.ts` ainda importava `supabaseAdmin`, enquanto a camada pública havia sido convertida para um cliente somente leitura.
+
+A correção mantém `supabaseAdmin` exportado para preservar as rotas existentes e cria um cliente público separado para todas as oito leituras públicas. O cliente público usa a chave publishable/anon e permanece protegido pelas políticas RLS do Supabase; a `service_role` não é necessária para o núcleo público.
+
+Commit da correção: `e590fd47b34c092ad29e4f471b02e95603edae31`.
+
 ## Verificação
 
-O primeiro deploy das Functions revelou que a forma `default handler(Request)` não foi invocada corretamente neste projeto Vite/Vercel. As oito funções foram corrigidas para a assinatura `GET(Request)`. O código está documentado em commits individuais.
+O primeiro deploy das Functions revelou que a forma `default handler(Request)` não foi invocada corretamente neste projeto Vite/Vercel. As oito funções foram corrigidas para a assinatura `GET(Request)`.
 
-O commit desta revisão serve também como novo gatilho de deploy para publicar o estado corrigido no projeto Vercel.
+O deploy do commit anterior `730f6e584ea9eb1b18b48d3585ae3a65ce385606` ficou READY e o build foi concluído, mas continha o erro de compilação de export citado acima. Esta documentação cria um novo gatilho para publicar a correção `e590fd47b34c092ad29e4f471b02e95603edae31`.
 
-A rodada só será considerada funcionalmente concluída após um novo deploy dessa revisão e a validação de todos os endpoints e da Home em produção.
+A rodada só será considerada funcionalmente concluída após o novo deploy e a validação de `/api/settings`, `/api/projects`, `/api/results`, `/api/videos`, `/api/media`, `/api/news`, `/api/agenda`, `/api/municipalities` e da Home em produção.
