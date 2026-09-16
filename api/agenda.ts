@@ -1,4 +1,4 @@
-import { getPublicAgenda } from '../server/supabase.js';
+import { getPublicAgenda } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
