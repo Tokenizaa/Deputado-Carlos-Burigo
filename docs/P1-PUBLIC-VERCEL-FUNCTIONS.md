@@ -41,6 +41,16 @@ Commit da correção: `e590fd47b34c092ad29e4f471b02e95603edae31`.
 
 O primeiro deploy das Functions revelou que a forma `default handler(Request)` não foi invocada corretamente neste projeto Vite/Vercel. As oito funções foram corrigidas para a assinatura `GET(Request)`.
 
-O deploy do commit anterior `730f6e584ea9eb1b18b48d3585ae3a65ce385606` ficou READY e o build foi concluído, mas continha o erro de compilação de export citado acima. Esta documentação cria um novo gatilho para publicar a correção `e590fd47b34c092ad29e4f471b02e95603edae31`.
+A validação seguinte confirmou que o deployment fica READY, mas as chamadas públicas ainda retornam `FUNCTION_INVOCATION_FAILED`. A próxima correção da rodada remove a extensão `.js` dos imports internos `../server/supabase.js`, permitindo que o bundler da Function resolva diretamente o módulo TypeScript existente `server/supabase.ts`.
 
-A rodada só será considerada funcionalmente concluída após o novo deploy e a validação de `/api/settings`, `/api/projects`, `/api/results`, `/api/videos`, `/api/media`, `/api/news`, `/api/agenda`, `/api/municipalities` e da Home em produção.
+Commits de correção dos oito endpoints:
+- `653ff55ba4e75a0d1356fbda536edac88a7da096` — settings
+- `07845326fa96fc48fabc5fd051978438a88973ba` — projects
+- `54321fc4dcb6040b921cb777ca89a751f5c881a2` — results
+- `45e18a88bf5550e6030bb4c384b3bdc83d5c1379` — videos
+- `0755374ae1a8426c4495c437db11d5a1abfc99ff` — media
+- `879b68af31f5488fc631657b0a5b66d0aaa4ff0c` — news
+- `597ba9c95bba853acba04ed478e3934dcabab5ba` — agenda
+- `e4a881065358b2db44483e502f31502af5bbe372` — municipalities
+
+O deploy seguinte deve validar novamente os oito endpoints e a Home antes do fechamento funcional de P1.
