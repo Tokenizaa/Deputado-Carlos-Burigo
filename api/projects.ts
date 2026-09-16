@@ -1,4 +1,4 @@
-import { getPublicProjects } from '../server/supabase.js';
+import { getPublicProjects } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
