@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { db } from '../server/db.js';
 import { supabaseAdmin, getPublicSettings, getPublicPages, getPublicProjects, getPublicResults, getPublicMunicipalities, getPublicVideos, getPublicMedia, getPublicNews, getPublicAgenda } from '../server/supabase.js';
+import { getAdminPages, getAdminPage, createAdminPage, updateAdminPage, rollbackAdminPage } from '../server/pagesAdmin.js';
 import { User } from '../src/types.js';
 
 export const app = express();
@@ -15,11 +16,20 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 app.use('/documents', express.static(path.join(process.cwd(), 'documents')));
 
 function getAuthenticatedUser(req: Request): User { const userId = (req.headers['x-user-id'] as string) || 'usr-1'; return db.getUserById(userId) || db.getUsers()[0]; }
+function requirePageEditor(req: Request, res: Response): User | null { const actor = getAuthenticatedUser(req); if (!['ADMIN', 'EDITOR', 'COMUNICACAO'].includes(actor.role)) { res.status(403).json({ error: 'Você não tem permissão para editar páginas.' }); return null; } return actor; }
+
 app.get('/api/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'Plataforma Carlos Búrigo', runtime: process.env.VERCEL ? 'vercel' : 'node', timestamp: new Date().toISOString() }));
 app.get('/api/auth/me', (req, res) => res.json({ user: getAuthenticatedUser(req), allUsers: db.getUsers() }));
 app.post('/api/auth/switch-user', (req, res) => { const user = db.getUserById(req.body.userId); if (!user) return res.status(404).json({ error: 'Usuário não encontrado' }); res.json({ success: true, user }); });
 app.get('/api/settings', async (_req, res) => { try { const settings = await getPublicSettings(); if (!settings) return res.status(404).json({ error: 'Configurações públicas não encontradas no acervo' }); res.json(settings); } catch (err: any) { console.error('[api/settings] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar configurações do acervo' }); } });
 app.put('/api/settings', (req, res) => { const actor = getAuthenticatedUser(req); if (actor.role !== 'ADMIN') return res.status(403).json({ error: 'Apenas administradores podem alterar as configurações gerais' }); res.json(db.updateSettings(req.body, actor)); });
+
+app.get('/api/admin/pages', async (req, res) => { if (!requirePageEditor(req, res)) return; try { res.json(await getAdminPages()); } catch (err: any) { console.error('[api/admin/pages] error:', err); res.status(500).json({ error: 'Falha ao carregar páginas do Page Builder' }); } });
+app.get('/api/admin/pages/:id', async (req, res) => { if (!requirePageEditor(req, res)) return; try { const page = await getAdminPage(req.params.id); if (!page) return res.status(404).json({ error: 'Página não encontrada' }); res.json(page); } catch (err: any) { console.error('[api/admin/pages/:id] error:', err); res.status(500).json({ error: 'Falha ao carregar página' }); } });
+app.post('/api/admin/pages', async (req, res) => { const actor = requirePageEditor(req, res); if (!actor) return; try { res.status(201).json(await createAdminPage(req.body)); } catch (err: any) { console.error('[api/admin/pages POST] error:', err); const status = err?.code === '23505' ? 409 : 400; res.status(status).json({ error: err?.code === '23505' ? 'Já existe uma página com este slug.' : err?.message || 'Falha ao criar página' }); } });
+app.put('/api/admin/pages/:id', async (req, res) => { const actor = requirePageEditor(req, res); if (!actor) return; try { res.json(await updateAdminPage(req.params.id, req.body)); } catch (err: any) { console.error('[api/admin/pages PUT] error:', err); const status = err?.code === '23505' ? 409 : err?.message === 'Página não encontrada.' ? 404 : 400; res.status(status).json({ error: err?.code === '23505' ? 'Já existe uma página com este slug.' : err?.message || 'Falha ao salvar página' }); } });
+app.post('/api/admin/pages/:id/rollback', async (req, res) => { const actor = requirePageEditor(req, res); if (!actor) return; try { res.json(await rollbackAdminPage(req.params.id, req.body.versionId)); } catch (err: any) { console.error('[api/admin/pages rollback] error:', err); res.status(400).json({ error: err?.message || 'Falha ao restaurar versão' }); } });
+
 app.get('/api/pages', async (_req, res) => { try { res.json(await getPublicPages()); } catch (err: any) { console.error('[api/pages] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar páginas do acervo' }); } });
 app.get('/api/pages/:slug', async (req, res) => { try { const pages = await getPublicPages(req.params.slug); if (!pages.length) return res.status(404).json({ error: 'Página não encontrada no acervo público' }); res.json(pages[0]); } catch (err: any) { console.error('[api/pages/:slug] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar página do acervo' }); } });
 

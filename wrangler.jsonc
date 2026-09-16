@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "deputado-carlos-burigo",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "SUPABASE_URL": "https://wktanxbpijurimdjgone.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj"
+  },
+  "secrets": {
+    "required": ["SUPABASE_SERVICE_ROLE_KEY"]
+  }
+}
