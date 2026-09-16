@@ -14,6 +14,7 @@ import {
   Demand,
   AuditLog,
 } from '../types';
+import { useAppUi } from './AppUiContext';
 
 interface AppContextType {
   settings: SiteSettings | null;
@@ -37,7 +38,6 @@ interface AppContextType {
   toastMessage: string | null;
   toastType: 'success' | 'error' | 'info';
 
-  // Navigation & Actions
   setCurrentView: (view: string) => void;
   openNewsDetail: (slug: string) => void;
   openProtocolModal: (protocol?: string) => void;
@@ -62,6 +62,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const ui = useAppUi();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [currentUser, setCurrentUser] = useState<User>({
     id: 'usr-1',
@@ -71,10 +72,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     cargo: 'Deputado Estadual / Titular',
   });
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [currentView, setCurrentView] = useState<string>('home');
-  const [selectedNewsSlug, setSelectedNewsSlug] = useState<string | null>(null);
-  const [trackingProtocol, setTrackingProtocol] = useState<string | null>(null);
-  const [isProtocolModalOpen, setIsProtocolModalOpen] = useState(false);
 
   const [pages, setPages] = useState<Page[]>([]);
   const [news, setNews] = useState<News[]>([]);
@@ -94,9 +91,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToastMessage(msg);
     setToastType(type);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4000);
+    setTimeout(() => setToastMessage(null), 4000);
   }, []);
 
   const refreshAllData = useCallback(async () => {
@@ -173,10 +168,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch('/api/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
-        },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
         body: JSON.stringify(newSettings),
       });
       if (!res.ok) {
@@ -205,42 +197,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       note?: string;
     }
   ): Promise<{ success: boolean; data?: Page; error?: string }> => {
-    console.log('[AppContext:updatePage] Committing page update to backend for id:', pageId, {
-      title: pageData.title,
-      blockCount: pageData.blocks?.length,
-      publish: pageData.publish,
-      status: pageData.status,
-    });
-
     try {
       const res = await fetch(`/api/pages/${pageId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
-        },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
         body: JSON.stringify(pageData),
       });
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
         const errMsg = errJson.error || `Erro HTTP ${res.status} ao atualizar página`;
-        console.error('[AppContext:updatePage] Server returned error:', errMsg);
         showToast(errMsg, 'error');
         return { success: false, error: errMsg };
       }
 
       const updatedPage: Page = await res.json();
-      console.log('[AppContext:updatePage] Successfully received updated page from server:', {
-        id: updatedPage.id,
-        title: updatedPage.title,
-        blockCount: updatedPage.blocks?.length,
-        versionCount: updatedPage.versions?.length,
-        status: updatedPage.status,
-        updatedAt: updatedPage.updatedAt,
-      });
-
-      // Synchronize data provider's `pages` state immediately with new reference
       setPages((prevPages) => {
         const found = prevPages.some((p) => p.id === updatedPage.id || p.slug === updatedPage.slug);
         if (found) {
@@ -258,38 +229,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: true, data: updatedPage };
     } catch (err: any) {
       const errMsg = err?.message || 'Erro de conexão com o servidor ao salvar página';
-      console.error('[AppContext:updatePage] Network/exception error updating page:', err);
       showToast(errMsg, 'error');
       return { success: false, error: errMsg };
     }
   };
 
-  const openNewsDetail = (slug: string) => {
-    setSelectedNewsSlug(slug);
-    setCurrentView('noticia-detalhe');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const openProtocolModal = (protocol?: string) => {
-    if (protocol) setTrackingProtocol(protocol);
-    setIsProtocolModalOpen(true);
-  };
-
-  const closeProtocolModal = () => {
-    setIsProtocolModalOpen(false);
-    setTrackingProtocol(null);
-  };
-
   return (
     <AppContext.Provider
       value={{
+        ...ui,
         settings,
         currentUser,
         allUsers,
-        currentView,
-        selectedNewsSlug,
-        trackingProtocol,
-        isProtocolModalOpen,
         pages,
         news,
         events,
@@ -303,10 +254,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoading,
         toastMessage,
         toastType,
-        setCurrentView,
-        openNewsDetail,
-        openProtocolModal,
-        closeProtocolModal,
         switchUser,
         updateSettings,
         updatePage,
@@ -315,7 +262,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }}
     >
       {children}
-      {/* Toast Notification Container */}
       {toastMessage && (
         <div
           id="global-toast"
@@ -328,10 +274,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }`}
         >
           <span>{toastMessage}</span>
-          <button
-            onClick={() => setToastMessage(null)}
-            className="text-stone-400 hover:text-white text-xs font-bold px-1"
-          >
+          <button onClick={() => setToastMessage(null)} className="text-stone-400 hover:text-white text-xs font-bold px-1">
             ✕
           </button>
         </div>
