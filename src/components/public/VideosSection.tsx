@@ -6,7 +6,6 @@ import { VideoItem } from '../../types';
 export const VideosSection: React.FC = () => {
   const { videos } = useApp();
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
-
   const mainVideo = videos.find((v) => v.featured) || videos[0];
   const otherVideos = videos.filter((v) => v.id !== mainVideo?.id);
   const sourceLabel = (video: VideoItem) => video.sourceName || video.platform || 'Fonte audiovisual';
@@ -15,179 +14,26 @@ export const VideosSection: React.FC = () => {
     <section className="py-16 sm:py-20 lg:py-24 bg-[#0A0A0A] text-white border-b border-stone-850">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-12 sm:mb-16">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="w-2.5 h-2.5 bg-[#00A550]" />
-            <span className="text-xs sm:text-sm font-bold text-[#00A550] uppercase tracking-[0.12em]">
-              ACERVO AUDIOVISUAL
-            </span>
-            <span className="text-stone-700">•</span>
-            <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">
-              FONTES REGISTRADAS
-            </span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-            Vídeos e registros audiovisuais
-          </h2>
-          <p className="mt-4 text-base sm:text-lg text-stone-300 max-w-[65ch] leading-relaxed">
-            Consulte os vídeos que fazem parte do acervo público registrado na plataforma, preservando a fonte e o endereço original quando disponíveis.
-          </p>
+          <div className="flex items-center gap-3 mb-3"><span className="w-2.5 h-2.5 bg-[#00A550]" /><span className="text-xs sm:text-sm font-bold text-[#00A550] uppercase tracking-[0.12em]">ACERVO AUDIOVISUAL</span><span className="text-stone-700">•</span><span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">FONTES REGISTRADAS</span></div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.06]">Vídeos e registros audiovisuais</h2>
+          <p className="mt-4 text-base sm:text-lg text-stone-300 max-w-[65ch] leading-relaxed">Consulte os vídeos que fazem parte do acervo público registrado na plataforma, preservando a fonte e o endereço original quando disponíveis.</p>
         </div>
-
         {!mainVideo ? (
-          <div className="border border-dashed border-stone-700 rounded-sm p-8 sm:p-10 text-stone-300">
-            <p className="font-semibold text-white">Nenhum vídeo publicado no acervo.</p>
-            <p className="mt-2 text-sm text-stone-400">Novos registros aparecerão aqui após validação e publicação.</p>
-          </div>
+          <div className="border border-dashed border-stone-700 rounded-sm p-8 sm:p-10 text-stone-300"><p className="font-semibold text-white">Nenhum vídeo publicado no acervo.</p><p className="mt-2 text-sm text-stone-400">Novos registros aparecerão aqui após validação e publicação.</p></div>
         ) : (
           <>
-            <div className="mb-14 sm:mb-16 bg-[#141414] border border-stone-800 rounded-[2px] overflow-hidden shadow-2xl">
-              <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
-                <div
-                  onClick={() => setSelectedVideo(mainVideo)}
-                  className="lg:col-span-7 aspect-video bg-black relative cursor-pointer group overflow-hidden"
-                >
-                  <img
-                    src={mainVideo.thumbnail || '/assets/alrs_parlamento.jpg'}
-                    alt={mainVideo.title}
-                    className="w-full h-full object-cover filter contrast-[1.05] group-hover:scale-[1.02] transition-transform duration-300 opacity-85 group-hover:opacity-100"
-                    loading="lazy"
-                    width={960}
-                    height={540}
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-colors group-hover:bg-black/25">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#00A550] text-white flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform cursor-pointer">
-                      <Play className="w-8 h-8 fill-white ml-1" />
-                    </div>
-                  </div>
-                  <div className="absolute top-4 left-4 glass-card-dark px-3 py-1 rounded-[2px] flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
-                    <Tv className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>EM DESTAQUE</span>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-[#00A550] uppercase tracking-wider">
-                      <span>{sourceLabel(mainVideo)}</span>
-                      <span className="text-stone-700">•</span>
-                      <span className="text-stone-400">
-                        {new Date(mainVideo.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}
-                      </span>
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">{mainVideo.title}</h3>
-                    <p className="text-stone-300 text-sm sm:text-base leading-relaxed">{mainVideo.description}</p>
-                  </div>
-
-                  <div className="pt-4 border-t border-stone-800 flex items-center justify-between">
-                    <span className="text-xs text-stone-400">Registro audiovisual do acervo</span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedVideo(mainVideo)}
-                      className="h-[44px] px-6 bg-[#00A550] hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider rounded-[2px] transition-all inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-white" />
-                      <span>ASSISTIR</span>
-                    </button>
-                  </div>
-                </div>
+            <div className="mb-14 sm:mb-16 bg-[#141414] border border-stone-800 rounded-[2px] overflow-hidden shadow-2xl"><div className="grid grid-cols-1 lg:grid-cols-12 items-center">
+              <div onClick={() => setSelectedVideo(mainVideo)} className="lg:col-span-7 aspect-video bg-black relative cursor-pointer group overflow-hidden">
+                <img src={mainVideo.thumbnail || '/assets/alrs_parlamento.jpg'} alt={mainVideo.title} className="w-full h-full object-cover filter contrast-[1.05] group-hover:scale-[1.02] transition-transform duration-300 opacity-85 group-hover:opacity-100" loading="lazy" width={960} height={540} referrerPolicy="no-referrer" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg'; }} />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-colors group-hover:bg-black/25"><div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#00A550] text-white flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform"><Play className="w-8 h-8 fill-white ml-1" /></div></div>
+                <div className="absolute top-4 left-4 glass-card-dark px-3 py-1 rounded-[2px] flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400"><Tv className="w-3.5 h-3.5" /><span>EM DESTAQUE</span></div>
               </div>
-            </div>
-
-            {otherVideos.length > 0 && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-stone-800 pb-3">
-                  <h4 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wider">OUTROS REGISTROS</h4>
-                  <span className="text-xs text-stone-400">{otherVideos.length} vídeos</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {otherVideos.map((vid) => (
-                    <div
-                      key={vid.id}
-                      onClick={() => setSelectedVideo(vid)}
-                      className="bg-[#141414] border border-stone-800 rounded-[2px] overflow-hidden group cursor-pointer hover:border-stone-600 transition-colors flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="relative aspect-video bg-black overflow-hidden">
-                          <img
-                            src={vid.thumbnail || '/assets/alrs_parlamento.jpg'}
-                            alt={vid.title}
-                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 opacity-80 group-hover:opacity-100"
-                            loading="lazy"
-                            width={640}
-                            height={360}
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg';
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/15 transition-colors">
-                            <div className="w-12 h-12 rounded-full bg-[#00A550] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                              <Play className="w-5 h-5 fill-white ml-0.5" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-2 left-2 glass-card-dark px-2 py-0.5 rounded-[2px] text-[10px] font-bold text-white uppercase tracking-wider">
-                            {vid.category || sourceLabel(vid)}
-                          </div>
-                        </div>
-
-                        <div className="p-5 space-y-2">
-                          <div className="flex items-center gap-2 text-xs text-stone-400">
-                            <span className="font-bold text-[#00A550]">{sourceLabel(vid)}</span>
-                            <span>•</span>
-                            <span>{new Date(vid.date).toLocaleDateString('pt-BR')}</span>
-                          </div>
-                          <h5 className="font-bold text-white text-base leading-snug group-hover:text-[#00A550] transition-colors">{vid.title}</h5>
-                          <p className="text-xs text-stone-400 line-clamp-2 leading-relaxed">{vid.description}</p>
-                        </div>
-                      </div>
-                      <div className="p-5 pt-0 text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                        <span>Assistir vídeo</span>
-                        <span className="group-hover:translate-x-0.5 transition-transform">→</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              <div className="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between space-y-6"><div className="space-y-4"><div className="flex items-center gap-2 text-xs font-semibold text-[#00A550] uppercase tracking-wider"><span>{sourceLabel(mainVideo)}</span><span className="text-stone-700">•</span><span className="text-stone-400">{new Date(mainVideo.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}</span></div><h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">{mainVideo.title}</h3><p className="text-stone-300 text-sm sm:text-base leading-relaxed">{mainVideo.description}</p></div><div className="pt-4 border-t border-stone-800 flex items-center justify-between"><span className="text-xs text-stone-400">Registro audiovisual do acervo</span><button type="button" onClick={() => setSelectedVideo(mainVideo)} className="h-[44px] px-6 bg-[#00A550] hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider rounded-[2px] transition-all inline-flex items-center gap-2 cursor-pointer"><Play className="w-3.5 h-3.5 fill-white" /><span>ASSISTIR</span></button></div></div>
+            </div></div>
+            {otherVideos.length > 0 && <div className="space-y-6"><div className="flex items-center justify-between border-b border-stone-800 pb-3"><h4 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wider">OUTROS REGISTROS</h4><span className="text-xs text-stone-400">{otherVideos.length} vídeos</span></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{otherVideos.map((vid) => <div key={vid.id} onClick={() => setSelectedVideo(vid)} className="bg-[#141414] border border-stone-800 rounded-[2px] overflow-hidden group cursor-pointer hover:border-stone-600 transition-colors flex flex-col justify-between"><div><div className="relative aspect-video bg-black overflow-hidden"><img src={vid.thumbnail || '/assets/alrs_parlamento.jpg'} alt={vid.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 opacity-80 group-hover:opacity-100" loading="lazy" width={640} height={360} referrerPolicy="no-referrer" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg'; }} /><div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/15 transition-colors"><div className="w-12 h-12 rounded-full bg-[#00A550] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"><Play className="w-5 h-5 fill-white ml-0.5" /></div></div><div className="absolute bottom-2 left-2 glass-card-dark px-2 py-0.5 rounded-[2px] text-[10px] font-bold text-white uppercase tracking-wider">{vid.category || sourceLabel(vid)}</div></div><div className="p-5 space-y-2"><div className="flex items-center gap-2 text-xs text-stone-400"><span className="font-bold text-[#00A550]">{sourceLabel(vid)}</span><span>•</span><span>{new Date(vid.date).toLocaleDateString('pt-BR')}</span></div><h5 className="font-bold text-white text-base leading-snug group-hover:text-[#00A550] transition-colors">{vid.title}</h5><p className="text-xs text-stone-400 line-clamp-2 leading-relaxed">{vid.description}</p></div></div><div className="p-5 pt-0 text-xs font-semibold text-emerald-400 flex items-center gap-1"><span>Assistir vídeo</span><span>→</span></div></div>)}</div></div>}
           </>
         )}
-
-        {selectedVideo && (
-          <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-            <div className="bg-[#141414] text-white rounded-[2px] border border-stone-700 max-w-4xl w-full overflow-hidden shadow-2xl">
-              <div className="flex items-center justify-between p-4 border-b border-stone-800">
-                <h4 className="font-bold text-sm sm:text-base text-white truncate pr-4">{selectedVideo.title}</h4>
-                <button type="button" onClick={() => setSelectedVideo(null)} className="text-stone-400 hover:text-white p-1 rounded cursor-pointer" aria-label="Fechar vídeo">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="aspect-video bg-black flex items-center justify-center">
-                {selectedVideo.videoUrl?.includes('youtube') || selectedVideo.videoUrl?.includes('youtu.be') ? (
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${selectedVideo.videoUrl.includes('v=') ? selectedVideo.videoUrl.split('v=')[1]?.split('&')[0] : selectedVideo.videoUrl.split('/').pop()}?autoplay=1`}
-                    title={selectedVideo.title}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="p-8 text-center space-y-4">
-                    <p className="text-stone-300 text-sm">Este vídeo está hospedado na plataforma registrada no acervo.</p>
-                    <a href={selectedVideo.videoUrl} target="_blank" rel="noreferrer" className="inline-block bg-[#00A550] text-white px-6 py-3 rounded-[2px] text-sm font-bold uppercase tracking-wider hover:bg-emerald-600 transition-colors">
-                      Abrir fonte original
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        {selectedVideo && <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"><div className="bg-[#141414] text-white rounded-[2px] border border-stone-700 max-w-4xl w-full overflow-hidden shadow-2xl"><div className="flex items-center justify-between p-4 border-b border-stone-800"><h4 className="font-bold text-sm sm:text-base text-white truncate pr-4">{selectedVideo.title}</h4><button type="button" onClick={() => setSelectedVideo(null)} className="text-stone-400 hover:text-white p-1 rounded cursor-pointer" aria-label="Fechar vídeo"><X className="w-6 h-6" /></button></div><div className="aspect-video bg-black flex items-center justify-center">{selectedVideo.url?.includes('youtube') || selectedVideo.url?.includes('youtu.be') ? <iframe src={`https://www.youtube-nocookie.com/embed/${selectedVideo.url.includes('v=') ? selectedVideo.url.split('v=')[1]?.split('&')[0] : selectedVideo.url.split('/').pop()}?autoplay=1`} title={selectedVideo.title} className="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <div className="p-8 text-center space-y-4"><p className="text-stone-300 text-sm">Este vídeo está hospedado na plataforma registrada no acervo.</p><a href={selectedVideo.url} target="_blank" rel="noreferrer" className="inline-block bg-[#00A550] text-white px-6 py-3 rounded-[2px] text-sm font-bold uppercase tracking-wider hover:bg-emerald-600 transition-colors">Abrir fonte original</a></div>}</div></div></div>}
       </div>
     </section>
   );
