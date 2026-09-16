@@ -20,20 +20,7 @@ import { CampaignView } from './components/public/CampaignView';
 
 // Admin Components
 import { AdminLayout } from './components/admin/AdminLayout';
-import { AdminDashboardTab } from './components/admin/AdminDashboardTab';
-import { AdminDemandsTab } from './components/admin/AdminDemandsTab';
-import { AdminPagesTab } from './components/admin/AdminPagesTab';
-import { AdminNewsTab } from './components/admin/AdminNewsTab';
-import { AdminAgendaTab } from './components/admin/AdminAgendaTab';
-import { AdminProjectsTab } from './components/admin/AdminProjectsTab';
-import { AdminResultsTab } from './components/admin/AdminResultsTab';
-import { AdminMunicipalitiesTab } from './components/admin/AdminMunicipalitiesTab';
-import { AdminMediaTab } from './components/admin/AdminMediaTab';
-import { AdminUsersTab } from './components/admin/AdminUsersTab';
-import { AdminAuditTab } from './components/admin/AdminAuditTab';
-import { AdminSettingsTab } from './components/admin/AdminSettingsTab';
-import { AdminContentTab } from './components/admin/AdminContentTab';
-import { AdminVideosTab } from './components/admin/AdminVideosTab';
+import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { PageBlock } from './types';
 
 const MainAppContent: React.FC = () => {
@@ -55,20 +42,7 @@ const MainAppContent: React.FC = () => {
   if (currentView === 'admin') {
     return (
       <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
-        {adminTab === 'dashboard' && <AdminDashboardTab setActiveTab={setAdminTab} />}
-        {adminTab === 'demands' && <AdminDemandsTab />}
-        {adminTab === 'pages' && <AdminPagesTab />}
-        {adminTab === 'content' && <AdminContentTab />}
-        {adminTab === 'news' && <AdminNewsTab />}
-        {adminTab === 'agenda' && <AdminAgendaTab />}
-        {adminTab === 'projects' && <AdminProjectsTab />}
-        {adminTab === 'results' && <AdminResultsTab />}
-        {adminTab === 'municipalities' && <AdminMunicipalitiesTab />}
-        {adminTab === 'videos' && <AdminVideosTab />}
-        {adminTab === 'media' && <AdminMediaTab />}
-        {adminTab === 'users' && <AdminUsersTab />}
-        {adminTab === 'audit' && <AdminAuditTab />}
-        {adminTab === 'settings' && <AdminSettingsTab />}
+        <AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} />
       </AdminLayout>
     );
   }
