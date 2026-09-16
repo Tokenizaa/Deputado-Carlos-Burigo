@@ -1,4 +1,4 @@
-import { getPublicNews } from '../server/supabase.js';
+import { getPublicNews } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
