@@ -1,18 +1,16 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { ArrowRight } from 'lucide-react';
 import { TrajectorySection } from './TrajectorySection';
-import { ArrowRight, GraduationCap, Building2, Landmark, Award } from 'lucide-react';
 
 export const AboutView: React.FC = () => {
   const { setCurrentView } = useApp();
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Editorial Profile Header */}
       <section className="border-b border-stone-200 py-16 sm:py-24 bg-[#0A0A0A] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Real Photograph with Noble Framing */}
             <div className="lg:col-span-5 order-2 lg:order-1">
               <div className="aspect-4/5 bg-stone-900 rounded-[2px] overflow-hidden border border-white/15 shadow-2xl max-w-md mx-auto lg:max-w-none">
                 <img
@@ -35,7 +33,6 @@ export const AboutView: React.FC = () => {
               </div>
             </div>
 
-            {/* Editorial Bio with Strong Typography */}
             <div className="lg:col-span-7 order-1 lg:order-2 space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
@@ -48,16 +45,16 @@ export const AboutView: React.FC = () => {
                   Carlos Búrigo
                 </h1>
                 <p className="text-sm font-semibold text-stone-300 uppercase tracking-wider pt-1">
-                  Contador • Ex-Prefeito • Ex-Secretário de Estado • Líder da Bancada MDB
+                  Contador • Ex-Prefeito • Ex-Secretário de Estado
                 </p>
               </div>
 
               <div className="space-y-4 text-base sm:text-lg text-stone-300 leading-relaxed max-w-[65ch]">
                 <p>
-                  Nascido em 5 de julho de 1964 nos Campos de Cima da Serra (São José dos Ausentes), Carlos Búrigo construiu sua trajetória na vida pública fundamentada no rigor orçamentário, no equilíbrio fiscal e no profundo conhecimento das demandas de cada município gaúcho.
+                  Carlos Búrigo nasceu em 5 de julho de 1964. Fontes institucionais e eleitorais registram Bom Jesus/RS como local de nascimento; o site oficial de Búrigo apresenta São José dos Ausentes. O projeto mantém essa divergência documentada até sua resolução definitiva.
                 </p>
                 <p>
-                  Casado com Danusa Liége e pai de Larissa e Felipe, formou-se em Ciências Contábeis pela Unisinos. Atuou na iniciativa privada e na agricultura antes de ser convocado a liderar a emancipação e estruturação de sua terra natal como prefeito por dois mandatos.
+                  É formado em Ciências Contábeis pela Unisinos. Segundo registro biográfico da Câmara Municipal de Caxias do Sul, trabalhou no Banco Bradesco e como gerente financeiro das empresas Calçados Glória e Calçados Platina. Em 1993, retornou a São José dos Ausentes, onde foi chefe de gabinete e secretário de Administração até 1996.
                 </p>
               </div>
 
@@ -76,17 +73,16 @@ export const AboutView: React.FC = () => {
         </div>
       </section>
 
-      {/* Pillars: Formação, Gestão Pública e Atuação Parlamentar */}
       <section className="py-16 sm:py-20 border-b border-stone-200 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-3 bg-white p-8 border border-stone-200 rounded-[2px]">
               <span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.12em] block">
-                01 • FORMAÇÃO TÉCNICA
+                01 • FORMAÇÃO
               </span>
               <h3 className="text-xl font-bold text-stone-900">Ciências Contábeis (Unisinos)</h3>
               <p className="text-sm text-stone-600 leading-relaxed">
-                Visão técnica dos números públicos, planejamento contábil e auditoria orçamentária que norteia sua atuação parlamentar permanente contra déficits fiscais crônicos.
+                Formado em Ciências Contábeis pela Universidade do Vale do Rio dos Sinos (Unisinos).
               </p>
             </div>
 
@@ -94,26 +90,25 @@ export const AboutView: React.FC = () => {
               <span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.12em] block">
                 02 • GESTÃO PÚBLICA
               </span>
-              <h3 className="text-xl font-bold text-stone-900">9 Anos na Fazenda de Caxias</h3>
+              <h3 className="text-xl font-bold text-stone-900">Atuação em Caxias do Sul</h3>
               <p className="text-sm text-stone-600 leading-relaxed">
-                Gestão financeira exemplar ao lado de José Ivo Sartori, equilibrando contas do segundo polo do estado e viabilizando recursos para obras de saúde e mobilidade urbana.
+                Atuou na Prefeitura de Caxias do Sul entre 2005 e 2014, passando pela Secretaria da Fazenda e pela Secretaria de Gestão e Finanças.
               </p>
             </div>
 
             <div className="space-y-3 bg-white p-8 border border-stone-200 rounded-[2px]">
               <span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.12em] block">
-                03 • PIRATINI & PARLAMENTO
+                03 • PARLAMENTO
               </span>
-              <h3 className="text-xl font-bold text-stone-900">Liderança na ALRS</h3>
+              <h3 className="text-xl font-bold text-stone-900">Atuação na Assembleia Legislativa</h3>
               <p className="text-sm text-stone-600 leading-relaxed">
-                Secretário-Geral de Governo e de Planejamento do RS (2015–2018). Na Assembleia, é Líder da Bancada do MDB e autor da histórica Lei da Silvicultura (Lei 16.445/2025).
+                Exerceu mandato na Assembleia Legislativa do RS a partir de 2019 e voltou ao Parlamento em 2023. Entre as funções documentadas estão a presidência da Comissão de Educação e a vice-presidência da CCJ.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Full Editorial Trajectory Timeline */}
       <TrajectorySection />
     </div>
   );
