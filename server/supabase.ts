@@ -1,5 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
-import { normalizeLegislativeCode, toPublicProjectDto, toPublicResultDto } from './mappers/publicLegislative';
+import {
+  normalizeLegislativeCode,
+  toLegislativeCode,
+  toPublicLegislativeItemDto,
+  toPublicLegislativeVoteDto,
+  toPublicProjectDto,
+  toPublicResultDto,
+} from './mappers/publicLegislative';
+import type {
+  LegislativeItemRow,
+  PublicLegislativeItemDto,
+  PublicLegislativeVoteDto,
+} from './mappers/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
@@ -7,7 +19,7 @@ const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
   ?? process.env.SUPABASE_ANON_KEY
   ?? 'sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj';
 
-const supabasePublic = createClient(url, publishableKey, {
+export const supabasePublic = createClient(url, publishableKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
@@ -17,13 +29,107 @@ export const supabaseAdmin = serviceRoleKey
   ? createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } })
   : supabasePublic;
 
-async function getPublishedLegislativeCodes() {
+type PublishedLegislativeIndex = ReadonlyMap<string, string>;
+
+async function getPublishedLegislativeIndex(): Promise<PublishedLegislativeIndex> {
   const { data, error } = await supabasePublic.from('legislative_items')
-    .select('type,number,year,status,verification_status')
+    .select('id,type,number,year,status,verification_status')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
   if (error) throw error;
-  return new Set((data ?? []).map((item) => normalizeLegislativeCode(`${item.type} ${item.number}/${item.year}`)));
+
+  return new Map((data ?? []).map((item) => [
+    normalizeLegislativeCode(`${item.type} ${item.number}/${item.year}`),
+    item.id,
+  ]));
+}
+
+async function getPublishedLegislativeItems(): Promise<LegislativeItemRow[]> {
+  const { data, error } = await supabasePublic.from('legislative_items')
+    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status')
+    .eq('status', 'PUBLISHED')
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('year', { ascending: false })
+    .order('number', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as LegislativeItemRow[];
+}
+
+export async function getPublishedLegislativeCodes() {
+  return new Set((await getPublishedLegislativeIndex()).keys());
+}
+
+export async function getPublicLegislativeItems(): Promise<PublicLegislativeItemDto[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const [{ data: events, error: eventsError }, { data: votes, error: votesError }, { data: roles, error: rolesError }] = await Promise.all([
+    supabasePublic.from('legislative_events')
+      .select('id,item_id,event_type,event_date,description,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+      .order('event_date', { ascending: true }),
+    supabasePublic.from('legislative_votes')
+      .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+      .order('vote_date', { ascending: true }),
+    supabasePublic.from('legislative_roles')
+      .select('id,item_id,person_name,role,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']),
+  ]);
+
+  if (eventsError) throw eventsError;
+  if (votesError) throw votesError;
+  if (rolesError) throw rolesError;
+
+  const eventsByItem = new Map<string, typeof events>();
+  for (const event of events ?? []) {
+    const list = eventsByItem.get(event.item_id) ?? [];
+    list.push(event);
+    eventsByItem.set(event.item_id, list);
+  }
+
+  const votesByItem = new Map<string, typeof votes>();
+  for (const vote of votes ?? []) {
+    const list = votesByItem.get(vote.item_id) ?? [];
+    list.push(vote);
+    votesByItem.set(vote.item_id, list);
+  }
+
+  const rolesByItem = new Map<string, typeof roles>();
+  for (const role of roles ?? []) {
+    const list = rolesByItem.get(role.item_id) ?? [];
+    list.push(role);
+    rolesByItem.set(role.item_id, list);
+  }
+
+  return items.map((item) => toPublicLegislativeItemDto(item, {
+    events: eventsByItem.get(item.id) ?? [],
+    votes: votesByItem.get(item.id) ?? [],
+    roles: rolesByItem.get(item.id) ?? [],
+  }));
+}
+
+export async function getPublicLegislativeVotes(): Promise<PublicLegislativeVoteDto[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const { data, error } = await supabasePublic.from('legislative_votes')
+    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+    .in('item_id', itemIds)
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('vote_date', { ascending: false, nullsFirst: false });
+  if (error) throw error;
+
+  return (data ?? []).flatMap((vote) => {
+    const item = itemById.get(vote.item_id);
+    return item ? [toPublicLegislativeVoteDto(vote, item)] : [];
+  });
 }
 
 export async function getPublicSettings() {
@@ -60,24 +166,34 @@ export async function getPublicSettings() {
 }
 
 export async function getPublicProjects() {
-  const publishedCodes = await getPublishedLegislativeCodes();
+  const publishedIndex = await getPublishedLegislativeIndex();
+  const publishedCodes = new Set(publishedIndex.keys());
   const { data, error } = await supabasePublic.from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
   return (data ?? [])
-    .map((item) => toPublicProjectDto(item, publishedCodes))
+    .map((item) => {
+      const legislativeCode = normalizeLegislativeCode(item.code);
+      const legislativeItemId = publishedIndex.get(legislativeCode);
+      return legislativeItemId ? toPublicProjectDto(item, publishedCodes, legislativeItemId) : null;
+    })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicResults() {
-  const publishedCodes = await getPublishedLegislativeCodes();
+  const publishedIndex = await getPublishedLegislativeIndex();
+  const publishedCodes = new Set(publishedIndex.keys());
   const { data, error } = await supabasePublic.from('results')
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
   return (data ?? [])
-    .map((item) => toPublicResultDto(item, publishedCodes))
+    .map((item) => {
+      const legislativeCode = item.title ? item.title.match(/\b(PL|PLC|PEC|RDI|PRS|PLO|LAW)\s+\d+\/\d{4}\b/i)?.[0] : undefined;
+      const legislativeItemId = legislativeCode ? publishedIndex.get(normalizeLegislativeCode(legislativeCode)) : undefined;
+      return toPublicResultDto(item, publishedCodes, legislativeItemId);
+    })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
