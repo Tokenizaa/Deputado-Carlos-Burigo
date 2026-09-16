@@ -49,7 +49,7 @@ export const MediaHighlightsSection: React.FC = () => {
                   referrerPolicy="no-referrer"
                 />
                 {(photo.credit || photo.title) && (
-                  <figcaption className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/70 to-transparent pt-10 text-xs text-white/90">
+                  <figcaption className="absolute inset-x-0 bottom-0 p-3 bg-black/60 text-xs text-white/90">
                     {photo.credit || photo.title}
                   </figcaption>
                 )}
@@ -78,7 +78,7 @@ export const MediaHighlightsSection: React.FC = () => {
                     <PlayCircle className="w-7 h-7" />
                   </span>
                 </span>
-                <span className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent pt-12 text-sm font-black text-white">
+                <span className="absolute inset-x-0 bottom-0 p-4 bg-black/65 text-sm font-black text-white">
                   {video.title}
                 </span>
               </button>
