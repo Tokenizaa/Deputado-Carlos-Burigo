@@ -33,4 +33,6 @@ As Functions não usam `db.json` para as leituras públicas migradas. Os dados v
 
 O primeiro deploy das Functions revelou que a forma `default handler(Request)` não foi invocada corretamente neste projeto Vite/Vercel. As oito funções foram corrigidas para a assinatura `GET(Request)`. O código está documentado em commits individuais.
 
+O commit desta revisão serve também como novo gatilho de deploy para publicar o estado corrigido no projeto Vercel.
+
 A rodada só será considerada funcionalmente concluída após um novo deploy dessa revisão e a validação de todos os endpoints e da Home em produção.
