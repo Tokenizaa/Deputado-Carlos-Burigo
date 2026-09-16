@@ -3,13 +3,68 @@
 @layer base {
   :root {
     --mdb-green: #00A550;
+    --mdb-green-dark: #008740;
     --mdb-yellow: #E1F200;
     --mdb-red: #ED1C24;
-    --mdb-dark: #111827;
+    --deep-black: #0A0A0A;
+    --dark-surface: #111111;
+    --dark-surface-elevated: #171717;
   }
 
   body {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    color: #111111;
+    background-color: #0A0A0A;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Editorial titles hierarchy - Bold, architectural, high impact */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.025em;
+    color: #111111;
+    font-weight: 700;
+  }
+
+  /* H1: Mobile 42-52px, Desktop 64-88px (up to 96px) */
+  h1 {
+    font-size: clamp(2.625rem, 5.5vw, 3.25rem); /* 42px to 52px on mobile/tablet */
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+
+  @media (min-width: 1024px) {
+    h1 {
+      font-size: clamp(4rem, 6.5vw, 5.5rem); /* 64px to 88px on desktop */
+      line-height: 1.02;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    h1 {
+      font-size: clamp(5rem, 6.8vw, 6rem); /* up to 96px in generous screens */
+      line-height: 1.0;
+    }
+  }
+
+  /* H2: 36px-48px on desktop, tight line-height (1.05-1.1) */
+  h2 {
+    font-size: clamp(2rem, 3.5vw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  @media (min-width: 1024px) {
+    h2 {
+      font-size: clamp(2.5rem, 3.8vw, 3.25rem); /* 40px to 52px */
+      line-height: 1.05;
+    }
+  }
+
+  h3 {
+    font-size: clamp(1.375rem, 2.2vw, 1.875rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
   }
 
   /* Accessibility visible focus */
@@ -19,19 +74,57 @@
   }
 }
 
+/* Controlled Glassmorphism (applied strictly on photographs and deep backgrounds) */
+.glass-card-dark {
+  background: rgba(10, 10, 10, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Editorial tracking styles */
+.tracking-eyebrow {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tracking-institutional {
+  letter-spacing: 0.04em;
+}
+
+.tracking-tight-editorial {
+  letter-spacing: -0.025em;
+}
+
+/* Global paragraph constraint: max-width 65ch for readable editorial measure in content sections */
+main section p,
+article p,
+.content-section p,
+.editorial-prose {
+  max-width: 65ch;
+  line-height: 1.65;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #171717;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: #333333;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #00A550;
 }
 

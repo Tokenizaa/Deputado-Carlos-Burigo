@@ -17,6 +17,7 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 app.use('/uploads', express.static(UPLOADS_DIR));
+app.use('/documents', express.static(path.join(process.cwd(), 'documents')));
 
 // TEMPORARY compatibility authentication. This remains only until Supabase Auth is wired in.
 // It must not be considered production authorization.

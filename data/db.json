@@ -130,15 +130,14 @@
           }
         },
         {
-          "id": "blk-news",
-          "type": "news",
-          "title": "Notícias Recentes",
-          "subtitle": "Acompanhe as ações e posições de Carlos Búrigo",
+          "id": "blk-municipalities",
+          "type": "municipalities",
+          "title": "Presença nos Municípios",
+          "subtitle": "Atuação regionalizada na Serra Gaúcha e em todo o Estado",
           "visible": true,
           "order": 5,
           "content": {
-            "limit": 3,
-            "showFeatured": true
+            "title": "Onde o nosso trabalho faz a diferença"
           }
         },
         {
@@ -146,22 +145,11 @@
           "type": "agenda",
           "title": "Agenda Pública",
           "subtitle": "Compromissos públicos com as comunidades",
-          "visible": true,
+          "visible": false,
           "order": 6,
           "content": {
             "badge": "Transparência",
             "title": "Próximos compromissos"
-          }
-        },
-        {
-          "id": "blk-municipalities",
-          "type": "municipalities",
-          "title": "Presença nos Municípios",
-          "subtitle": "Atuação regionalizada na Serra Gaúcha e em todo o Estado",
-          "visible": true,
-          "order": 7,
-          "content": {
-            "title": "Onde o nosso trabalho faz a diferença"
           }
         },
         {
@@ -170,9 +158,21 @@
           "title": "Vídeos e Pronunciamentos",
           "subtitle": "Discursos na tribuna, entrevistas e vistorias",
           "visible": true,
-          "order": 8,
+          "order": 6,
           "content": {
             "title": "Vídeos em Destaque"
+          }
+        },
+        {
+          "id": "blk-news",
+          "type": "news",
+          "title": "Notícias Recentes",
+          "subtitle": "Acompanhe as ações e posições de Carlos Búrigo",
+          "visible": true,
+          "order": 7,
+          "content": {
+            "limit": 3,
+            "showFeatured": true
           }
         },
         {
@@ -181,7 +181,7 @@
           "title": "Portal do Cidadão — Fale com o Gabinete",
           "subtitle": "Canal direto para envio de demandas, solicitações e propostas com número de protocolo",
           "visible": true,
-          "order": 9,
+          "order": 8,
           "content": {
             "title": "Fale com o Gabinete de Carlos Búrigo",
             "ctaText": "Solicitar Atendimento ou Apresentar Demanda"
@@ -193,7 +193,7 @@
           "title": "Canais de Contato e Gabinete",
           "subtitle": "Endereços em Porto Alegre e Caxias do Sul",
           "visible": true,
-          "order": 10,
+          "order": 9,
           "content": {
             "showAddresses": true
           }
