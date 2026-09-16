@@ -135,6 +135,35 @@ export async function getPublicLegislativeVotes(): Promise<PublicLegislativeVote
   });
 }
 
+// Simpler format for public /api/votes endpoint (edge Worker)
+export async function getPublicVotes(): Promise<{ id: string; itemId: string; sessionName: string; date?: string; voterName: string; vote: string; sourceUrl?: string }[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const { data, error } = await supabasePublic.from('legislative_votes')
+    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+    .in('item_id', itemIds)
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('vote_date', { ascending: false, nullsFirst: false });
+  if (error) throw error;
+
+  return (data ?? []).flatMap((vote) => {
+    const item = itemById.get(vote.item_id);
+    if (!item) return [];
+    return [{
+      id: vote.id,
+      itemId: vote.item_id,
+      sessionName: vote.session_name ?? '',
+      date: vote.vote_date ?? undefined,
+      voterName: vote.voter_name,
+      vote: vote.vote,
+      sourceUrl: vote.source_url ?? undefined,
+    }];
+  });
+}
+
 export async function getPublicSettings() {
   const { data, error } = await supabasePublic.from('site_settings')
     .select('*').eq('id', true).maybeSingle();

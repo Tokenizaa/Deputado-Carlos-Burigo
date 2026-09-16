@@ -37,6 +37,7 @@ function toVersion(row: any): PageVersion {
     blocks: Array.isArray(row.blocks) ? row.blocks : [],
     savedAt: row.created_at,
     savedBy: row.saved_by ?? '',
+    status: (row.status === 'published' ? 'published' : 'draft'),
   };
 }
 
