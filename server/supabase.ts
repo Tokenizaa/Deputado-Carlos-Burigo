@@ -1,19 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
-// The publishable key is intentionally safe for public applications; service_role must not
-// be required by public Vercel Functions.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
 const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
   ?? process.env.SUPABASE_ANON_KEY
   ?? 'sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj';
 
-const supabaseAdmin = createClient(url, publishableKey, {
+const supabasePublic = createClient(url, publishableKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+// Keep the existing server export for admin/auth routes. Public functions never require it.
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export const supabaseAdmin = serviceRoleKey
+  ? createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } })
+  : supabasePublic;
+
 async function getPublishedLegislativeCodes() {
-  const { data, error } = await supabaseAdmin.from('legislative_items')
+  const { data, error } = await supabasePublic.from('legislative_items')
     .select('type,number,year,status,verification_status')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
@@ -22,7 +26,7 @@ async function getPublishedLegislativeCodes() {
 }
 
 export async function getPublicSettings() {
-  const { data, error } = await supabaseAdmin.from('site_settings')
+  const { data, error } = await supabasePublic.from('site_settings')
     .select('*').eq('id', true).maybeSingle();
   if (error) throw error;
   if (!data) return null;
@@ -56,7 +60,7 @@ export async function getPublicSettings() {
 
 export async function getPublicProjects() {
   const publishedCodes = await getPublishedLegislativeCodes();
-  const { data, error } = await supabaseAdmin.from('projects')
+  const { data, error } = await supabasePublic.from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
@@ -76,7 +80,7 @@ export async function getPublicProjects() {
 
 export async function getPublicResults() {
   const publishedCodes = await getPublishedLegislativeCodes();
-  const { data, error } = await supabaseAdmin.from('results')
+  const { data, error } = await supabasePublic.from('results')
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
@@ -95,7 +99,7 @@ export async function getPublicResults() {
 }
 
 export async function getPublicMunicipalities() {
-  const { data, error } = await supabaseAdmin.from('municipalities')
+  const { data, error } = await supabasePublic.from('municipalities')
     .select('id,name,region,population,key_deliveries').order('name', { ascending: true });
   if (error) throw error;
   return (data ?? []).map((item) => ({
@@ -108,7 +112,7 @@ export async function getPublicMunicipalities() {
 }
 
 export async function getPublicVideos() {
-  const { data, error } = await supabaseAdmin.from('videos')
+  const { data, error } = await supabasePublic.from('videos')
     .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status,created_at,source_name,verification_status,rights_status')
     .eq('status', 'ativo')
     .order('published_at', { ascending: false, nullsFirst: false })
@@ -132,7 +136,7 @@ export async function getPublicVideos() {
 }
 
 export async function getPublicMedia() {
-  const { data, error } = await supabaseAdmin.from('media')
+  const { data, error } = await supabasePublic.from('media')
     .select('id,name,title,alt_text,description,credit,category,storage_path,url,size,mime_type,created_at,original_url,source_name,source_page_url,sha256,published_at,downloaded_at,verification_status,rights_status,event_name,notes')
     .order('created_at', { ascending: false });
   if (error) throw error;
@@ -162,7 +166,7 @@ export async function getPublicMedia() {
 }
 
 export async function getPublicNews() {
-  const { data, error } = await supabaseAdmin.from('news')
+  const { data, error } = await supabasePublic.from('news')
     .select('id,title,slug,summary,content,main_media_id,gallery,video_url,category,municipality,published_at,author_id,status,featured,seo_title,seo_description,social_media_id,created_at')
     .eq('status', 'publicado')
     .order('published_at', { ascending: false, nullsFirst: false });
@@ -189,7 +193,7 @@ export async function getPublicNews() {
 }
 
 export async function getPublicAgenda() {
-  const { data, error } = await supabaseAdmin.from('events')
+  const { data, error } = await supabasePublic.from('events')
     .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
     .eq('status', 'publicado')
     .eq('visibility', 'publico')
