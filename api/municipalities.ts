@@ -1,4 +1,4 @@
-import { getPublicMunicipalities } from '../server/supabase.js';
+import { getPublicMunicipalities } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
