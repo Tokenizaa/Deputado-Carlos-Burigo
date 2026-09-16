@@ -6,8 +6,14 @@ import {
   toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
+import {
+  toPublicAgendaDto,
+  toPublicNewsDto,
+  toPublicPageDto,
+} from './mappers/publicCommunication';
 import type { LegislativeItemRow } from './mappers/publicLegislative';
 import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
+import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
 import { extractLegislativeCode } from '../src/contracts/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
@@ -261,54 +267,51 @@ export async function getPublicMedia() {
   }));
 }
 
-export async function getPublicNews() {
+export async function getPublicNews(): Promise<PublicNewsDto[]> {
   const { data, error } = await supabasePublic.from('news')
     .select('id,title,slug,summary,content,main_media_id,gallery,video_url,category,municipality,published_at,author_id,status,featured,seo_title,seo_description,social_media_id,created_at')
     .eq('status', 'publicado')
     .order('published_at', { ascending: false, nullsFirst: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    title: item.title,
-    slug: item.slug,
-    summary: item.summary,
-    content: item.content,
-    mainImage: item.main_media_id ?? '',
-    gallery: Array.isArray(item.gallery) ? item.gallery : [],
-    videoUrl: item.video_url ?? undefined,
-    category: item.category,
-    municipality: item.municipality ?? undefined,
-    date: item.published_at ?? item.created_at,
-    author: item.author_id ?? '',
-    status: item.status,
-    featured: Boolean(item.featured),
-    seoTitle: item.seo_title ?? undefined,
-    seoDescription: item.seo_description ?? undefined,
-    socialImage: item.social_media_id ?? undefined,
-  }));
+  return (data ?? []).map(toPublicNewsDto);
 }
 
-export async function getPublicAgenda() {
+export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
   const { data, error } = await supabasePublic.from('events')
     .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
     .eq('status', 'publicado')
     .eq('visibility', 'publico')
     .order('starts_at', { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((item) => {
-    const start = item.starts_at ? new Date(item.starts_at) : null;
-    return {
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      date: start ? start.toISOString().slice(0, 10) : '',
-      time: start ? start.toISOString().slice(11, 16) : '',
-      location: item.location,
-      municipality: item.municipality,
-      image: item.media_id ?? undefined,
-      link: item.link ?? undefined,
-      participants: item.participants ?? undefined,
-      visibility: item.visibility,
-    };
-  });
+  return (data ?? []).map(toPublicAgendaDto);
+}
+
+export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
+  let query = supabasePublic.from('pages')
+    .select('id,title,slug,description,status,updated_by,updated_at')
+    .eq('status', 'publicado')
+    .order('slug', { ascending: true });
+  if (slug) query = query.eq('slug', slug);
+
+  const { data: pages, error: pagesError } = await query;
+  if (pagesError) throw pagesError;
+  if (!pages?.length) return [];
+
+  const pageIds = pages.map((page) => page.id);
+  const { data: blocks, error: blocksError } = await supabasePublic.from('page_blocks')
+    .select('id,page_id,type,title,subtitle,content,visible,active,position')
+    .in('page_id', pageIds)
+    .eq('visible', true)
+    .eq('active', true)
+    .order('position', { ascending: true });
+  if (blocksError) throw blocksError;
+
+  const blocksByPage = new Map<string, typeof blocks>();
+  for (const block of blocks ?? []) {
+    const list = blocksByPage.get(block.page_id) ?? [];
+    list.push(block);
+    blocksByPage.set(block.page_id, list);
+  }
+
+  return pages.map((page) => toPublicPageDto(page, blocksByPage.get(page.id) ?? []));
 }
