@@ -1,13 +1,14 @@
-import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const url = process.env.SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Public read-only adapter: RLS exposes only the institutional/public rows needed here.
+// The publishable key is intentionally safe for public applications; service_role must not
+// be required by public Vercel Functions.
+const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
+const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
+  ?? process.env.SUPABASE_ANON_KEY
+  ?? 'sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj';
 
-if (!url) throw new Error('SUPABASE_URL não configurada.');
-if (!serviceRoleKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY não configurada no servidor.');
-
-export const supabaseAdmin = createClient(url, serviceRoleKey, {
+const supabaseAdmin = createClient(url, publishableKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
