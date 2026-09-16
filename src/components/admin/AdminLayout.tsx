@@ -2,24 +2,13 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   LayoutDashboard,
-  Inbox,
-  Layers,
-  Newspaper,
-  Calendar,
   FileCode2,
-  Award,
-  MapPin,
+  Newspaper,
   Image,
-  Users,
-  History,
+  Inbox,
   Settings,
   ArrowLeft,
   ChevronDown,
-  Shield,
-  LogOut,
-  Bell,
-  FileText,
-  Video,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -36,36 +25,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const { currentUser, allUsers, switchUser, setCurrentView, demands, settings } = useApp();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-  // Count pending demands
   const pendingDemandsCount = demands.filter(
     (d) => d.status === 'recebida' || d.status === 'em análise'
   ).length;
 
   const navItems = [
     { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard, badge: null },
+    { id: 'atuação', label: 'Atuação Pública', icon: FileCode2, badge: null },
+    { id: 'conteúdo', label: 'Conteúdo Público', icon: Newspaper, badge: null },
+    { id: 'acervo', label: 'Acervo', icon: Image, badge: null },
     {
-      id: 'demands',
-      label: 'Demandas do Cidadão',
+      id: 'cidadão',
+      label: 'Cidadão',
       icon: Inbox,
       badge: pendingDemandsCount > 0 ? pendingDemandsCount : null,
     },
-    { id: 'pages', label: 'Páginas & Page Builder', icon: Layers, badge: null },
-    { id: 'content', label: 'Editor de Conteúdo', icon: FileText, badge: null },
-    { id: 'news', label: 'Notícias & Imprensa', icon: Newspaper, badge: null },
-    { id: 'agenda', label: 'Agenda de Eventos', icon: Calendar, badge: null },
-    { id: 'projects', label: 'Projetos de Lei', icon: FileCode2, badge: null },
-    { id: 'results', label: 'Resultados & Entregas', icon: Award, badge: null },
-    { id: 'municipalities', label: 'Municípios', icon: MapPin, badge: null },
-    { id: 'videos', label: 'Vídeos & Discursos', icon: Video, badge: null },
-    { id: 'media', label: 'Biblioteca de Mídia', icon: Image, badge: null },
-    { id: 'users', label: 'Equipe & Papéis', icon: Users, badge: null },
-    { id: 'audit', label: 'Trilha de Auditoria', icon: History, badge: null },
-    { id: 'settings', label: 'Configurações', icon: Settings, badge: null },
+    { id: 'administração', label: 'Administração', icon: Settings, badge: null },
   ];
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col">
-      {/* Admin Top Header */}
       <header className="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -87,7 +66,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         </div>
 
-        {/* User Session Switcher (RBAC Tester) */}
         <div className="relative">
           <button
             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -103,7 +81,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
           </button>
 
-          {/* User selection menu */}
           {userDropdownOpen && (
             <div className="absolute right-0 mt-2 w-64 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 py-2 z-50 animate-fade-in">
               <div className="px-3 py-1.5 border-b border-stone-100 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
@@ -134,12 +111,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         </div>
       </header>
 
-      {/* Main Admin Workspace (Sidebar + Content) */}
       <div className="flex-1 flex flex-col md:flex-row">
-        {/* Admin Sidebar Navigation */}
         <aside className="w-full md:w-64 bg-white border-r border-stone-200 p-4 space-y-1.5 shrink-0">
           <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400">
-            Módulos de Gestão
+            Gestão da Plataforma
           </div>
 
           <nav className="space-y-1">
@@ -150,7 +125,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
                     active
                       ? 'bg-[#00A550] text-white shadow-xs'
                       : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
@@ -174,9 +149,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               );
             })}
           </nav>
+
+          <div className="mt-6 px-3 text-[11px] leading-relaxed text-stone-400">
+            Os módulos agrupam as tarefas por finalidade. As funções detalhadas aparecem dentro de cada módulo.
+          </div>
         </aside>
 
-        {/* Content Area */}
         <main className="flex-1 p-4 sm:p-8 overflow-y-auto max-w-7xl">
           {children}
         </main>
