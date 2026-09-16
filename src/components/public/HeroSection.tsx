@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Award, CheckCircle2, ChevronRight, PhoneCall, Sparkles, Building, TrendingUp } from 'lucide-react';
+import { ArrowRight, Building2, CalendarDays, FileText, PhoneCall, PlayCircle } from 'lucide-react';
 
 interface HeroSectionProps {
   customTitle?: string;
@@ -13,168 +13,134 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   customSubtitle,
   customContent,
 }) => {
-  const { settings, setCurrentView } = useApp();
-  const mode = settings?.site_mode || 'campaign';
+  const { settings, media, videos, setCurrentView } = useApp();
+  const mode = settings?.site_mode || 'institutional';
 
-  const headline = customContent?.headline || customTitle || 'CARLOS BÚRIGO';
-  const slogan =
-    customContent?.highlightPhrase ||
-    customSubtitle ||
-    (mode === 'campaign'
-      ? settings?.campaign_slogan || 'Trabalho sério, presença constante e resultados reais para o Rio Grande do Sul.'
-      : 'Responsabilidade fiscal, apoio ao setor produtivo e defesa contínua dos municípios da Serra Gaúcha e de todo o Estado.');
+  const headline = customContent?.headline || customTitle || settings?.candidate_name || 'Carlos Búrigo';
+  const slogan = customContent?.highlightPhrase || customSubtitle || settings?.campaign_slogan || 'Atuação pública, trajetória e informação em um só lugar.';
 
-  const heroImage =
-    customContent?.imageUrl ||
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1000&q=85';
+  const mediaImage =
+    media.find((item) => item.category === 'campanha' && item.mimeType.startsWith('image/'))?.url ||
+    media.find((item) => item.category === 'fotos' && item.mimeType.startsWith('image/'))?.url;
+
+  const heroImage = customContent?.imageUrl || mediaImage;
+  const featuredVideo = videos.find((video) => video.featured && video.status === 'ativo') || videos.find((video) => video.status === 'ativo');
 
   return (
-    <section className="relative bg-white border-b border-stone-200 overflow-hidden">
-      {/* Subtle institutional top accent bar (Green & Yellow) */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-[#00A550] via-[#00A550] to-[#E1F200]" />
+    <section className="bg-stone-950 text-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[620px] rounded-3xl overflow-hidden bg-stone-900">
+          <div className="lg:col-span-7 relative flex items-end">
+            {heroImage ? (
+              <img
+                src={heroImage}
+                alt={customContent?.imageAlt || 'Carlos Búrigo'}
+                className="absolute inset-0 w-full h-full object-cover object-top"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-[#006f38] flex items-center justify-center">
+                <span className="text-[clamp(8rem,22vw,18rem)] font-black text-white/10 leading-none select-none">CB</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/55" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Editorial Headline & Messaging */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Mode-specific Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-              {mode === 'campaign' && (
-                <div className="flex items-center gap-2 bg-emerald-50 text-[#00A550] border border-emerald-200 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-[#00A550]" />
-                  <span>Eleições 2026 • Candidato a Deputado Estadual</span>
-                  <span className="bg-[#ED1C24] text-white px-2 py-0.5 rounded text-[11px] font-black">
-                    15140
-                  </span>
-                </div>
-              )}
-              {mode === 'mandate' && (
-                <div className="flex items-center gap-2 bg-emerald-50 text-[#00A550] border border-emerald-200 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-[#00A550]" />
-                  <span>Assembleia Legislativa do RS • Líder da Bancada do MDB</span>
-                </div>
-              )}
-              {mode === 'institutional' && (
-                <div className="flex items-center gap-2 bg-stone-100 text-stone-800 border border-stone-300 px-3 py-1 rounded-full">
-                  <Building className="w-3.5 h-3.5 text-[#00A550]" />
-                  <span>Gestão Pública • Experiência e Responsabilidade</span>
-                </div>
-              )}
-            </div>
+            <div className="relative z-10 p-7 sm:p-10 lg:p-12 max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                <span className="w-2 h-2 rounded-full bg-[#E1F200]" />
+                {mode === 'campaign' ? 'Eleições 2026' : 'Atuação pública'}
+              </div>
 
-            {/* Main Name & Title */}
-            <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-stone-950 tracking-tight leading-none uppercase">
+              <h1 className="mt-5 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.92]">
                 {headline}
               </h1>
-              <p className="mt-3 text-lg sm:text-xl font-medium text-stone-600 max-w-2xl">
+
+              <p className="mt-5 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed">
                 {slogan}
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button
+                  onClick={() => setCurrentView('atuacao')}
+                  className="inline-flex items-center gap-2 bg-[#00A550] hover:bg-emerald-700 text-white font-bold px-5 py-3.5 rounded-xl transition-colors"
+                >
+                  Conheça a atuação
+                  <ArrowRight className="w-4 h-4 text-[#E1F200]" />
+                </button>
+                <button
+                  onClick={() => setCurrentView('cidadao')}
+                  className="inline-flex items-center gap-2 bg-white text-stone-950 hover:bg-stone-100 font-bold px-5 py-3.5 rounded-xl transition-colors"
+                >
+                  <PhoneCall className="w-4 h-4 text-[#00A550]" />
+                  Fale com o gabinete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 bg-white text-stone-950 p-7 sm:p-10 flex flex-col justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] font-black text-[#00A550]">Portal público</p>
+              <h2 className="mt-3 text-3xl sm:text-4xl font-black tracking-tight">
+                Informação, atuação e contato.
+              </h2>
+              <p className="mt-4 text-stone-600 leading-relaxed">
+                Consulte projetos, notícias, vídeos, agenda e canais de atendimento em um único lugar.
               </p>
             </div>
 
-            {/* Bio Synopsis & Real Credentials */}
-            <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 space-y-3">
-              <div className="text-xs font-bold text-stone-500 uppercase tracking-wider">
-                Trajetória de Liderança Comprovada
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-stone-700">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00A550] shrink-0 mt-0.5" />
-                  <span>Prefeito de São José dos Ausentes por dois mandatos</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00A550] shrink-0 mt-0.5" />
-                  <span>9 anos Secretário da Fazenda de Caxias do Sul</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00A550] shrink-0 mt-0.5" />
-                  <span>Secretário-Geral e Planejamento do Governo do RS</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00A550] shrink-0 mt-0.5" />
-                  <span>Autor da Lei da Silvicultura (PL 332/2025)</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
               <button
                 onClick={() => setCurrentView('atuacao')}
-                className="bg-[#00A550] hover:bg-emerald-700 text-white font-bold px-6 py-3.5 rounded-lg shadow-sm transition-all hover:shadow-md flex items-center gap-2 text-sm sm:text-base"
+                className="group flex items-center gap-4 p-4 rounded-2xl border border-stone-200 hover:border-emerald-300 hover:bg-emerald-50/60 text-left transition-colors"
               >
-                <span>Conheça a Atuação e Projetos</span>
-                <ChevronRight className="w-4 h-4 text-[#E1F200]" />
+                <span className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-[#00A550]" />
+                </span>
+                <span>
+                  <strong className="block text-sm font-black">Projetos e atuação</strong>
+                  <span className="text-xs text-stone-500">Proposições e informações legislativas</span>
+                </span>
               </button>
 
               <button
-                onClick={() => setCurrentView('cidadao')}
-                className="bg-white hover:bg-stone-100 text-stone-900 border-2 border-stone-300 font-bold px-6 py-3.5 rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base"
+                onClick={() => setCurrentView('noticias')}
+                className="group flex items-center gap-4 p-4 rounded-2xl border border-stone-200 hover:border-emerald-300 hover:bg-emerald-50/60 text-left transition-colors"
               >
-                <PhoneCall className="w-4 h-4 text-[#00A550]" />
-                <span>Fale com o Gabinete</span>
+                <span className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <CalendarDays className="w-5 h-5 text-[#00A550]" />
+                </span>
+                <span>
+                  <strong className="block text-sm font-black">Notícias e agenda</strong>
+                  <span className="text-xs text-stone-500">Atualizações e compromissos públicos</span>
+                </span>
+              </button>
+
+              <button
+                onClick={() => setCurrentView('videos')}
+                className="group flex items-center gap-4 p-4 rounded-2xl border border-stone-200 hover:border-emerald-300 hover:bg-emerald-50/60 text-left transition-colors"
+              >
+                <span className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <PlayCircle className="w-5 h-5 text-[#00A550]" />
+                </span>
+                <span>
+                  <strong className="block text-sm font-black">Vídeos</strong>
+                  <span className="text-xs text-stone-500">
+                    {featuredVideo ? 'Conteúdos em destaque' : 'Conteúdos audiovisuais'}
+                  </span>
+                </span>
               </button>
             </div>
-          </div>
 
-          {/* Right Column: High Quality Portrait & Ballot Card */}
-          <div className="lg:col-span-5 flex flex-col items-center">
-            <div className="relative w-full max-w-md">
-              {/* Photo Frame */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-stone-100 aspect-4/5">
-                <img
-                  src={heroImage}
-                  alt="Carlos Búrigo - Deputado Estadual e Candidato MDB"
-                  className="w-full h-full object-cover object-top"
-                  referrerPolicy="no-referrer"
-                />
-
-                {/* Bottom Overlay Label */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6 text-white">
-                  <span className="text-xs uppercase font-bold text-[#E1F200] tracking-wider">
-                    {mode === 'campaign' ? 'Eleições 04 de Outubro de 2026' : 'Assembleia Legislativa do RS'}
-                  </span>
-                  <p className="text-xl font-black">Carlos Búrigo</p>
-                  <p className="text-xs text-stone-200">
-                    Contador, ex-prefeito e atual líder do MDB
-                  </p>
-                </div>
+            <div className="mt-8 pt-6 border-t border-stone-200 flex items-start gap-3">
+              <Building2 className="w-5 h-5 text-[#00A550] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs uppercase tracking-wider font-black text-stone-500">Gabinete</p>
+                <p className="mt-1 text-sm font-semibold text-stone-800">
+                  {settings?.gabinete_address_poa || 'Porto Alegre • Assembleia Legislativa do RS'}
+                </p>
               </div>
-
-              {/* Electoral Badge Floating Card (when in campaign mode) */}
-              {mode === 'campaign' && (
-                <div className="absolute -bottom-6 -left-4 sm:-left-6 bg-white border-2 border-[#00A550] shadow-2xl rounded-xl p-4 flex items-center gap-4">
-                  <div className="bg-[#00A550] text-white font-black px-3 py-2 rounded-lg text-center">
-                    <span className="block text-[10px] tracking-wider uppercase">MDB</span>
-                    <span className="text-2xl leading-none text-[#E1F200]">15</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-stone-500 font-bold uppercase block">Deputado Estadual</span>
-                    <span className="text-3xl font-black text-stone-900 tracking-tight">15140</span>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
-
-        {/* Highlighted Results Banner */}
-        <div className="mt-16 pt-10 border-t border-stone-200 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
-            <p className="text-3xl font-black text-[#00A550]">R$ 5 bi+</p>
-            <p className="text-xs font-semibold text-stone-600 mt-1">Investimentos florestais com a nova Lei da Silvicultura</p>
-          </div>
-          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
-            <p className="text-3xl font-black text-stone-900">9 Anos</p>
-            <p className="text-xs font-semibold text-stone-600 mt-1">Gestão fiscal e financeira em Caxias do Sul</p>
-          </div>
-          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
-            <p className="text-3xl font-black text-[#00A550]">R$ 18 mi+</p>
-            <p className="text-xs font-semibold text-stone-600 mt-1">Viabilizados para hospitais e saúde na Serra Gaúcha</p>
-          </div>
-          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
-            <p className="text-3xl font-black text-stone-900">100%</p>
-            <p className="text-xs font-semibold text-stone-600 mt-1">Voto contra aumento de impostos e tarifas no RS</p>
           </div>
         </div>
       </div>
