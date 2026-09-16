@@ -20,6 +20,39 @@ async function getPublishedLegislativeCodes() {
   return new Set((data ?? []).map((item) => `${item.type} ${item.number}/${item.year}`));
 }
 
+export async function getPublicSettings() {
+  const { data, error } = await supabaseAdmin.from('site_settings')
+    .select('*').eq('id', true).maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    ...data,
+    candidateTitle: data.candidate_title,
+    mandateTitle: data.mandate_title,
+    institutionalTitle: data.institutional_title,
+    candidateName: data.candidate_name,
+    electoralNumber: data.electoral_number,
+    partyNumber: data.party_number,
+    partyName: data.party_name,
+    campaignSlogan: data.campaign_slogan,
+    campaignCnpj: data.campaign_cnpj,
+    campaignCoalition: data.campaign_coalition,
+    officialElectionDate: data.official_election_date,
+    gabineteAddressPoa: data.gabinete_address_poa,
+    gabineteAddressCaxias: data.gabinete_address_caxias,
+    gabinetePhone: data.gabinete_phone,
+    gabineteWhatsapp: data.gabinete_whatsapp,
+    gabineteEmail: data.gabinete_email,
+    socialInstagram: data.social_instagram,
+    socialFacebook: data.social_facebook,
+    socialYoutube: data.social_youtube,
+    socialWhatsapp: data.social_whatsapp,
+    seoDefaultTitle: data.seo_default_title,
+    seoDefaultDescription: data.seo_default_description,
+    privacyPolicyText: data.privacy_policy_text,
+  };
+}
+
 export async function getPublicProjects() {
   const publishedCodes = await getPublishedLegislativeCodes();
   const { data, error } = await supabaseAdmin.from('projects')
