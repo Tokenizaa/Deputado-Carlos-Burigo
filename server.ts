@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { db } from './server/db.js';
-import { supabaseAdmin, getPublicProjects, getPublicResults, getPublicMunicipalities, getPublicVideos, getPublicMedia, getPublicNews, getPublicAgenda } from './server/supabase.js';
+import { supabaseAdmin, getPublicSettings, getPublicProjects, getPublicResults, getPublicMunicipalities, getPublicVideos, getPublicMedia, getPublicNews, getPublicAgenda } from './server/supabase.js';
 import { User } from './src/types.js';
 
 export const app = express();
@@ -18,14 +18,13 @@ function getAuthenticatedUser(req: Request): User { const userId = (req.headers[
 app.get('/api/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'Plataforma Carlos Búrigo', runtime: process.env.VERCEL ? 'vercel' : 'node', timestamp: new Date().toISOString() }));
 app.get('/api/auth/me', (req, res) => res.json({ user: getAuthenticatedUser(req), allUsers: db.getUsers() }));
 app.post('/api/auth/switch-user', (req, res) => { const user = db.getUserById(req.body.userId); if (!user) return res.status(404).json({ error: 'Usuário não encontrado' }); res.json({ success: true, user }); });
-app.get('/api/settings', (_req, res) => res.json(db.getSettings()));
+app.get('/api/settings', async (_req, res) => { try { const settings = await getPublicSettings(); if (!settings) return res.status(404).json({ error: 'Configurações públicas não encontradas no acervo' }); res.json(settings); } catch (err: any) { console.error('[api/settings] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar configurações do acervo' }); } });
 app.put('/api/settings', (req, res) => { const actor = getAuthenticatedUser(req); if (actor.role !== 'ADMIN') return res.status(403).json({ error: 'Apenas administradores podem alterar as configurações gerais' }); res.json(db.updateSettings(req.body, actor)); });
 app.get('/api/pages', (_req, res) => res.json(db.getPages()));
 app.get('/api/pages/:slug', (req, res) => { const page = db.getPageBySlug(req.params.slug); if (!page) return res.status(404).json({ error: 'Página não encontrada' }); res.json(page); });
 
 app.get('/api/news', async (_req, res) => { try { res.json(await getPublicNews()); } catch (err: any) { console.error('[api/news] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar notícias do acervo' }); } });
 app.get('/api/agenda', async (_req, res) => { try { res.json(await getPublicAgenda()); } catch (err: any) { console.error('[api/agenda] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar agenda do acervo' }); } });
-
 app.get('/api/projects', async (_req, res) => { try { res.json(await getPublicProjects()); } catch (err: any) { console.error('[api/projects] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar projetos do acervo' }); } });
 app.get('/api/results', async (_req, res) => { try { res.json(await getPublicResults()); } catch (err: any) { console.error('[api/results] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar resultados do acervo' }); } });
 app.get('/api/municipalities', async (_req, res) => { try { res.json(await getPublicMunicipalities()); } catch (err: any) { console.error('[api/municipalities] Supabase error:', err); res.status(500).json({ error: 'Falha ao carregar municípios do acervo' }); } });
