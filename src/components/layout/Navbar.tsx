@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Menu, X, PhoneCall, ChevronDown } from 'lucide-react';
+import { Menu, X, PhoneCall } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { settings, currentView, setCurrentView } = useApp();
@@ -62,14 +62,6 @@ export const Navbar: React.FC = () => {
                 </button>
               );
             })}
-            <button
-              onClick={() => navigate('atuacao')}
-              className="ml-1 inline-flex items-center gap-1 px-3.5 py-2.5 rounded-lg text-sm font-semibold text-stone-600 hover:text-stone-950 hover:bg-stone-50"
-              aria-label="Ver outras áreas de atuação"
-            >
-              Mais
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
           </nav>
 
           <div className="hidden lg:flex items-center shrink-0">
