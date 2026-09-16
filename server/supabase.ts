@@ -26,8 +26,7 @@ export async function getPublicProjects() {
   const { data, error } = await supabaseAdmin
     .from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
-    .order('year', { ascending: false })
-    .order('code', { ascending: true });
+    .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
   return (data ?? []).filter((item) => publishedCodes.has(item.code)).map((item) => ({
     id: item.id, code: item.code, title: item.title, summary: item.summary,
@@ -39,8 +38,7 @@ export async function getPublicProjects() {
 export async function getPublicResults() {
   const publishedCodes = await getPublishedLegislativeCodes();
   const { data, error } = await supabaseAdmin
-    .from('results')
-    .select('id,title,category,description,metrics,municipality,result_date')
+    .from('results').select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
   return (data ?? []).filter((item) => {
@@ -53,13 +51,36 @@ export async function getPublicResults() {
 }
 
 export async function getPublicMunicipalities() {
-  const { data, error } = await supabaseAdmin
-    .from('municipalities')
-    .select('id,name,region,population,key_deliveries')
-    .order('name', { ascending: true });
+  const { data, error } = await supabaseAdmin.from('municipalities')
+    .select('id,name,region,population,key_deliveries').order('name', { ascending: true });
   if (error) throw error;
   return (data ?? []).map((item) => ({
     id: item.id, name: item.name, region: item.region, population: item.population,
     keyDeliveries: Array.isArray(item.key_deliveries) ? item.key_deliveries : [],
+  }));
+}
+
+export async function getPublicVideos() {
+  const { data, error } = await supabaseAdmin.from('videos')
+    .select('id,name,title,description,category,url,thumbnail_url,created_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((item) => ({
+    id: item.id, name: item.name, title: item.title, description: item.description,
+    category: item.category, url: item.url, thumbnailUrl: item.thumbnail_url ?? null,
+    createdAt: item.created_at,
+  }));
+}
+
+export async function getPublicMedia() {
+  const { data, error } = await supabaseAdmin.from('media')
+    .select('id,name,title,alt_text,description,credit,category,storage_path,url,mime_type,created_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((item) => ({
+    id: item.id, name: item.name, title: item.title, altText: item.alt_text,
+    description: item.description, credit: item.credit, category: item.category,
+    storagePath: item.storage_path, url: item.url, mimeType: item.mime_type,
+    createdAt: item.created_at,
   }));
 }
