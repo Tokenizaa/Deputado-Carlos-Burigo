@@ -35,6 +35,7 @@ type LegislativeEventRow = {
 
 type LegislativeVoteRow = {
   id: string;
+  item_id: string;
   session_name?: string | null;
   vote_date?: string | null;
   voter_name: string;
@@ -93,9 +94,15 @@ export function toPublicLegislativeEventDto(row: LegislativeEventRow): PublicLeg
   };
 }
 
-export function toPublicLegislativeVoteDto(row: LegislativeVoteRow): PublicLegislativeVoteDto {
+export function toPublicLegislativeVoteDto(
+  row: LegislativeVoteRow,
+  item: Pick<LegislativeItemRow, 'id' | 'type' | 'number' | 'year' | 'title'>,
+): PublicLegislativeVoteDto {
   return {
     id: row.id,
+    legislativeItemId: item.id,
+    legislativeCode: toLegislativeCode(item),
+    legislativeTitle: item.title ?? undefined,
     sessionName: row.session_name ?? undefined,
     voteDate: row.vote_date ?? undefined,
     voterName: row.voter_name,
@@ -137,7 +144,7 @@ export function toPublicLegislativeItemDto(
     sourceUrl: row.source_url ?? undefined,
     verificationStatus: row.verification_status,
     events: (relations.events ?? []).map(toPublicLegislativeEventDto),
-    votes: (relations.votes ?? []).map(toPublicLegislativeVoteDto),
+    votes: (relations.votes ?? []).map((vote) => toPublicLegislativeVoteDto(vote, row)),
     roles: (relations.roles ?? []).map(toPublicLegislativeRoleDto),
   };
 }
