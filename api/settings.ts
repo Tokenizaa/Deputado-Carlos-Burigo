@@ -1,6 +1,6 @@
 import { getPublicSettings } from '../server/supabase.js';
 
-export default async function handler(_req: Request) {
+export async function GET(_request: Request) {
   try {
     const settings = await getPublicSettings();
     if (!settings) return Response.json({ error: 'Configurações públicas não encontradas no acervo' }, { status: 404 });
