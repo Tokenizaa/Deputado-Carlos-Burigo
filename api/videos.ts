@@ -1,4 +1,4 @@
-import { getPublicVideos } from '../server/supabase.js';
+import { getPublicVideos } from '../server/supabase';
 
 export async function GET(_request: Request) {
   try {
