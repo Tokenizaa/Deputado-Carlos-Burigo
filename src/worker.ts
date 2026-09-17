@@ -533,7 +533,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
           demand_id: demandData.id,
           action: 'Criação da demanda',
           new_status: 'recebida',
-          actor_id: 'system',
+          actor_id: null,
           actor_name: 'Sistema',
           actor_role: 'system',
           note: 'Demanda criada via portal do cidadão',
