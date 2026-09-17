@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowRight, ExternalLink, FileText, X } from 'lucide-react';
 import { ProjectItem } from '../../types';
@@ -24,7 +24,55 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             ? 'resultados'
             : initialSubTab,
   );
-  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+   const [selectedVote, setSelectedVote] = useState<any>(null);
+   const overlayContainerRef = useRef(null);
+   const closeButtonRef = useRef(null);
+   const lastTriggerRef = useRef(null);
+   const voteOverlayContainerRef = useRef(null);
+   const voteCloseButtonRef = useRef(null);
+   const voteLastTriggerRef = useRef(null);
+
+   // Close overlay with Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedProject && e.key === 'Escape') {
+        setSelectedProject(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedProject]);
+
+   useEffect(() => {
+     if (selectedProject) {
+       // Overlay opening: focus the close button after render
+       if (closeButtonRef.current) {
+         closeButtonRef.current.focus();
+       }
+     } else {
+       // Overlay closing: return focus to the trigger
+       if (lastTriggerRef.current) {
+         lastTriggerRef.current.focus();
+       }
+     }
+}, [selectedProject]);
+
+   useEffect(() => {
+     if (selectedVote) {
+       // Overlay opening: focus the close button after render
+       if (voteCloseButtonRef.current) {
+         voteCloseButtonRef.current.focus();
+       }
+     } else {
+       // Overlay closing: return focus to the trigger
+       if (voteLastTriggerRef.current) {
+         voteLastTriggerRef.current.focus();
+       }
+     }
+   }, [selectedVote]);
 
   const publishedProjects = projects.filter((project) => project.status === 'Concluído');
   const projectDocuments = projects.filter((project) => project.linkAlrs);
@@ -108,7 +156,10 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       {project.impacts.length > 0 && <p className="text-xs text-stone-500">{project.impacts.length} registro(s) de impacto no acervo.</p>}
                     </div>
                     <div className="shrink-0 flex items-center gap-3">
-                      <button type="button" onClick={() => setSelectedProject(project)} className="text-sm font-semibold text-[#00A550] hover:text-emerald-400 inline-flex items-center gap-1.5 border border-stone-700 hover:border-[#00A550] bg-transparent px-4 py-2 rounded-md">Ver projeto <ArrowRight className="w-4 h-4" /></button>
+                      <button type="button" onClick={(e) => {
+  lastTriggerRef.current = e.currentTarget;
+  setSelectedProject(project);
+}} className="text-sm font-semibold text-[#00A550] hover:text-emerald-400 inline-flex items-center gap-1.5 border border-stone-700 hover:border-[#00A550] bg-transparent px-4 py-2 rounded-md">Ver projeto <ArrowRight className="w-4 h-4" /></button>
                     </div>
                   </div>
                 ))}
@@ -127,13 +178,51 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <div className="border border-stone-800 rounded-sm overflow-hidden">
                 <div className="divide-y divide-stone-800">
                   {votes.map((vote) => (
-                    <div key={vote.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div key={vote.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" onClick={(e) => {
+  voteLastTriggerRef.current = e.currentTarget;
+  setSelectedVote(vote);
+}}>
                       <div>
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
                           <span className={`font-semibold ${vote.vote?.toLowerCase() === 'sim' ? 'text-[#00A550]' : 'text-stone-400'}`}>{vote.vote}</span>
                           {vote.voteDate && <span className="text-stone-500">• {vote.voteDate}</span>}
-                        </div>
+{selectedVote && (
+           <div
+             className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+             onClick={(e) => {
+               if (e.target === e.currentTarget) {
+                 setSelectedVote(null);
+               }
+             }}
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby={`vote-title-${selectedVote?.id}`}
+           >
+             <div className="bg-white rounded-sm border border-stone-300 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+               <div className="p-6 border-b border-stone-200 flex items-start justify-between">
+                 <div>
+                   <div className="text-xs font-mono text-[#00A550] font-bold">{selectedVote.legislativeCode}</div>
+                   <h3 id={`vote-title-${selectedVote?.id}`} className="text-xl sm:text-2xl font-bold text-stone-900 mt-1">
+                     {selectedVote.sessionName ?? 'Votação'}
+                   </h3>
+                 </div>
+<button type="button" ref={voteCloseButtonRef} onClick={() => setSelectedVote(null)} className="p-1 text-stone-400 hover:text-stone-700" aria-label="Fechar detalhe da votação">
+                    <X className="w-6 h-6" />
+                  </button>
+               </div>
+               <div className="p-6 sm:p-8 space-y-6 text-sm text-stone-700">
+                 <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Votação</span><p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedVote.vote}</p></div>
+                 {selectedVote.sessionName && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Sessão</span><p className="leading-relaxed">{selectedVote.sessionName}</p></div>}
+                 {selectedVote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Data</span><p className="leading-relaxed">{selectedVote.voteDate}</p></div>}
+                 <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Votante</span><p className="leading-relaxed">{selectedVote.voterName}</p></div>
+                 {selectedVote.verificationStatus && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Status de verificação</span><p className="leading-relaxed">{selectedVote.verificationStatus.replace(/_/g, ' ')}</p></div>}
+                 {selectedVote.sourceUrl && <div className="pt-4 border-t border-stone-200 flex items-center justify-between gap-4"><span className="text-xs text-stone-500">Fonte legislativa vinculada ao acervo</span><a href={selectedVote.sourceUrl} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Portal ALRS <ExternalLink className="w-3 h-3" /></a></div>}
+               </div>
+             </div>
+           </div>
+         )}
+       </div>
                         {vote.sessionName && <p className="text-sm font-medium text-stone-300 mt-1.5">{vote.sessionName}</p>}
                         <p className="text-xs text-stone-500 mt-0.5">Voto registrado de {vote.voterName}{vote.verificationStatus ? ` — ${vote.verificationStatus.replace(/_/g, ' ')}` : ''}</p>
                       </div>
@@ -176,11 +265,28 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         )}
 
         {selectedProject && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedProject(null);
+              }
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`project-title-${selectedProject?.id}`}
+          >
             <div className="bg-white rounded-sm border border-stone-300 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="p-6 border-b border-stone-200 flex items-start justify-between">
-                <div><div className="text-xs font-mono text-[#00A550] font-bold">{selectedProject.code}</div><h3 className="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{selectedProject.title}</h3></div>
-                <button type="button" onClick={() => setSelectedProject(null)} className="p-1 text-stone-400 hover:text-stone-700" aria-label="Fechar detalhe do projeto"><X className="w-6 h-6" /></button>
+                <div>
+                  <div className="text-xs font-mono text-[#00A550] font-bold">{selectedProject.code}</div>
+                  <h3 id={`project-title-${selectedProject?.id}`} className="text-xl sm:text-2xl font-bold text-stone-900 mt-1">
+                    {selectedProject.title}
+                  </h3>
+                </div>
+                <button type="button" ref={closeButtonRef} onClick={() => setSelectedProject(null)} className="p-1 text-stone-400 hover:text-stone-700" aria-label="Fechar detalhe do projeto">
+                  <X className="w-6 h-6" />
+                </button>
               </div>
               <div className="p-6 sm:p-8 space-y-6 text-sm text-stone-700">
                 <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Resumo</span><p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedProject.summary}</p></div>
