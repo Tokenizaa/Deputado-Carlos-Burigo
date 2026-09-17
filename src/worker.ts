@@ -18,6 +18,8 @@ import {
   getAdminAuditLogs,
   getAllDemandsAdmin,
   updateDemandAdmin,
+  getPublicDocuments,
+  getPublicEvidence,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -286,6 +288,32 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       console.error('[api/pages/:slug]', error);
       return Response.json(
         { error: 'Falha ao carregar página do acervo' },
+        { status: 500 }
+      );
+    }
+  },
+  '/api/documents': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const documents = await getPublicDocuments();
+      return Response.json(documents);
+    } catch (error) {
+      console.error('[api/documents]', error);
+      return Response.json(
+        { error: 'Falha ao carregar documentos do acervo' },
+        { status: 500 }
+      );
+    }
+  },
+  '/api/evidence': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const evidence = await getPublicEvidence();
+      return Response.json(evidence);
+    } catch (error) {
+      console.error('[api/evidence]', error);
+      return Response.json(
+        { error: 'Falha ao carregar evidências do acervo' },
         { status: 500 }
       );
     }
