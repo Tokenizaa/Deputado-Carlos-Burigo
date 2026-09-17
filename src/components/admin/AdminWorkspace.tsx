@@ -83,9 +83,9 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
   const tabs = moduleTabs[activeModule as Exclude<ModuleId, 'dashboard' | 'cidadão'>] ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="border-b border-stone-200 bg-white -mx-4 sm:-mx-8 px-4 sm:px-8 pt-1">
-        <nav className="flex items-center gap-1 overflow-x-auto" aria-label="Seções do módulo">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="border-b border-stone-200 bg-white -mx-4 sm:-mx-8 px-4 sm:px-8 pt-1 overflow-hidden">
+        <nav className="flex items-center gap-1 overflow-x-auto overscroll-x-contain -mb-px" aria-label="Seções do módulo">
           {tabs.map((tab) => {
             const active = subTab === tab.id;
             return (
@@ -93,7 +93,7 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
                 key={tab.id}
                 type="button"
                 onClick={() => setSubTab(tab.id)}
-                className={`px-4 py-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${
+                className={`min-h-[48px] px-4 py-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550] focus-visible:ring-inset ${
                   active
                     ? 'border-[#00A550] text-[#00A550]'
                     : 'border-transparent text-stone-500 hover:text-stone-900'
