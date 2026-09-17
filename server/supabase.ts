@@ -637,7 +637,7 @@ export async function updateDemandAdmin(
         demand_id: id,
         action: 'Atualização administrativa',
         new_status: patch.status ?? null,
-        actor_id: actor.id ?? null,
+        actor_id: actor.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(actor.id) ? actor.id : null,
         actor_name: actorName,
         actor_role: actorRole,
         note,
