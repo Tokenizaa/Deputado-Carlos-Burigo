@@ -1,10 +1,12 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { ExternalLink, X } from 'lucide-react';
+import { ExternalLink, FileText, Image as ImageIcon, Play, X } from 'lucide-react';
 import { ContextSurface } from '../components/layout/ContextSurface';
+
+export type DocumentKind = 'pdf' | 'image' | 'video' | 'external';
 
 export type UiOverlay =
   | { type: 'protocol'; protocol?: string | null }
-  | { type: 'document'; url: string; title?: string }
+  | { type: 'document'; url: string; title?: string; kind?: DocumentKind }
   | null;
 
 export interface ContextSurfaceState {
@@ -23,7 +25,7 @@ interface AppUiContextValue {
   openNewsDetail: (slug: string) => void;
   openProtocolModal: (protocol?: string) => void;
   closeProtocolModal: () => void;
-  openDocumentViewer: (url: string, title?: string) => void;
+  openDocumentViewer: (url: string, title?: string, kind?: DocumentKind) => void;
   closeOverlay: () => void;
   openContextSurface: (title: string, content: React.ReactNode) => void;
   closeContextSurface: () => void;
@@ -48,12 +50,29 @@ const normalizePath = (pathname: string) => {
 };
 
 const readLocation = () => {
-  if (typeof window === 'undefined') return { view: 'home', newsSlug: null as string | null, protocol: null as string | null };
+  if (typeof window === 'undefined') return { view: 'home', newsSlug: null as string | null, protocol: null as string | null, documentUrl: null as string | null, documentTitle: null as string | null, documentKind: null as DocumentKind | null };
   const path = normalizePath(window.location.pathname);
   const params = new URLSearchParams(window.location.search);
   const newsSlug = path === '/noticias' ? params.get('noticia') : null;
   const protocol = params.has('protocolo') ? params.get('protocolo') : null;
-  return { view: newsSlug ? 'noticia-detalhe' : PATH_TO_VIEW[path] || 'home', newsSlug, protocol };
+  const documentUrl = params.get('documento');
+  const documentTitle = params.get('titulo');
+  const rawKind = params.get('tipo');
+  const documentKind: DocumentKind | null = rawKind === 'pdf' || rawKind === 'image' || rawKind === 'video' || rawKind === 'external' ? rawKind : null;
+  return { view: newsSlug ? 'noticia-detalhe' : PATH_TO_VIEW[path] || 'home', newsSlug, protocol, documentUrl, documentTitle, documentKind };
+};
+
+const inferDocumentKind = (url: string, kind?: DocumentKind): DocumentKind => {
+  if (kind) return kind;
+  try {
+    const pathname = new URL(url, window.location.href).pathname.toLowerCase();
+    if (/\.pdf$/.test(pathname)) return 'pdf';
+    if (/\.(png|jpe?g|gif|webp|svg|avif)$/.test(pathname)) return 'image';
+    if (/\.(mp4|webm|ogg|mov)$/.test(pathname)) return 'video';
+  } catch {
+    // Keep external fallback for malformed or non-file URLs.
+  }
+  return 'external';
 };
 
 export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -61,7 +80,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentView, setCurrentViewState] = useState(initial.view);
   const [selectedNewsSlug, setSelectedNewsSlug] = useState<string | null>(initial.newsSlug);
   const [trackingProtocol, setTrackingProtocol] = useState<string | null>(initial.protocol);
-  const [overlay, setOverlay] = useState<UiOverlay>(initial.protocol !== null ? { type: 'protocol', protocol: initial.protocol } : null);
+  const [overlay, setOverlay] = useState<UiOverlay>(initial.protocol !== null ? { type: 'protocol', protocol: initial.protocol } : initial.documentUrl ? { type: 'document', url: initial.documentUrl, title: initial.documentTitle || undefined, kind: initial.documentKind || undefined } : null);
   const [contextSurface, setContextSurface] = useState<ContextSurfaceState | null>(null);
 
   const syncFromLocation = useCallback(() => {
@@ -69,7 +88,11 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentViewState(location.view);
     setSelectedNewsSlug(location.newsSlug);
     setTrackingProtocol(location.protocol);
-    setOverlay(location.protocol !== null ? { type: 'protocol', protocol: location.protocol } : null);
+    setOverlay(location.protocol !== null
+      ? { type: 'protocol', protocol: location.protocol }
+      : location.documentUrl
+        ? { type: 'document', url: location.documentUrl, title: location.documentTitle || undefined, kind: location.documentKind || undefined }
+        : null);
     setContextSurface(null);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -102,15 +125,25 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const openProtocolModal = useCallback((protocol?: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set('protocolo', protocol || '');
+    params.delete('documento');
+    params.delete('titulo');
+    params.delete('tipo');
     window.history.pushState({ overlay: 'protocol' }, '', `${window.location.pathname}?${params.toString()}`);
     setTrackingProtocol(protocol || null);
     setOverlay({ type: 'protocol', protocol: protocol || null });
     setContextSurface(null);
   }, []);
 
-  const openDocumentViewer = useCallback((url: string, title?: string) => {
-    window.history.pushState({ overlay: 'document' }, '', window.location.href);
-    setOverlay({ type: 'document', url, title });
+  const openDocumentViewer = useCallback((url: string, title?: string, kind?: DocumentKind) => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('protocolo');
+    params.set('documento', url);
+    if (title) params.set('titulo', title);
+    else params.delete('titulo');
+    params.set('tipo', inferDocumentKind(url, kind));
+    window.history.pushState({ overlay: 'document', url }, '', `${window.location.pathname}?${params.toString()}`);
+    setTrackingProtocol(null);
+    setOverlay({ type: 'document', url, title, kind: inferDocumentKind(url, kind) });
     setContextSurface(null);
   }, []);
 
@@ -119,9 +152,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setContextSurface({ title, content });
   }, []);
 
-  const closeContextSurface = useCallback(() => {
-    setContextSurface(null);
-  }, []);
+  const closeContextSurface = useCallback(() => setContextSurface(null), []);
 
   const closeOverlay = useCallback(() => {
     if (overlay) {
@@ -145,7 +176,8 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const handleOfficialDocumentClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
       const link = target?.closest('a') as HTMLAnchorElement | null;
-      if (!link?.href || link.dataset.noDocumentViewer !== undefined) return;
+      if (!link?.href || link.dataset.noDocumentViewer !== undefined || link.dataset.documentViewer === 'false') return;
+      if (link.dataset.documentViewer !== 'true') return;
 
       let url: URL;
       try {
@@ -156,32 +188,35 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       if (!url.hostname.endsWith('al.rs.gov.br')) return;
       event.preventDefault();
-      openDocumentViewer(url.toString(), link.textContent?.trim() || 'Fonte oficial ALRS');
+      const kind = link.dataset.documentKind as DocumentKind | undefined;
+      openDocumentViewer(url.toString(), link.textContent?.trim() || 'Fonte oficial ALRS', kind);
     };
 
     document.addEventListener('click', handleOfficialDocumentClick);
     return () => document.removeEventListener('click', handleOfficialDocumentClick);
   }, [openDocumentViewer]);
 
+  const documentKind = overlay?.type === 'document' ? (overlay.kind || inferDocumentKind(overlay.url)) : null;
+  const documentLabel = overlay?.type === 'document' ? (overlay.title || 'Documento oficial') : 'Documento oficial';
+  const renderDocumentContent = overlay?.type === 'document' ? (
+    documentKind === 'image' ? <img src={overlay.url} alt={documentLabel} className="w-full h-full object-contain" />
+      : documentKind === 'video' ? <video src={overlay.url} controls playsInline className="w-full h-full object-contain" aria-label={documentLabel} />
+        : documentKind === 'external' ? <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center"><FileText className="h-10 w-10 text-stone-400" aria-hidden="true" /><p className="max-w-md text-sm text-stone-600">Esta fonte oficial não pode ser incorporada com segurança. Abra a fonte original.</p><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-800 hover:bg-stone-50">Abrir fonte oficial <ExternalLink className="h-4 w-4" /></a></div>
+          : <iframe src={overlay.url} title={documentLabel} className="w-full h-full border-0" />
+  ) : null;
+
   const renderDocumentOverlay = overlay?.type === 'document' ? (
-    <div className="fixed inset-0 z-[70] bg-black/80 flex items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label={overlay.title || 'Documento oficial'}>
+    <div className="fixed inset-0 z-[70] bg-black/80 flex items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label={documentLabel}>
       <div className="bg-white w-full h-full sm:max-w-6xl sm:h-[92vh] sm:rounded-lg overflow-hidden flex flex-col shadow-2xl">
         <div className="h-14 shrink-0 border-b border-stone-200 flex items-center justify-between gap-3 px-4 sm:px-5">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-stone-900 truncate">{overlay.title || 'Documento oficial'}</p>
-            <p className="text-[11px] text-stone-500">Leitura integrada • fonte oficial ALRS</p>
-          </div>
+          <div className="min-w-0 flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-stone-500" aria-hidden="true" /><div className="min-w-0"><p className="text-sm font-semibold text-stone-900 truncate">{documentLabel}</p><p className="text-[11px] text-stone-500">Leitura integrada • fonte oficial</p></div></div>
           <div className="flex items-center gap-2 shrink-0">
             <a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-stone-900 px-3 py-2 rounded-md border border-stone-200">Abrir fonte <ExternalLink className="w-3 h-3" /></a>
-            <button type="button" onClick={closeOverlay} className="min-h-[44px] min-w-[44px] rounded-md flex items-center justify-center text-stone-500 hover:text-stone-900 hover:bg-stone-100" aria-label="Fechar documento"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={closeOverlay} className="min-h-[44px] min-w-[44px] rounded-md flex items-center justify-center text-stone-500 hover:text-stone-900 hover:bg-stone-100 focus-visible:ring-2 focus-visible:ring-[#00A550]" aria-label="Fechar documento"><X className="w-6 h-6" /></button>
           </div>
         </div>
-        <div className="flex-1 bg-stone-100">
-          <iframe src={overlay.url} title={overlay.title || 'Documento oficial'} className="w-full h-full border-0" />
-        </div>
-        <div className="sm:hidden shrink-0 border-t border-stone-200 p-3 bg-white">
-          <a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-stone-700 border border-stone-200 rounded-md py-2.5">Abrir fonte oficial <ExternalLink className="w-4 h-4" /></a>
-        </div>
+        <div className="flex-1 min-h-0 bg-stone-100">{renderDocumentContent}</div>
+        <div className="sm:hidden shrink-0 border-t border-stone-200 p-3 bg-white"><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-stone-700 border border-stone-200 rounded-md py-2.5">Abrir fonte oficial <ExternalLink className="w-4 h-4" /></a></div>
       </div>
     </div>
   ) : null;
@@ -190,9 +225,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <AppUiContext.Provider value={{ currentView, selectedNewsSlug, trackingProtocol, isProtocolModalOpen: overlay?.type === 'protocol', overlay, contextSurface, setCurrentView, openNewsDetail, openProtocolModal, closeProtocolModal, openDocumentViewer, closeOverlay, openContextSurface, closeContextSurface }}>
       {children}
       {renderDocumentOverlay}
-      <ContextSurface open={contextSurface !== null} title={contextSurface?.title || ''} onClose={closeContextSurface}>
-        {contextSurface?.content}
-      </ContextSurface>
+      <ContextSurface open={contextSurface !== null} title={contextSurface?.title || ''} onClose={closeContextSurface}>{contextSurface?.content}</ContextSurface>
     </AppUiContext.Provider>
   );
 };
