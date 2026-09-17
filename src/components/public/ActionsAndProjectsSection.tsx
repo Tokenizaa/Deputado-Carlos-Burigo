@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowRight, ExternalLink, FileText, X } from 'lucide-react';
+import { ArrowRight, ExternalLink, FileText } from 'lucide-react';
 import { ProjectItem } from '../../types';
+import { ContextSurface } from '../layout/ContextSurface';
 
 interface ActionsAndProjectsSectionProps {
   initialSubTab?: 'visao-geral' | 'projetos' | 'votacoes' | 'resultados' | 'documentos';
@@ -175,23 +176,27 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           </div>
         )}
 
-        {selectedProject && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-sm border border-stone-300 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="p-6 border-b border-stone-200 flex items-start justify-between">
-                <div><div className="text-xs font-mono text-[#00A550] font-bold">{selectedProject.code}</div><h3 className="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{selectedProject.title}</h3></div>
-                <button type="button" onClick={() => setSelectedProject(null)} className="p-1 text-stone-400 hover:text-stone-700" aria-label="Fechar detalhe do projeto"><X className="w-6 h-6" /></button>
+        <ContextSurface
+          open={selectedProject !== null}
+          title={selectedProject?.title || 'Projeto'}
+          onClose={() => setSelectedProject(null)}
+        >
+          {selectedProject && (
+            <div className="space-y-6 text-sm text-stone-700">
+              <div>
+                <span className="text-xs font-bold text-[#00A550] uppercase tracking-wider block mb-1">{selectedProject.code}</span>
+                <p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedProject.summary}</p>
               </div>
-              <div className="p-6 sm:p-8 space-y-6 text-sm text-stone-700">
-                <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Resumo</span><p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedProject.summary}</p></div>
-                {selectedProject.detailedDescription && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Descrição</span><p className="leading-relaxed">{selectedProject.detailedDescription}</p></div>}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedProject.theme}</p></div><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação</span><p className="font-semibold text-[#00A550] mt-0.5">{selectedProject.status}</p></div></div>
-                {selectedProject.impacts.length > 0 && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">Registros de impacto</span><ul className="space-y-2 list-disc pl-5">{selectedProject.impacts.map((impact) => <li key={impact}>{impact}</li>)}</ul></div>}
-                {selectedProject.linkAlrs && <div className="pt-4 border-t border-stone-200 flex items-center justify-between gap-4"><span className="text-xs text-stone-500">Fonte legislativa vinculada ao acervo</span><a href={selectedProject.linkAlrs} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Portal ALRS <ExternalLink className="w-3 h-3" /></a></div>}
+              {selectedProject.detailedDescription && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Descrição</span><p className="leading-relaxed">{selectedProject.detailedDescription}</p></div>}
+              <div className="grid grid-cols-1 gap-4">
+                <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedProject.theme}</p></div>
+                <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação</span><p className="font-semibold text-[#00A550] mt-0.5">{selectedProject.status}</p></div>
               </div>
+              {selectedProject.impacts.length > 0 && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">Registros de impacto</span><ul className="space-y-2 list-disc pl-5">{selectedProject.impacts.map((impact) => <li key={impact}>{impact}</li>)}</ul></div>}
+              {selectedProject.linkAlrs && <div className="pt-4 border-t border-stone-200"><a href={selectedProject.linkAlrs} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Portal ALRS <ExternalLink className="w-3 h-3" /></a></div>}
             </div>
-          </div>
-        )}
+          )}
+        </ContextSurface>
       </div>
     </section>
   );
