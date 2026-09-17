@@ -39,6 +39,11 @@ async function respond(fn: JsonHandler, label: string, errorMessage: string): Pr
   }
 }
 
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Helper to extract user ID from request headers
 function getUserId(request: Request): string | null {
   const userId = request.headers.get('x-user-id');
@@ -493,12 +498,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         );
       }
       
+      const trackingTokenHash = await sha256Hex(protocol + citizenEmail);
+      
       // Insert demand into demands table
       const now = new Date().toISOString();
       const { data: demandData, error: demandError } = await supabaseAdmin
         .from('demands')
         .insert({
           protocol,
+          tracking_token_hash: trackingTokenHash,
           citizen_name: citizenName,
           citizen_email: citizenEmail,
           citizen_phone: citizenPhone,
