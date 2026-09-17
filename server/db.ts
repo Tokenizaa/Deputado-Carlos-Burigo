@@ -83,7 +83,7 @@ const INITIAL_USERS: User[] = [
     id: 'usr-3',
     name: 'Rodrigo Fontana',
     email: 'rodrigo.comunicacao@burigo.com.br',
-    role: 'COMUNICACAO',
+    role: 'COMUNICAÇÃO',
     cargo: 'Coordenador de Comunicação & Imprensa',
   },
   {
@@ -511,6 +511,7 @@ const INITIAL_DEMANDS: Demand[] = [
   {
     id: 'dem-1',
     protocol: '#2026-004821',
+    trackingTokenHash: 'tok-dem-004821',
     citizenName: 'Adalberto Mengue da Silva',
     citizenEmail: 'adalberto.mengue@gmail.com',
     citizenPhone: '(54) 99812-3456',
@@ -580,6 +581,7 @@ const INITIAL_DEMANDS: Demand[] = [
   {
     id: 'dem-2',
     protocol: '#2026-004815',
+    trackingTokenHash: 'tok-dem-004815',
     citizenName: 'Cláudia Beatriz Rossi',
     citizenEmail: 'claudiarossi.caxias@terra.com.br',
     citizenPhone: '(54) 99123-7788',
@@ -637,6 +639,7 @@ const INITIAL_DEMANDS: Demand[] = [
   {
     id: 'dem-3',
     protocol: '#2026-004830',
+    trackingTokenHash: 'tok-dem-004830',
     citizenName: 'Marcos Vinícius Boeira',
     citizenEmail: 'boeira.mv@agrofloresta.com.br',
     citizenPhone: '(54) 99654-0011',
@@ -1322,6 +1325,7 @@ class DatabaseManager {
     const newDemand: Demand = {
       id: `dem-${Date.now()}`,
       protocol,
+      trackingTokenHash: `tok-dem-${Date.now()}`,
       citizenName: data.citizenName.trim(),
       citizenEmail: data.citizenEmail.trim().toLowerCase(),
       citizenPhone: data.citizenPhone.trim(),
