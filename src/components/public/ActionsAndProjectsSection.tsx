@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowRight, ExternalLink, FileText } from 'lucide-react';
 import { ProjectItem } from '../../types';
+import { PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
 import { ContextSurface } from '../layout/ContextSurface';
 
 interface ActionsAndProjectsSectionProps {
@@ -26,6 +27,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             : initialSubTab,
   );
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
 
   const publishedProjects = projects.filter((project) => project.status === 'Concluído');
   const projectDocuments = projects.filter((project) => project.linkAlrs);
@@ -128,7 +130,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <div className="border border-stone-800 rounded-sm overflow-hidden">
                 <div className="divide-y divide-stone-800">
                   {votes.map((vote) => (
-                    <div key={vote.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <button key={vote.id} type="button" onClick={() => setSelectedVote(vote)} className="w-full text-left p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00A550]">
                       <div>
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
@@ -138,8 +140,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         {vote.sessionName && <p className="text-sm font-medium text-stone-300 mt-1.5">{vote.sessionName}</p>}
                         <p className="text-xs text-stone-500 mt-0.5">Voto registrado de {vote.voterName}{vote.verificationStatus ? ` — ${vote.verificationStatus.replace(/_/g, ' ')}` : ''}</p>
                       </div>
-                      {vote.sourceUrl && <a href={vote.sourceUrl} target="_blank" rel="noreferrer" className="text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0"><FileText className="w-3.5 h-3.5" /> Fonte ALRS <ExternalLink className="w-3 h-3" /></a>}
-                    </div>
+                      {vote.sourceUrl && <span className="text-[#00A550] font-semibold text-xs inline-flex items-center gap-1 shrink-0"><FileText className="w-3.5 h-3.5" /> Ver detalhes <ArrowRight className="w-3 h-3" /></span>}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -176,24 +178,26 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           </div>
         )}
 
-        <ContextSurface
-          open={selectedProject !== null}
-          title={selectedProject?.title || 'Projeto'}
-          onClose={() => setSelectedProject(null)}
-        >
+        <ContextSurface open={selectedProject !== null} title={selectedProject?.title || 'Projeto'} onClose={() => setSelectedProject(null)}>
           {selectedProject && (
             <div className="space-y-6 text-sm text-stone-700">
-              <div>
-                <span className="text-xs font-bold text-[#00A550] uppercase tracking-wider block mb-1">{selectedProject.code}</span>
-                <p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedProject.summary}</p>
-              </div>
+              <div><span className="text-xs font-bold text-[#00A550] uppercase tracking-wider block mb-1">{selectedProject.code}</span><p className="text-stone-900 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedProject.summary}</p></div>
               {selectedProject.detailedDescription && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Descrição</span><p className="leading-relaxed">{selectedProject.detailedDescription}</p></div>}
-              <div className="grid grid-cols-1 gap-4">
-                <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedProject.theme}</p></div>
-                <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação</span><p className="font-semibold text-[#00A550] mt-0.5">{selectedProject.status}</p></div>
-              </div>
+              <div className="grid grid-cols-1 gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedProject.theme}</p></div><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação</span><p className="font-semibold text-[#00A550] mt-0.5">{selectedProject.status}</p></div></div>
               {selectedProject.impacts.length > 0 && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">Registros de impacto</span><ul className="space-y-2 list-disc pl-5">{selectedProject.impacts.map((impact) => <li key={impact}>{impact}</li>)}</ul></div>}
               {selectedProject.linkAlrs && <div className="pt-4 border-t border-stone-200"><a href={selectedProject.linkAlrs} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Portal ALRS <ExternalLink className="w-3 h-3" /></a></div>}
+            </div>
+          )}
+        </ContextSurface>
+
+        <ContextSurface open={selectedVote !== null} title={selectedVote?.sessionName || 'Votação'} onClose={() => setSelectedVote(null)}>
+          {selectedVote && (
+            <div className="space-y-6 text-sm text-stone-700">
+              <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Matéria legislativa</span><p className="font-semibold text-stone-900">{selectedVote.legislativeCode}</p></div>
+              <div className="grid grid-cols-1 gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.vote}</p></div>{selectedVote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.voteDate}</p></div>}<div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.voterName}</p></div></div>
+              {selectedVote.sessionName && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Sessão</span><p className="text-stone-900 mt-0.5">{selectedVote.sessionName}</p></div>}
+              {selectedVote.verificationStatus && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Verificação</span><p className="text-stone-900 mt-0.5">{selectedVote.verificationStatus.replace(/_/g, ' ')}</p></div>}
+              {selectedVote.sourceUrl && <div className="pt-4 border-t border-stone-200"><a href={selectedVote.sourceUrl} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Fonte oficial ALRS <ExternalLink className="w-3 h-3" /></a></div>}
             </div>
           )}
         </ContextSurface>
