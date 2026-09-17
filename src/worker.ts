@@ -502,7 +502,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       
       // Insert demand into demands table
       const now = new Date().toISOString();
-      const { data: demandData, error: demandError } = await supabaseAdmin
+      const { error: demandError } = await supabaseAdmin
         .from('demands')
         .insert({
           protocol,
@@ -520,17 +520,18 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
           status: 'recebida',
           created_at: now,
           updated_at: now
-        })
-        .select()
-        .single();
+        });
         
       if (demandError) throw demandError;
+      
+      const fullDemand = await getPublicDemandByProtocol(protocol);
+      if (!fullDemand) return Response.json({ error: 'Demanda criada mas não encontrada' }, { status: 500 });
       
       // Insert initial history entry
       await supabaseAdmin
         .from('demand_history')
         .insert({
-          demand_id: demandData.id,
+          demand_id: fullDemand.id,
           action: 'Criação da demanda',
           new_status: 'recebida',
           actor_id: null,
@@ -539,16 +540,6 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
           note: 'Demanda criada via portal do cidadão',
           created_at: now
         });
-      
-      // Fetch the full demand with messages and history
-      const fullDemand = await getPublicDemandByProtocol(protocol);
-      
-      if (!fullDemand) {
-        return Response.json(
-          { error: 'Demanda criada mas não encontrada' },
-          { status: 500 }
-        );
-      }
       
       return Response.json({
         success: true,
