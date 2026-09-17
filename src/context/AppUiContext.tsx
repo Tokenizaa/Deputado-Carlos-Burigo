@@ -1,5 +1,5 @@
-import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { ExternalLink, FileText, Image as ImageIcon, Play, X } from 'lucide-react';
+import React, { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import { ExternalLink, FileText, X } from 'lucide-react';
 import { ContextSurface } from '../components/layout/ContextSurface';
 
 export type DocumentKind = 'pdf' | 'image' | 'video' | 'external';
@@ -82,6 +82,8 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [trackingProtocol, setTrackingProtocol] = useState<string | null>(initial.protocol);
   const [overlay, setOverlay] = useState<UiOverlay>(initial.protocol !== null ? { type: 'protocol', protocol: initial.protocol } : initial.documentUrl ? { type: 'document', url: initial.documentUrl, title: initial.documentTitle || undefined, kind: initial.documentKind || undefined } : null);
   const [contextSurface, setContextSurface] = useState<ContextSurfaceState | null>(null);
+  const documentCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const previousDocumentFocusRef = useRef<HTMLElement | null>(null);
 
   const syncFromLocation = useCallback(() => {
     const location = readLocation();
@@ -140,10 +142,11 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     params.set('documento', url);
     if (title) params.set('titulo', title);
     else params.delete('titulo');
-    params.set('tipo', inferDocumentKind(url, kind));
+    const resolvedKind = inferDocumentKind(url, kind);
+    params.set('tipo', resolvedKind);
     window.history.pushState({ overlay: 'document', url }, '', `${window.location.pathname}?${params.toString()}`);
     setTrackingProtocol(null);
-    setOverlay({ type: 'document', url, title, kind: inferDocumentKind(url, kind) });
+    setOverlay({ type: 'document', url, title, kind: resolvedKind });
     setContextSurface(null);
   }, []);
 
@@ -171,6 +174,67 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOverlay(null);
     setTrackingProtocol(null);
   }, [overlay]);
+
+  useEffect(() => {
+    if (overlay?.type !== 'document') return;
+
+    previousDocumentFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeOverlay();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const root = document.querySelector('[data-document-viewer="true"]');
+      if (!(root instanceof HTMLElement)) return;
+
+      const focusable = Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), video[controls], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => {
+        if (element.hasAttribute('aria-hidden')) return false;
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        documentCloseButtonRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    const frame = requestAnimationFrame(() => documentCloseButtonRef.current?.focus());
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+      if (previousDocumentFocusRef.current && document.contains(previousDocumentFocusRef.current)) {
+        previousDocumentFocusRef.current.focus();
+      }
+      previousDocumentFocusRef.current = null;
+    };
+  }, [overlay?.type, closeOverlay]);
 
   useEffect(() => {
     const handleOfficialDocumentClick = (event: MouseEvent) => {
@@ -201,22 +265,22 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const renderDocumentContent = overlay?.type === 'document' ? (
     documentKind === 'image' ? <img src={overlay.url} alt={documentLabel} className="w-full h-full object-contain" />
       : documentKind === 'video' ? <video src={overlay.url} controls playsInline className="w-full h-full object-contain" aria-label={documentLabel} />
-        : documentKind === 'external' ? <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center"><FileText className="h-10 w-10 text-stone-400" aria-hidden="true" /><p className="max-w-md text-sm text-stone-600">Esta fonte oficial não pode ser incorporada com segurança. Abra a fonte original.</p><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-800 hover:bg-stone-50">Abrir fonte oficial <ExternalLink className="h-4 w-4" /></a></div>
+        : documentKind === 'external' ? <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center"><FileText className="h-10 w-10 text-stone-400" aria-hidden="true" /><p className="max-w-md text-sm text-stone-600">Esta fonte oficial não pode ser incorporada com segurança. Abra a fonte original.</p><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-800 hover:bg-stone-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Abrir fonte oficial <ExternalLink className="h-4 w-4" aria-hidden="true" /></a></div>
           : <iframe src={overlay.url} title={documentLabel} className="w-full h-full border-0" />
   ) : null;
 
   const renderDocumentOverlay = overlay?.type === 'document' ? (
-    <div className="fixed inset-0 z-[70] bg-black/80 flex items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label={documentLabel}>
+    <div className="fixed inset-0 z-[70] bg-black/80 flex items-center justify-center sm:p-4" data-document-viewer="true" role="dialog" aria-modal="true" aria-labelledby="document-viewer-title">
       <div className="bg-white w-full h-full sm:max-w-6xl sm:h-[92vh] sm:rounded-lg overflow-hidden flex flex-col shadow-2xl">
         <div className="h-14 shrink-0 border-b border-stone-200 flex items-center justify-between gap-3 px-4 sm:px-5">
-          <div className="min-w-0 flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-stone-500" aria-hidden="true" /><div className="min-w-0"><p className="text-sm font-semibold text-stone-900 truncate">{documentLabel}</p><p className="text-[11px] text-stone-500">Leitura integrada • fonte oficial</p></div></div>
+          <div className="min-w-0 flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-stone-500" aria-hidden="true" /><div className="min-w-0"><p id="document-viewer-title" className="text-sm font-semibold text-stone-900 truncate">{documentLabel}</p><p className="text-[11px] text-stone-500">Leitura integrada • fonte oficial</p></div></div>
           <div className="flex items-center gap-2 shrink-0">
-            <a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-stone-900 px-3 py-2 rounded-md border border-stone-200">Abrir fonte <ExternalLink className="w-3 h-3" /></a>
-            <button type="button" onClick={closeOverlay} className="min-h-[44px] min-w-[44px] rounded-md flex items-center justify-center text-stone-500 hover:text-stone-900 hover:bg-stone-100 focus-visible:ring-2 focus-visible:ring-[#00A550]" aria-label="Fechar documento"><X className="w-6 h-6" /></button>
+            <a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-stone-900 px-3 py-2 rounded-md border border-stone-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Abrir fonte <ExternalLink className="w-3 h-3" aria-hidden="true" /></a>
+            <button ref={documentCloseButtonRef} type="button" onClick={closeOverlay} className="min-h-[44px] min-w-[44px] rounded-md flex items-center justify-center text-stone-500 hover:text-stone-900 hover:bg-stone-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]" aria-label="Fechar documento"><X className="w-6 h-6" aria-hidden="true" /></button>
           </div>
         </div>
         <div className="flex-1 min-h-0 bg-stone-100">{renderDocumentContent}</div>
-        <div className="sm:hidden shrink-0 border-t border-stone-200 p-3 bg-white"><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-stone-700 border border-stone-200 rounded-md py-2.5">Abrir fonte oficial <ExternalLink className="w-4 h-4" /></a></div>
+        <div className="sm:hidden shrink-0 border-t border-stone-200 p-3 bg-white"><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-stone-700 border border-stone-200 rounded-md py-2.5 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Abrir fonte oficial <ExternalLink className="w-4 h-4" aria-hidden="true" /></a></div>
       </div>
     </div>
   ) : null;
