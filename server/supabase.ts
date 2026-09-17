@@ -1,4 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
+import {
+  normalizeLegislativeCode,
+  toPublicLegislativeItemDto,
+  toPublicLegislativeVoteDto,
+  toPublicProjectDto,
+  toPublicResultDto,
+} from './mappers/publicLegislative';
+import type { User, UserRole } from '../src/types';
+import type { AuditLog } from '../src/types';
+import {
+  toPublicAgendaDto,
+  toPublicNewsDto,
+  toPublicPageDto,
+} from './mappers/publicCommunication';
+import {
+  mapToPublicMediaDto,
+  mapToPublicVideoDto,
+  mapToPublicDocumentDto,
+  mapToPublicEvidenceDto,
+} from './mappers/publicArchive';
+import {
+  mapToPublicDemandDto,
+  mapToPublicDemandMessageDto,
+  mapToPublicDemandHistoryDto,
+} from './mappers/publicDemand';
+import type { LegislativeItemRow } from './mappers/publicLegislative';
+import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
+import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
+import type { PublicDemandDto, DemandMessageDto, DemandHistoryDto } from '../src/contracts/publicDemand';
+import { extractLegislativeCode } from '../src/contracts/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
@@ -6,7 +36,7 @@ const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
   ?? process.env.SUPABASE_ANON_KEY
   ?? 'sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj';
 
-const supabasePublic = createClient(url, publishableKey, {
+export const supabasePublic = createClient(url, publishableKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
@@ -16,13 +46,136 @@ export const supabaseAdmin = serviceRoleKey
   ? createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } })
   : supabasePublic;
 
-async function getPublishedLegislativeCodes() {
+type PublishedLegislativeIndex = ReadonlyMap<string, string>;
+
+async function getPublishedLegislativeIndex(): Promise<PublishedLegislativeIndex> {
   const { data, error } = await supabasePublic.from('legislative_items')
-    .select('type,number,year,status,verification_status')
+    .select('id,type,number,year,status,verification_status')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']);
   if (error) throw error;
-  return new Set((data ?? []).map((item) => `${item.type} ${item.number}/${item.year}`));
+
+  return new Map((data ?? []).map((item) => [
+    normalizeLegislativeCode(`${item.type} ${item.number}/${item.year}`),
+    item.id,
+  ]));
+}
+
+async function getPublishedLegislativeItems(): Promise<LegislativeItemRow[]> {
+  const { data, error } = await supabasePublic.from('legislative_items')
+    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status')
+    .eq('status', 'PUBLISHED')
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('year', { ascending: false })
+    .order('number', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as LegislativeItemRow[];
+}
+
+export async function getPublishedLegislativeCodes() {
+  return new Set((await getPublishedLegislativeIndex()).keys());
+}
+
+export async function getPublicLegislativeItems(): Promise<PublicLegislativeItemDto[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const [{ data: events, error: eventsError }, { data: votes, error: votesError }, { data: roles, error: rolesError }] = await Promise.all([
+    supabasePublic.from('legislative_events')
+      .select('id,item_id,event_type,event_date,description,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+      .order('event_date', { ascending: true }),
+    supabasePublic.from('legislative_votes')
+      .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+      .order('vote_date', { ascending: true }),
+    supabasePublic.from('legislative_roles')
+      .select('id,item_id,person_name,role,source_url,verification_status')
+      .in('item_id', itemIds)
+      .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE']),
+  ]);
+
+  if (eventsError) throw eventsError;
+  if (votesError) throw votesError;
+  if (rolesError) throw rolesError;
+
+  const eventsByItem = new Map<string, typeof events>();
+  for (const event of events ?? []) {
+    const list = eventsByItem.get(event.item_id) ?? [];
+    list.push(event);
+    eventsByItem.set(event.item_id, list);
+  }
+
+  const votesByItem = new Map<string, typeof votes>();
+  for (const vote of votes ?? []) {
+    const list = votesByItem.get(vote.item_id) ?? [];
+    list.push(vote);
+    votesByItem.set(vote.item_id, list);
+  }
+
+  const rolesByItem = new Map<string, typeof roles>();
+  for (const role of roles ?? []) {
+    const list = rolesByItem.get(role.item_id) ?? [];
+    list.push(role);
+    rolesByItem.set(role.item_id, list);
+  }
+
+  return items.map((item) => toPublicLegislativeItemDto(item, {
+    events: eventsByItem.get(item.id) ?? [],
+    votes: votesByItem.get(item.id) ?? [],
+    roles: rolesByItem.get(item.id) ?? [],
+  }));
+}
+
+export async function getPublicLegislativeVotes(): Promise<PublicLegislativeVoteDto[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const { data, error } = await supabasePublic.from('legislative_votes')
+    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+    .in('item_id', itemIds)
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('vote_date', { ascending: false, nullsFirst: false });
+  if (error) throw error;
+
+  return (data ?? []).flatMap((vote) => {
+    const item = itemById.get(vote.item_id);
+    return item ? [toPublicLegislativeVoteDto(vote, item)] : [];
+  });
+}
+
+// Simpler format for public /api/votes endpoint (edge Worker)
+export async function getPublicVotes(): Promise<{ id: string; itemId: string; sessionName: string; date?: string; voterName: string; vote: string; sourceUrl?: string }[]> {
+  const items = await getPublishedLegislativeItems();
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const itemIds = items.map((item) => item.id);
+  if (itemIds.length === 0) return [];
+
+  const { data, error } = await supabasePublic.from('legislative_votes')
+    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
+    .in('item_id', itemIds)
+    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
+    .order('vote_date', { ascending: false, nullsFirst: false });
+  if (error) throw error;
+
+  return (data ?? []).flatMap((vote) => {
+    const item = itemById.get(vote.item_id);
+    if (!item) return [];
+    return [{
+      id: vote.id,
+      itemId: vote.item_id,
+      sessionName: vote.session_name ?? '',
+      date: vote.vote_date ?? undefined,
+      voterName: vote.voter_name,
+      vote: vote.vote,
+      sourceUrl: vote.source_url ?? undefined,
+    }];
+  });
 }
 
 export async function getPublicSettings() {
@@ -59,43 +212,35 @@ export async function getPublicSettings() {
 }
 
 export async function getPublicProjects() {
-  const publishedCodes = await getPublishedLegislativeCodes();
+  const publishedIndex = await getPublishedLegislativeIndex();
+  const publishedCodes = new Set(publishedIndex.keys());
   const { data, error } = await supabasePublic.from('projects')
     .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
     .order('year', { ascending: false }).order('code', { ascending: true });
   if (error) throw error;
-  return (data ?? []).filter((item) => publishedCodes.has(item.code)).map((item) => ({
-    id: item.id,
-    code: item.code,
-    title: item.title,
-    summary: item.summary,
-    detailedDescription: item.detailed_description,
-    theme: item.theme,
-    status: item.status,
-    linkAlrs: item.link_alrs,
-    year: item.year,
-    impacts: Array.isArray(item.impacts) ? item.impacts : [],
-  }));
+  return (data ?? [])
+    .map((item) => {
+      const legislativeCode = normalizeLegislativeCode(item.code);
+      const legislativeItemId = publishedIndex.get(legislativeCode);
+      return legislativeItemId ? toPublicProjectDto(item, publishedCodes, legislativeItemId) : null;
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicResults() {
-  const publishedCodes = await getPublishedLegislativeCodes();
+  const publishedIndex = await getPublishedLegislativeIndex();
+  const publishedCodes = new Set(publishedIndex.keys());
   const { data, error } = await supabasePublic.from('results')
     .select('id,title,category,description,metrics,municipality,result_date')
     .order('result_date', { ascending: false });
   if (error) throw error;
-  return (data ?? []).filter((item) => {
-    const match = item.title?.match(/(PL|PLC)\s+\d+\/\d{4}/i);
-    return match ? publishedCodes.has(match[0].toUpperCase()) : false;
-  }).map((item) => ({
-    id: item.id,
-    title: item.title,
-    category: item.category,
-    description: item.description,
-    metrics: item.metrics,
-    municipality: item.municipality,
-    date: item.result_date,
-  }));
+  return (data ?? [])
+    .map((item) => {
+      const legislativeCode = extractLegislativeCode(item.title);
+      const legislativeItemId = legislativeCode ? publishedIndex.get(normalizeLegislativeCode(legislativeCode)) : undefined;
+      return toPublicResultDto(item, publishedCodes, legislativeItemId);
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicMunicipalities() {
@@ -118,21 +263,7 @@ export async function getPublicVideos() {
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    url: item.url,
-    platform: item.platform,
-    category: item.category,
-    date: item.published_at ?? item.created_at,
-    thumbnail: item.thumbnail_url ?? '',
-    featured: Boolean(item.featured),
-    status: item.status,
-    sourceName: item.source_name,
-    verificationStatus: item.verification_status,
-    rightsStatus: item.rights_status,
-  }));
+  return data ?? [];
 }
 
 export async function getPublicMedia() {
@@ -140,79 +271,257 @@ export async function getPublicMedia() {
     .select('id,name,title,alt_text,description,credit,category,storage_path,url,size,mime_type,created_at,original_url,source_name,source_page_url,sha256,published_at,downloaded_at,verification_status,rights_status,event_name,notes')
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    name: item.name,
-    title: item.title,
-    altText: item.alt_text,
-    description: item.description,
-    credit: item.credit,
-    category: item.category,
-    storagePath: item.storage_path,
-    url: item.url,
-    size: item.size,
-    mimeType: item.mime_type,
-    uploadedAt: item.created_at,
-    originalUrl: item.original_url,
-    sourceName: item.source_name,
-    sourcePageUrl: item.source_page_url,
-    sha256: item.sha256,
-    publishedAt: item.published_at,
-    verificationStatus: item.verification_status,
-    rightsStatus: item.rights_status,
-    eventName: item.event_name,
-    notes: item.notes,
-  }));
+  return data ?? [];
 }
 
-export async function getPublicNews() {
+export async function getPublicDocuments() {
+  const { data, error } = await supabasePublic.from('documents')
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicDocumentDto);
+}
+
+export async function getPublicEvidence() {
+  const { data, error } = await supabasePublic.from('evidence')
+    .select('id,title,description,type,url,storage_path,mime_type,file_size,sha256,source_name,uploaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicEvidenceDto);
+}
+
+export async function getPublicDemands(): Promise<PublicDemandDto[]> {
+  const { data, error } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .in('status', ['recebida', 'em análise', 'em atendimento', 'encaminhada', 'aguardando retorno', 'respondida', 'concluída'])
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicDemandDto);
+}
+
+export async function getPublicDemandById(id: string): Promise<PublicDemandDto | null> {
+  // Get the demand
+  const { data: demandData, error: demandError } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .eq('id', id)
+    .single();
+   
+  if (demandError) throw demandError;
+  if (!demandData) return null;
+  
+  // Get messages for this demand
+  const { data: messagesData, error: messagesError } = await supabasePublic.from('demand_messages')
+    .select('id,demand_id,sender_type,sender_name,text,attachments,created_at')
+    .eq('demand_id', id)
+    .order('created_at', { ascending: true });
+  
+  if (messagesError) throw messagesError;
+  
+  // Get history for this demand
+  const { data: historyData, error: historyError } = await supabasePublic.from('demand_history')
+    .select('id,demand_id,action,previous_status,new_status,actor_id,actor_name,actor_role,note,created_at')
+    .eq('demand_id', id)
+    .order('created_at', { ascending: true });
+  
+  if (historyError) throw historyError;
+  
+  // Map to DTO with messages and history
+  const demandDto = mapToPublicDemandDto(demandData);
+  return {
+    ...demandDto,
+    messages: (messagesData ?? []).map(mapToPublicDemandMessageDto),
+    history: (historyData ?? []).map(mapToPublicDemandHistoryDto)
+  };
+}
+
+export async function getPublicDemandByProtocol(protocol: string): Promise<PublicDemandDto | null> {
+  // Get the demand by protocol
+  const { data: demandData, error: demandError } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .eq('protocol', protocol)
+    .single();
+   
+  if (demandError) throw demandError;
+  if (!demandData) return null;
+  
+  // Get messages for this demand
+  const { data: messagesData, error: messagesError } = await supabasePublic.from('demand_messages')
+    .select('id,demand_id,sender_type,sender_name,text,attachments,created_at')
+    .eq('demand_id', demandData.id)
+    .order('created_at', { ascending: true });
+  
+  if (messagesError) throw messagesError;
+  
+  // Get history for this demand
+  const { data: historyData, error: historyError } = await supabasePublic.from('demand_history')
+    .select('id,demand_id,action,previous_status,new_status,actor_id,actor_name,actor_role,note,created_at')
+    .eq('demand_id', demandData.id)
+    .order('created_at', { ascending: true });
+  
+  if (historyError) throw historyError;
+  
+  // Map to DTO with messages and history
+  const demandDto = mapToPublicDemandDto(demandData);
+  return {
+    ...demandDto,
+    messages: (messagesData ?? []).map(mapToPublicDemandMessageDto),
+    history: (historyData ?? []).map(mapToPublicDemandHistoryDto)
+  };
+}
+
+export async function getPublicNews(): Promise<PublicNewsDto[]> {
   const { data, error } = await supabasePublic.from('news')
     .select('id,title,slug,summary,content,main_media_id,gallery,video_url,category,municipality,published_at,author_id,status,featured,seo_title,seo_description,social_media_id,created_at')
     .eq('status', 'publicado')
     .order('published_at', { ascending: false, nullsFirst: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    title: item.title,
-    slug: item.slug,
-    summary: item.summary,
-    content: item.content,
-    mainImage: item.main_media_id ?? '',
-    gallery: Array.isArray(item.gallery) ? item.gallery : [],
-    videoUrl: item.video_url ?? undefined,
-    category: item.category,
-    municipality: item.municipality ?? undefined,
-    date: item.published_at ?? item.created_at,
-    author: item.author_id ?? '',
-    status: item.status,
-    featured: Boolean(item.featured),
-    seoTitle: item.seo_title ?? undefined,
-    seoDescription: item.seo_description ?? undefined,
-    socialImage: item.social_media_id ?? undefined,
-  }));
+  return (data ?? []).map(toPublicNewsDto);
 }
 
-export async function getPublicAgenda() {
+export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
   const { data, error } = await supabasePublic.from('events')
     .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
     .eq('status', 'publicado')
     .eq('visibility', 'publico')
     .order('starts_at', { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((item) => {
-    const start = item.starts_at ? new Date(item.starts_at) : null;
-    return {
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      date: start ? start.toISOString().slice(0, 10) : '',
-      time: start ? start.toISOString().slice(11, 16) : '',
-      location: item.location,
-      municipality: item.municipality,
-      image: item.media_id ?? undefined,
-      link: item.link ?? undefined,
-      participants: item.participants ?? undefined,
-      visibility: item.visibility,
-    };
-  });
+  return (data ?? []).map(toPublicAgendaDto);
+}
+
+export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
+  let query = supabasePublic.from('pages')
+    .select('id,title,slug,description,status,updated_by,updated_at')
+    .eq('status', 'publicado')
+    .order('slug', { ascending: true });
+  if (slug) query = query.eq('slug', slug);
+
+  const { data: pages, error: pagesError } = await query;
+  if (pagesError) throw pagesError;
+  if (!pages?.length) return [];
+
+  const pageIds = pages.map((page) => page.id);
+  const { data: blocks, error: blocksError } = await supabasePublic.from('page_blocks')
+    .select('id,page_id,type,title,subtitle,content,visible,active,position')
+    .in('page_id', pageIds)
+    .eq('visible', true)
+    .eq('active', true)
+    .order('position', { ascending: true });
+  if (blocksError) throw blocksError;
+
+  const blocksByPage = new Map<string, typeof blocks>();
+  for (const block of blocks ?? []) {
+    const list = blocksByPage.get(block.page_id) ?? [];
+    list.push(block);
+    blocksByPage.set(block.page_id, list);
+  }
+
+  return pages.map((page) => toPublicPageDto(page, blocksByPage.get(page.id) ?? []));
+}
+
+export async function getAdminUserById(id: string): Promise<User | null> {
+  try {
+    // Get auth user (includes email)
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(id);
+    if (authError) throw authError;
+    if (!authUser) return null;
+
+    // Get profile
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, name, cargo, avatar_url')
+      .eq('id', id)
+      .single();
+    if (profileError) throw profileError;
+    if (!profile) return null;
+
+    // Get user role
+    const { data: roleData, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', id)
+      .single();
+    if (roleError && roleError.code !== 'PGRST116') throw roleError; // PGRST116 means no rows
+    const role = roleData?.role ?? 'VISUALIZADOR';
+
+const userEntity = authUser!.user;
+return {
+        id: profile.id,
+        name: profile.name,
+        email: userEntity.email ?? '',
+        role: role as UserRole,
+        avatar: profile.avatar_url ?? undefined,
+        cargo: profile.cargo ?? '',
+      };
+  } catch (error) {
+    console.error('Error fetching admin user by id:', error);
+    return null;
+  }
+}
+
+export async function getAllAdminUsers(): Promise<User[]> {
+  try {
+    // Get all auth users (admin API)
+    const { data: listUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+    if (authError) throw authError;
+    const authUsers = listUsers?.users ?? [];
+
+    // Get all profiles
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, name, cargo, avatar_url');
+    if (profilesError) throw profilesError;
+
+    // Get all user roles
+    const { data: roles, error: rolesError } = await supabaseAdmin
+      .from('user_roles')
+      .select('user_id, role');
+    if (rolesError) throw rolesError;
+
+    // Build maps
+    const profileMap = new Map<string, any>();
+    profiles?.forEach(p => profileMap.set(p.id, p));
+
+    const roleMap = new Map<string, string>();
+    roles?.forEach(r => roleMap.set(r.user_id, r.role));
+
+    const users: User[] = [];
+    for (const authUser of authUsers) {
+      const profile = profileMap.get(authUser.id);
+if (!profile) continue; // skip if no profile (should not happen)
+       const role = roleMap.get(authUser.id) ?? 'VISUALIZADOR';
+       users.push({
+         id: authUser.id,
+         name: profile.name,
+         email: ((authUser as any).email ?? (authUser as any)?.user?.email) ?? '',
+         role: role as UserRole,
+         avatar: profile.avatar_url ?? undefined,
+         cargo: profile.cargo ?? '',
+       });
+    }
+
+    return users;
+  } catch (error) {
+    console.error('Error fetching all admin users:', error);
+    return [];
+  }
+}
+
+export async function getAdminAuditLogs(): Promise<AuditLog[]> {
+  const { data, error } = await supabaseAdmin.from('audit_logs')
+    .select('id, user_id, user_name, user_role, action, entity_type, entity_id, details, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    userName: row.user_name,
+    userRole: row.user_role,
+    action: row.action,
+    entityType: row.entity_type,
+    entityId: row.entity_id,
+    details: row.details,
+    timestamp: row.created_at,
+  }));
 }

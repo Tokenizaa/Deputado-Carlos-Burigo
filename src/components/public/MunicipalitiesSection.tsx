@@ -6,6 +6,15 @@ export const MunicipalitiesSection: React.FC = () => {
   const { municipalities, setCurrentView } = useApp();
   const [selectedMun, setSelectedMun] = useState(municipalities[0] || null);
 
+  const renderDelivery = (delivery: any) => {
+    // Cada entrega tem estrutura diferente; renderiza o campo mais relevante
+    if (delivery.projeto) return delivery.projeto;
+    if (delivery.evento) return delivery.evento;
+    if (delivery.mandato) return delivery.mandato;
+    if (delivery.detalhes) return delivery.detalhes;
+    return JSON.stringify(delivery);
+  };
+
   return (
     <section className="py-16 sm:py-24 bg-stone-50/60 border-b border-stone-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,14 +90,14 @@ export const MunicipalitiesSection: React.FC = () => {
                     Ações, Recursos e Demandas Atendidas
                   </h4>
                   <div className="space-y-2">
-                    {selectedMun.keyDeliveries.map((delivery, i) => (
+                    {selectedMun.keyDeliveries?.map((delivery, i) => (
                       <div
                         key={i}
                         className="p-3.5 border border-stone-100 rounded-sm bg-stone-50/50 flex items-start gap-3"
                       >
                         <CheckCircle2 className="w-4 h-4 text-[#00A550] shrink-0 mt-0.5" />
                         <p className="text-sm text-stone-700 leading-relaxed editorial-prose">
-                          {delivery}
+                          {renderDelivery(delivery)}
                         </p>
                       </div>
                     ))}
@@ -108,3 +117,5 @@ export const MunicipalitiesSection: React.FC = () => {
     </section>
   );
 };
+
+export default MunicipalitiesSection;

@@ -14,6 +14,8 @@ import {
   Demand,
   AuditLog,
 } from '../types';
+import { useAppUi } from './AppUiContext';
+import { PublicLegislativeVoteDto } from '../contracts/publicLegislative';
 
 interface AppContextType {
   settings: SiteSettings | null;
@@ -24,6 +26,7 @@ interface AppContextType {
   trackingProtocol: string | null;
   isProtocolModalOpen: boolean;
   pages: Page[];
+  adminPages: Page[];
   news: News[];
   events: EventItem[];
   projects: ProjectItem[];
@@ -33,11 +36,11 @@ interface AppContextType {
   media: MediaItem[];
   demands: Demand[];
   auditLogs: AuditLog[];
+  votes: PublicLegislativeVoteDto[];
   isLoading: boolean;
   toastMessage: string | null;
   toastType: 'success' | 'error' | 'info';
 
-  // Navigation & Actions
   setCurrentView: (view: string) => void;
   openNewsDetail: (slug: string) => void;
   openProtocolModal: (protocol?: string) => void;
@@ -49,12 +52,23 @@ interface AppContextType {
     pageData: {
       blocks?: PageBlock[];
       title?: string;
+      slug?: string;
       description?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
     }
   ) => Promise<{ success: boolean; data?: Page; error?: string }>;
+  createPage: (pageData: {
+    title: string;
+    slug: string;
+    description?: string;
+    status?: 'publicado' | 'rascunho';
+    blocks?: PageBlock[];
+    publish?: boolean;
+    note?: string;
+  }) => Promise<{ success: boolean; data?: Page; error?: string }>;
+  rollbackPage: (pageId: string, versionId: string) => Promise<{ success: boolean; data?: Page; error?: string }>;
   showToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   refreshAllData: () => Promise<void>;
 }
@@ -62,6 +76,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const ui = useAppUi();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [currentUser, setCurrentUser] = useState<User>({
     id: 'usr-1',
@@ -71,12 +86,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     cargo: 'Deputado Estadual / Titular',
   });
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [currentView, setCurrentView] = useState<string>('home');
-  const [selectedNewsSlug, setSelectedNewsSlug] = useState<string | null>(null);
-  const [trackingProtocol, setTrackingProtocol] = useState<string | null>(null);
-  const [isProtocolModalOpen, setIsProtocolModalOpen] = useState(false);
 
   const [pages, setPages] = useState<Page[]>([]);
+  const [adminPages, setAdminPages] = useState<Page[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -86,6 +98,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [demands, setDemands] = useState<Demand[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [votes, setVotes] = useState<PublicLegislativeVoteDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -94,9 +107,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToastMessage(msg);
     setToastType(type);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4000);
+    setTimeout(() => setToastMessage(null), 4000);
   }, []);
 
   const refreshAllData = useCallback(async () => {
@@ -105,6 +116,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         settingsRes,
         authRes,
         pagesRes,
+        adminPagesRes,
         newsRes,
         eventsRes,
         projectsRes,
@@ -112,12 +124,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         munRes,
         videosRes,
         mediaRes,
+        votesRes,
         demandsRes,
         logsRes,
       ] = await Promise.all([
         fetch('/api/settings').then((r) => r.json()),
         fetch('/api/auth/me', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.json()),
         fetch('/api/pages').then((r) => r.json()),
+        fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
         fetch('/api/news?admin=true').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
         fetch('/api/projects').then((r) => r.json()),
@@ -125,6 +139,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/municipalities').then((r) => r.json()),
         fetch('/api/videos').then((r) => r.json()),
         fetch('/api/media').then((r) => r.json()),
+        fetch('/api/votes').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
         fetch('/api/audit-logs').then((r) => r.json()),
       ]);
@@ -132,6 +147,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (settingsRes) setSettings(settingsRes);
       if (authRes?.allUsers) setAllUsers(authRes.allUsers);
       if (Array.isArray(pagesRes)) setPages(pagesRes);
+      if (Array.isArray(adminPagesRes)) setAdminPages(adminPagesRes);
       if (Array.isArray(newsRes)) setNews(newsRes);
       if (Array.isArray(eventsRes)) setEvents(eventsRes);
       if (Array.isArray(projectsRes)) setProjects(projectsRes);
@@ -139,6 +155,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(munRes)) setMunicipalities(munRes);
       if (Array.isArray(videosRes)) setVideos(videosRes);
       if (Array.isArray(mediaRes)) setMedia(mediaRes);
+      if (Array.isArray(votesRes)) setVotes(votesRes);
       if (Array.isArray(demandsRes)) setDemands(demandsRes);
       if (Array.isArray(logsRes)) setAuditLogs(logsRes);
     } catch (err) {
@@ -173,10 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch('/api/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
-        },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
         body: JSON.stringify(newSettings),
       });
       if (!res.ok) {
@@ -199,98 +213,106 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     pageData: {
       blocks?: PageBlock[];
       title?: string;
+      slug?: string;
       description?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
     }
   ): Promise<{ success: boolean; data?: Page; error?: string }> => {
-    console.log('[AppContext:updatePage] Committing page update to backend for id:', pageId, {
-      title: pageData.title,
-      blockCount: pageData.blocks?.length,
-      publish: pageData.publish,
-      status: pageData.status,
-    });
-
     try {
-      const res = await fetch(`/api/pages/${pageId}`, {
+      const res = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
-        },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
         body: JSON.stringify(pageData),
       });
-
+      const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        const errMsg = errJson.error || `Erro HTTP ${res.status} ao atualizar página`;
-        console.error('[AppContext:updatePage] Server returned error:', errMsg);
+        const errMsg = json.error || `Erro HTTP ${res.status} ao atualizar página`;
         showToast(errMsg, 'error');
         return { success: false, error: errMsg };
       }
-
-      const updatedPage: Page = await res.json();
-      console.log('[AppContext:updatePage] Successfully received updated page from server:', {
-        id: updatedPage.id,
-        title: updatedPage.title,
-        blockCount: updatedPage.blocks?.length,
-        versionCount: updatedPage.versions?.length,
-        status: updatedPage.status,
-        updatedAt: updatedPage.updatedAt,
-      });
-
-      // Synchronize data provider's `pages` state immediately with new reference
-      setPages((prevPages) => {
-        const found = prevPages.some((p) => p.id === updatedPage.id || p.slug === updatedPage.slug);
-        if (found) {
-          return prevPages.map((p) => (p.id === updatedPage.id || p.slug === updatedPage.slug ? updatedPage : p));
-        }
-        return [...prevPages, updatedPage];
-      });
-
-      showToast(
-        pageData.publish
-          ? 'Página publicada com sucesso! Alterações ao vivo no site.'
-          : 'Alterações da página salvas com sucesso no servidor!',
-        'success'
-      );
+      const updatedPage: Page = json;
+      setAdminPages((prev) => prev.some((p) => p.id === updatedPage.id) ? prev.map((p) => p.id === updatedPage.id ? updatedPage : p) : [updatedPage, ...prev]);
+      if (updatedPage.status === 'publicado') {
+        setPages((prev) => prev.some((p) => p.id === updatedPage.id) ? prev.map((p) => p.id === updatedPage.id ? updatedPage : p) : [updatedPage, ...prev]);
+      }
+      showToast(pageData.publish ? 'Página publicada com sucesso.' : 'Rascunho salvo no Supabase.', 'success');
       return { success: true, data: updatedPage };
     } catch (err: any) {
       const errMsg = err?.message || 'Erro de conexão com o servidor ao salvar página';
-      console.error('[AppContext:updatePage] Network/exception error updating page:', err);
       showToast(errMsg, 'error');
       return { success: false, error: errMsg };
     }
   };
 
-  const openNewsDetail = (slug: string) => {
-    setSelectedNewsSlug(slug);
-    setCurrentView('noticia-detalhe');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const createPage = async (pageData: {
+    title: string;
+    slug: string;
+    description?: string;
+    status?: 'publicado' | 'rascunho';
+    blocks?: PageBlock[];
+    publish?: boolean;
+    note?: string;
+  }): Promise<{ success: boolean; data?: Page; error?: string }> => {
+    try {
+      const res = await fetch('/api/admin/pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        body: JSON.stringify(pageData),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errMsg = json.error || `Erro HTTP ${res.status} ao criar página`;
+        showToast(errMsg, 'error');
+        return { success: false, error: errMsg };
+      }
+      const page: Page = json;
+      setAdminPages((prev) => [page, ...prev]);
+      if (page.status === 'publicado') setPages((prev) => [page, ...prev]);
+      showToast('Página criada no Supabase.', 'success');
+      return { success: true, data: page };
+    } catch (err: any) {
+      const errMsg = err?.message || 'Erro de conexão ao criar página';
+      showToast(errMsg, 'error');
+      return { success: false, error: errMsg };
+    }
   };
 
-  const openProtocolModal = (protocol?: string) => {
-    if (protocol) setTrackingProtocol(protocol);
-    setIsProtocolModalOpen(true);
-  };
-
-  const closeProtocolModal = () => {
-    setIsProtocolModalOpen(false);
-    setTrackingProtocol(null);
+  const rollbackPage = async (pageId: string, versionId: string): Promise<{ success: boolean; data?: Page; error?: string }> => {
+    try {
+      const res = await fetch(`/api/admin/pages/${pageId}/rollback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        body: JSON.stringify({ versionId }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errMsg = json.error || 'Falha ao restaurar versão';
+        showToast(errMsg, 'error');
+        return { success: false, error: errMsg };
+      }
+      const page: Page = json;
+      setAdminPages((prev) => prev.map((p) => p.id === page.id ? page : p));
+      if (page.status === 'publicado') setPages((prev) => prev.map((p) => p.id === page.id ? page : p));
+      showToast('Versão restaurada.', 'success');
+      return { success: true, data: page };
+    } catch (err: any) {
+      const errMsg = err?.message || 'Erro de conexão ao restaurar versão';
+      showToast(errMsg, 'error');
+      return { success: false, error: errMsg };
+    }
   };
 
   return (
     <AppContext.Provider
       value={{
+        ...ui,
         settings,
         currentUser,
         allUsers,
-        currentView,
-        selectedNewsSlug,
-        trackingProtocol,
-        isProtocolModalOpen,
         pages,
+        adminPages,
         news,
         events,
         projects,
@@ -300,22 +322,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         media,
         demands,
         auditLogs,
+        votes,
         isLoading,
         toastMessage,
         toastType,
-        setCurrentView,
-        openNewsDetail,
-        openProtocolModal,
-        closeProtocolModal,
         switchUser,
         updateSettings,
         updatePage,
+        createPage,
+        rollbackPage,
         showToast,
         refreshAllData,
       }}
     >
       {children}
-      {/* Toast Notification Container */}
       {toastMessage && (
         <div
           id="global-toast"
@@ -328,10 +348,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }`}
         >
           <span>{toastMessage}</span>
-          <button
-            onClick={() => setToastMessage(null)}
-            className="text-stone-400 hover:text-white text-xs font-bold px-1"
-          >
+          <button onClick={() => setToastMessage(null)} className="text-stone-400 hover:text-white text-xs font-bold px-1">
             ✕
           </button>
         </div>

@@ -15,7 +15,7 @@ export const AdminUsersTab: React.FC = () => {
       title: 'Editor de Conteúdo',
       desc: 'Gestão completa de páginas, blocos modulares, notícias e compromissos da agenda.',
     },
-    COMUNICACAO: {
+    COMUNICAÇÃO: {
       title: 'Assessoria de Comunicação',
       desc: 'Criação e edição de notícias, pronunciamentos, vídeos e biblioteca de fotos para imprensa.',
     },
