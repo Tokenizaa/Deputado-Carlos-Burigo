@@ -8,7 +8,7 @@ import {
   getPublicResults,
   getPublicSettings,
   getPublicVideos,
-  getPublicVotes,
+  getPublicLegislativeVotes,
   getPublicPages,
   supabaseAdmin,
   supabasePublic,
@@ -228,7 +228,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/votes': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     try {
-      const votes = await getPublicVotes();
+      const votes = await getPublicLegislativeVotes();
       return Response.json(votes);
     } catch (error) {
       console.error('[api/votes]', error);

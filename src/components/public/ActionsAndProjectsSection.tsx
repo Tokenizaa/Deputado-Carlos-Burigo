@@ -90,7 +90,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         {activeTab === 'projetos' && (
           <div className="space-y-8">
             <div className="max-w-2xl">
-              <h3 className="text-xl font-bold text-white">Projetos de Lei e iniciativas parlamentares</h3>
+              <h3 className="text-xl font-bold text-white">Projetos de Lei</h3>
               <p className="text-sm text-stone-400 mt-1">Esta lista é alimentada pelo acervo público do Supabase e não por uma lista paralela no frontend.</p>
             </div>
             {projects.length === 0 ? <EmptyState message="Nenhum projeto publicado no acervo público." /> : (
