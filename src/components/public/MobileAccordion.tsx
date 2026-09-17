@@ -37,11 +37,7 @@ export const MobileAccordion: React.FC<MobileAccordionProps> = ({
         />
       </button>
 
-      <div
-        id={contentId}
-        className={`${open ? 'block' : 'hidden'} md:block`}
-        aria-hidden={open ? undefined : true}
-      >
+      <div id={contentId} className={`${open ? 'block' : 'hidden'} md:block`}>
         {children}
       </div>
     </div>
