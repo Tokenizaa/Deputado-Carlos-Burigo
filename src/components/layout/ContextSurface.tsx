@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 
 export interface ContextSurfaceProps {
@@ -13,7 +13,7 @@ export interface ContextSurfaceProps {
  * Shared interaction shell for contextual details.
  * Desktop: right-side drawer. Mobile: bottom sheet.
  * Content and navigation state stay outside this component so projects,
- * votes and documents can reuse the same interaction contract.
+ * votes and other contextual content reuse the same interaction contract.
  */
 export const ContextSurface: React.FC<ContextSurfaceProps> = ({
   open,
@@ -24,6 +24,8 @@ export const ContextSurface: React.FC<ContextSurfaceProps> = ({
 }) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const generatedTitleId = useId();
+  const headingId = labelledBy || `context-surface-title-${generatedTitleId}`;
 
   useEffect(() => {
     if (!open) return;
@@ -49,9 +51,13 @@ export const ContextSurface: React.FC<ContextSurfaceProps> = ({
 
       const focusable = Array.from(
         root.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ),
-      ).filter((element) => !element.hasAttribute('aria-hidden'));
+      ).filter((element) => {
+        if (element.hasAttribute('aria-hidden')) return false;
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
 
       if (focusable.length === 0) {
         event.preventDefault();
@@ -72,19 +78,20 @@ export const ContextSurface: React.FC<ContextSurfaceProps> = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    requestAnimationFrame(() => closeButtonRef.current?.focus());
+    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
 
     return () => {
+      cancelAnimationFrame(frame);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
-      previousFocusRef.current?.focus();
+      if (previousFocusRef.current && document.contains(previousFocusRef.current)) {
+        previousFocusRef.current.focus();
+      }
       previousFocusRef.current = null;
     };
   }, [open, onClose]);
 
   if (!open) return null;
-
-  const headingId = labelledBy || 'context-surface-title';
 
   return (
     <div
