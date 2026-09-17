@@ -12,6 +12,12 @@ import {
   getPublicPages,
   supabaseAdmin,
   supabasePublic,
+  configureSupabaseAdmin,
+  getAdminUserById,
+  getAllAdminUsers,
+  getAdminAuditLogs,
+  getAllDemandsAdmin,
+  updateDemandAdmin,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -26,6 +32,7 @@ export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
   SUPABASE_URL?: string;
   SUPABASE_PUBLISHABLE_KEY?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
 }
 
 type JsonHandler = () => Promise<unknown>;
@@ -589,10 +596,86 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
+
+  '/api/auth/me': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const userId = (request.headers.get('x-user-id') as string) || undefined;
+      const user = userId ? await getAdminUserById(userId) : null;
+      const allUsers = await getAllAdminUsers();
+      return Response.json({ user, allUsers });
+    } catch (error) {
+      console.error('[api/auth/me] error:', error);
+      return Response.json({ user: null, allUsers: [] }, { status: 500 });
+    }
+  },
+
+  '/api/auth/switch-user': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+    try {
+      const { userId } = await request.json();
+      if (!userId) return Response.json({ error: 'userId é obrigatório' }, { status: 400 });
+      const user = await getAdminUserById(userId);
+      if (!user) return Response.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      return Response.json({ success: true, user });
+    } catch (error) {
+      console.error('[api/auth/switch-user] error:', error);
+      return Response.json({ error: 'Falha ao alternar usuário' }, { status: 500 });
+    }
+  },
+
+  '/api/demands': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const demands = await getAllDemandsAdmin();
+      return Response.json(demands);
+    } catch (error) {
+      console.error('[api/demands] error:', error);
+      return Response.json({ error: 'Falha ao carregar demandas' }, { status: 500 });
+    }
+  },
+
+  '/api/demands/:id': async (request) => {
+    if (request.method !== 'PUT') return methodNotAllowed();
+    try {
+      const id = (request as any).params?.id;
+      if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+      const body = await request.json();
+      const actor: { id?: string; name?: string; role?: string } = {
+        id: request.headers.get('x-user-id') || undefined,
+      };
+      // Resolve actor name/role for history entries when possible
+      if (actor.id) {
+        const me = await getAdminUserById(actor.id);
+        if (me) { actor.name = me.name; if (me.role) actor.role = me.role; }
+      }
+      const updated = await updateDemandAdmin(id, body, actor);
+      if (!updated) return Response.json({ error: 'Demanda não encontrada' }, { status: 404 });
+      return Response.json(updated);
+    } catch (error) {
+      console.error('[api/demands/:id] error:', error);
+      return Response.json({ error: 'Falha ao atualizar demanda' }, { status: 500 });
+    }
+  },
+
+  '/api/audit-logs': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const logs = await getAdminAuditLogs();
+      return Response.json(logs);
+    } catch (error) {
+      console.error('[api/audit-logs] error:', error);
+      return Response.json({ error: 'Falha ao carregar trilha de auditoria' }, { status: 500 });
+    }
+  },
 };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Cloudflare Worker: bindings live on env, not process.env. Upgrade the
+    // admin client once the service key arrives so admin/auth routes work.
+    if (env.SUPABASE_SERVICE_ROLE_KEY) configureSupabaseAdmin(env.SUPABASE_SERVICE_ROLE_KEY);
+
     const url = new URL(request.url);
     
     if (url.pathname.startsWith('/api/')) {

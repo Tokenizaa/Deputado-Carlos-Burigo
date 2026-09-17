@@ -41,10 +41,18 @@ export const supabasePublic = createClient(url, publishableKey, {
 });
 
 // Keep the existing server export for admin/auth routes. Public functions never require it.
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-export const supabaseAdmin = serviceRoleKey
+// Worker runtime has no process.env bindings at module scope; Cloudflare passes the
+// service key via env in fetch(). configureSupabaseAdmin() upgrades the client lazily.
+let serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export let supabaseAdmin = serviceRoleKey
   ? createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } })
   : supabasePublic;
+
+export function configureSupabaseAdmin(key?: string): void {
+  if (!key) return;
+  serviceRoleKey = key;
+  supabaseAdmin = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 type PublishedLegislativeIndex = ReadonlyMap<string, string>;
 
@@ -524,4 +532,120 @@ export async function getAdminAuditLogs(): Promise<AuditLog[]> {
     details: row.details,
     timestamp: row.created_at,
   }));
+}
+
+const DEMAND_FIELDS = 'id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at';
+
+export async function getAllDemandsAdmin(): Promise<PublicDemandDto[]> {
+  const { data: demandsData, error } = await supabaseAdmin.from('demands')
+    .select(DEMAND_FIELDS)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+
+  const rows = demandsData ?? [];
+  const ids = rows.map((r) => r.id);
+  if (ids.length === 0) return [];
+
+  const [{ data: messagesData }, { data: historyData }] = await Promise.all([
+    supabaseAdmin.from('demand_messages').select('id,demand_id,sender_type,sender_name,text,attachments,created_at').in('demand_id', ids).order('created_at', { ascending: true }),
+    supabaseAdmin.from('demand_history').select('id,demand_id,action,previous_status,new_status,actor_id,actor_name,actor_role,note,created_at').in('demand_id', ids).order('created_at', { ascending: true }),
+  ]);
+
+  const messagesByDemand = new Map<string, DemandMessageDto[]>();
+  (messagesData ?? []).forEach((m) => {
+    const list = messagesByDemand.get(m.demand_id) ?? [];
+    list.push(mapToPublicDemandMessageDto(m));
+    messagesByDemand.set(m.demand_id, list);
+  });
+  const historyByDemand = new Map<string, DemandHistoryDto[]>();
+  (historyData ?? []).forEach((h) => {
+    const list = historyByDemand.get(h.demand_id) ?? [];
+    list.push(mapToPublicDemandHistoryDto(h));
+    historyByDemand.set(h.demand_id, list);
+  });
+
+  return rows.map((row) => ({
+    ...mapToPublicDemandDto(row),
+    messages: messagesByDemand.get(row.id) ?? [],
+    history: historyByDemand.get(row.id) ?? [],
+  }));
+}
+
+export interface AdminDemandUpdate {
+  status?: string;
+  priority?: string;
+  assignedTo?: string; // uuid ou nome legado
+  internalNote?: string;
+  officialReply?: string;
+  actor?: { id?: string; name?: string; role?: string };
+}
+
+export async function updateDemandAdmin(
+  id: string,
+  patch: AdminDemandUpdate,
+  actor: { id?: string; name?: string; role?: string } = {},
+): Promise<PublicDemandDto | null> {
+  const actorName = actor.name || 'Sistema';
+  const actorRole = actor.role || 'system';
+
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  const historyNotes: string[] = [];
+  let replyText: string | undefined;
+
+  if (patch.status) {
+    const { data: current } = await supabaseAdmin.from('demands').select('status').eq('id', id).single();
+    updates.status = patch.status;
+    historyNotes.push(`Status alterado para ${patch.status}${current?.status && current.status !== patch.status ? ` (era ${current.status})` : ''}`);
+  }
+  if (patch.priority) {
+    updates.priority = patch.priority;
+    historyNotes.push(`Prioridade alterada para ${patch.priority}`);
+  }
+  if (patch.assignedTo !== undefined) {
+    // frontend envia uuid; aceita nome legado por compatibilidade
+    if (patch.assignedTo && !patch.assignedTo.includes('-')) {
+      const { data: user } = await supabaseAdmin.from('profiles').select('id,name').eq('name', patch.assignedTo).maybeSingle();
+      updates.assigned_to = user?.id ?? null;
+      historyNotes.push(user ? `Demanda atribuída a ${user.name}` : 'Atribuição removida');
+    } else {
+      updates.assigned_to = patch.assignedTo || null;
+      historyNotes.push(patch.assignedTo ? `Demanda atribuída a ${patch.assignedTo}` : 'Atribuição removida');
+    }
+  }
+  if (patch.internalNote) historyNotes.push(`Nota interna: ${patch.internalNote}`);
+  if (patch.officialReply) replyText = patch.officialReply;
+
+  const { error: updateError } = await supabaseAdmin.from('demands').update(updates).eq('id', id);
+  if (updateError) throw updateError;
+
+  if (replyText) {
+    const { error: msgError } = await supabaseAdmin.from('demand_messages').insert({
+      demand_id: id,
+      sender_type: 'cabinet',
+      sender_name: actorName,
+      text: replyText,
+      attachments: [],
+      created_at: new Date().toISOString(),
+    });
+    if (msgError) throw msgError;
+    historyNotes.push(`Resposta oficial enviada ao cidadão`);
+  }
+
+  if (historyNotes.length > 0) {
+    const { error: histError } = await supabaseAdmin.from('demand_history').insert(
+      historyNotes.map((note) => ({
+        demand_id: id,
+        action: 'Atualização administrativa',
+        new_status: patch.status ?? null,
+        actor_id: actor.id ?? null,
+        actor_name: actorName,
+        actor_role: actorRole,
+        note,
+        created_at: new Date().toISOString(),
+      })),
+    );
+    if (histError) throw histError;
+  }
+
+  return getPublicDemandById(id);
 }
