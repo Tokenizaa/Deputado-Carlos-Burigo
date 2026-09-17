@@ -1,17 +1,14 @@
 {
-  "name": "react-example",
+  "name": "deputado-carlos-burigo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx api/server.ts",
-    "dev:cf": "CLOUDFLARE=true vite dev",
-    "build": "vite build && esbuild api/server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "build:cf": "CLOUDFLARE=true vite build",
-    "deploy:cf": "npm run build:cf && wrangler deploy -c dist-cf/deputado_carlos_burigo/wrangler.json",
-    "start": "node dist/server.cjs",
+    "dev": "CLOUDFLARE=true vite dev",
+    "build": "CLOUDFLARE=true vite build",
+    "deploy": "npm run build && wrangler deploy -c dist-cf/deputado_carlos_burigo/wrangler.json",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist dist-cf .wrangler",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -22,9 +19,6 @@
     "lucide-react": "^0.546.0",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
-    "vite": "^6.2.3",
-    "express": "^4.21.2",
-    "dotenv": "^17.2.3",
     "motion": "^12.23.24"
   },
   "devDependencies": {
@@ -35,8 +29,6 @@
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.3",
-    "@types/express": "^4.17.21",
     "wrangler": "^4.132.0"
   }
 }
