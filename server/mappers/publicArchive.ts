@@ -69,19 +69,16 @@ type DocumentRow = {
 
 type EvidenceRow = {
   id: string;
-  title: string;
-  description: string | null;
-  type: string;
-  url: string | null;
-  storage_path: string | null;
-  mime_type: string | null;
-  file_size: number | null;
-  sha256: string | null;
-  source_name: string | null;
-  uploaded_at: string | null;
+  entity_type: string;
+  entity_id: string;
+  source_name: string;
+  source_url: string | null;
+  source_type: string;
+  publication_date: string | null;
   verification_status: string;
-  rights_status: string;
   notes: string | null;
+  verified_at: string | null;
+  verified_by: string | null;
   created_at: string;
   updated_at: string;
 };
