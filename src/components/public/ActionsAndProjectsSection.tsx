@@ -26,7 +26,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   );
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
-  const publishedProjects = projects.filter((project) => project.status === 'Aprovado / Lei Sancionada');
+  const publishedProjects = projects.filter((project) => project.status === 'Concluído');
   const projectDocuments = projects.filter((project) => project.linkAlrs);
 
   const tabs: { id: NonNullable<Tab>; label: string }[] = [
