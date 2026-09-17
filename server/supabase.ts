@@ -6,14 +6,28 @@ import {
   toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
+import type { User, UserRole } from '../src/types';
+import type { AuditLog } from '../src/types';
 import {
   toPublicAgendaDto,
   toPublicNewsDto,
   toPublicPageDto,
 } from './mappers/publicCommunication';
+import {
+  mapToPublicMediaDto,
+  mapToPublicVideoDto,
+  mapToPublicDocumentDto,
+  mapToPublicEvidenceDto,
+} from './mappers/publicArchive';
+import {
+  mapToPublicDemandDto,
+  mapToPublicDemandMessageDto,
+  mapToPublicDemandHistoryDto,
+} from './mappers/publicDemand';
 import type { LegislativeItemRow } from './mappers/publicLegislative';
 import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
 import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
+import type { PublicDemandDto, DemandMessageDto, DemandHistoryDto } from '../src/contracts/publicDemand';
 import { extractLegislativeCode } from '../src/contracts/publicLegislative';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
@@ -249,21 +263,7 @@ export async function getPublicVideos() {
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    url: item.url,
-    platform: item.platform,
-    category: item.category,
-    date: item.published_at ?? item.created_at,
-    thumbnail: item.thumbnail_url ?? '',
-    featured: Boolean(item.featured),
-    status: item.status,
-    sourceName: item.source_name,
-    verificationStatus: item.verification_status,
-    rightsStatus: item.rights_status,
-  }));
+  return data ?? [];
 }
 
 export async function getPublicMedia() {
@@ -271,29 +271,102 @@ export async function getPublicMedia() {
     .select('id,name,title,alt_text,description,credit,category,storage_path,url,size,mime_type,created_at,original_url,source_name,source_page_url,sha256,published_at,downloaded_at,verification_status,rights_status,event_name,notes')
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    name: item.name,
-    title: item.title,
-    altText: item.alt_text,
-    description: item.description,
-    credit: item.credit,
-    category: item.category,
-    storagePath: item.storage_path,
-    url: item.url,
-    size: item.size,
-    mimeType: item.mime_type,
-    uploadedAt: item.created_at,
-    originalUrl: item.original_url,
-    sourceName: item.source_name,
-    sourcePageUrl: item.source_page_url,
-    sha256: item.sha256,
-    publishedAt: item.published_at,
-    verificationStatus: item.verification_status,
-    rightsStatus: item.rights_status,
-    eventName: item.event_name,
-    notes: item.notes,
-  }));
+  return data ?? [];
+}
+
+export async function getPublicDocuments() {
+  const { data, error } = await supabasePublic.from('documents')
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicDocumentDto);
+}
+
+export async function getPublicEvidence() {
+  const { data, error } = await supabasePublic.from('evidence')
+    .select('id,title,description,type,url,storage_path,mime_type,file_size,sha256,source_name,uploaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicEvidenceDto);
+}
+
+export async function getPublicDemands(): Promise<PublicDemandDto[]> {
+  const { data, error } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .in('status', ['recebida', 'em análise', 'em atendimento', 'encaminhada', 'aguardando retorno', 'respondida', 'concluída'])
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicDemandDto);
+}
+
+export async function getPublicDemandById(id: string): Promise<PublicDemandDto | null> {
+  // Get the demand
+  const { data: demandData, error: demandError } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .eq('id', id)
+    .single();
+   
+  if (demandError) throw demandError;
+  if (!demandData) return null;
+  
+  // Get messages for this demand
+  const { data: messagesData, error: messagesError } = await supabasePublic.from('demand_messages')
+    .select('id,demand_id,sender_type,sender_name,text,attachments,created_at')
+    .eq('demand_id', id)
+    .order('created_at', { ascending: true });
+  
+  if (messagesError) throw messagesError;
+  
+  // Get history for this demand
+  const { data: historyData, error: historyError } = await supabasePublic.from('demand_history')
+    .select('id,demand_id,action,previous_status,new_status,actor_id,actor_name,actor_role,note,created_at')
+    .eq('demand_id', id)
+    .order('created_at', { ascending: true });
+  
+  if (historyError) throw historyError;
+  
+  // Map to DTO with messages and history
+  const demandDto = mapToPublicDemandDto(demandData);
+  return {
+    ...demandDto,
+    messages: (messagesData ?? []).map(mapToPublicDemandMessageDto),
+    history: (historyData ?? []).map(mapToPublicDemandHistoryDto)
+  };
+}
+
+export async function getPublicDemandByProtocol(protocol: string): Promise<PublicDemandDto | null> {
+  // Get the demand by protocol
+  const { data: demandData, error: demandError } = await supabasePublic.from('demands')
+    .select('id,protocol,tracking_token_hash,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,assigned_to,priority,status,created_at,updated_at')
+    .eq('protocol', protocol)
+    .single();
+   
+  if (demandError) throw demandError;
+  if (!demandData) return null;
+  
+  // Get messages for this demand
+  const { data: messagesData, error: messagesError } = await supabasePublic.from('demand_messages')
+    .select('id,demand_id,sender_type,sender_name,text,attachments,created_at')
+    .eq('demand_id', demandData.id)
+    .order('created_at', { ascending: true });
+  
+  if (messagesError) throw messagesError;
+  
+  // Get history for this demand
+  const { data: historyData, error: historyError } = await supabasePublic.from('demand_history')
+    .select('id,demand_id,action,previous_status,new_status,actor_id,actor_name,actor_role,note,created_at')
+    .eq('demand_id', demandData.id)
+    .order('created_at', { ascending: true });
+  
+  if (historyError) throw historyError;
+  
+  // Map to DTO with messages and history
+  const demandDto = mapToPublicDemandDto(demandData);
+  return {
+    ...demandDto,
+    messages: (messagesData ?? []).map(mapToPublicDemandMessageDto),
+    history: (historyData ?? []).map(mapToPublicDemandHistoryDto)
+  };
 }
 
 export async function getPublicNews(): Promise<PublicNewsDto[]> {
@@ -343,4 +416,112 @@ export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
   }
 
   return pages.map((page) => toPublicPageDto(page, blocksByPage.get(page.id) ?? []));
+}
+
+export async function getAdminUserById(id: string): Promise<User | null> {
+  try {
+    // Get auth user (includes email)
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(id);
+    if (authError) throw authError;
+    if (!authUser) return null;
+
+    // Get profile
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, name, cargo, avatar_url')
+      .eq('id', id)
+      .single();
+    if (profileError) throw profileError;
+    if (!profile) return null;
+
+    // Get user role
+    const { data: roleData, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', id)
+      .single();
+    if (roleError && roleError.code !== 'PGRST116') throw roleError; // PGRST116 means no rows
+    const role = roleData?.role ?? 'VISUALIZADOR';
+
+const userEntity = authUser!.user;
+return {
+        id: profile.id,
+        name: profile.name,
+        email: userEntity.email ?? '',
+        role: role as UserRole,
+        avatar: profile.avatar_url ?? undefined,
+        cargo: profile.cargo ?? '',
+      };
+  } catch (error) {
+    console.error('Error fetching admin user by id:', error);
+    return null;
+  }
+}
+
+export async function getAllAdminUsers(): Promise<User[]> {
+  try {
+    // Get all auth users (admin API)
+    const { data: listUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+    if (authError) throw authError;
+    const authUsers = listUsers?.users ?? [];
+
+    // Get all profiles
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, name, cargo, avatar_url');
+    if (profilesError) throw profilesError;
+
+    // Get all user roles
+    const { data: roles, error: rolesError } = await supabaseAdmin
+      .from('user_roles')
+      .select('user_id, role');
+    if (rolesError) throw rolesError;
+
+    // Build maps
+    const profileMap = new Map<string, any>();
+    profiles?.forEach(p => profileMap.set(p.id, p));
+
+    const roleMap = new Map<string, string>();
+    roles?.forEach(r => roleMap.set(r.user_id, r.role));
+
+    const users: User[] = [];
+    for (const authUser of authUsers) {
+      const profile = profileMap.get(authUser.id);
+if (!profile) continue; // skip if no profile (should not happen)
+       const role = roleMap.get(authUser.id) ?? 'VISUALIZADOR';
+       users.push({
+         id: authUser.id,
+         name: profile.name,
+         email: ((authUser as any).email ?? (authUser as any)?.user?.email) ?? '',
+         role: role as UserRole,
+         avatar: profile.avatar_url ?? undefined,
+         cargo: profile.cargo ?? '',
+       });
+    }
+
+    return users;
+  } catch (error) {
+    console.error('Error fetching all admin users:', error);
+    return [];
+  }
+}
+
+export async function getAdminAuditLogs(): Promise<AuditLog[]> {
+  const { data, error } = await supabaseAdmin.from('audit_logs')
+    .select('id, user_id, user_name, user_role, action, entity_type, entity_id, details, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    userName: row.user_name,
+    userRole: row.user_role,
+    action: row.action,
+    entityType: row.entity_type,
+    entityId: row.entity_id,
+    details: row.details,
+    timestamp: row.created_at,
+  }));
 }

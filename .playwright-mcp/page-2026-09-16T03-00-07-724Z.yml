@@ -1,0 +1,297 @@
+- generic [ref=f43e1]:
+  - link [aria-hidden] [ref=f43e2] [cursor=pointer]:
+    - /url: "#main-content"
+    - text: Pular para o conteúdo principal
+  - generic [ref=f43e5]:
+    - banner [ref=f43e6]:
+      - navigation [ref=f43e7]:
+        - generic [ref=f43e8]:
+          - link [ref=f43e9] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f43e11]:
+            - generic [ref=f43e12]:
+              - navigation [ref=f43e13]:
+                - heading [level=2] [ref=f43e14]: Menu Topo
+                - list [ref=f43e15]:
+                  - listitem [ref=f43e16]:
+                    - link [ref=f43e17] [cursor=pointer]:
+                      - /url: https://ww4.al.rs.gov.br
+                      - text: Sites AL RS
+                  - listitem [ref=f43e18]:
+                    - link [ref=f43e19] [cursor=pointer]:
+                      - /url: /proposicao
+                      - text: Opine
+                  - listitem [ref=f43e20]:
+                    - link [ref=f43e21] [cursor=pointer]:
+                      - /url: https://transparencia.al.rs.gov.br
+                      - text: Transparência
+                  - listitem [ref=f43e22]:
+                    - link [ref=f43e23] [cursor=pointer]:
+                      - /url: https://ouvidoriageral.al.rs.gov.br/envie-sua-manifestacao
+                      - text: Ouvidoria
+              - navigation [ref=f43e24]:
+                - heading [level=2] [ref=f43e25]: Menu Acessibilidade
+                - list [ref=f43e26]:
+                  - listitem [ref=f43e27] [cursor=pointer]:
+                    - generic [ref=f43e28]: Contraste
+                  - listitem [ref=f43e29] [cursor=pointer]:
+                    - generic [ref=f43e30]: Tamanho do Texto
+            - generic [ref=f43e31]:
+              - navigation [ref=f43e32]:
+                - heading [level=2] [ref=f43e33]: Midias Header
+                - list [ref=f43e34]:
+                  - listitem [ref=f43e35]:
+                    - link [ref=f43e36] [cursor=pointer]:
+                      - /url: https://www.facebook.com/share/17jdh4bkv8
+                  - listitem [ref=f43e38]:
+                    - link [ref=f43e39] [cursor=pointer]:
+                      - /url: https://www.instagram.com/alrs.noticias?igsh=MW40cWc4ZDJtd3k5bA%3D%3D
+                  - listitem [ref=f43e41]:
+                    - link [ref=f43e42] [cursor=pointer]:
+                      - /url: https://www.youtube.com/@tvassembleia-periodoeleitoral
+              - navigation [ref=f43e44]:
+                - heading [level=2] [ref=f43e45]: Main navigation
+                - list [ref=f43e46]:
+                  - listitem [ref=f43e47]:
+                    - generic [ref=f43e48]: Institucional
+                  - listitem [ref=f43e49]:
+                    - generic [ref=f43e50]: Deputados
+                  - listitem [ref=f43e51]:
+                    - generic [ref=f43e52]: Atividades Legislativas
+                  - listitem [ref=f43e53]:
+                    - generic [ref=f43e54]: Comunicação & Cultura
+                  - listitem [ref=f43e55]:
+                    - generic [ref=f43e56]: Serviços
+              - generic [ref=f43e57]:
+                - button [ref=f43e59] [cursor=pointer]
+                - navigation [ref=f43e61]:
+                  - heading [level=2] [ref=f43e62]: Menu de conta de usuário
+                  - img [ref=f43e64] [cursor=pointer]
+    - generic [ref=f43e65]:
+      - navigation [ref=f43e68]:
+        - list [ref=f43e69]:
+          - listitem [ref=f43e70]:
+            - link [ref=f43e71] [cursor=pointer]:
+              - /url: /
+              - text: Início
+          - listitem [ref=f43e72]:
+            - text: ">"
+            - link [ref=f43e73] [cursor=pointer]:
+              - /url: /deputados
+              - text: Deputados
+          - listitem [ref=f43e74]: ">"
+      - main [ref=f43e77]:
+        - generic [ref=f43e81]:
+          - heading [level=2] [ref=f43e86]: / Dep.
+          - generic [ref=f43e96]:
+            - link [ref=f43e97] [cursor=pointer]:
+              - /url: /deputados/carlos-burigo/noticias
+              - text: Imprensa
+            - link [ref=f43e99] [cursor=pointer]:
+              - /url: /deputados/carlos-burigo/comissoes
+              - text: Comissões
+            - link [ref=f43e101] [cursor=pointer]:
+              - /url: /deputados/carlos-burigo/proposicoes
+              - text: Proposições
+            - link [ref=f43e103] [cursor=pointer]:
+              - /url: /deputados/carlos-burigo/contato
+              - text: Contato
+    - contentinfo [ref=f43e105]:
+      - generic [ref=f43e107]:
+        - generic [ref=f43e108]:
+          - navigation [ref=f43e109]:
+            - heading [level=2] [ref=f43e110]: Institucional Rodape
+            - list [ref=f43e111]:
+              - listitem [ref=f43e112]:
+                - generic [ref=f43e113]: INSTITUCIONAL
+                - list [ref=f43e114]:
+                  - listitem [ref=f43e115]:
+                    - link [ref=f43e116] [cursor=pointer]:
+                      - /url: /DOAL
+                      - text: Diário Oficial
+                  - listitem [ref=f43e117]:
+                    - link [ref=f43e118] [cursor=pointer]:
+                      - /url: https://ww2.al.rs.gov.br/escola/
+                      - text: Escola do Legislativo
+                  - listitem [ref=f43e119]:
+                    - link [ref=f43e120] [cursor=pointer]:
+                      - /url: https://ww2.al.rs.gov.br/forumdemocratico
+                      - text: Fórum Democrático
+                  - listitem [ref=f43e121]:
+                    - link [ref=f43e122] [cursor=pointer]:
+                      - /url: https://ww2.al.rs.gov.br/memorial
+                      - text: Memorial do Legislativo
+                  - listitem [ref=f43e123]:
+                    - link [ref=f43e124] [cursor=pointer]:
+                      - /url: /institucional/presidencia
+                      - text: Presidência
+                  - listitem [ref=f43e125]:
+                    - link [ref=f43e126] [cursor=pointer]:
+                      - /url: https://procuradoriadamulher.al.rs.gov.br
+                      - text: Procuradoria da Mulher
+          - navigation [ref=f43e127]:
+            - heading [level=2] [ref=f43e128]: Deputados rodape
+            - list [ref=f43e129]:
+              - listitem [ref=f43e130]:
+                - generic [ref=f43e131]: DEPUTADOS
+                - list [ref=f43e132]:
+                  - listitem [ref=f43e133]:
+                    - link [ref=f43e134] [cursor=pointer]:
+                      - /url: /plenario
+                      - text: Plenário
+                  - listitem [ref=f43e135]:
+                    - link [ref=f43e136] [cursor=pointer]:
+                      - /url: /deputados
+                      - text: Deputados
+          - navigation [ref=f43e137]:
+            - heading [level=2] [ref=f43e138]: Atividades Legislativas
+            - list [ref=f43e139]:
+              - listitem [ref=f43e140]:
+                - generic [ref=f43e141]: ATIVIDADES LEGISLATIVAS
+                - list [ref=f43e142]:
+                  - listitem [ref=f43e143]:
+                    - link [ref=f43e144] [cursor=pointer]:
+                      - /url: /institucional/agenda-de-eventos?tab=comissoes&data=
+                      - text: Agenda das Comissões
+                  - listitem [ref=f43e145]:
+                    - link [ref=f43e146] [cursor=pointer]:
+                      - /url: /comissoes-parlamentares
+                      - text: Comissões Parlamentares
+                  - listitem [ref=f43e147]:
+                    - link [ref=f43e148] [cursor=pointer]:
+                      - /url: /DOAL
+                      - text: Diário Oficial
+                  - listitem [ref=f43e149]:
+                    - link [ref=f43e150] [cursor=pointer]:
+                      - /url: https://ww3.al.rs.gov.br/deputados/FrentesParlamentares.aspx
+                      - text: Frentes Parlamentares
+                  - listitem [ref=f43e151]:
+                    - link [ref=f43e152] [cursor=pointer]:
+                      - /url: /legislacao-estadual
+                      - text: Legislação Estadual
+                  - listitem [ref=f43e153]:
+                    - link [ref=f43e154] [cursor=pointer]:
+                      - /url: https://ww4.al.rs.gov.br/perguntas-frequentes
+                      - text: Perguntas Frequentes
+                  - listitem [ref=f43e155]:
+                    - link [ref=f43e156] [cursor=pointer]:
+                      - /url: /legislativo
+                      - text: Proposições Legislativas
+              - listitem [ref=f43e157]:
+                - link [ref=f43e158] [cursor=pointer]:
+                  - /url: https://ww2.al.rs.gov.br/dal/LinkClick.aspx?fileticket=ZiVvjGaiO44%3D&tabid=3682&mid=5357
+                  - text: Regimento Interno
+          - navigation [ref=f43e159]:
+            - heading [level=2] [ref=f43e160]: Comunicação Rodape
+            - list [ref=f43e161]:
+              - listitem [ref=f43e162]:
+                - generic [ref=f43e163]: COMUNICAÇÃO & CULTURA
+                - list [ref=f43e164]:
+                  - listitem [ref=f43e165]:
+                    - link [ref=f43e166] [cursor=pointer]:
+                      - /url: /noticias
+                      - text: Agência de Notícias
+                  - listitem [ref=f43e167]:
+                    - link [ref=f43e168] [cursor=pointer]:
+                      - /url: /cultura
+                      - text: Cultura e Memória
+                  - listitem [ref=f43e169]:
+                    - link [ref=f43e170] [cursor=pointer]:
+                      - /url: /fotos
+                      - text: Fotos do Dia
+                  - listitem [ref=f43e171]:
+                    - link [ref=f43e172] [cursor=pointer]:
+                      - /url: /fotos/data
+                      - text: Fotos por Data
+                  - listitem [ref=f43e173]:
+                    - link [ref=f43e174] [cursor=pointer]:
+                      - /url: /radio
+                      - text: Rádio Assembleia
+                  - listitem [ref=f43e175]:
+                    - link [ref=f43e176] [cursor=pointer]:
+                      - /url: /tv-assembleia
+                      - text: TV Assembleia
+                  - listitem [ref=f43e177]:
+                    - link [ref=f43e178] [cursor=pointer]:
+                      - /url: https://ww3.al.rs.gov.br/eleicoes
+                      - text: Portal das Eleições
+          - navigation [ref=f43e179]:
+            - heading [level=2] [ref=f43e180]: Serviços Rodape
+            - list [ref=f43e181]:
+              - listitem [ref=f43e182]:
+                - generic [ref=f43e183]: SERVIÇOS
+                - list [ref=f43e184]:
+                  - listitem [ref=f43e185]:
+                    - link [ref=f43e186] [cursor=pointer]:
+                      - /url: https://ww3.al.rs.gov.br/compras
+                      - text: Compras e Licitações
+                  - listitem [ref=f43e187]:
+                    - link [ref=f43e188] [cursor=pointer]:
+                      - /url: /institucional/concursos-e-estagios
+                      - text: Concursos e Estágios
+                  - listitem [ref=f43e189]:
+                    - link [ref=f43e190] [cursor=pointer]:
+                      - /url: /contratos-ativos
+                      - text: Contratos Ativos
+                  - listitem [ref=f43e191]:
+                    - link [ref=f43e192] [cursor=pointer]:
+                      - /url: https://alrs.cloud4biz.com/4biz/pages/knowledgeBasePortal/knowledgeBasePortal.load#/knowledge/1226
+                      - text: INTRANET | Esqueci minha senha
+                  - listitem [ref=f43e193]:
+                    - link [ref=f43e194] [cursor=pointer]:
+                      - /url: /institucional/consultar-processos-administrativos
+                      - text: Processo Administrativo | Consulta
+                  - listitem [ref=f43e195]:
+                    - link [ref=f43e196] [cursor=pointer]:
+                      - /url: https://ww2.al.rs.gov.br/memorial/VisitasGuiadasnaAL/tabid/6335/Default.aspx
+                      - text: Visite a ALRS
+            - navigation [ref=f43e197]:
+              - heading [level=2] [ref=f43e198]: Termos de Uso Rodape
+              - list [ref=f43e199]:
+                - listitem [ref=f43e200]:
+                  - link [ref=f43e201] [cursor=pointer]:
+                    - /url: /sites/default/files/politica-de-privacidade-portal-institucional.pdf
+                    - text: Política de Privacidade
+                - listitem [ref=f43e202]:
+                  - link [ref=f43e203] [cursor=pointer]:
+                    - /url: /sites/default/files/termo-de-uso-portal-institucional.pdf
+                    - text: Termos de Uso
+                - listitem [ref=f43e204]:
+                  - link [ref=f43e205] [cursor=pointer]:
+                    - /url: /mapa-do-site
+                    - text: Mapa do Site
+          - navigation [ref=f43e206]:
+            - heading [level=2] [ref=f43e207]: Midias Footer
+            - list [ref=f43e208]:
+              - listitem [ref=f43e209]:
+                - link [ref=f43e210] [cursor=pointer]:
+                  - /url: https://radardatransparencia.atricon.org.br
+              - listitem [ref=f43e212]:
+                - link [ref=f43e213] [cursor=pointer]:
+                  - /url: https://www.facebook.com/share/17jdh4bkv8
+              - listitem [ref=f43e215]:
+                - link [ref=f43e216] [cursor=pointer]:
+                  - /url: https://www.instagram.com/alrs.noticias?igsh=MW40cWc4ZDJtd3k5bA%3D%3D
+              - listitem [ref=f43e218]:
+                - link [ref=f43e219] [cursor=pointer]:
+                  - /url: https://www.youtube.com/@tvassembleia-periodoeleitoral
+        - generic [ref=f43e221]:
+          - generic [ref=f43e224]:
+            - heading [level=6] [ref=f43e225]: Assembleia Legislativa do Estado do Rio Grande do Sul
+            - paragraph [ref=f43e226]: "Praça Marechal Deodoro, 101 Porto Alegre - Rio Grande do Sul - 90010-300 PABX (51) 3210-2000 Horário de atendimento: das 08h30min às 18h30min"
+          - heading [level=6] [ref=f43e230]:
+            - strong [ref=f43e231]: Copyright 2023
+            - text: Assembleia Legislativa - Todos os direitos reservados.
+  - generic [ref=f43e234]:
+    - paragraph [ref=f43e235]:
+      - text: Estamos realizando adequações em razão da LGPD - Lei Geral de Proteção de Dados Pessoais, lei 13.709/2018. Utilizamos
+      - link "cookies" [ref=f43e237] [cursor=pointer]:
+        - /url: /sites/default/files/politica-de-privacidade-portal-institucional.pdf
+      - text: "que armazenam informações sobre a forma como você usa esse site. Clique no botão: Eu concordo para consentir com a utilização dos cookies. Apenas cookies necessários para consentir com a utilização restrita dos cookies. Lembrar mais tarde para sair."
+    - generic [ref=f43e238]:
+      - button "Eu concordo" [ref=f43e239] [cursor=pointer]
+      - button "Apenas cookies necessários" [ref=f43e240] [cursor=pointer]
+      - button "Lembrar mais tarde" [ref=f43e241] [cursor=pointer]
+  - generic [ref=f43e242]:
+    - img "Acessível com VLibras" [ref=f43e243]
+    - button "Conteúdo acessível em Libras usando o VLibras Widget com opções dos Avatares Ícaro, Hosana ou Guga." [ref=f43e244] [cursor=pointer]

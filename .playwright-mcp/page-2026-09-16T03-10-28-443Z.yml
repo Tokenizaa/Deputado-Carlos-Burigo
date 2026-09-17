@@ -1,0 +1,12 @@
+- iframe [ref=f46e2]:
+  - generic [ref=f47e3]:
+    - paragraph [ref=f47e4]: Página indisponível. Lamentamos o transtorno.
+    - paragraph [ref=f47e5]: Tente pesquisar algo diferente.
+    - generic [ref=f47e6]:
+      - link "Página inicial do YouTube BR" [ref=f47e7] [cursor=pointer]:
+        - /url: https://www.youtube.com/
+        - generic "Página inicial do YouTube" [ref=f47e8]
+        - text: BR
+      - generic [ref=f47e9]:
+        - textbox "Pesquisa" [ref=f47e11]
+        - button "Pesquisa" [ref=f47e12] [cursor=pointer]
