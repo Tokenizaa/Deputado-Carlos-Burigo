@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 export const TrajectorySection: React.FC = () => {
   const { projects, setCurrentView } = useApp();
   const publishedProjects = projects
-    .filter((project) => project.status === 'Aprovado / Lei Sancionada')
+    .filter((project) => project.status === 'Concluído')
     .sort((a, b) => b.year - a.year)
     .slice(0, 4);
 
