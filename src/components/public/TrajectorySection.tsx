@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowRight } from 'lucide-react';
+import { MobileAccordion } from './MobileAccordion';
 
 export const TrajectorySection: React.FC = () => {
   const { projects, setCurrentView } = useApp();
@@ -41,19 +42,21 @@ export const TrajectorySection: React.FC = () => {
               <div className="border border-dashed border-stone-300 rounded-sm p-8 text-stone-600"><p className="font-semibold text-stone-900">Nenhum marco legislativo publicado no acervo.</p><p className="mt-2 text-sm">Novos registros aparecerão após validação e publicação.</p></div>
             ) : (
               publishedProjects.map((item) => (
-                <article key={item.id} className="pt-6 first:pt-0 border-t border-stone-200 group">
-                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-baseline">
-                    <div className="sm:col-span-4">
-                      <span className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-stone-900 block leading-none group-hover:text-[#00A550] transition-colors">{item.year}</span>
-                      <span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.1em] block mt-1.5">{item.code}</span>
+                <MobileAccordion key={item.id} title={item.title} summary={`${item.year} · ${item.code}`}>
+                  <article className="pt-6 first:pt-0 border-t border-stone-200 group">
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-baseline">
+                      <div className="sm:col-span-4">
+                        <span className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-stone-900 block leading-none group-hover:text-[#00A550] transition-colors">{item.year}</span>
+                        <span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.1em] block mt-1.5">{item.code}</span>
+                      </div>
+                      <div className="sm:col-span-8 space-y-1.5">
+                        <h3 className="text-xl sm:text-2xl font-bold text-stone-900 leading-snug">{item.title}</h3>
+                        <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">{item.status}</p>
+                        <p className="text-sm sm:text-base text-stone-600 leading-relaxed pt-1 max-w-[55ch]">{item.summary}</p>
+                      </div>
                     </div>
-                    <div className="sm:col-span-8 space-y-1.5">
-                      <h3 className="text-xl sm:text-2xl font-bold text-stone-900 leading-snug">{item.title}</h3>
-                      <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">{item.status}</p>
-                      <p className="text-sm sm:text-base text-stone-600 leading-relaxed pt-1 max-w-[55ch]">{item.summary}</p>
-                    </div>
-                  </div>
-                </article>
+                  </article>
+                </MobileAccordion>
               ))
             )}
 
