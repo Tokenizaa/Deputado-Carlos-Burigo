@@ -1,10 +1,16 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { ExternalLink, X } from 'lucide-react';
+import { ContextSurface } from '../components/layout/ContextSurface';
 
 export type UiOverlay =
   | { type: 'protocol'; protocol?: string | null }
   | { type: 'document'; url: string; title?: string }
   | null;
+
+export interface ContextSurfaceState {
+  title: string;
+  content: React.ReactNode;
+}
 
 interface AppUiContextValue {
   currentView: string;
@@ -12,12 +18,15 @@ interface AppUiContextValue {
   trackingProtocol: string | null;
   isProtocolModalOpen: boolean;
   overlay: UiOverlay;
+  contextSurface: ContextSurfaceState | null;
   setCurrentView: (view: string) => void;
   openNewsDetail: (slug: string) => void;
   openProtocolModal: (protocol?: string) => void;
   closeProtocolModal: () => void;
   openDocumentViewer: (url: string, title?: string) => void;
   closeOverlay: () => void;
+  openContextSurface: (title: string, content: React.ReactNode) => void;
+  closeContextSurface: () => void;
 }
 
 const AppUiContext = createContext<AppUiContextValue | undefined>(undefined);
@@ -53,6 +62,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [selectedNewsSlug, setSelectedNewsSlug] = useState<string | null>(initial.newsSlug);
   const [trackingProtocol, setTrackingProtocol] = useState<string | null>(initial.protocol);
   const [overlay, setOverlay] = useState<UiOverlay>(initial.protocol !== null ? { type: 'protocol', protocol: initial.protocol } : null);
+  const [contextSurface, setContextSurface] = useState<ContextSurfaceState | null>(null);
 
   const syncFromLocation = useCallback(() => {
     const location = readLocation();
@@ -60,6 +70,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setSelectedNewsSlug(location.newsSlug);
     setTrackingProtocol(location.protocol);
     setOverlay(location.protocol !== null ? { type: 'protocol', protocol: location.protocol } : null);
+    setContextSurface(null);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
 
@@ -73,6 +84,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     window.history.pushState({ view }, '', `${path}${search}`);
     setCurrentViewState(view);
     setSelectedNewsSlug(null);
+    setContextSurface(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -83,6 +95,7 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     window.history.pushState({ view: 'noticia-detalhe', newsSlug: slug }, '', `/noticias?${params.toString()}`);
     setSelectedNewsSlug(slug);
     setCurrentViewState('noticia-detalhe');
+    setContextSurface(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -92,11 +105,22 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     window.history.pushState({ overlay: 'protocol' }, '', `${window.location.pathname}?${params.toString()}`);
     setTrackingProtocol(protocol || null);
     setOverlay({ type: 'protocol', protocol: protocol || null });
+    setContextSurface(null);
   }, []);
 
   const openDocumentViewer = useCallback((url: string, title?: string) => {
     window.history.pushState({ overlay: 'document' }, '', window.location.href);
     setOverlay({ type: 'document', url, title });
+    setContextSurface(null);
+  }, []);
+
+  const openContextSurface = useCallback((title: string, content: React.ReactNode) => {
+    setOverlay(null);
+    setContextSurface({ title, content });
+  }, []);
+
+  const closeContextSurface = useCallback(() => {
+    setContextSurface(null);
   }, []);
 
   const closeOverlay = useCallback(() => {
@@ -163,9 +187,12 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   ) : null;
 
   return (
-    <AppUiContext.Provider value={{ currentView, selectedNewsSlug, trackingProtocol, isProtocolModalOpen: overlay?.type === 'protocol', overlay, setCurrentView, openNewsDetail, openProtocolModal, closeProtocolModal, openDocumentViewer, closeOverlay }}>
+    <AppUiContext.Provider value={{ currentView, selectedNewsSlug, trackingProtocol, isProtocolModalOpen: overlay?.type === 'protocol', overlay, contextSurface, setCurrentView, openNewsDetail, openProtocolModal, closeProtocolModal, openDocumentViewer, closeOverlay, openContextSurface, closeContextSurface }}>
       {children}
       {renderDocumentOverlay}
+      <ContextSurface open={contextSurface !== null} title={contextSurface?.title || ''} onClose={closeContextSurface}>
+        {contextSurface?.content}
+      </ContextSurface>
     </AppUiContext.Provider>
   );
 };
