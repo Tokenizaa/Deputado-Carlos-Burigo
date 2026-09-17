@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef } from 'react';
-import { X } from 'lucide-react';
+import { ArrowLeft, Home, X } from 'lucide-react';
 
 export interface ContextSurfaceProps {
   open: boolean;
@@ -93,6 +93,15 @@ export const ContextSurface: React.FC<ContextSurfaceProps> = ({
 
   if (!open) return null;
 
+  const goHome = () => {
+    if (window.location.pathname === '/') {
+      onClose();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    window.location.assign('/');
+  };
+
   return (
     <div
       className="fixed inset-0 z-[60]"
@@ -112,10 +121,22 @@ export const ContextSurface: React.FC<ContextSurfaceProps> = ({
         aria-labelledby={headingId}
         className="absolute inset-x-0 bottom-0 max-h-[92dvh] rounded-t-2xl border border-stone-200 bg-white shadow-2xl flex flex-col overflow-hidden sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[min(100%,32rem)] sm:max-h-none sm:rounded-none sm:border-y-0 sm:border-r-0 sm:border-l"
       >
-        <header className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-stone-200 px-4 sm:px-5">
-          <h2 id={headingId} className="min-w-0 truncate text-base font-semibold text-stone-900">
+        <header className="flex min-h-16 shrink-0 items-center justify-between gap-3 border-b border-stone-200 px-3 sm:px-5">
+          <button
+            type="button"
+            onClick={goHome}
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-stone-600 hover:bg-stone-100 hover:text-stone-900 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"
+            aria-label="Voltar para o início"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <Home className="h-4 w-4 sm:hidden" aria-hidden="true" />
+            <span className="hidden sm:inline">Início</span>
+          </button>
+
+          <h2 id={headingId} className="min-w-0 flex-1 truncate text-center text-base font-semibold text-stone-900">
             {title}
           </h2>
+
           <button
             ref={closeButtonRef}
             type="button"
