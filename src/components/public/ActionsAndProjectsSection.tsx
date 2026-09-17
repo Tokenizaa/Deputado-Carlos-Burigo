@@ -7,26 +7,20 @@ import { PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
 import { ContextSurface } from '../layout/ContextSurface';
 
 interface ActionsAndProjectsSectionProps {
-  initialSubTab?: 'visao-geral' | 'projetos' | 'votacoes' | 'resultados' | 'documentos';
+  initialSubTab?: 'projetos' | 'votacoes' | 'documentos';
 }
 
 type Tab = ActionsAndProjectsSectionProps['initialSubTab'];
 
 export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({
-  initialSubTab = 'visao-geral',
+  initialSubTab,
 }) => {
   const { projects, setCurrentView, currentView, votes } = useApp();
   const { openDocumentViewer } = useAppUi();
-  const [activeTab, setActiveTab] = useState<NonNullable<Tab>>(
-    currentView === 'projetos'
-      ? 'projetos'
-      : currentView === 'votacoes'
-        ? 'votacoes'
-        : currentView === 'documentos'
-          ? 'documentos'
-          : currentView === 'resultados'
-            ? 'resultados'
-            : initialSubTab,
+  const [activeTab, setActiveTab] = useState<Tab>(
+    currentView === 'projetos' || currentView === 'votacoes' || currentView === 'documentos'
+      ? currentView
+      : initialSubTab,
   );
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
@@ -35,7 +29,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const projectDocuments = projects.filter((project) => project.linkAlrs);
 
   const tabs: { id: NonNullable<Tab>; label: string }[] = [
-    { id: 'visao-geral', label: 'VISÃO GERAL' },
     { id: 'projetos', label: 'PROJETOS DE LEI' },
     { id: 'votacoes', label: 'VOTAÇÕES' },
     { id: 'documentos', label: 'ACERVO DOCUMENTAL' },
@@ -62,35 +55,23 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <Metric value={votes.length} label="Votações no acervo" detail="Registros verificados no Supabase" />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 border-b border-stone-800 mb-12 pb-3">
+        <div className="divide-y divide-stone-800 border-y border-stone-800 mb-10">
           {tabs.map((tab) => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-xs sm:text-sm font-bold tracking-wider transition-colors border-b-2 -mb-[14px] cursor-pointer ${activeTab === tab.id ? 'border-[#00A550] text-[#00A550]' : 'border-transparent text-stone-400 hover:text-white hover:border-stone-600'}`}>
-              {tab.label}
+            <button
+              key={tab.id}
+              type="button"
+              aria-expanded={activeTab === tab.id}
+              aria-controls={`atuacao-panel-${tab.id}`}
+              onClick={() => setActiveTab(activeTab === tab.id ? undefined : tab.id)}
+              className="flex min-h-16 w-full items-center justify-between gap-4 px-1 py-4 text-left focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00A550]"
+            >
+              <span id={`atuacao-${tab.id}`} className={`text-sm sm:text-base font-bold tracking-wide ${activeTab === tab.id ? 'text-[#00A550]' : 'text-white'}`}>
+                {tab.label}
+              </span>
+              <span aria-hidden="true" className={`text-2xl font-light leading-none transition-transform ${activeTab === tab.id ? 'rotate-45' : ''}`}>+</span>
             </button>
           ))}
         </div>
-
-        {activeTab === 'visao-geral' && (
-          <div className="space-y-8">
-            {publishedProjects[0] ? (
-              <div className="bg-[#141414] border border-stone-800 p-6 sm:p-10 rounded-[2px]">
-                <div className="flex flex-wrap items-center gap-2 text-xs mb-4">
-                  <span className="font-bold text-[#00A550] uppercase tracking-[0.12em]">PROJETO PUBLICADO</span>
-                  <span className="text-stone-600">•</span>
-                  <span className="font-mono text-stone-400">{publishedProjects[0].code}</span>
-                </div>
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">{publishedProjects[0].title}</h3>
-                <p className="mt-4 text-stone-300 text-base sm:text-lg leading-relaxed max-w-[70ch]">{publishedProjects[0].summary}</p>
-                <button type="button" onClick={() => setActiveTab('projetos')} className="mt-6 h-[48px] px-7 bg-[#00A550] hover:bg-emerald-600 text-white font-bold text-sm uppercase tracking-wider rounded-[2px] inline-flex items-center gap-3 cursor-pointer">Ver projetos de lei <ArrowRight className="w-4 h-4" /></button>
-              </div>
-            ) : <EmptyState message="Ainda não há projetos publicados no acervo público." />}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <InfoCard eyebrow="VOTAÇÕES" title="Votações e posicionamentos" text={votes.length > 0 ? `${votes.length} voto(s) registrado(s) com fonte oficial vinculada no acervo público.` : 'O acervo de votações será exibido quando houver registros documentados na base pública. Nenhuma posição é inferida a partir de texto editorial.'} onClick={() => setActiveTab('votacoes')} action="Consultar acervo" />
-              <InfoCard eyebrow="ACERVO OFICIAL" title="Documentos parlamentares" text="Acesse as fontes oficiais vinculadas aos projetos já catalogados na plataforma." onClick={() => setActiveTab('documentos')} action="Acessar documentos" />
-            </div>
-          </div>
-        )}
 
         {activeTab === 'projetos' && (
           <div className="space-y-8">
@@ -172,13 +153,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           </div>
         )}
 
-        {activeTab === 'resultados' && (
-          <div className="max-w-3xl">
-            <h3 className="text-xl font-bold text-white">Resultados</h3>
-            <p className="text-sm text-stone-400 mt-2">Os resultados públicos são exibidos na seção própria da plataforma, diretamente a partir do acervo.</p>
-            <button type="button" onClick={() => setCurrentView('resultados')} className="mt-5 text-[#00A550] font-semibold text-sm inline-flex items-center gap-2">Abrir resultados <ArrowRight className="w-4 h-4" /></button>
-          </div>
-        )}
 
         <ContextSurface open={selectedProject !== null} title={selectedProject?.title || 'Projeto'} onClose={() => setSelectedProject(null)}>
           {selectedProject && (
