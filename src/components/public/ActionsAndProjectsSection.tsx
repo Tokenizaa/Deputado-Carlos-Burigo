@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAppUi } from '../../context/AppUiContext';
 import { ArrowRight, ExternalLink, FileText } from 'lucide-react';
 import { ProjectItem } from '../../types';
 import { PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
@@ -15,6 +16,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   initialSubTab = 'visao-geral',
 }) => {
   const { projects, setCurrentView, currentView, votes } = useApp();
+  const { openDocumentViewer } = useAppUi();
   const [activeTab, setActiveTab] = useState<NonNullable<Tab>>(
     currentView === 'projetos'
       ? 'projetos'
@@ -161,7 +163,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                   {projectDocuments.map((project) => (
                     <div key={project.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div><p className="font-semibold text-white">{project.code} — {project.title}</p><p className="text-xs text-stone-500 mt-1">Fonte oficial vinculada ao registro do projeto.</p></div>
-                      <a href={project.linkAlrs} target="_blank" rel="noreferrer" className="text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0"><FileText className="w-3.5 h-3.5" /> Fonte ALRS <ExternalLink className="w-3 h-3" /></a>
+                      <button type="button" onClick={() => openDocumentViewer(project.linkAlrs!, `${project.code} — ${project.title}`, "external")} className="min-h-11 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"><FileText className="w-3.5 h-3.5" /> Ler fonte oficial <ExternalLink className="w-3 h-3" aria-hidden="true" /></button>
                     </div>
                   ))}
                 </div>
@@ -185,7 +187,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               {selectedProject.detailedDescription && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Descrição</span><p className="leading-relaxed">{selectedProject.detailedDescription}</p></div>}
               <div className="grid grid-cols-1 gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedProject.theme}</p></div><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação</span><p className="font-semibold text-[#00A550] mt-0.5">{selectedProject.status}</p></div></div>
               {selectedProject.impacts.length > 0 && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">Registros de impacto</span><ul className="space-y-2 list-disc pl-5">{selectedProject.impacts.map((impact) => <li key={impact}>{impact}</li>)}</ul></div>}
-              {selectedProject.linkAlrs && <div className="pt-4 border-t border-stone-200"><a href={selectedProject.linkAlrs} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Portal ALRS <ExternalLink className="w-3 h-3" /></a></div>}
+              {selectedProject.linkAlrs && <div className="pt-4 border-t border-stone-200"><button type="button" onClick={() => openDocumentViewer(selectedProject.linkAlrs!, `${selectedProject.code} — ${selectedProject.title}`, "external")} className="min-h-11 text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Ler fonte oficial <ExternalLink className="w-3 h-3" aria-hidden="true" /></button></div>}
             </div>
           )}
         </ContextSurface>
@@ -197,7 +199,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <div className="grid grid-cols-1 gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.vote}</p></div>{selectedVote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.voteDate}</p></div>}<div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-stone-900 mt-0.5">{selectedVote.voterName}</p></div></div>
               {selectedVote.sessionName && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Sessão</span><p className="text-stone-900 mt-0.5">{selectedVote.sessionName}</p></div>}
               {selectedVote.verificationStatus && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Verificação</span><p className="text-stone-900 mt-0.5">{selectedVote.verificationStatus.replace(/_/g, ' ')}</p></div>}
-              {selectedVote.sourceUrl && <div className="pt-4 border-t border-stone-200"><a href={selectedVote.sourceUrl} target="_blank" rel="noreferrer" className="text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1">Fonte oficial ALRS <ExternalLink className="w-3 h-3" /></a></div>}
+              {selectedVote.sourceUrl && <div className="pt-4 border-t border-stone-200"><button type="button" onClick={() => openDocumentViewer(selectedVote.sourceUrl!, `Votação — ${selectedVote.legislativeCode}`, "external")} className="min-h-11 text-[#00A550] font-semibold hover:underline inline-flex items-center gap-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Ler fonte oficial <ExternalLink className="w-3 h-3" aria-hidden="true" /></button></div>}
             </div>
           )}
         </ContextSurface>
