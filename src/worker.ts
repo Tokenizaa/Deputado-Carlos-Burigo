@@ -528,7 +528,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       if (!fullDemand) return Response.json({ error: 'Demanda criada mas não encontrada' }, { status: 500 });
       
       // Insert initial history entry
-      await supabaseAdmin
+      const { error: historyError } = await supabaseAdmin
         .from('demand_history')
         .insert({
           demand_id: fullDemand.id,
@@ -540,6 +540,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
           note: 'Demanda criada via portal do cidadão',
           created_at: now
         });
+      if (historyError) throw historyError;
       
       return Response.json({
         success: true,
