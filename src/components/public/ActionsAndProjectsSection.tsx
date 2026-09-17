@@ -12,7 +12,7 @@ type Tab = ActionsAndProjectsSectionProps['initialSubTab'];
 export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({
   initialSubTab = 'visao-geral',
 }) => {
-  const { projects, setCurrentView, currentView } = useApp();
+  const { projects, setCurrentView, currentView, votes } = useApp();
   const [activeTab, setActiveTab] = useState<NonNullable<Tab>>(
     currentView === 'projetos'
       ? 'projetos'
@@ -54,7 +54,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <Metric value={projects.length} label="Projetos no acervo" detail="Registros disponíveis no Supabase" />
           <Metric value={publishedProjects.length} label="Projetos publicados" detail="Itens com status publicado" />
           <Metric value={projectDocuments.length} label="Com fonte ALRS" detail="Registros com link oficial" />
-          <Metric value="—" label="Votações" detail="Sem acervo de votos publicado" />
+          <Metric value={votes.length} label="Votações no acervo" detail="Registros verificados no Supabase" />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 border-b border-stone-800 mb-12 pb-3">
@@ -81,7 +81,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             ) : <EmptyState message="Ainda não há projetos publicados no acervo público." />}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <InfoCard eyebrow="VOTAÇÕES" title="Votações e posicionamentos" text="O acervo de votações será exibido quando houver registros documentados na base pública. Nenhuma posição é inferida a partir de texto editorial." onClick={() => setActiveTab('votacoes')} action="Consultar acervo" />
+              <InfoCard eyebrow="VOTAÇÕES" title="Votações e posicionamentos" text={votes.length > 0 ? `${votes.length} voto(s) registrado(s) com fonte oficial vinculada no acervo público.` : 'O acervo de votações será exibido quando houver registros documentados na base pública. Nenhuma posição é inferida a partir de texto editorial.'} onClick={() => setActiveTab('votacoes')} action="Consultar acervo" />
               <InfoCard eyebrow="ACERVO OFICIAL" title="Documentos parlamentares" text="Acesse as fontes oficiais vinculadas aos projetos já catalogados na plataforma." onClick={() => setActiveTab('documentos')} action="Acessar documentos" />
             </div>
           </div>
@@ -118,9 +118,31 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         )}
 
         {activeTab === 'votacoes' && (
-          <div className="max-w-3xl">
-            <h3 className="text-xl font-bold text-white">Votações e posicionamentos</h3>
-            <p className="text-sm text-stone-400 mt-2">O acervo de votos ainda não possui registros públicos suficientes para esta seção. O sistema não apresenta posições sem uma fonte registrada.</p>
+          <div className="space-y-6">
+            <div className="max-w-2xl">
+              <h3 className="text-xl font-bold text-white">Votações e posicionamentos</h3>
+              <p className="text-sm text-stone-400 mt-2">Posições registradas com fonte oficial vinculada ao acervo público do Supabase.</p>
+            </div>
+            {votes.length === 0 ? <EmptyState message="Nenhum voto publicado no acervo público." /> : (
+              <div className="border border-stone-800 rounded-sm overflow-hidden">
+                <div className="divide-y divide-stone-800">
+                  {votes.map((vote) => (
+                    <div key={vote.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
+                          <span className={`font-semibold ${vote.vote?.toLowerCase() === 'sim' ? 'text-[#00A550]' : 'text-stone-400'}`}>{vote.vote}</span>
+                          {vote.voteDate && <span className="text-stone-500">• {vote.voteDate}</span>}
+                        </div>
+                        {vote.sessionName && <p className="text-sm font-medium text-stone-300 mt-1.5">{vote.sessionName}</p>}
+                        <p className="text-xs text-stone-500 mt-0.5">Voto registrado de {vote.voterName}{vote.verificationStatus ? ` — ${vote.verificationStatus.replace(/_/g, ' ')}` : ''}</p>
+                      </div>
+                      {vote.sourceUrl && <a href={vote.sourceUrl} target="_blank" rel="noreferrer" className="text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0"><FileText className="w-3.5 h-3.5" /> Fonte ALRS <ExternalLink className="w-3 h-3" /></a>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
