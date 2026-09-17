@@ -652,9 +652,9 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       const updated = await updateDemandAdmin(id, body, actor);
       if (!updated) return Response.json({ error: 'Demanda não encontrada' }, { status: 404 });
       return Response.json(updated);
-    } catch (error: any) {
+    } catch (error) {
       console.error('[api/demands/:id] error:', error);
-      return Response.json({ error: `Falha ao atualizar demanda: ${error?.message ?? JSON.stringify(error)}` }, { status: 500 });
+      return Response.json({ error: 'Falha ao atualizar demanda' }, { status: 500 });
     }
   },
 
