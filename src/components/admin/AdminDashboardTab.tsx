@@ -4,11 +4,8 @@ import {
   Inbox,
   Newspaper,
   Calendar,
-  Layers,
   Sparkles,
-  TrendingUp,
   AlertCircle,
-  CheckCircle2,
   Clock,
   ArrowRight,
 } from 'lucide-react';
@@ -24,192 +21,154 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
   const inProgressDemands = demands.filter(
     (d) => d.status === 'em atendimento' || d.status === 'encaminhada'
   );
-  const completedDemands = demands.filter(
-    (d) => d.status === 'concluída' || d.status === 'respondida'
-  );
 
   const mode = settings?.site_mode || 'campaign';
 
   return (
-    <div className="space-y-8">
-      {/* Platform Mode Switching Control Banner */}
-      <div className="bg-white border-2 border-[#00A550] rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#00A550]" />
-            <h2 className="text-lg font-black text-stone-900">
-              Modo Operacional da Plataforma: <span className="uppercase text-[#00A550] font-black">{mode}</span>
-            </h2>
-          </div>
-          <p className="text-xs sm:text-sm text-stone-600 max-w-2xl">
-            {mode === 'campaign'
-              ? 'Atualmente configurado como Presença Digital de Campanha (Eleições 04/10/2026, número eleitoral 15140, MDB e avisos legais TSE ativos).'
-              : mode === 'mandate'
-              ? 'Atualmente configurado como Mandato Parlamentar Ativo (comunicação institucional da Assembleia Legislativa do RS).'
-              : 'Atualmente configurado como Atuação Pública e Memória Institucional.'}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-stone-100 p-1.5 rounded-xl shrink-0">
-          {(['campaign', 'mandate', 'institutional'] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => updateSettings({ site_mode: m })}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                mode === m
-                  ? 'bg-[#00A550] text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              {m === 'campaign' ? 'Eleitoral / Campanha' : m === 'mandate' ? 'Mandato' : 'Institucional'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div
-          onClick={() => setActiveTab('demands')}
-          className="cursor-pointer bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:border-[#00A550] transition-colors"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-              Demandas Pendentes
-            </span>
-            <div className="p-2 rounded-lg bg-rose-50 text-rose-600">
-              <AlertCircle className="w-4 h-4" />
+    <div className="space-y-5 sm:space-y-8">
+      <section className="bg-white border-2 border-[#00A550] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#00A550] shrink-0" />
+              <h2 className="text-base sm:text-lg font-black text-stone-900 truncate">
+                Modo: <span className="uppercase text-[#00A550]">{mode}</span>
+              </h2>
             </div>
+            <p className="text-xs sm:text-sm text-stone-600 max-w-2xl">
+              {mode === 'campaign'
+                ? 'Presença Digital de Campanha.'
+                : mode === 'mandate'
+                ? 'Mandato Parlamentar Ativo.'
+                : 'Atuação Pública e Memória Institucional.'}
+            </p>
           </div>
-          <p className="text-3xl font-black text-stone-900 mt-2">{pendingDemands.length}</p>
-          <p className="text-xs text-rose-600 font-semibold mt-1">
-            Necessitam triagem ou resposta do gabinete
-          </p>
-        </div>
 
-        <div
+          <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-lg overflow-x-auto max-w-full" aria-label="Modo da plataforma">
+            {(['campaign', 'mandate', 'institutional'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => updateSettings({ site_mode: m })}
+                className={`min-h-[44px] px-3 rounded-md text-xs font-bold whitespace-nowrap transition-colors ${
+                  mode === m
+                    ? 'bg-[#00A550] text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                {m === 'campaign' ? 'Campanha' : m === 'mandate' ? 'Mandato' : 'Institucional'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Indicadores do gabinete" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        <button
+          type="button"
           onClick={() => setActiveTab('demands')}
-          className="cursor-pointer bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:border-[#00A550] transition-colors"
+          className="text-left bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-xs hover:border-[#00A550] transition-colors min-h-[132px]"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-              Em Atendimento
-            </span>
-            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-              <Clock className="w-4 h-4" />
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Pendentes</span>
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           </div>
-          <p className="text-3xl font-black text-stone-900 mt-2">{inProgressDemands.length}</p>
-          <p className="text-xs text-stone-500 mt-1">Ofícios expedidos ou em análise</p>
-        </div>
+          <p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{pendingDemands.length}</p>
+          <p className="text-[11px] sm:text-xs text-rose-600 font-semibold mt-1">Triagem necessária</p>
+        </button>
 
-        <div
+        <button
+          type="button"
+          onClick={() => setActiveTab('demands')}
+          className="text-left bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-xs hover:border-[#00A550] transition-colors min-h-[132px]"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Atendimento</span>
+            <Clock className="w-4 h-4 text-indigo-600 shrink-0" />
+          </div>
+          <p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{inProgressDemands.length}</p>
+          <p className="text-[11px] sm:text-xs text-stone-500 mt-1">Em andamento</p>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('news')}
-          className="cursor-pointer bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:border-[#00A550] transition-colors"
+          className="text-left bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-xs hover:border-[#00A550] transition-colors min-h-[132px]"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-              Notícias no Ar
-            </span>
-            <div className="p-2 rounded-lg bg-emerald-50 text-[#00A550]">
-              <Newspaper className="w-4 h-4" />
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Notícias</span>
+            <Newspaper className="w-4 h-4 text-[#00A550] shrink-0" />
           </div>
-          <p className="text-3xl font-black text-stone-900 mt-2">
-            {news.filter((n) => n.status === 'publicado').length}
-          </p>
-          <p className="text-xs text-stone-500 mt-1">Artigos e comunicados publicados</p>
-        </div>
+          <p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{news.filter((n) => n.status === 'publicado').length}</p>
+          <p className="text-[11px] sm:text-xs text-stone-500 mt-1">Publicadas</p>
+        </button>
 
-        <div
+        <button
+          type="button"
           onClick={() => setActiveTab('agenda')}
-          className="cursor-pointer bg-white border border-stone-200 rounded-2xl p-5 shadow-xs hover:border-[#00A550] transition-colors"
+          className="text-left bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-xs hover:border-[#00A550] transition-colors min-h-[132px]"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-              Compromissos
-            </span>
-            <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-              <Calendar className="w-4 h-4" />
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Agenda</span>
+            <Calendar className="w-4 h-4 text-amber-600 shrink-0" />
           </div>
-          <p className="text-3xl font-black text-stone-900 mt-2">{events.length}</p>
-          <p className="text-xs text-stone-500 mt-1">Eventos públicos e agendas internas</p>
-        </div>
-      </div>
+          <p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{events.length}</p>
+          <p className="text-[11px] sm:text-xs text-stone-500 mt-1">Compromissos</p>
+        </button>
+      </section>
 
-      {/* Two columns: Pending Demands list & Recent Audit Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Pending Demands Queue */}
-        <div className="lg:col-span-7 bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-            <h3 className="font-black text-stone-900 text-base flex items-center gap-2">
-              <Inbox className="w-4 h-4 text-[#00A550]" />
-              Fila Prioritária de Demandas
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
+        <div className="lg:col-span-7 bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-3 gap-3">
+            <h3 className="font-black text-stone-900 text-sm sm:text-base flex items-center gap-2 min-w-0">
+              <Inbox className="w-4 h-4 text-[#00A550] shrink-0" />
+              <span className="truncate">Fila de Demandas</span>
             </h3>
-            <button
-              onClick={() => setActiveTab('demands')}
-              className="text-xs font-bold text-[#00A550] hover:underline flex items-center gap-1"
-            >
+            <button type="button" onClick={() => setActiveTab('demands')} className="min-h-[44px] shrink-0 text-xs font-bold text-[#00A550] flex items-center gap-1">
               Ver todas <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {demands.slice(0, 4).map((d) => (
-              <div
+              <button
+                type="button"
                 key={d.id}
                 onClick={() => setActiveTab('demands')}
-                className="cursor-pointer p-3.5 rounded-xl border border-stone-200 hover:border-[#00A550] hover:bg-stone-50 transition-colors flex items-start justify-between gap-4"
+                className="w-full text-left min-h-[64px] cursor-pointer p-3 rounded-lg sm:rounded-xl border border-stone-200 hover:border-[#00A550] hover:bg-stone-50 transition-colors flex items-start justify-between gap-3"
               >
-                <div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="font-mono font-bold text-[#00A550]">{d.protocol}</span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs min-w-0">
+                    <span className="font-mono font-bold text-[#00A550] shrink-0">{d.protocol}</span>
                     <span className="text-stone-400">•</span>
-                    <span className="font-semibold text-stone-700">{d.citizenName}</span>
-                    <span className="text-stone-400">•</span>
-                    <span className="text-stone-500">{d.municipality}</span>
+                    <span className="font-semibold text-stone-700 truncate">{d.citizenName}</span>
                   </div>
-                  <h4 className="font-bold text-stone-900 text-sm mt-1 leading-snug">
-                    {d.subject}
-                  </h4>
+                  <h4 className="font-bold text-stone-900 text-xs sm:text-sm mt-1 leading-snug line-clamp-2">{d.subject}</h4>
                 </div>
-
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-stone-100 text-stone-700 shrink-0">
-                  {d.status}
-                </span>
-              </div>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-stone-100 text-stone-700 shrink-0">{d.status}</span>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Audit Log Stream */}
-        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-            <h3 className="font-black text-stone-900 text-base">
-              Registro de Auditoria Recente
-            </h3>
-            <button
-              onClick={() => setActiveTab('audit')}
-              className="text-xs font-bold text-[#00A550] hover:underline"
-            >
-              Histórico
-            </button>
+        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-3 gap-3">
+            <h3 className="font-black text-stone-900 text-sm sm:text-base truncate">Auditoria recente</h3>
+            <button type="button" onClick={() => setActiveTab('audit')} className="min-h-[44px] shrink-0 text-xs font-bold text-[#00A550]">Histórico</button>
           </div>
-
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {auditLogs.slice(0, 5).map((log) => (
               <div key={log.id} className="text-xs p-3 rounded-lg bg-stone-50 border border-stone-200">
-                <div className="flex items-center justify-between text-stone-500">
-                  <span className="font-semibold text-stone-800">{log.userName}</span>
-                  <span>{new Date(log.timestamp).toLocaleTimeString('pt-BR')}</span>
+                <div className="flex items-center justify-between gap-3 text-stone-500">
+                  <span className="font-semibold text-stone-800 truncate">{log.userName}</span>
+                  <span className="shrink-0">{new Date(log.timestamp).toLocaleTimeString('pt-BR')}</span>
                 </div>
-                <p className="text-stone-700 font-medium mt-1">{log.action}</p>
+                <p className="text-stone-700 font-medium mt-1 line-clamp-2">{log.action}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
