@@ -292,7 +292,7 @@ export async function getPublicDocuments() {
 
 export async function getPublicEvidence() {
   const { data, error } = await supabasePublic.from('evidence')
-    .select('id,title,description,type,url,storage_path,mime_type,file_size,sha256,source_name,uploaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .select('id,entity_type,entity_id,source_name,source_url,source_type,publication_date,verification_status,notes,verified_at,verified_by,created_at,updated_at')
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map(mapToPublicEvidenceDto);
