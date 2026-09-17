@@ -25,7 +25,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
 
-  const publishedProjects = projects.filter((project) => project.status === 'Concluído');
   const projectDocuments = projects.filter((project) => project.linkAlrs);
 
   const tabs: { id: NonNullable<Tab>; label: string }[] = [
@@ -46,13 +45,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.06]">O trabalho parlamentar em movimento.</h2>
           <p className="mt-4 text-base sm:text-lg text-stone-300 leading-relaxed max-w-[65ch]">Consulte projetos e documentos que já fazem parte do acervo público da plataforma.</p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pb-12 mb-12 border-b border-stone-800">
-          <Metric value={projects.length} label="Projetos no acervo" detail="Registros disponíveis no Supabase" />
-          <Metric value={publishedProjects.length} label="Projetos publicados" detail="Itens com status publicado" />
-          <Metric value={projectDocuments.length} label="Com fonte ALRS" detail="Registros com link oficial" />
-          <Metric value={votes.length} label="Votações no acervo" detail="Registros verificados no Supabase" />
         </div>
 
         <div className="divide-y divide-stone-800 border-y border-stone-800 mb-10">
@@ -182,12 +174,5 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   );
 };
 
-const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
-  <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>
-);
-
 const EmptyState: React.FC<{ message: string }> = ({ message }) => <div className="border border-dashed border-stone-700 p-8 text-sm text-stone-400">{message}</div>;
 
-const InfoCard: React.FC<{ eyebrow: string; title: string; text: string; action: string; onClick: () => void }> = ({ eyebrow, title, text, action, onClick }) => (
-  <div className="bg-[#141414] border border-stone-800 p-8 rounded-[2px] space-y-4 flex flex-col justify-between min-h-[220px]"><div className="space-y-3"><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.12em] block">{eyebrow}</span><h4 className="text-2xl font-bold text-white leading-snug">{title}</h4><p className="text-stone-300 text-sm sm:text-base leading-relaxed">{text}</p></div><button type="button" onClick={onClick} className="text-white hover:text-[#00A550] font-bold text-xs sm:text-sm uppercase tracking-wider inline-flex items-center gap-2 transition-colors cursor-pointer">{action} <ArrowRight className="w-4 h-4" /></button></div>
-);
