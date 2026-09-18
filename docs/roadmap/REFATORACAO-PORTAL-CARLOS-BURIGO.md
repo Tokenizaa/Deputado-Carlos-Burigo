@@ -1418,12 +1418,12 @@ FASE 2 — CONCLUÍDA
 FASE 3 — CONCLUÍDA
 FASE 4 — CONCLUÍDA
 FASE 5 — CONCLUÍDA
-FASE 6 — PENDENTE
+FASE 6 — CONCLUÍDA
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 6 — Transparência e política de publicação**.
+FASE 6 foi executada no `main`. A próxima etapa oficial é a **FASE 7 — Reconstrução da Home V2**.
 
 A Fase 5 foi concluída com o canal Fale com o Gabinete consolidado e o fluxo cidadão existente promovido a experiência canônica. A Home não foi reconstruída nesta fase. A auditoria final de acessibilidade permanece prevista para a Fase 14.
 
