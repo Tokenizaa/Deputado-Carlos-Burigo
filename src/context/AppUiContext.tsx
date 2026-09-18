@@ -36,7 +36,7 @@ const AppUiContext = createContext<AppUiContextValue | undefined>(undefined);
 const VIEW_TO_PATH: Record<string, string> = {
   home: '/', sobre: '/sobre', trajetoria: '/trajetoria', atuacao: '/atuacao', projetos: '/projetos',
   votacoes: '/votacoes', documentos: '/documentos', resultados: '/resultados', noticias: '/noticias',
-  agenda: '/agenda', municipios: '/municipios', videos: '/videos', cidadao: '/cidadao', contato: '/contato',
+  agenda: '/agenda', municipios: '/municipios', videos: '/videos', cidadao: '/cidadao', contato: '/contato', transparencia: '/transparencia',
   campanha: '/campanha', privacidade: '/privacidade', acessibilidade: '/acessibilidade', admin: '/admin',
 };
 
