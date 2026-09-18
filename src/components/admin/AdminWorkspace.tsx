@@ -11,6 +11,7 @@ import { AdminVideosTab } from './AdminVideosTab';
 import { AdminMediaTab } from './AdminMediaTab';
 import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
+import { AdminTasksTab } from './AdminTasksTab';
 import { AdminSettingsTab } from './AdminSettingsTab';
 
 interface AdminWorkspaceProps {
@@ -18,26 +19,25 @@ interface AdminWorkspaceProps {
   setActiveModule: (module: string) => void;
 }
 
-type ModuleId = 'dashboard' | 'atuação' | 'conteúdo' | 'acervo' | 'cidadão' | 'administração';
+type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'atuação' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
 
-const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão'>, Array<{ id: string; label: string }>> = {
+const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
   atuação: [
-    { id: 'results', label: 'Resultados' },
+    { id: 'results', label: 'Atuação' },
     { id: 'municipalities', label: 'Municípios' },
   ],
   conteúdo: [
     { id: 'pages', label: 'Páginas' },
     { id: 'news', label: 'Notícias' },
-    { id: 'agenda', label: 'Agenda' },
-    { id: 'content', label: 'Conteúdo' },
-  ],
-  acervo: [
+    { id: 'content', label: 'Institucional' },
     { id: 'videos', label: 'Vídeos' },
     { id: 'media', label: 'Mídia' },
   ],
   administração: [
     { id: 'users', label: 'Equipe' },
     { id: 'audit', label: 'Auditoria' },
+  ],
+  configurações: [
     { id: 'settings', label: 'Configurações' },
   ],
 };
@@ -48,8 +48,8 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
   useEffect(() => {
     if (activeModule === 'atuação') setSubTab('results');
     if (activeModule === 'conteúdo') setSubTab('pages');
-    if (activeModule === 'acervo') setSubTab('videos');
     if (activeModule === 'administração') setSubTab('users');
+    if (activeModule === 'configurações') setSubTab('settings');
   }, [activeModule]);
 
   const renderSubTab = () => {
@@ -73,11 +73,11 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
     return <AdminDashboardTab setActiveTab={setActiveModule} />;
   }
 
-  if (activeModule === 'cidadão') {
-    return <AdminDemandsTab />;
-  }
+  if (activeModule === 'cidadão') return <AdminDemandsTab />;
+  if (activeModule === 'agenda') return <AdminAgendaTab />;
+  if (activeModule === 'tarefas') return <AdminTasksTab />;
 
-  const tabs = moduleTabs[activeModule as Exclude<ModuleId, 'dashboard' | 'cidadão'>] ?? [];
+  const tabs = moduleTabs[activeModule as Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>] ?? [];
 
   return (
     <div className="space-y-5 sm:space-y-6">
