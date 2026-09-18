@@ -3,7 +3,6 @@ import type {
   PublicLegislativeItemDto,
   PublicLegislativeRoleDto,
   PublicLegislativeVoteDto,
-  PublicProjectDto,
   PublicResultDto,
 } from '../../src/contracts/publicLegislative';
 import { extractLegislativeCode } from '../../src/contracts/publicLegislative';
@@ -152,31 +151,6 @@ export function toPublicLegislativeItemDto(
     events: (relations.events ?? []).map(toPublicLegislativeEventDto),
     votes: (relations.votes ?? []).map((vote) => toPublicLegislativeVoteDto(vote, row)),
     roles: (relations.roles ?? []).map(toPublicLegislativeRoleDto),
-  };
-}
-
-export function toPublicProjectDto(
-  row: ProjectRow,
-  publishedCodes: PublishedCodeSet,
-  legislativeItemId: string,
-): PublicProjectDto | null {
-  const legislativeCode = normalizeLegislativeCode(row.code);
-  if (!publishedCodes.has(legislativeCode)) return null;
-
-  return {
-    id: row.id,
-    code: row.code,
-    title: row.title,
-    summary: row.summary,
-    detailedDescription: row.detailed_description,
-    theme: row.theme,
-    status: row.status,
-    linkAlrs: row.link_alrs ?? undefined,
-    year: row.year,
-    impacts: Array.isArray(row.impacts) ? row.impacts.filter((impact): impact is string => typeof impact === 'string') : [],
-    source: 'projects_projection',
-    legislativeCode,
-    legislativeItemId,
   };
 }
 
