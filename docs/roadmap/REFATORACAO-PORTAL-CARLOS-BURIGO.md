@@ -87,7 +87,7 @@ Não criar:
 
 Produção permanece em **Cloudflare Workers**.
 
-Não reintroduzir Vercel como runtime de produção.
+Vercel não faz parte da arquitetura, do runtime, do deploy ou da validação deste projeto.
 
 ## 2.4 Acessibilidade
 
@@ -1434,7 +1434,7 @@ Estados permitidos:
 | Fase | Bloqueador | Evidência | Próxima ação |
 |---|---|---|---|
 | 0 | PR #19 estava aberto antes da execução da Fase 0 | PR #19 documentava ADRs canônicos; foi integrado nesta fase | Resolvido: PR #19 merged |
-| 0 | Metadado `homepage` do repositório ainda aponta para Vercel | `get_repo` retorna `https://deputado-darlos-burigo.vercel.app` | Corrigir durante auditoria/SEO; não reintroduzir Vercel como runtime |
+| 0 | Metadado `homepage` do repositório ainda aponta para Vercel | O metadata do repositório ainda pode conter uma URL histórica; revisar o campo `homepage` para a URL canônica da Cloudflare | Corrigir durante auditoria/SEO; não reintroduzir Vercel como runtime |
 | 0 | Existem branches históricas/paralelas no repositório | Listagem de branches mostra branches de consolidação, UX, Vercel e outras fases antigas | Não usar essas branches como fonte de verdade; trabalhar a partir de `main` |
 
 Não mascarar bloqueador como concluído.
@@ -1452,7 +1452,7 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Execução | Integrar fases validadas em main | Evitar acúmulo de branches/PRs | CANÔNICA |
 | 2026-09-18 | Fase 0 | `main` é a única referência operacional da refatoração | Evitar continuidade em branches históricas divergentes | CANÔNICA |
 | 2026-09-18 | Fase 0 | PR #19 foi integrado antes do checkpoint da fase | O ADR documenta decisões arquiteturais que já estavam vigentes | CONCLUÍDA |
-| 2026-09-18 | Fase 0 | Referência Vercel no metadata do repositório é tratada como resíduo a corrigir | Cloudflare é o runtime canônico | PENDENTE |
+| 2026-09-18 | Fase 0 | Referência histórica de hosting no metadata do repositório deve ser corrigida para a Cloudflare | Cloudflare é o runtime canônico | PENDENTE |
 | 2026-09-18 | Fase 1 | Auditoria deve ser audit-only antes da reconstrução visual | Evitar alterar a Home com diagnóstico incompleto | CONCLUÍDA |
 | 2026-09-18 | Fase 1 | Base atual é aproveitável; priorizar shell, tokens e acessibilidade antes da Home | Evitar segunda arquitetura e retrabalho | CONCLUÍDA |
 | 2026-09-18 | Fase 2 | Design system usa tokens semânticos com aliases de compatibilidade | Evitar migração destrutiva e segunda arquitetura de estilos | CONCLUÍDA |
