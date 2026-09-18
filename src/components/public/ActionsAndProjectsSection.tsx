@@ -15,7 +15,7 @@ type Tab = ActionsAndProjectsSectionProps['initialSubTab'];
 export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({
   initialSubTab,
 }) => {
-  const { projects, setCurrentView, currentView, votes } = useApp();
+  const { projects, setCurrentView, currentView, votes, documents } = useApp();
   const { openDocumentViewer } = useAppUi();
   const [activeTab, setActiveTab] = useState<Tab>(
     currentView === 'projetos' || currentView === 'votacoes' || currentView === 'documentos'
@@ -25,7 +25,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
 
-  const projectDocuments = projects.filter((project) => project.linkAlrs);
+  const publicDocuments = documents.filter((document) => document.verificationStatus === 'VERIFIED_PRIMARY' || document.verificationStatus === 'VERIFIED_MULTIPLE');
 
   const tabs: { id: NonNullable<Tab>; label: string }[] = [
     { id: 'projetos', label: 'PROJETOS DE LEI' },
@@ -130,24 +130,29 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
         {activeTab === 'documentos' && (
           <div id="atuacao-panel-documentos" role="region" aria-labelledby="atuacao-documentos" className="scroll-mt-24">
-          <div className="space-y-6">
-            <div className="max-w-2xl">
-              <h3 className="text-xl font-bold text-white">Acervo documental</h3>
-              <p className="text-sm text-stone-400 mt-1">Projetos com fonte legislativa registrada no acervo público.</p>
-            </div>
-            {projectDocuments.length === 0 ? <EmptyState message="Nenhum documento com fonte pública vinculada." /> : (
-              <div className="border border-stone-800 rounded-sm overflow-hidden">
-                <div className="divide-y divide-stone-800">
-                  {projectDocuments.map((project) => (
-                    <div key={project.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div><p className="font-semibold text-white">{project.code} — {project.title}</p><p className="text-xs text-stone-500 mt-1">Fonte oficial vinculada ao registro do projeto.</p></div>
-                      <button type="button" onClick={() => openDocumentViewer(project.linkAlrs!, `${project.code} — ${project.title}`, "external")} className="min-h-11 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"><FileText className="w-3.5 h-3.5" /> Ler fonte oficial <ExternalLink className="w-3 h-3" aria-hidden="true" /></button>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-6">
+              <div className="max-w-2xl">
+                <h3 className="text-xl font-bold text-white">Acervo documental</h3>
+                <p className="text-sm text-stone-400 mt-1">Documentos registrados no acervo público. A leitura permanece nesta experiência; a fonte oficial só é aberta quando o arquivo não está disponível para incorporação.</p>
               </div>
-            )}
-          </div>
+              {publicDocuments.length === 0 ? <EmptyState message="Nenhum documento publicado no acervo público." /> : (
+                <div className="border border-stone-800 rounded-sm overflow-hidden">
+                  <div className="divide-y divide-stone-800">
+                    {publicDocuments.map((document) => (
+                      <div key={document.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-white">{document.title}</p>
+                          <p className="text-xs text-stone-500 mt-1">{document.documentType} • {document.sourceName || 'Fonte oficial'} • {document.mimeType}</p>
+                        </div>
+                        <button type="button" onClick={() => document.originalUrl && openDocumentViewer(document.originalUrl, document.title, document.mimeType === 'application/pdf' ? 'pdf' : 'external')} disabled={!document.originalUrl} className="min-h-11 shrink-0 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550] disabled:text-stone-600 disabled:no-underline disabled:cursor-not-allowed">
+                          <FileText className="w-3.5 h-3.5" /> Consultar documento
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
