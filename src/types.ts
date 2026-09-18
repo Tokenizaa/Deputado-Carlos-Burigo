@@ -250,6 +250,27 @@ export interface PageVersion {
   note?: string;
 }
 
+export type TaskStatus = 'pendente' | 'em_andamento' | 'aguardando' | 'concluida' | 'cancelada';
+export type TaskPriority = 'baixa' | 'normal' | 'alta' | 'urgente';
+export type TaskSourceType = 'demanda' | 'legislativo' | 'agenda' | 'conteudo' | 'documento' | 'interna';
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignedTo?: string | null;
+  dueAt?: string | null;
+  sourceType?: TaskSourceType | null;
+  sourceId?: string | null;
+  completionNotes?: string | null;
+  completedAt?: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AuditLog {
   id: string;
   userId: string;
