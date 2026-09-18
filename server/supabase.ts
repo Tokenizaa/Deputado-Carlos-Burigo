@@ -323,7 +323,28 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
     .eq('status', 'publicado')
     .order('published_at', { ascending: false, nullsFirst: false });
   if (error) throw error;
-  return (data ?? []).map(toPublicNewsDto);
+
+  const mediaIds = [...new Set((data ?? []).map((row) => row.main_media_id).filter(Boolean))] as string[];
+  const mediaById = new Map<string, string>();
+  if (mediaIds.length) {
+    const { data: mediaRows, error: mediaError } = await supabasePublic
+      .from('media')
+      .select('id,url,original_url')
+      .in('id', mediaIds);
+    if (mediaError) throw mediaError;
+    for (const media of mediaRows ?? []) {
+      const url = media.url || media.original_url;
+      if (url) mediaById.set(media.id, url);
+    }
+  }
+
+  return (data ?? []).map((row) => {
+    const dto = toPublicNewsDto(row);
+    return {
+      ...dto,
+      mainImage: row.main_media_id ? mediaById.get(row.main_media_id) : dto.mainImage,
+    };
+  });
 }
 
 export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {

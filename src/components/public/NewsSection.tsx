@@ -87,18 +87,15 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
           >
             {/* Dominant Full-width or Cinematic Photo */}
             <div className="aspect-16/9 sm:aspect-21/9 max-h-[460px] w-full overflow-hidden bg-stone-900 relative">
-              <img
-                src={featuredItem.mainImage || '/assets/alrs_parlamento.jpg'}
+              {featuredItem.mainImage ? <img
+                src={featuredItem.mainImage}
                 alt={featuredItem.title}
                 className="w-full h-full object-cover filter contrast-[1.03] group-hover:scale-[1.01] transition-transform duration-500"
                 loading="lazy"
                 width={1280}
                 height={550}
                 referrerPolicy="no-referrer"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg';
-                }}
-              />
+              /> : <div className="w-full h-full flex items-center justify-center bg-stone-100 text-stone-400"><div className="text-center px-6"><Newspaper className="w-10 h-10 mx-auto mb-3" /><p className="text-xs font-bold uppercase tracking-wider">Imagem da matéria não cadastrada</p></div></div>}
               <div className="absolute top-4 left-4 bg-stone-900 text-white px-3 py-1 rounded-[2px] text-xs font-bold uppercase tracking-wider border border-white/10">
                 MANCHETE PRINCIPAL
               </div>
@@ -153,18 +150,15 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
                 >
                   <div>
                     <div className="aspect-16/10 overflow-hidden bg-stone-100 border-b border-stone-200">
-                      <img
-                        src={item.mainImage || '/assets/alrs_parlamento.jpg'}
+                      {item.mainImage ? <img
+                        src={item.mainImage}
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
                         loading="lazy"
                         width={640}
                         height={400}
                         referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/alrs_parlamento.jpg';
-                        }}
-                      />
+                      /> : <div className="w-full h-full flex items-center justify-center bg-stone-100 text-stone-400"><div className="text-center px-4"><Newspaper className="w-8 h-8 mx-auto mb-2" /><p className="text-[10px] font-bold uppercase tracking-wider">Imagem não cadastrada</p></div></div>}
                     </div>
 
                     <div className="p-6 space-y-2.5">
