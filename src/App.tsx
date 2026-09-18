@@ -29,7 +29,7 @@ import { DynamicPageView } from './components/public/DynamicPageView';
 const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia']);
 
 const MainAppContent: React.FC = () => {
-  const { currentView, pages, isLoading, setCurrentView } = useApp();
+  const { currentView, isLoading, setCurrentView } = useApp();
   const [adminTab, setAdminTab] = useState('dashboard');
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
