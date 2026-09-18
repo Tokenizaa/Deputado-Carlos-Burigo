@@ -14,7 +14,6 @@ import { MunicipalitiesSection } from './components/public/MunicipalitiesSection
 import { VideosSection } from './components/public/VideosSection';
 import { CitizenPortalView } from './components/citizen/CitizenPortalView';
 import { CitizenProtocolModal } from './components/citizen/CitizenProtocolModal';
-import { ContactView } from './components/public/ContactView';
 import { PrivacyPolicyView } from './components/public/PrivacyPolicyView';
 import { AccessibilityView } from './components/public/AccessibilityView';
 import { AccessibilityBar } from './components/accessibility/AccessibilityBar';
@@ -71,7 +70,16 @@ const MainAppContent: React.FC = () => {
     }
   };
 
-  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><AccessibilityBar /><Navbar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <div className="flex flex-col space-y-8 sm:space-y-16 md:space-y-20 lg:space-y-24 xl:space-y-28">{sortedBlocks.length > 0 ? sortedBlocks.map((b) => <div key={b.id} className="w-full">{renderBlock(b)}</div>) : <div className="px-4 py-24 text-center text-stone-600"><h1 className="text-2xl font-bold text-stone-900">Página inicial indisponível</h1><p className="mt-2 text-sm">A página inicial canônica ainda não foi publicada.</p></div>}</div>}{(currentView === 'sobre' || currentView === 'trajetoria') && <AboutView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{currentView === 'cidadao' && <CitizenPortalView />}{currentView === 'contato' && <ContactView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}{currentView === 'acessibilidade' && <AccessibilityView />}</main><Footer /><CitizenProtocolModal /></div>;
+  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><AccessibilityBar /><Navbar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <div className="flex flex-col space-y-8 sm:space-y-16 md:space-y-20 lg:space-y-24 xl:space-y-28">{sortedBlocks.length > 0 ? sortedBlocks.map((b) => <div key={b.id} className="w-full">{renderBlock(b)}</div>) : <div className="px-4 py-24 text-center text-stone-600"><h1 className="text-2xl font-bold text-stone-900">Página inicial indisponível</h1><p className="mt-2 text-sm">A página inicial canônica ainda não foi publicada.</p></div>}</div>}{(currentView === 'sobre' || currentView === 'trajetoria') && <AboutView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}{currentView === 'acessibilidade' && <AccessibilityView />}</main><Footer /><CitizenProtocolModal />{currentView !== 'contato' && currentView !== 'cidadao' && (
+      <a
+        href="/contato"
+        onClick={(event) => { event.preventDefault(); window.history.pushState({ view: 'contato' }, '', '/contato'); window.dispatchEvent(new PopStateEvent('popstate')); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        className="lg:hidden fixed right-4 z-40 min-h-12 min-w-12 rounded-full bg-[#00863f] px-4 text-sm font-bold text-white shadow-lg border-2 border-white flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f] bottom-[calc(4.75rem+env(safe-area-inset-bottom))]"
+        aria-label="Fale com o Gabinete"
+      >
+        Fale com o Gabinete
+      </a>
+    )}</div>;
 };
 
 export function App() { return <AppUiProvider><AppProvider><MainAppContent /></AppProvider></AppUiProvider>; }
