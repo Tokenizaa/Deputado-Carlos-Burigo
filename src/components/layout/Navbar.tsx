@@ -121,20 +121,20 @@ export const Navbar: React.FC = () => {
               className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-4 text-sm font-semibold text-white hover:bg-[#006b32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
             >
               <PhoneCall className="h-4 w-4" aria-hidden="true" />
-              Fale com o Gabinete
+              Fale com o Deputado
             </a>
           </nav>
 
           <div className="hidden md:flex lg:hidden items-center">
             <a href="/contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
               <PhoneCall className="h-4 w-4" aria-hidden="true" />
-              Fale com o Gabinete
+              Fale com o Deputado
             </a>
           </div>
 
           <div className="flex lg:hidden items-center gap-2 md:hidden">
             <a href="/contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
-              Fale com o Gabinete
+              Fale com o Deputado
             </a>
           </div>
         </div>
