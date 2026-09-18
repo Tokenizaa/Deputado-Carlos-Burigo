@@ -114,10 +114,10 @@ export const CitizenPortalView: React.FC = () => {
         {/* Header Section */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-50 text-[#00A550] border border-emerald-200 text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
-            Canal Direto com o Gabinete
+            Canal Direto com o Deputado
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
-            Fale com o Gabinete de Carlos Búrigo
+            Fale com o Deputado de Carlos Búrigo
           </h1>
           <p className="mt-3 text-stone-600 text-sm sm:text-base leading-relaxed">
             Envie sua demanda comunitária, solicitação de apoio parlamentar, sugestão de projeto de lei ou pedido de providência aos órgãos públicos. Cada manifestação recebe protocolo individual com acompanhamento transparente.
@@ -188,7 +188,7 @@ export const CitizenPortalView: React.FC = () => {
         <div className="bg-white border border-stone-200 rounded-2xl p-6 sm:p-10 shadow-xs">
           <form onSubmit={handleSubmit} className="space-y-6">
             <h3 className="text-lg font-black text-stone-900 border-b border-stone-200 pb-3">
-              Formulário de Atendimento e Demanda
+              Formulário de Atendimento ao Deputado
             </h3>
 
             {/* Citizen Identity */}
