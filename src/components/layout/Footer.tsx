@@ -8,6 +8,30 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-stone-900 text-stone-400 text-sm border-t border-stone-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="lg:hidden mb-10 pb-6 border-b border-stone-800">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-3">Navegação</p>
+          <nav className="grid grid-cols-2 gap-2" aria-label="Navegação no rodapé">
+            {[
+              ['home', 'Início'],
+              ['atuacao', 'Atuação'],
+              ['noticias', 'Notícias'],
+              ['agenda', 'Agenda'],
+              ['municipios', 'Municípios'],
+              ['contato', 'Contato'],
+            ].map(([view, label]) => (
+              <button
+                key={view}
+                type="button"
+                onClick={() => setCurrentView(view)}
+                className="min-h-11 px-3 text-left border border-stone-800 rounded-md text-sm font-semibold text-stone-300 hover:text-white hover:border-stone-600"
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-stone-800">
           {/* Col 1: Identification */}
           <div className="space-y-4">
