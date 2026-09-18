@@ -1,4 +1,4 @@
-# Fase 5 — Fale com o Gabinete
+# Fase 5 — Fale com o Deputado
 
 **Data:** 2026-09-18  
 **Base:** `main`  
@@ -25,7 +25,7 @@ Também existia uma segunda `ContactView` com formulário separado por `mailto:`
 
 ### Canal canônico
 
-**Fale com o Gabinete** agora utiliza o fluxo de atendimento cidadão existente como fonte única.
+**Fale com o Deputado** agora utiliza o fluxo de atendimento cidadão existente como fonte única.
 
 A rota canônica é:
 
@@ -35,13 +35,13 @@ O caminho legado `/cidadao` permanece reconhecido como alias de compatibilidade,
 
 ### Desktop
 
-O CTA **Fale com o Gabinete** permanece diretamente no header e também está disponível no footer.
+O CTA **Fale com o Deputado** permanece diretamente no header e também está disponível no footer.
 
 ### Mobile
 
 Foi adicionada uma ação flutuante persistente:
 
-**Fale com o Gabinete**
+**Fale com o Deputado**
 
 Características:
 - texto explícito;
