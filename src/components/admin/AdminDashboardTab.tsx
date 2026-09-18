@@ -123,7 +123,7 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
             <div className="flex items-center justify-between mb-3"><h2 className="font-black">Conteúdo</h2><Newspaper className="w-4 h-4 text-[#00A550]" /></div>
             <p className="text-2xl font-black">{draftNews.length}</p>
             <p className="text-xs text-stone-500">notícias em rascunho</p>
-            <button type="button" onClick={() => setActiveTab('news')} className="mt-3 text-xs font-bold text-[#00A550] flex items-center gap-1">Revisar conteúdo <ArrowRight className="w-3.5 h-3.5" /></button>
+            <button type="button" onClick={() => setActiveTab('conteúdo')} className="mt-3 text-xs font-bold text-[#00A550] flex items-center gap-1">Revisar conteúdo <ArrowRight className="w-3.5 h-3.5" /></button>
           </section>
 
           <section className="bg-white border border-stone-200 rounded-xl p-5">
