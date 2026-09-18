@@ -8,7 +8,6 @@ import {
   PhoneCall,
   ChevronDown,
   FileText,
-  CheckCircle2,
   FolderOpen,
   Vote,
 } from 'lucide-react';
