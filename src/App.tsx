@@ -32,7 +32,12 @@ const MainAppContent: React.FC = () => {
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
 
   if (isLoading) {
-    return <div className="min-h-screen bg-stone-900 flex flex-col items-center justify-center text-white space-y-4"><div className="w-12 h-12 rounded-xl bg-[#00A550] flex items-center justify-center font-black text-lg text-[#E1F200] animate-pulse">15</div><p className="text-sm font-bold text-stone-300">Carregando Plataforma Carlos Búrigo...</p></div>;
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-stone-900">
+        <div className="w-10 h-10 rounded-full border-4 border-stone-200 border-t-emerald-700 animate-spin" aria-hidden="true" />
+        <p className="mt-5 text-base font-semibold">Carregando o portal institucional...</p>
+      </div>
+    );
   }
 
   if (currentView === 'admin' || pathname === 'admin') {
@@ -64,7 +69,7 @@ const MainAppContent: React.FC = () => {
     }
   };
 
-  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><Navbar /><main className="flex-1">{currentView === 'home' && <div className="flex flex-col space-y-8 sm:space-y-16 md:space-y-20 lg:space-y-24 xl:space-y-28">{sortedBlocks.length > 0 ? sortedBlocks.map((b) => <div key={b.id} className="w-full">{renderBlock(b)}</div>) : <div className="px-4 py-24 text-center text-stone-600"><h1 className="text-2xl font-bold text-stone-900">Página inicial indisponível</h1><p className="mt-2 text-sm">A página inicial canônica ainda não foi publicada.</p></div>}</div>}{(currentView === 'sobre' || currentView === 'trajetoria') && <AboutView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{currentView === 'cidadao' && <CitizenPortalView />}{currentView === 'contato' && <ContactView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}</main><Footer /><CitizenProtocolModal /></div>;
+  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><Navbar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <div className="flex flex-col space-y-8 sm:space-y-16 md:space-y-20 lg:space-y-24 xl:space-y-28">{sortedBlocks.length > 0 ? sortedBlocks.map((b) => <div key={b.id} className="w-full">{renderBlock(b)}</div>) : <div className="px-4 py-24 text-center text-stone-600"><h1 className="text-2xl font-bold text-stone-900">Página inicial indisponível</h1><p className="mt-2 text-sm">A página inicial canônica ainda não foi publicada.</p></div>}</div>}{(currentView === 'sobre' || currentView === 'trajetoria') && <AboutView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{currentView === 'cidadao' && <CitizenPortalView />}{currentView === 'contato' && <ContactView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}</main><Footer /><CitizenProtocolModal /></div>;
 };
 
 export function App() { return <AppUiProvider><AppProvider><MainAppContent /></AppProvider></AppUiProvider>; }
