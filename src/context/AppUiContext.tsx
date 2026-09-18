@@ -44,6 +44,8 @@ const PATH_TO_VIEW: Record<string, string> = Object.entries(VIEW_TO_PATH).reduce
   (acc, [view, path]) => ({ ...acc, [path]: view }), {} as Record<string, string>,
 );
 
+PATH_TO_VIEW['/cidadao'] = 'contato';
+
 const normalizePath = (pathname: string) => {
   const normalized = pathname.replace(/^\/+|\/+$/g, '');
   return normalized ? `/${normalized}` : '/';
