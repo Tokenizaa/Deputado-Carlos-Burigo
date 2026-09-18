@@ -6,7 +6,6 @@ import {
   PageBlock,
   News,
   EventItem,
-  ProjectItem,
   ResultItem,
   Municipality,
   VideoItem,
@@ -30,7 +29,6 @@ interface AppContextType {
   adminPages: Page[];
   news: News[];
   events: EventItem[];
-  projects: ProjectItem[];
   results: ResultItem[];
   municipalities: Municipality[];
   videos: VideoItem[];
@@ -94,7 +92,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [adminPages, setAdminPages] = useState<Page[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [results, setResults] = useState<ResultItem[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -124,7 +121,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         adminPagesRes,
         newsRes,
         eventsRes,
-        projectsRes,
         resultsRes,
         munRes,
         videosRes,
@@ -141,7 +137,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
         fetch('/api/news?admin=true').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
-        fetch('/api/projects').then((r) => r.json()),
         fetch('/api/results').then((r) => r.json()),
         fetch('/api/municipalities').then((r) => r.json()),
         fetch('/api/videos').then((r) => r.json()),
@@ -159,7 +154,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(adminPagesRes)) setAdminPages(adminPagesRes);
       if (Array.isArray(newsRes)) setNews(newsRes);
       if (Array.isArray(eventsRes)) setEvents(eventsRes);
-      if (Array.isArray(projectsRes)) setProjects(projectsRes);
       if (Array.isArray(resultsRes)) setResults(resultsRes);
       if (Array.isArray(munRes)) setMunicipalities(munRes);
       if (Array.isArray(videosRes)) setVideos(videosRes);
@@ -326,7 +320,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         adminPages,
         news,
         events,
-        projects,
         results,
         municipalities,
         videos,
