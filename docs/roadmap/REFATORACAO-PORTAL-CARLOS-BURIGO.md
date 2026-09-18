@@ -1414,7 +1414,8 @@ Depois registrar o SHA no checkpoint.
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
 | 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
 | 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
-| 13 — PWA | PENDENTE | — | |
+| 13 — PWA | CONCLUÍDA |  | Manifest, service worker, cache conservador e fallback offline integrados |
+| 13 — PWA | CONCLUÍDA |  | Manifest, service worker, cache conservador e fallback offline integrados |
 | 14 — Acessibilidade final | PENDENTE | — | |
 | 15 — QA final | PENDENTE | — | |
 | 16 — Auditoria cidadão | PENDENTE | — | |
@@ -1479,13 +1480,16 @@ FASE 7 — CONCLUÍDA
 FASE 8 — CONCLUÍDA
 FASE 9 — CONCLUÍDA
 FASE 10 — CONCLUÍDA
+FASE 11 — CONCLUÍDA
+FASE 12 — CONCLUÍDA
+FASE 13 — CONCLUÍDA
 ```
 
 ### Próxima ação obrigatória
 
-A próxima etapa oficial é a **FASE 11 — Documentos e acervo**.
+A próxima etapa oficial é a **FASE 14 — Auditoria final de acessibilidade**.
 
-A Fase 5 foi concluída com o canal Fale com o Gabinete consolidado e o fluxo cidadão existente promovido a experiência canônica. A Home não foi reconstruída nesta fase. A auditoria final de acessibilidade permanece prevista para a Fase 14.
+A Fase 13 foi concluída com manifest, ícones, service worker, estratégia conservadora de cache e fallback offline. A implementação permanece no mesmo portal e não cria uma segunda aplicação. A próxima etapa é a auditoria final de acessibilidade da Fase 14.
 
 ---
 
