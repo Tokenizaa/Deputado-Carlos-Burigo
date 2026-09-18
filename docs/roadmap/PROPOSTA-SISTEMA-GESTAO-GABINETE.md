@@ -778,6 +778,134 @@ A arquitetura de integração do Gabinete OS fica provisoriamente definida assim
 O objetivo é eliminar o trabalho manual desnecessário do gabinete, sem criar dependência de integrações não documentadas ou frágeis.
 
 
+
+---
+
+## 25. Investigação técnica — dados abertos estaduais: Emendas e despesas
+
+A investigação de setembro de 2026 confirmou que o **Portal da Transparência RS** possui uma camada oficial de dados abertos reutilizáveis. O portal informa que os dados são publicados em formatos abertos como CSV/XML e que os arquivos podem ser acompanhados de arquivos de layout contendo colunas, formato, tamanho e descrição dos atributos. Os dados são disponibilizados conforme a atualização dos painéis de origem.
+
+Fonte oficial: https://www.transparencia.rs.gov.br/dados-abertos/dados-transparencia-rs/dados/
+
+### 25.1 Emendas Parlamentares Estaduais
+
+O painel oficial informa que:
+
+- a destinação das emendas é fornecida pela **SPGG**;
+- os dados incluem ano, deputado, partido, município, órgão, projeto, subtítulo e valor;
+- a execução financeira é derivada do **FPE**, administrado pela CAGE/RS;
+- a execução inclui data de empenho, liquidação e pagamento, credor, CPF/CNPJ, processo, empenho e valor;
+- a execução orçamentária do painel é atualizada diariamente;
+- as alterações das emendas recebidas da Assembleia são incorporadas periodicamente;
+- os arquivos de dados abertos são disponibilizados pelo próprio Portal da Transparência RS.
+
+Fonte oficial: https://transparencia.rs.gov.br/emendas-parlamentares/emendas-parlamentares-estaduais/dados/
+
+### 25.2 Regra de identificação das emendas
+
+A própria documentação oficial registra um ponto importante para a futura ingestão:
+
+- o município passou a ser parametrizado a partir de 2024;
+- registros anteriores podem trazer o município apenas no subtítulo;
+- uma mesma emenda pode aparecer em mais de uma linha quando sofre alteração;
+- registros com valor zero podem representar o histórico anterior de uma emenda alterada.
+
+Portanto, **o número da emenda não deve ser tratado isoladamente como chave física de uma linha de execução**.
+
+A futura camada de ingestão deve preservar:
+
+1. identificador/número da emenda;
+2. ano;
+3. versão/registro de origem, quando disponível;
+4. situação/valor vigente;
+5. município;
+6. subtítulo;
+7. dados de execução;
+8. data da última sincronização;
+9. fonte e arquivo de origem.
+
+A modelagem definitiva deve ser confirmada somente depois de inspecionar o layout real dos arquivos.
+
+### 25.3 Despesas estaduais
+
+O Portal da Transparência RS mantém conjuntos de dados abertos relacionados a:
+
+- despesas com fornecedores e prestadores de serviços;
+- materiais e serviços;
+- relatório detalhado e resumido de despesas;
+- despesas extraorçamentárias;
+- ordem cronológica de pagamentos.
+
+O FAQ oficial informa que os arquivos de dados abertos das despesas podem ser organizados por mês ou ano devido ao volume de dados.
+
+Fonte oficial: https://www.transparencia.rs.gov.br/faq/
+
+O portal também apresenta painéis específicos de contratos e despesas, inclusive referências às despesas detalhadas da Assembleia Legislativa.
+
+Fonte oficial: https://www.transparencia.rs.gov.br/inicio
+
+### 25.4 O que foi confirmado e o que ainda não foi confirmado
+
+**Confirmado:**
+
+- existe uma infraestrutura oficial de dados abertos;
+- os arquivos são reutilizáveis;
+- existem layouts dos arquivos;
+- Emendas Parlamentares Estaduais estão incluídas;
+- execução das emendas utiliza dados do FPE/CAGE;
+- a execução do painel de emendas é atualizada diariamente;
+- despesas estaduais possuem conjuntos de dados abertos;
+- o Portal possui uma área pública chamada ViewApi.
+
+**Ainda não confirmado:**
+
+- URL estável e direta de cada arquivo CSV de emendas;
+- nome exato dos arquivos atuais;
+- layout efetivo/colunas do arquivo atual;
+- tamanho dos arquivos;
+- mecanismo técnico para detectar novos arquivos automaticamente;
+- endpoint documentado e utilizável da área ViewApi para os dados de interesse do Gabinete OS.
+
+A página pública de dados abertos expõe a seleção dos conjuntos de dados, mas os links/arquivos são carregados de forma que o conteúdo dos arquivos individuais não ficou exposto no HTML consultável. Portanto, **não devemos inventar URLs de CSV nem declarar que um endpoint foi confirmado sem obtê-lo diretamente**.
+
+### 25.5 Decisão para a arquitetura do Gabinete OS
+
+A integração estadual deve ser construída em duas camadas:
+
+```
+Portal Transparência RS
+        ↓
+arquivo oficial / endpoint confirmado
+        ↓
+ingestão controlada
+        ↓
+Supabase
+        ↓
+Gabinete OS
+        ↓
+acompanhamento de emendas / despesas / tarefas
+```
+
+A ingestão deve guardar metadados de origem e data de sincronização. A camada interna não deve substituir os dados oficiais: deve manter uma representação operacional para pesquisa, acompanhamento e relacionamento com tarefas.
+
+### 25.6 Próxima ação técnica
+
+Antes de implementar qualquer tabela ou cron de sincronização para emendas, realizar uma inspeção técnica do mecanismo de download do Portal da Transparência RS para obter:
+
+1. URL real do arquivo;
+2. nome do arquivo;
+3. formato/encoding/separador;
+4. layout;
+5. colunas;
+6. identificadores;
+7. volume;
+8. periodicidade;
+9. regra de substituição/histórico;
+10. estratégia de carga incremental.
+
+Somente depois dessa inspeção deve ser criada a ingestão no Supabase.
+
+
 ---
 
 ## 19. Evolução deste documento
