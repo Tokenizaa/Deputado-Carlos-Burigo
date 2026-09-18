@@ -16,7 +16,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   initialSubTab,
 }) => {
   const { projects, setCurrentView, currentView, votes, documents } = useApp();
-  const { openDocumentViewer } = useAppUi();
+  const { openDocumentViewer, openContextSurface } = useAppUi();
   const [activeTab, setActiveTab] = useState<Tab>(
     currentView === 'projetos' || currentView === 'votacoes' || currentView === 'documentos'
       ? currentView
@@ -133,7 +133,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             <div className="space-y-6">
               <div className="max-w-2xl">
                 <h3 className="text-xl font-bold text-white">Acervo documental</h3>
-                <p className="text-sm text-stone-400 mt-1">Documentos registrados no acervo público. A leitura permanece nesta experiência; a fonte oficial só é aberta quando o arquivo não está disponível para incorporação.</p>
+                <p className="text-sm text-stone-400 mt-1">Documentos registrados no acervo público. Primeiro mostramos os dados do documento; a fonte oficial fica como ação secundária.</p>
               </div>
               {publicDocuments.length === 0 ? <EmptyState message="Nenhum documento publicado no acervo público." /> : (
                 <div className="border border-stone-800 rounded-sm overflow-hidden">
@@ -144,7 +144,17 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                           <p className="font-semibold text-white">{document.title}</p>
                           <p className="text-xs text-stone-500 mt-1">{document.documentType} • {document.sourceName || 'Fonte oficial'} • {document.mimeType}</p>
                         </div>
-                        <button type="button" onClick={() => document.originalUrl && openDocumentViewer(document.originalUrl, document.title, document.mimeType === 'application/pdf' ? 'pdf' : 'external')} disabled={!document.originalUrl} className="min-h-11 shrink-0 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550] disabled:text-stone-600 disabled:no-underline disabled:cursor-not-allowed">
+                        <button type="button" onClick={() => openContextSurface(document.title, (
+  <div className="space-y-5 text-sm text-stone-700">
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tipo</span><p className="font-semibold text-stone-900 mt-1">{document.documentType}</p></div>
+      <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Formato</span><p className="font-semibold text-stone-900 mt-1">{document.mimeType}</p></div>
+    </div>
+    {document.sourceName && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Fonte</span><p className="font-semibold text-stone-900 mt-1">{document.sourceName}</p></div>}
+    <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Situação no acervo</span><p className="text-stone-700 mt-1">Documento registrado e verificado no acervo público.</p></div>
+    {document.originalUrl && <div className="pt-4 border-t border-stone-200"><button type="button" onClick={() => openDocumentViewer(document.originalUrl!, document.title, 'external')} className="min-h-11 text-[#00A550] font-semibold hover:underline inline-flex items-center gap-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Abrir fonte oficial <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" /></button></div>}
+  </div>
+))} disabled={!document.originalUrl} className="min-h-11 shrink-0 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550] disabled:text-stone-600 disabled:no-underline disabled:cursor-not-allowed">
                           <FileText className="w-3.5 h-3.5" /> Consultar documento
                         </button>
                       </div>
