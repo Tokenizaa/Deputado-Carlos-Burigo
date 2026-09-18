@@ -46,6 +46,7 @@ export interface PublicDocumentDto {
   documentType: string;
   title: string;
   originalUrl: string | null;
+  publicUrl: string | null;
   storagePath: string;
   mimeType: string;
   fileSize: number;

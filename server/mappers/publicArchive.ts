@@ -145,6 +145,7 @@ export function mapToPublicDocumentDto(row: DocumentRow): PublicDocumentDto {
     documentType: row.document_type,
     title: row.title,
     originalUrl: row.original_url,
+    publicUrl: null,
     storagePath: row.storage_path,
     mimeType: row.mime_type,
     fileSize: row.file_size,

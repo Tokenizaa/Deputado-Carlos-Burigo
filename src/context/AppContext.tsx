@@ -6,7 +6,6 @@ import {
   PageBlock,
   News,
   EventItem,
-  ProjectItem,
   ResultItem,
   Municipality,
   VideoItem,
@@ -15,7 +14,7 @@ import {
   AuditLog,
 } from '../types';
 import { useAppUi } from './AppUiContext';
-import { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../contracts/publicLegislative';
+import { PublicLegislativeItemDto } from '../contracts/publicLegislative';
 import type { PublicDocumentDto } from '../contracts/publicArchive';
 
 interface AppContextType {
@@ -30,14 +29,12 @@ interface AppContextType {
   adminPages: Page[];
   news: News[];
   events: EventItem[];
-  projects: ProjectItem[];
   results: ResultItem[];
   municipalities: Municipality[];
   videos: VideoItem[];
   media: MediaItem[];
   demands: Demand[];
   auditLogs: AuditLog[];
-  votes: PublicLegislativeVoteDto[];
   legislativeItems: PublicLegislativeItemDto[];
   documents: PublicDocumentDto[];
   isLoading: boolean;
@@ -94,14 +91,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [adminPages, setAdminPages] = useState<Page[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [results, setResults] = useState<ResultItem[]>([]);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [demands, setDemands] = useState<Demand[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [votes, setVotes] = useState<PublicLegislativeVoteDto[]>([]);
   const [legislativeItems, setLegislativeItems] = useState<PublicLegislativeItemDto[]>([]);
   const [documents, setDocuments] = useState<PublicDocumentDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,12 +119,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         adminPagesRes,
         newsRes,
         eventsRes,
-        projectsRes,
         resultsRes,
         munRes,
         videosRes,
         mediaRes,
-        votesRes,
         legislativeRes,
         documentsRes,
         demandsRes,
@@ -141,12 +134,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
         fetch('/api/news?admin=true').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
-        fetch('/api/projects').then((r) => r.json()),
         fetch('/api/results').then((r) => r.json()),
         fetch('/api/municipalities').then((r) => r.json()),
         fetch('/api/videos').then((r) => r.json()),
         fetch('/api/media').then((r) => r.json()),
-        fetch('/api/votes').then((r) => r.json()),
         fetch('/api/legislative').then((r) => r.json()),
         fetch('/api/documents').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
@@ -159,12 +150,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(adminPagesRes)) setAdminPages(adminPagesRes);
       if (Array.isArray(newsRes)) setNews(newsRes);
       if (Array.isArray(eventsRes)) setEvents(eventsRes);
-      if (Array.isArray(projectsRes)) setProjects(projectsRes);
       if (Array.isArray(resultsRes)) setResults(resultsRes);
       if (Array.isArray(munRes)) setMunicipalities(munRes);
       if (Array.isArray(videosRes)) setVideos(videosRes);
       if (Array.isArray(mediaRes)) setMedia(mediaRes);
-      if (Array.isArray(votesRes)) setVotes(votesRes);
       if (Array.isArray(legislativeRes)) setLegislativeItems(legislativeRes);
       if (Array.isArray(documentsRes)) setDocuments(documentsRes);
       if (Array.isArray(demandsRes)) setDemands(demandsRes);
@@ -326,14 +315,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         adminPages,
         news,
         events,
-        projects,
         results,
         municipalities,
         videos,
         media,
         demands,
         auditLogs,
-        votes,
         legislativeItems,
         documents,
         isLoading,

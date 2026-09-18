@@ -3,7 +3,6 @@ import type {
   PublicLegislativeItemDto,
   PublicLegislativeRoleDto,
   PublicLegislativeVoteDto,
-  PublicProjectDto,
   PublicResultDto,
 } from '../../src/contracts/publicLegislative';
 import { extractLegislativeCode } from '../../src/contracts/publicLegislative';
@@ -22,6 +21,9 @@ export type LegislativeItemRow = {
   concluded_at?: string | null;
   source_url?: string | null;
   verification_status: string;
+  theme?: string | null;
+  detailed_description?: string | null;
+  impacts?: unknown;
 };
 
 type LegislativeEventRow = {
@@ -143,34 +145,12 @@ export function toPublicLegislativeItemDto(
     concludedAt: row.concluded_at ?? undefined,
     sourceUrl: row.source_url ?? undefined,
     verificationStatus: row.verification_status,
+    theme: row.theme ?? undefined,
+    detailedDescription: row.detailed_description ?? undefined,
+    impacts: Array.isArray(row.impacts) ? row.impacts.filter((impact): impact is string => typeof impact === 'string') : [],
     events: (relations.events ?? []).map(toPublicLegislativeEventDto),
     votes: (relations.votes ?? []).map((vote) => toPublicLegislativeVoteDto(vote, row)),
     roles: (relations.roles ?? []).map(toPublicLegislativeRoleDto),
-  };
-}
-
-export function toPublicProjectDto(
-  row: ProjectRow,
-  publishedCodes: PublishedCodeSet,
-  legislativeItemId: string,
-): PublicProjectDto | null {
-  const legislativeCode = normalizeLegislativeCode(row.code);
-  if (!publishedCodes.has(legislativeCode)) return null;
-
-  return {
-    id: row.id,
-    code: row.code,
-    title: row.title,
-    summary: row.summary,
-    detailedDescription: row.detailed_description,
-    theme: row.theme,
-    status: row.status,
-    linkAlrs: row.link_alrs ?? undefined,
-    year: row.year,
-    impacts: Array.isArray(row.impacts) ? row.impacts.filter((impact): impact is string => typeof impact === 'string') : [],
-    source: 'projects_projection',
-    legislativeCode,
-    legislativeItemId,
   };
 }
 

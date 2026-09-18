@@ -2,8 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import {
   normalizeLegislativeCode,
   toPublicLegislativeItemDto,
-  toPublicLegislativeVoteDto,
-  toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
 import type { User, UserRole } from '../src/types';
@@ -25,7 +23,7 @@ import {
   mapToPublicDemandHistoryDto,
 } from './mappers/publicDemand';
 import type { LegislativeItemRow } from './mappers/publicLegislative';
-import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
+import type { PublicLegislativeItemDto } from '../src/contracts/publicLegislative';
 import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
 import type { PublicDemandDto, DemandMessageDto, DemandHistoryDto } from '../src/contracts/publicDemand';
 import { extractLegislativeCode } from '../src/contracts/publicLegislative';
@@ -71,7 +69,7 @@ async function getPublishedLegislativeIndex(): Promise<PublishedLegislativeIndex
 
 async function getPublishedLegislativeItems(): Promise<LegislativeItemRow[]> {
   const { data, error } = await supabasePublic.from('legislative_items')
-    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status')
+    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status,theme,detailed_description,impacts')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
     .order('year', { ascending: false })
@@ -138,54 +136,8 @@ export async function getPublicLegislativeItems(): Promise<PublicLegislativeItem
   }));
 }
 
-export async function getPublicLegislativeVotes(): Promise<PublicLegislativeVoteDto[]> {
-  const items = await getPublishedLegislativeItems();
-  const itemById = new Map(items.map((item) => [item.id, item]));
-  const itemIds = items.map((item) => item.id);
-  if (itemIds.length === 0) return [];
 
-  const { data, error } = await supabasePublic.from('legislative_votes')
-    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
-    .in('item_id', itemIds)
-    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
-    .order('vote_date', { ascending: false, nullsFirst: false });
-  if (error) throw error;
-
-  return (data ?? []).flatMap((vote) => {
-    const item = itemById.get(vote.item_id);
-    return item ? [toPublicLegislativeVoteDto(vote, item)] : [];
-  });
-}
-
-// Simpler format for public /api/votes endpoint (edge Worker)
-export async function getPublicVotes(): Promise<{ id: string; itemId: string; sessionName: string; date?: string; voterName: string; vote: string; sourceUrl?: string }[]> {
-  const items = await getPublishedLegislativeItems();
-  const itemById = new Map(items.map((item) => [item.id, item]));
-  const itemIds = items.map((item) => item.id);
-  if (itemIds.length === 0) return [];
-
-  const { data, error } = await supabasePublic.from('legislative_votes')
-    .select('id,item_id,session_name,vote_date,voter_name,vote,source_url,verification_status')
-    .in('item_id', itemIds)
-    .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
-    .order('vote_date', { ascending: false, nullsFirst: false });
-  if (error) throw error;
-
-  return (data ?? []).flatMap((vote) => {
-    const item = itemById.get(vote.item_id);
-    if (!item) return [];
-    return [{
-      id: vote.id,
-      itemId: vote.item_id,
-      sessionName: vote.session_name ?? '',
-      date: vote.vote_date ?? undefined,
-      voterName: vote.voter_name,
-      vote: vote.vote,
-      sourceUrl: vote.source_url ?? undefined,
-    }];
-  });
-}
-
+// Votos públicos são derivados diretamente de getPublicLegislativeItems().
 export async function getPublicSettings() {
   const { data, error } = await supabasePublic.from('site_settings')
     .select('*').eq('id', true).maybeSingle();
@@ -217,22 +169,6 @@ export async function getPublicSettings() {
     seoDefaultDescription: data.seo_default_description,
     privacyPolicyText: data.privacy_policy_text,
   };
-}
-
-export async function getPublicProjects() {
-  const publishedIndex = await getPublishedLegislativeIndex();
-  const publishedCodes = new Set(publishedIndex.keys());
-  const { data, error } = await supabasePublic.from('projects')
-    .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
-    .order('year', { ascending: false }).order('code', { ascending: true });
-  if (error) throw error;
-  return (data ?? [])
-    .map((item) => {
-      const legislativeCode = normalizeLegislativeCode(item.code);
-      const legislativeItemId = publishedIndex.get(legislativeCode);
-      return legislativeItemId ? toPublicProjectDto(item, publishedCodes, legislativeItemId) : null;
-    })
-    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 export async function getPublicResults() {
@@ -287,7 +223,11 @@ export async function getPublicDocuments() {
     .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at')
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map(mapToPublicDocumentDto);
+  return (data ?? []).map((row) => {
+    const dto = mapToPublicDocumentDto(row);
+    const publicUrl = supabasePublic.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
+    return { ...dto, publicUrl };
+  });
 }
 
 export async function getPublicEvidence() {

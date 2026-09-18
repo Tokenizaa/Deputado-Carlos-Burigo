@@ -5,7 +5,6 @@ import { AdminPagesTab } from './AdminPagesTab';
 import { AdminContentTab } from './AdminContentTab';
 import { AdminNewsTab } from './AdminNewsTab';
 import { AdminAgendaTab } from './AdminAgendaTab';
-import { AdminProjectsTab } from './AdminProjectsTab';
 import { AdminResultsTab } from './AdminResultsTab';
 import { AdminMunicipalitiesTab } from './AdminMunicipalitiesTab';
 import { AdminVideosTab } from './AdminVideosTab';
@@ -23,7 +22,6 @@ type ModuleId = 'dashboard' | 'atuação' | 'conteúdo' | 'acervo' | 'cidadão' 
 
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão'>, Array<{ id: string; label: string }>> = {
   atuação: [
-    { id: 'projects', label: 'Projetos de Lei' },
     { id: 'results', label: 'Resultados' },
     { id: 'municipalities', label: 'Municípios' },
   ],
@@ -45,10 +43,10 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão'>, Array<{ id
 };
 
 export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, setActiveModule }) => {
-  const [subTab, setSubTab] = useState('projects');
+  const [subTab, setSubTab] = useState('results');
 
   useEffect(() => {
-    if (activeModule === 'atuação') setSubTab('projects');
+    if (activeModule === 'atuação') setSubTab('results');
     if (activeModule === 'conteúdo') setSubTab('pages');
     if (activeModule === 'acervo') setSubTab('videos');
     if (activeModule === 'administração') setSubTab('users');
@@ -56,7 +54,6 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
 
   const renderSubTab = () => {
     switch (subTab) {
-      case 'projects': return <AdminProjectsTab />;
       case 'results': return <AdminResultsTab />;
       case 'municipalities': return <AdminMunicipalitiesTab />;
       case 'pages': return <AdminPagesTab />;
