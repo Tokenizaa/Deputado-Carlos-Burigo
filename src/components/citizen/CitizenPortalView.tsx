@@ -130,7 +130,7 @@ export const CitizenPortalView: React.FC = () => {
             <h3 className="font-bold text-stone-900 text-sm sm:text-base">
               Já possui uma demanda em andamento?
             </h3>
-            <p className="text-xs text-stone-500 mt-0.5">
+            <p className="text-sm text-stone-500 mt-0.5">
               Consulte despachos, ofícios expedidos e respostas da equipe técnica.
             </p>
           </div>
@@ -327,16 +327,16 @@ export const CitizenPortalView: React.FC = () => {
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
                   <Upload className="w-6 h-6 text-stone-400 mx-auto mb-1.5" />
-                  <p className="text-xs text-stone-600 font-semibold">
+                  <p className="text-sm text-stone-600 font-semibold">
                     Clique para selecionar arquivos ou arraste fotos/ofícios aqui
                   </p>
-                  <p className="text-xs text-stone-400">PDF, JPEG, PNG até 10MB</p>
+                  <p className="text-sm text-stone-400">PDF, JPEG, PNG até 10MB</p>
                 </div>
 
                 {attachments.length > 0 && (
                   <div className="mt-2 space-y-1">
                     {attachments.map((file, i) => (
-                      <div key={i} className="text-xs text-stone-600 flex items-center gap-1.5 bg-stone-100 px-2 py-1 rounded">
+                      <div key={i} className="text-sm text-stone-600 flex items-center gap-1.5 bg-stone-100 px-2 py-1 rounded">
                         <FileText className="w-3.5 h-3.5 text-[#00A550]" />
                         <span>{file}</span>
                       </div>
@@ -356,7 +356,7 @@ export const CitizenPortalView: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, lgpdConsent: e.target.checked })}
                   className="mt-1 w-4 h-4 rounded text-[#00A550] focus:ring-[#00A550] border-stone-300"
                 />
-                <span className="text-xs text-stone-600 leading-relaxed">
+                <span className="text-sm text-stone-600 leading-relaxed">
                   Autorizo o tratamento dos dados pessoais informados acima pelo gabinete do deputado Carlos Búrigo exclusivamente para fins de atendimento institucional, tramitação e contato sobre esta demanda, conforme os preceitos da Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
                 </span>
               </label>
