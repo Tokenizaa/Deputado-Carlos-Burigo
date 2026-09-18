@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Lock, Menu, X, PhoneCall, ChevronDown } from 'lucide-react';
+import { Search, PhoneCall, ChevronDown } from 'lucide-react';
 
 const MORE_ITEMS = [
   ['trajetoria', 'Trajetória'],
