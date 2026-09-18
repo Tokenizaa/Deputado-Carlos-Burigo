@@ -16,6 +16,7 @@ import {
 } from '../types';
 import { useAppUi } from './AppUiContext';
 import { PublicLegislativeVoteDto } from '../contracts/publicLegislative';
+import { PublicDocumentDto } from '../contracts/publicArchive';
 
 interface AppContextType {
   settings: SiteSettings | null;
@@ -37,6 +38,7 @@ interface AppContextType {
   demands: Demand[];
   auditLogs: AuditLog[];
   votes: PublicLegislativeVoteDto[];
+  documents: PublicDocumentDto[];
   isLoading: boolean;
   toastMessage: string | null;
   toastType: 'success' | 'error' | 'info';
@@ -99,6 +101,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [demands, setDemands] = useState<Demand[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [votes, setVotes] = useState<PublicLegislativeVoteDto[]>([]);
+  const [documents, setDocuments] = useState<PublicDocumentDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -125,6 +128,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         videosRes,
         mediaRes,
         votesRes,
+        documentsRes,
         demandsRes,
         logsRes,
       ] = await Promise.all([
@@ -140,6 +144,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/videos').then((r) => r.json()),
         fetch('/api/media').then((r) => r.json()),
         fetch('/api/votes').then((r) => r.json()),
+        fetch('/api/documents').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
         fetch('/api/audit-logs').then((r) => r.json()),
       ]);
@@ -156,6 +161,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(videosRes)) setVideos(videosRes);
       if (Array.isArray(mediaRes)) setMedia(mediaRes);
       if (Array.isArray(votesRes)) setVotes(votesRes);
+      if (Array.isArray(documentsRes)) setDocuments(documentsRes);
       if (Array.isArray(demandsRes)) setDemands(demandsRes);
       if (Array.isArray(logsRes)) setAuditLogs(logsRes);
     } catch (err) {
@@ -323,6 +329,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         demands,
         auditLogs,
         votes,
+        documents,
         isLoading,
         toastMessage,
         toastType,
