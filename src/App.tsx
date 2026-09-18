@@ -25,7 +25,7 @@ import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { PageBlock } from './types';
 import { DynamicPageView } from './components/public/DynamicPageView';
 
-const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade']);
+const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'transparencia', 'privacidade', 'acessibilidade']);
 
 const MainAppContent: React.FC = () => {
   const { currentView, pages, isLoading } = useApp();
