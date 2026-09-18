@@ -233,11 +233,72 @@ article p,
 }
 
 button,
-a,
 input,
 textarea,
 select {
   min-height: 44px;
+}
+
+.accessibility-bar {
+  min-height: 44px;
+  background: #111111;
+  color: #FFFFFF;
+  border-bottom: 1px solid #FFFFFF;
+  font-size: 0.875rem;
+}
+
+.accessibility-link,
+.accessibility-control {
+  min-height: 36px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.25rem;
+  color: #FFFFFF;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.accessibility-control {
+  border: 1px solid #FFFFFF;
+  text-decoration: none;
+  background: transparent;
+}
+
+.accessibility-link:focus-visible,
+.accessibility-control:focus-visible {
+  outline-color: #FFFFFF;
+}
+
+html[data-font-scale="large"] {
+  font-size: 112.5%;
+}
+
+html[data-font-scale="larger"] {
+  font-size: 125%;
+}
+
+html[data-high-contrast="true"] {
+  filter: contrast(1.12);
+}
+
+html[data-high-contrast="true"] body {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+html[data-high-contrast="true"] .surface,
+html[data-high-contrast="true"] .surface-muted {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+html[data-high-contrast="true"] a {
+  text-decoration-thickness: 2px;
+}
+
+@media (max-width: 767px) {
+  .accessibility-bar .max-w-7xl {
+    justify-content: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
