@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import {
   normalizeLegislativeCode,
   toPublicLegislativeItemDto,
-  toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
 import type { User, UserRole } from '../src/types';
