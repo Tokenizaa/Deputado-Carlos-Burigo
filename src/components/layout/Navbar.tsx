@@ -270,17 +270,6 @@ export const Navbar: React.FC = () => {
               <div className="mt-1 pl-2 space-y-1">
                 <button
                   onClick={() => {
-                    setCurrentView('atuacao');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'atuacao' ? 'text-[#00A550] font-bold' : 'text-stone-700'
-                  }`}
-                >
-                  Visão Geral
-                </button>
-                <button
-                  onClick={() => {
                     setCurrentView('projetos');
                     setMobileMenuOpen(false);
                   }}
@@ -300,17 +289,6 @@ export const Navbar: React.FC = () => {
                   }`}
                 >
                   Votações & Posicionamentos
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('resultados');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'resultados' ? 'text-[#00A550] font-bold' : 'text-stone-700'
-                  }`}
-                >
-                  Resultados
                 </button>
                 <button
                   onClick={() => {
