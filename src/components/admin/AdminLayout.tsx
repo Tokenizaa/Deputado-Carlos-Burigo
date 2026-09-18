@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   FileCode2,
   Newspaper,
-  Image,
   Inbox,
   Settings,
   CalendarDays,
