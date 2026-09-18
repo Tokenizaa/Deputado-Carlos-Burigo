@@ -71,7 +71,7 @@ async function getPublishedLegislativeIndex(): Promise<PublishedLegislativeIndex
 
 async function getPublishedLegislativeItems(): Promise<LegislativeItemRow[]> {
   const { data, error } = await supabasePublic.from('legislative_items')
-    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status')
+    .select('id,type,number,year,title,summary,status,presented_at,concluded_at,source_url,verification_status,theme,detailed_description,impacts')
     .eq('status', 'PUBLISHED')
     .in('verification_status', ['VERIFIED_PRIMARY', 'VERIFIED_MULTIPLE'])
     .order('year', { ascending: false })
@@ -219,22 +219,6 @@ export async function getPublicSettings() {
   };
 }
 
-export async function getPublicProjects() {
-  const publishedIndex = await getPublishedLegislativeIndex();
-  const publishedCodes = new Set(publishedIndex.keys());
-  const { data, error } = await supabasePublic.from('projects')
-    .select('id,code,title,summary,detailed_description,theme,status,link_alrs,year,impacts')
-    .order('year', { ascending: false }).order('code', { ascending: true });
-  if (error) throw error;
-  return (data ?? [])
-    .map((item) => {
-      const legislativeCode = normalizeLegislativeCode(item.code);
-      const legislativeItemId = publishedIndex.get(legislativeCode);
-      return legislativeItemId ? toPublicProjectDto(item, publishedCodes, legislativeItemId) : null;
-    })
-    .filter((item): item is NonNullable<typeof item> => item !== null);
-}
-
 export async function getPublicResults() {
   const publishedIndex = await getPublishedLegislativeIndex();
   const publishedCodes = new Set(publishedIndex.keys());
@@ -287,7 +271,11 @@ export async function getPublicDocuments() {
     .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at')
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map(mapToPublicDocumentDto);
+  return (data ?? []).map((row) => {
+    const dto = mapToPublicDocumentDto(row);
+    const publicUrl = supabasePublic.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
+    return { ...dto, publicUrl };
+  });
 }
 
 export async function getPublicEvidence() {
