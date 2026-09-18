@@ -54,7 +54,11 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
             {/* Clean filter & search */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative">
+                <label htmlFor="news-search" className="sr-only">
+                  Buscar notícia
+                </label>
                 <input
+                  id="news-search"
                   type="text"
                   placeholder="Buscar notícia..."
                   value={searchTerm}
@@ -64,7 +68,11 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
                 <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-3" />
               </div>
 
+              <label htmlFor="news-category" className="sr-only">
+                Filtrar por categoria
+              </label>
               <select
+                id="news-category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="text-xs bg-stone-50 border border-stone-300 rounded-[2px] px-3 py-2.5 text-stone-800 font-semibold"

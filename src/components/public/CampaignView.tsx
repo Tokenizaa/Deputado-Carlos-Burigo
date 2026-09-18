@@ -265,10 +265,11 @@ export const CampaignView: React.FC = () => {
           ) : (
             <form onSubmit={handleVolunteerSubmit} className="space-y-4 text-left border border-stone-200 p-6 sm:p-8 rounded-sm bg-stone-50/50">
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                <label htmlFor="supporter-name" className="block text-xs font-semibold text-stone-700 mb-1">
                   Seu nome completo
                 </label>
                 <input
+                  id="supporter-name"
                   type="text"
                   required
                   value={supporterName}
@@ -279,10 +280,11 @@ export const CampaignView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  <label htmlFor="supporter-city" className="block text-xs font-semibold text-stone-700 mb-1">
                     Município
                   </label>
                   <input
+                    id="supporter-city"
                     type="text"
                     required
                     placeholder="Ex: Caxias do Sul"
@@ -292,10 +294,11 @@ export const CampaignView: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  <label htmlFor="supporter-phone" className="block text-xs font-semibold text-stone-700 mb-1">
                     WhatsApp / Telefone
                   </label>
                   <input
+                    id="supporter-phone"
                     type="tel"
                     required
                     placeholder="(54) 99999-0000"

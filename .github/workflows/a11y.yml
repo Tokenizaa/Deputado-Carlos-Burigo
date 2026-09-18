@@ -1,0 +1,223 @@
+name: Accessibility Audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/a11y/**'
+      - 'playwright.a11y.config.ts'
+      - 'package.json'
+      - '.github/workflows/a11y.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/a11y/**'
+      - 'playwright.a11y.config.ts'
+      - 'package.json'
+      - '.github/workflows/a11y.yml'
+  workflow_dispatch:
+    inputs:
+      run-mobile:
+        description: 'Run mobile viewport tests'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  accessibility:
+    name: Accessibility Audit (WCAG 2.1 AA + eMAG v3.1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --port 4173 &
+          sleep 5
+
+      - name: Run accessibility tests (Desktop)
+        run: npx playwright test --config=playwright.a11y.config.ts --project=chromium
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+
+      - name: Run accessibility tests (Firefox)
+        run: npx playwright test --config=playwright.a11y.config.ts --project=firefox
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+
+      - name: Run accessibility tests (Mobile)
+        if: ${{ github.event.inputs.run-mobile != 'false' }}
+        run: npx playwright test --config=playwright.a11y.config.ts --project=mobile-chrome
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+
+      - name: Upload Playwright HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-a11y-report
+          path: playwright-report/a11y/
+          retention-days: 30
+
+      - name: Upload Test Results JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-test-results
+          path: test-results/a11y-results.json
+          retention-days: 30
+
+      - name: Generate violation summary
+        if: always()
+        run: |
+          if [ -f test-results/a11y-results.json ]; then
+            node -e "
+              const fs = require('fs');
+              const results = JSON.parse(fs.readFileSync('test-results/a11y-results.json', 'utf8'));
+              let totalCritical = 0, totalSerious = 0, totalModerate = 0, totalMinor = 0;
+              for (const suite of results.suites) {
+                for (const spec of suite.specs) {
+                  for (const test of spec.tests) {
+                    for (const result of test.results) {
+                      if (result.annotations) {
+                        for (const annotation of result.annotations) {
+                          if (annotation.type === 'a11y-violation') {
+                            switch(annotation.impact) {
+                              case 'critical': totalCritical++; break;
+                              case 'serious': totalSerious++; break;
+                              case 'moderate': totalModerate++; break;
+                              case 'minor': totalMinor++; break;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              console.log('## Accessibility Violations Summary');
+              console.log('');
+              console.log('| Impact | Count |');
+              console.log('|--------|-------|');
+              console.log(\`| 🔴 Critical | \${totalCritical} |\`);
+              console.log(\`| 🟠 Serious | \${totalSerious} |\`);
+              console.log(\`| 🟡 Moderate | \${totalModerate} |\`);
+              console.log(\`| 🔵 Minor | \${totalMinor} |\`);
+              console.log('');
+              if (totalCritical + totalSerious > 0) {
+                console.log('❌ **FAIL**: Critical or Serious violations found!');
+                process.exit(1);
+              } else {
+                console.log('✅ **PASS**: No Critical or Serious violations');
+              }
+            "
+          fi
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let body = '## ♿ Accessibility Audit Results\n\n';
+            
+            try {
+              const reportPath = path.join(process.env.GITHUB_WORKSPACE, 'playwright-report', 'a11y', 'index.html');
+              if (fs.existsSync(reportPath)) {
+                body += '📊 [View Full HTML Report](https://htmlpreview.github.io/?' + 
+                  'https://raw.githubusercontent.com/' + 
+                  process.env.GITHUB_REPOSITORY + '/' + 
+                  process.env.GITHUB_SHA + '/' + 
+                  'playwright-report/a11y/index.html)';
+              }
+            } catch (e) {
+              body += '📊 HTML report available as artifact';
+            }
+            
+            body += '\n\n---\n*WCAG 2.1 AA + eMAG v3.1 compliance check*';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  baseline-check:
+    name: Baseline Comparison
+    runs-on: ubuntu-latest
+    needs: accessibility
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --port 4173 &
+          sleep 5
+
+      - name: Run baseline accessibility tests
+        run: npx playwright test --config=playwright.a11y.config.ts --project=chromium --reporter=json
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+
+      - name: Store baseline results
+        run: |
+          mkdir -p .github/a11y-baseline
+          cp test-results/a11y-results.json .github/a11y-baseline/baseline-$(date +%Y%m%d-%H%M%S).json
+          # Keep only last 10 baselines
+          ls -t .github/a11y-baseline/baseline-*.json | tail -n +11 | xargs rm -f
+
+      - name: Commit baseline
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/a11y-baseline/
+          git diff --staged --quiet || git commit -m "chore: update a11y baseline [skip ci]"
+          git push

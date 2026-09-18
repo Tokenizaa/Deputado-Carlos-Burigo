@@ -53,22 +53,125 @@ async function sha256Hex(input: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Helper to extract user ID from request headers
-function getUserId(request: Request): string | null {
-  const userId = request.headers.get('x-user-id');
-  return userId ?? null;
+// Auth context attached to request
+interface AuthContext {
+  userId: string;
+  role: string;
+  email: string;
+  name: string;
+}
+
+// Cache for validated tokens (in-memory, per worker instance)
+const tokenCache = new Map<string, { context: AuthContext; expires: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Extract Bearer token from Authorization header
+function extractBearerToken(request: Request): string | null {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader) return null;
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2 || parts[0].toLowerCase() !== 'bearer') return null;
+  return parts[1];
+}
+
+// Validate Bearer token with Supabase and get user role
+async function validateBearerToken(token: string, env: Env): Promise<AuthContext | null> {
+  // Check cache first
+  const cached = tokenCache.get(token);
+  if (cached && cached.expires > Date.now()) {
+    return cached.context;
+  }
+
+  try {
+    // Call Supabase /auth/v1/user to validate token and get user info
+    const supabaseUrl = env.SUPABASE_URL || 'https://wktanxbpijurimdjgone.supabase.co';
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_HsuRNZejK8aMxqOxDGK60g_WnabIOYj',
+      },
+    });
+
+    if (!userResponse.ok) {
+      console.log('[auth] Token validation failed:', userResponse.status);
+      return null;
+    }
+
+    const userData = await userResponse.json();
+    const userId = userData.id;
+    const email = userData.email;
+
+    // Get user role from user_roles table
+    const { data: roleData, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+
+    if (roleError || !roleData) {
+      console.log('[auth] No role found for user:', userId);
+      return null;
+    }
+
+    // Get profile for name
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('name')
+      .eq('id', userId)
+      .single();
+
+    const context: AuthContext = {
+      userId,
+      role: roleData.role,
+      email,
+      name: profile?.name || 'Unknown',
+    };
+
+    // Cache the result
+    tokenCache.set(token, { context, expires: Date.now() + CACHE_TTL });
+    
+    return context;
+  } catch (error) {
+    console.error('[auth] Token validation error:', error);
+    return null;
+  }
 }
 
 // Helper to require authentication for admin endpoints
-async function requireAuth(request: Request): Promise<{ userId: string } | Response> {
-  const userId = getUserId(request);
-  if (!userId) {
+async function requireAuth(request: Request, env: Env): Promise<AuthContext | Response> {
+  const token = extractBearerToken(request);
+  if (!token) {
     return Response.json(
-      { error: 'Unauthorized: Missing x-user-id header' },
+      { error: 'Unauthorized: Missing Bearer token' },
       { status: 401 }
     );
   }
-  return { userId };
+
+  const context = await validateBearerToken(token, env);
+  if (!context) {
+    return Response.json(
+      { error: 'Unauthorized: Invalid or expired token' },
+      { status: 401 }
+    );
+  }
+
+  return context;
+}
+
+// Helper to require specific role(s)
+function requireRole(context: AuthContext, allowedRoles: string[]): Response | null {
+  if (!allowedRoles.includes(context.role)) {
+    return Response.json(
+      { error: `Forbidden: Required role(s) ${allowedRoles.join(', ')}` },
+      { status: 403 }
+    );
+  }
+  return null;
+}
+
+// Helper for method not allowed
+function methodNotAllowed(): Response {
+  return Response.json({ error: 'Method Not Allowed' }, { status: 405 });
 }
 
 // Helper to add security headers
@@ -128,7 +231,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
+const routeHandlers: Record<string, (request: Request, env: Env) => Promise<Response>> = {
   '/api/health': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     return Response.json({
@@ -343,9 +446,13 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
   // Admin endpoints - require authentication
-  '/api/admin/pages': async (request) => {
-    const authResult = await requireAuth(request);
+  '/api/admin/pages': async (request, env) => {
+    const authResult = await requireAuth(request, env);
     if (authResult instanceof Response) return authResult;
+    
+    // All staff roles can access pages
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO']);
+    if (roleCheck) return roleCheck;
     
     if (request.method === 'GET') {
       try {
@@ -381,9 +488,12 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       return methodNotAllowed();
     }
   },
-  '/api/admin/pages/:id': async (request) => {
-    const authResult = await requireAuth(request);
+  '/api/admin/pages/:id': async (request, env) => {
+    const authResult = await requireAuth(request, env);
     if (authResult instanceof Response) return authResult;
+    
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO']);
+    if (roleCheck) return roleCheck;
     
     if (request.method === 'GET') {
       try {
@@ -447,9 +557,13 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       return methodNotAllowed();
     }
   },
-  '/api/admin/pages/:id/rollback': async (request) => {
-    const authResult = await requireAuth(request);
+  '/api/admin/pages/:id/rollback': async (request, env) => {
+    const authResult = await requireAuth(request, env);
     if (authResult instanceof Response) return authResult;
+    
+    // Only ADMIN and EDITOR can rollback
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR']);
+    if (roleCheck) return roleCheck;
     
     if (request.method === 'POST') {
       try {
@@ -649,11 +763,13 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/auth/me': async (request) => {
+  '/api/auth/me': async (request, env) => {
     if (request.method !== 'GET') return methodNotAllowed();
+    const authResult = await requireAuth(request, env);
+    if (authResult instanceof Response) return authResult;
+    
     try {
-      const userId = (request.headers.get('x-user-id') as string) || undefined;
-      const user = userId ? await getAdminUserById(userId) : null;
+      const user = await getAdminUserById(authResult.userId);
       const allUsers = await getAllAdminUsers();
       return Response.json({ user, allUsers });
     } catch (error) {
@@ -662,8 +778,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/auth/switch-user': async (request) => {
+  '/api/auth/switch-user': async (request, env) => {
     if (request.method !== 'POST') return methodNotAllowed();
+    const authResult = await requireAuth(request, env);
+    if (authResult instanceof Response) return authResult;
+    
+    // Only ADMIN can switch users
+    const roleCheck = requireRole(authResult, ['ADMIN']);
+    if (roleCheck) return roleCheck;
+    
     try {
       const { userId } = await request.json();
       if (!userId) return Response.json({ error: 'userId é obrigatório' }, { status: 400 });
@@ -676,8 +799,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/demands': async (request) => {
+  '/api/demands': async (request, env) => {
     if (request.method !== 'GET') return methodNotAllowed();
+    const authResult = await requireAuth(request, env);
+    if (authResult instanceof Response) return authResult;
+    
+    // All staff roles can view demands
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO']);
+    if (roleCheck) return roleCheck;
+    
     try {
       const demands = await getAllDemandsAdmin();
       return Response.json(demands);
@@ -687,20 +817,24 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/demands/:id': async (request) => {
+  '/api/demands/:id': async (request, env) => {
     if (request.method !== 'PUT') return methodNotAllowed();
+    const authResult = await requireAuth(request, env);
+    if (authResult instanceof Response) return authResult;
+    
+    // All staff roles can update demands
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO']);
+    if (roleCheck) return roleCheck;
+    
     try {
       const id = (request as any).params?.id;
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
       const body = await request.json();
       const actor: { id?: string; name?: string; role?: string } = {
-        id: request.headers.get('x-user-id') || undefined,
+        id: authResult.userId,
+        name: authResult.name,
+        role: authResult.role,
       };
-      // Resolve actor name/role for history entries when possible
-      if (actor.id) {
-        const me = await getAdminUserById(actor.id);
-        if (me) { actor.name = me.name; if (me.role) actor.role = me.role; }
-      }
       const updated = await updateDemandAdmin(id, body, actor);
       if (!updated) return Response.json({ error: 'Demanda não encontrada' }, { status: 404 });
       return Response.json(updated);
@@ -710,8 +844,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/audit-logs': async (request) => {
+  '/api/audit-logs': async (request, env) => {
     if (request.method !== 'GET') return methodNotAllowed();
+    const authResult = await requireAuth(request, env);
+    if (authResult instanceof Response) return authResult;
+    
+    // Only ADMIN and EDITOR can view audit logs
+    const roleCheck = requireRole(authResult, ['ADMIN', 'EDITOR']);
+    if (roleCheck) return roleCheck;
+    
     try {
       const logs = await getAdminAuditLogs();
       return Response.json(logs);
@@ -758,7 +899,7 @@ export default {
         const enhancedRequest = request as any;
         enhancedRequest.params = params;
         
-        response = await handler(enhancedRequest);
+        response = await handler(enhancedRequest, env);
       }
     } else {
       // Non-API requests: serve static assets. `assets.not_found_handling:

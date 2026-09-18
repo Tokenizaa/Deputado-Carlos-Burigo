@@ -1,0 +1,29 @@
+[
+  {
+    "role": "ADMIN",
+    "email": "admin@test.carlosburigo.rs.gov.br",
+    "userId": "533f4f2f-cd60-4618-a28d-323c95145d3b",
+    "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImVkOTUyMDRkLWMzOWYtNDY2Yy04OTM3LTZiNDVhN2Q1NzE3ZCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3drdGFueGJwaWp1cmltZGpnb25lLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1MzNmNGYyZi1jZDYwLTQ2MTgtYTI4ZC0zMjNjOTUxNDVkM2IiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg5NzExNjYwLCJpYXQiOjE3ODk3MDgwNjAsImVtYWlsIjoiYWRtaW5AdGVzdC5jYXJsb3NidXJpZ28ucnMuZ292LmJyIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkFkbWluIFRlc3QgVXNlciJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg5NzA4MDYwfV0sInNlc3Npb25faWQiOiJlODNlNzFkOS03ZmU2LTRkZDctYTcwOS1lYzk2Njk1ODBhNGYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.R8x04jSQmZFQMgk5L56rR15NbY1VK1Ujo40uie8X593D2O_eB00o7lJr8HEsP6uIBOCRmfYUJI8ABBaE5yWLLA",
+    "name": "Admin Test User",
+    "cargo": "Administrador do Sistema",
+    "dbRole": "ADMIN"
+  },
+  {
+    "role": "EDITOR",
+    "email": "editor@test.carlosburigo.rs.gov.br",
+    "userId": "98f89853-5ad3-41eb-b450-7417f9c805d7",
+    "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImVkOTUyMDRkLWMzOWYtNDY2Yy04OTM3LTZiNDVhN2Q1NzE3ZCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3drdGFueGJwaWp1cmltZGpnb25lLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5OGY4OTg1My01YWQzLTQxZWItYjQ1MC03NDE3ZjljODA1ZDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg5NzExNjYyLCJpYXQiOjE3ODk3MDgwNjIsImVtYWlsIjoiZWRpdG9yQHRlc3QuY2FybG9zYnVyaWdvLnJzLmdvdi5iciIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJFZGl0b3IgVGVzdCBVc2VyIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODk3MDgwNjJ9XSwic2Vzc2lvbl9pZCI6IjM1N2U5MjZlLTBkMzAtNDQwNy05YWMwLWVjODJmNTY2MWMzMiIsImlzX2Fub255bW91cyI6ZmFsc2V9.Og8xsdLwfS-uGExv9sAaNLAuKZ2fAE7jxWSf-ttn5Ggx9sXY9-nz98N4KFVVzZE_193cZ0dfnMKQyXEelaJl8Q",
+    "name": "Editor Test User",
+    "cargo": "Editor de Conteúdo",
+    "dbRole": "EDITOR"
+  },
+  {
+    "role": "COMUNICACAO",
+    "email": "comunicacao@test.carlosburigo.rs.gov.br",
+    "userId": "b0a8047c-99ae-40a2-8827-a278d4800d39",
+    "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImVkOTUyMDRkLWMzOWYtNDY2Yy04OTM3LTZiNDVhN2Q1NzE3ZCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3drdGFueGJwaWp1cmltZGpnb25lLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiMGE4MDQ3Yy05OWFlLTQwYTItODgyNy1hMjc4ZDQ4MDBkMzkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg5NzExNjYzLCJpYXQiOjE3ODk3MDgwNjMsImVtYWlsIjoiY29tdW5pY2FjYW9AdGVzdC5jYXJsb3NidXJpZ28ucnMuZ292LmJyIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkNvbXVuaWNhw6fDo28gVGVzdCBVc2VyIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODk3MDgwNjN9XSwic2Vzc2lvbl9pZCI6ImNiMjQwZGMyLTEyMmMtNGVjMC05MWJjLTk3ZWZmNTI5NDFiZiIsImlzX2Fub255bW91cyI6ZmFsc2V9.eCph3BHQ6pEpW5bI3JnT9sWVLrx8-Klf4hm3ZJzngFPPovOY6nMEeSzP_OhtTEGXpTVR2KcjiYUr3JYCobn-kg",
+    "name": "Comunicação Test User",
+    "cargo": "Assessoria de Comunicação",
+    "dbRole": "COMUNICACAO"
+  }
+]

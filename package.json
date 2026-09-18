@@ -9,22 +9,33 @@
     "deploy": "npm run build && wrangler deploy -c dist-cf/deputado_carlos_burigo/wrangler.json",
     "preview": "vite preview",
     "clean": "rm -rf dist dist-cf .wrangler",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:a11y": "playwright test --config=playwright.a11y.config.ts",
+    "test:a11y:desktop": "playwright test --config=playwright.a11y.config.ts --project=chromium",
+    "test:a11y:mobile": "playwright test --config=playwright.a11y.config.ts --project=mobile-chrome",
+    "test:a11y:firefox": "playwright test --config=playwright.a11y.config.ts --project=firefox",
+    "test:a11y:headed": "playwright test --config=playwright.a11y.config.ts --headed",
+    "test:a11y:report": "playwright show-report playwright-report/a11y"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
-    "@supabase/supabase-js": "^2.57.4",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
     "react": "^19.0.1",
-    "react-dom": "^19.0.1",
-    "motion": "^12.23.24"
+    "react-dom": "^19.0.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@cloudflare/vite-plugin": "^1.54.10",
-    "@types/node": "^22.14.0",
+    "@playwright/test": "^1.63.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "@types/node": "^22.20.3",
     "autoprefixer": "^10.4.21",
+    "axe-core": "^4.13.0",
+    "axe-playwright": "^2.2.2",
+    "dotenv": "^18.0.0",
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",

@@ -48,7 +48,7 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-stone-200">
+    <header className="sticky top-0 z-40 bg-white border-b border-stone-200" role="banner">
       {/* Institutional Top Bar */}
       <div className="bg-stone-900 text-stone-300 text-xs px-4 py-1.5 border-b border-stone-800">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
@@ -129,7 +129,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => setCurrentView('atuacao')}
                       className={`flex items-center gap-1 px-3 py-2 text-[15px] font-medium transition-colors border-b-2 ${
                         active
-                          ? 'border-[#00A550] text-[#00A550] font-semibold'
+                          ? 'border-[#00A550] text-[var(--mdb-green-text)] font-semibold'
                           : 'border-transparent text-stone-700 hover:text-stone-950 hover:bg-stone-50'
                       }`}
                     >
@@ -152,11 +152,11 @@ export const Navbar: React.FC = () => {
                               }}
                               className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors ${
                                 isSubActive
-                                  ? 'bg-stone-50 text-[#00A550] font-semibold'
+                                  ? 'bg-stone-50 text-[var(--mdb-green-text)] font-semibold'
                                   : 'text-stone-700 hover:bg-stone-50 hover:text-stone-900'
                               }`}
                             >
-                              <Icon className="w-4 h-4 text-[#00A550] shrink-0" />
+                              <Icon className="w-4 h-4 text-[var(--mdb-green-text)] shrink-0" />
                               <span>{sub.label}</span>
                             </button>
                           );
@@ -173,7 +173,7 @@ export const Navbar: React.FC = () => {
                   onClick={() => setCurrentView(item.id)}
                   className={`px-3 py-2 text-[15px] font-medium transition-colors border-b-2 ${
                     active
-                      ? 'border-[#00A550] text-[#00A550] font-semibold'
+                      ? 'border-[#00A550] text-[var(--mdb-green-text)] font-semibold'
                       : 'border-transparent text-stone-700 hover:text-stone-950 hover:bg-stone-50'
                   }`}
                 >
@@ -246,7 +246,7 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
               }}
               className={`text-left px-3 py-2.5 rounded-md text-base font-medium ${
-                currentView === 'home' ? 'text-[#00A550] font-bold bg-emerald-50' : 'text-stone-800'
+                currentView === 'home' ? 'text-[var(--mdb-green-text)] font-bold bg-emerald-50' : 'text-stone-800'
               }`}
             >
               Início
@@ -259,7 +259,7 @@ export const Navbar: React.FC = () => {
               }}
               className={`text-left px-3 py-2.5 rounded-md text-base font-medium ${
                 currentView === 'sobre' || currentView === 'trajetoria'
-                  ? 'text-[#00A550] font-bold bg-emerald-50'
+                  ? 'text-[var(--mdb-green-text)] font-bold bg-emerald-50'
                   : 'text-stone-800'
               }`}
             >
@@ -277,7 +277,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'atuacao' ? 'text-[#00A550] font-bold' : 'text-stone-700'
+                    currentView === 'atuacao' ? 'text-[var(--mdb-green-text)] font-bold' : 'text-stone-700'
                   }`}
                 >
                   Visão Geral
@@ -288,7 +288,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'projetos' ? 'text-[#00A550] font-bold' : 'text-stone-700'
+                    currentView === 'projetos' ? 'text-[var(--mdb-green-text)] font-bold' : 'text-stone-700'
                   }`}
                 >
                   Projetos de Lei
@@ -299,7 +299,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'votacoes' ? 'text-[#00A550] font-bold' : 'text-stone-700'
+                    currentView === 'votacoes' ? 'text-[var(--mdb-green-text)] font-bold' : 'text-stone-700'
                   }`}
                 >
                   Votações & Posicionamentos
@@ -310,7 +310,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'resultados' ? 'text-[#00A550] font-bold' : 'text-stone-700'
+                    currentView === 'resultados' ? 'text-[var(--mdb-green-text)] font-bold' : 'text-stone-700'
                   }`}
                 >
                   Resultados
@@ -321,7 +321,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'documentos' ? 'text-[#00A550] font-bold' : 'text-stone-700'
+                    currentView === 'documentos' ? 'text-[var(--mdb-green-text)] font-bold' : 'text-stone-700'
                   }`}
                 >
                   Documentos Oficiais
@@ -335,7 +335,7 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
               }}
               className={`text-left px-3 py-2.5 rounded-md text-base font-medium ${
-                currentView === 'noticias' ? 'text-[#00A550] font-bold bg-emerald-50' : 'text-stone-800'
+                currentView === 'noticias' ? 'text-[var(--mdb-green-text)] font-bold bg-emerald-50' : 'text-stone-800'
               }`}
             >
               Notícias
@@ -347,7 +347,7 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
               }}
               className={`text-left px-3 py-2.5 rounded-md text-base font-medium ${
-                currentView === 'videos' ? 'text-[#00A550] font-bold bg-emerald-50' : 'text-stone-800'
+                currentView === 'videos' ? 'text-[var(--mdb-green-text)] font-bold bg-emerald-50' : 'text-stone-800'
               }`}
             >
               Vídeos
@@ -359,7 +359,7 @@ export const Navbar: React.FC = () => {
                 setMobileMenuOpen(false);
               }}
               className={`text-left px-3 py-2.5 rounded-md text-base font-medium ${
-                currentView === 'contato' ? 'text-[#00A550] font-bold bg-emerald-50' : 'text-stone-800'
+                currentView === 'contato' ? 'text-[var(--mdb-green-text)] font-bold bg-emerald-50' : 'text-stone-800'
               }`}
             >
               Contato

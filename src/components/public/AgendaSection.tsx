@@ -33,7 +33,11 @@ export const AgendaSection: React.FC = () => {
 
           {/* City filter */}
           <div>
+            <label htmlFor="city-filter" className="sr-only">
+              Filtrar por município
+            </label>
             <select
+              id="city-filter"
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
               className="text-xs bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 font-medium"

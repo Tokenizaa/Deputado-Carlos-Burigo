@@ -53,11 +53,75 @@ export const ContactView: React.FC = () => {
             <p className="text-sm text-stone-600 mb-6">O formulário abre o cliente de e-mail do dispositivo com os dados preenchidos. Nenhuma mensagem é declarada como enviada sem passar pelo seu cliente de e-mail.</p>
             {submitted && <div className="mb-6 p-5 bg-emerald-50 border border-emerald-200 rounded-[2px] text-sm text-emerald-900 flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-[#00A550] shrink-0" /><span className="font-semibold">Cliente de e-mail aberto para conclusão do envio.</span></div>}
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-              <div><label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Nome completo</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm" /></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">E-mail</label><input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm" /></div><div><label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Município / Região</label><input type="text" required value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm" /></div></div>
-              <div><label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Assunto</label><input type="text" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm" /></div>
-              <div><label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Mensagem</label><textarea rows={4} required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full min-h-[100px] p-3.5 bg-stone-50 border border-stone-300 rounded-[2px] text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm" /></div>
-              <button type="submit" disabled={!email} className="h-[48px] px-7 bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer">ABRIR E-MAIL PARA ENVIO</button>
+              <div>
+                <label htmlFor="contact-name" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                  Nome completo
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="contact-email" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                    E-mail
+                  </label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contact-city" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                    Município / Região
+                  </label>
+                  <input
+                    id="contact-city"
+                    type="text"
+                    required
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="contact-subject" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                  Assunto
+                </label>
+                <input
+                  id="contact-subject"
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full h-[44px] bg-stone-50 border border-stone-300 rounded-[2px] px-3.5 text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-message" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                  Mensagem
+                </label>
+                <textarea
+                  id="contact-message"
+                  rows={4}
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full min-h-[100px] p-3.5 bg-stone-50 border border-stone-300 rounded-[2px] text-stone-900 focus:outline-hidden focus:ring-1 focus:ring-[#00A550] focus:bg-white text-sm"
+                />
+              </div>
+              <button type="submit" disabled={!email} className="h-[48px] px-7 bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer">
+                ABRIR E-MAIL PARA ENVIO
+              </button>
             </form>
           </div>
         </div>

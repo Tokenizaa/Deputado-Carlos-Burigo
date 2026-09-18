@@ -45,7 +45,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col">
-      <header className="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-[#00A550] focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:font-bold focus:shadow-lg"
+      >
+        Pular para o conteúdo principal
+      </a>
+      <header className="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between" role="banner">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setCurrentView('home')}
@@ -155,7 +161,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         </aside>
 
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto max-w-7xl">
+        <main className="flex-1 p-4 sm:p-8 overflow-y-auto max-w-7xl" role="main" id="main-content">
           {children}
         </main>
       </div>

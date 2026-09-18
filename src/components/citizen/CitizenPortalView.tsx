@@ -236,10 +236,11 @@ export const CitizenPortalView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                <label htmlFor="citizen-municipality" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
                   Município de Residência *
                 </label>
                 <select
+                  id="citizen-municipality"
                   value={formData.municipality}
                   onChange={(e) => setFormData({ ...formData, municipality: e.target.value })}
                   className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg px-3.5 py-2.5 text-stone-900 font-medium focus:outline-hidden focus:ring-2 focus:ring-[#00A550]"
@@ -270,10 +271,11 @@ export const CitizenPortalView: React.FC = () => {
             {/* Demand Details */}
             <div className="space-y-4 pt-4 border-t border-stone-200">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                <label htmlFor="citizen-category" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
                   Categoria da Demanda *
                 </label>
                 <select
+                  id="citizen-category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as DemandCategory })}
                   className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg px-3.5 py-2.5 text-stone-900 font-medium focus:outline-hidden focus:ring-2 focus:ring-[#00A550]"
@@ -316,11 +318,12 @@ export const CitizenPortalView: React.FC = () => {
 
               {/* Attachments Upload */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                <label htmlFor="attachments-upload" className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
                   Anexar Documentos ou Fotos (Opcional)
                 </label>
                 <div className="border-2 border-dashed border-stone-300 rounded-xl p-4 text-center hover:bg-stone-50 transition-colors cursor-pointer relative">
                   <input
+                    id="attachments-upload"
                     type="file"
                     multiple
                     onChange={handleFileUpload}
