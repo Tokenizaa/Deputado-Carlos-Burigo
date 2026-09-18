@@ -891,6 +891,8 @@ O cidadão consegue compreender a trajetória sem depender de notícias dispersa
 
 # 13. FASE 9 — Atuação Parlamentar
 
+**Status:** CONCLUÍDA — checkpoint `be1867992551da4b88300d155db7fc6a9d34a91c`
+
 **Objetivo:** transformar dados legislativos em experiência pública compreensível.
 
 ## 9.1 Proposições
@@ -937,6 +939,17 @@ Cada item deve responder:
 ### Critério
 
 Não criar novo banco legislativo nem duplicar os dados.
+
+### Execução
+
+- [x] proposições com filtros de período, tipo e situação;
+- [x] votações nominais derivadas da fonte existente;
+- [x] participações e relatorias quando presentes nos registros publicados;
+- [x] fonte oficial indicada quando disponível;
+- [x] comissões e discursos sem registros inventados;
+- [x] acervo documental mantido vinculado às matérias.
+
+**Auditoria:** `docs/audits/FASE-9-ATUACAO-PARLAMENTAR.md`
 
 ---
 
