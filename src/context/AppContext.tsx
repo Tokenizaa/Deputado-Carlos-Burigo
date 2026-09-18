@@ -152,7 +152,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(eventsRes)) setEvents(eventsRes);
       if (Array.isArray(resultsRes)) setResults(resultsRes);
       if (Array.isArray(munRes)) setMunicipalities(munRes);
-      if (Array.isArray(videosRes)) setVideos(videosRes);
+      if (Array.isArray(videosRes)) setVideos(videosRes.map((video: any) => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        url: video.url,
+        platform: video.platform,
+        category: video.category,
+        date: video.publishedAt || video.createdAt,
+        thumbnail: video.thumbnailUrl || '',
+        featured: Boolean(video.featured),
+        status: video.status,
+        sourceName: video.sourceName,
+        verificationStatus: video.verificationStatus,
+        rightsStatus: video.rightsStatus,
+      })));
       if (Array.isArray(mediaRes)) setMedia(mediaRes);
       if (Array.isArray(legislativeRes)) setLegislativeItems(legislativeRes);
       if (Array.isArray(documentsRes)) setDocuments(documentsRes);
