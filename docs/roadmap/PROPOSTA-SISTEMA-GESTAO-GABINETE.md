@@ -906,6 +906,267 @@ Antes de implementar qualquer tabela ou cron de sincronização para emendas, re
 Somente depois dessa inspeção deve ser criada a ingestão no Supabase.
 
 
+
+---
+
+## 26. Auditoria do dashboard/CMS atual — primeira leitura estrutural
+
+A auditoria do código atual confirma que a proposta de **Gabinete OS** não deve ser implementada como simples redesign visual do dashboard. A estrutura existente já possui várias peças reutilizáveis, mas a organização funcional ainda está orientada à **gestão do portal**, e não à operação completa do gabinete.
+
+### 26.1 Navegação atual
+
+O dashboard atual está organizado em seis módulos:
+
+- Visão Geral;
+- Atuação Pública;
+- Conteúdo Público;
+- Acervo;
+- Cidadão;
+- Administração.
+
+A navegação é definida em `AdminLayout.tsx` e os conteúdos são renderizados por `AdminWorkspace.tsx`.
+
+Isso funciona como um **painel administrativo do site**, mas ainda não corresponde à navegação operacional proposta para o Gabinete OS.
+
+### 26.2 O CMS atual é essencialmente um Page Builder
+
+O módulo **Páginas e Landing Pages** utiliza:
+
+- páginas;
+- blocos;
+- versões;
+- status de rascunho/publicado;
+- rollback;
+- editor genérico de blocos;
+- biblioteca de mídia;
+- prévia.
+
+A implementação existente está em `AdminPagesTab.tsx`, `BlockEditorForm.tsx` e `server/pagesAdmin.ts`.
+
+O modelo é tecnicamente reutilizável e possui histórico de versões, mas apresenta um problema de produto:
+
+> **o gabinete precisa administrar conteúdo por finalidade; o CMS atual administra componentes por tipo de bloco.**
+
+O assessor atualmente precisa pensar em conceitos como:
+
+- Hero;
+- bloco;
+- CTA;
+- alinhamento;
+- posição de mídia;
+- slug;
+- biblioteca;
+- URL externa.
+
+Esses conceitos podem continuar existindo internamente, mas não devem ser o centro da experiência operacional do gabinete.
+
+### 26.3 Conteúdo está fragmentado em modelos diferentes
+
+Além do Page Builder, existem módulos independentes para:
+
+- notícias;
+- agenda;
+- resultados;
+- municípios;
+- vídeos;
+- mídia;
+- páginas.
+
+Isso não significa que esses módulos devam ser eliminados. A conclusão é diferente:
+
+**a experiência de gestão precisa unificar o trabalho sem necessariamente unificar todas as tabelas.**
+
+Exemplo:
+
+```
+Conteúdo
+├── Notícias
+├── Eventos
+├── Documentos
+├── Páginas
+├── Agenda pública
+└── Mídia
+```
+
+A equipe deve enxergar essas coisas como tipos de conteúdo do mandato, enquanto o banco pode continuar usando suas entidades atuais.
+
+### 26.4 O módulo "Conteúdo Público" contém responsabilidades que não são CMS
+
+A auditoria encontrou no `AdminContentTab.tsx` configurações de:
+
+- telefones;
+- WhatsApp;
+- e-mail;
+- slogan;
+- dados eleitorais;
+- redes sociais;
+- textos institucionais;
+- CTA de contato.
+
+Portanto, o nome **Conteúdo Público** mistura configuração institucional, campanha, comunicação e conteúdo editorial.
+
+Isso deverá ser separado conceitualmente na futura arquitetura de navegação.
+
+### 26.5 O dashboard atual ainda é orientado a indicadores do site
+
+O `AdminDashboardTab.tsx` mostra:
+
+- demandas pendentes;
+- demandas em atendimento;
+- quantidade de notícias;
+- quantidade de compromissos;
+- fila de demandas;
+- auditoria recente;
+- seletor de modo campanha/mandato/institucional.
+
+Isso é útil, mas ainda não responde integralmente à pergunta:
+
+> **"O que a equipe do gabinete precisa resolver hoje?"**
+
+Faltam, entre outros:
+
+- tarefas vencidas;
+- tarefas próximas do vencimento;
+- demandas sem responsável;
+- demandas aguardando resposta;
+- compromissos de hoje;
+- itens legislativos em acompanhamento;
+- emendas em acompanhamento;
+- conteúdos aguardando revisão;
+- pendências externas;
+- atividades relacionadas a municípios.
+
+### 26.6 Atendimento é a parte mais próxima do Gabinete OS
+
+O sistema já possui uma base importante para Atendimento:
+
+- `demands`;
+- `demand_messages`;
+- `demand_history`;
+- atribuição;
+- prioridade;
+- status;
+- resposta oficial;
+- protocolo.
+
+A API administrativa também já permite listar e atualizar demandas.
+
+Portanto, **não devemos recriar o módulo Atendimento**.
+
+O trabalho futuro deve evoluí-lo de "lista de demandas" para **central de atendimento do gabinete**, preservando as entidades e APIs existentes quando forem adequadas.
+
+### 26.7 Há uma lacuna estrutural: Tarefas
+
+Na estrutura atual auditada não foi encontrada uma entidade operacional de **Tarefas** equivalente ao conceito proposto neste documento.
+
+Isso é importante porque:
+
+```
+Demanda
+   ↓
+Tarefa
+   ↓
+Responsável + prazo
+   ↓
+Conclusão
+```
+
+Sem essa camada, o gabinete registra o problema, mas ainda não possui uma unidade clara de trabalho que possa ser atribuída, cobrada e encerrada.
+
+A criação de tarefas deverá ser analisada na auditoria de banco/migrations antes de qualquer decisão de schema.
+
+### 26.8 Há uma lacuna estrutural: Mandato como área operacional
+
+Existe `/api/legislative` e uma entidade pública de atividade legislativa, mas a interface administrativa atual não possui um módulo operacional de Mandato equivalente a:
+
+- proposições acompanhadas;
+- comissões;
+- votações;
+- emendas;
+- assuntos;
+- responsáveis;
+- tarefas relacionadas;
+- referências externas.
+
+A existência do endpoint público **não significa que devemos criar uma segunda base legislativa**.
+
+O módulo futuro deve começar como camada de acompanhamento e referência, conforme a decisão arquitetural registrada nas seções anteriores.
+
+### 26.9 Há uma lacuna estrutural: workflow editorial
+
+O Page Builder possui rascunho/publicado e versões, mas o workflow proposto:
+
+```
+Rascunho → Em revisão → Aprovado → Publicado → Arquivado
+```
+
+ainda não está representado como processo editorial completo.
+
+A evolução deve primeiro confirmar se o banco atual suporta os estados necessários e quais módulos precisam deles. Não criar workflow paralelo para cada tipo de conteúdo.
+
+### 26.10 Ponto de atenção de autenticação
+
+A API administrativa utiliza atualmente o cabeçalho `x-user-id` para identificar o usuário.
+
+A função `requireAuth()` presente no Worker verifica a existência desse cabeçalho, mas a leitura realizada nesta auditoria não comprova, por si só, uma validação criptográfica da identidade enviada no header.
+
+Esse ponto deve permanecer como **bloqueador de segurança para a próxima auditoria de autenticação/autorização**, especialmente antes de ampliar permissões administrativas.
+
+Não alterar isso incidentalmente durante o redesign do CMS.
+
+### 26.11 Decisão de produto derivada da auditoria
+
+A partir desta leitura, a próxima etapa não deve ser "refazer o CMS".
+
+Deve ser:
+
+**reorganizar o dashboard em torno do trabalho do gabinete e reaproveitar os módulos existentes.**
+
+A direção passa a ser:
+
+```
+GABINETE
+
+Início
+Atendimento
+Agenda
+Mandato
+Conteúdo
+Tarefas
+Equipe
+Configurações
+```
+
+com o CMS/Page Builder permanecendo como infraestrutura de páginas, e não como modelo mental principal da gestão.
+
+### 26.12 Próxima auditoria obrigatória
+
+Antes de implementar a nova navegação, mapear no banco/migrations:
+
+1. todas as tabelas existentes;
+2. relacionamentos entre conteúdo;
+3. políticas RLS;
+4. perfis e permissões;
+5. entidades de agenda;
+6. entidades de demanda;
+7. entidades legislativas;
+8. entidades de documentos;
+9. entidades de mídia;
+10. entidades que possam servir de base para tarefas;
+11. campos de publicação/status;
+12. funções RPC existentes;
+13. triggers relevantes;
+14. histórico/auditoria;
+15. índices e identificadores.
+
+O resultado deve separar explicitamente:
+
+- **reaproveitar**;
+- **adaptar**;
+- **criar**;
+- **remover somente se comprovadamente obsoleto**.
+
+
 ---
 
 ## 19. Evolução deste documento
