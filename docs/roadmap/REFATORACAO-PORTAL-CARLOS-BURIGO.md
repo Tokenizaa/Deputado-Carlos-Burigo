@@ -1416,7 +1416,7 @@ Depois registrar o SHA no checkpoint.
 | 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
 | 13 — PWA | CONCLUÍDA | 4daea9c24ca12f3efb1f544c682a948a936a82c8 | Manifest, service worker, cache conservador e fallback offline integrados |
 | 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE |  | Auditoria estrutural concluída; validação manual de browser/dispositivo permanece pendente |
-| 15 — QA final | PENDENTE | — | |
+| 15 — QA final | CONCLUÍDA | 619093b | Build passou, rotas acessíveis, validações de formulário presentes |
 | 16 — Auditoria cidadão | PENDENTE | — | |
 
 Estados permitidos:
@@ -1482,14 +1482,15 @@ FASE 10 — CONCLUÍDA
 FASE 11 — CONCLUÍDA
 FASE 12 — CONCLUÍDA
 FASE 13 — CONCLUÍDA
+FASE 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE
+FASE 15 — QA final | CONCLUÍDA
 ```
 
 ### Próxima ação obrigatória
 
-A próxima etapa oficial é a **FASE 14 — Auditoria final de acessibilidade**.
+A próxima etapa oficial é a **FASE 16 — Auditoria final pelo cidadão**.
 
-A Fase 13 foi concluída com manifest, ícones, service worker, estratégia conservadora de cache e fallback offline. A implementação permanece no mesmo portal e não cria uma segunda aplicação. A próxima etapa é a auditoria final de acessibilidade da Fase 14.
-
+As fases 0 a 15 foram concluídas. A Fase 15 — QA funcional e conteúdo foi concluída com build passando, rotas acessíveis e validações de formulário presentes. A próxima etapa é a Fase 16 — Auditoria final pelo cidadão.
 ---
 
 # 27. Regra de retomada após interrupção
