@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import {
   normalizeLegislativeCode,
   toPublicLegislativeItemDto,
-  toPublicLegislativeVoteDto,
   toPublicProjectDto,
   toPublicResultDto,
 } from './mappers/publicLegislative';
@@ -25,7 +24,7 @@ import {
   mapToPublicDemandHistoryDto,
 } from './mappers/publicDemand';
 import type { LegislativeItemRow } from './mappers/publicLegislative';
-import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../src/contracts/publicLegislative';
+import type { PublicLegislativeItemDto } from '../src/contracts/publicLegislative';
 import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
 import type { PublicDemandDto, DemandMessageDto, DemandHistoryDto } from '../src/contracts/publicDemand';
 import { extractLegislativeCode } from '../src/contracts/publicLegislative';
