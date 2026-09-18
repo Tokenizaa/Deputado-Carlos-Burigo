@@ -8,7 +8,6 @@ import {
   PhoneCall,
   ChevronDown,
   FileText,
-  CheckCircle2,
   FolderOpen,
   Vote,
 } from 'lucide-react';
@@ -35,11 +34,9 @@ export const Navbar: React.FC = () => {
       label: 'Atuação',
       hasDropdown: true,
       subItems: [
-        { id: 'atuacao', label: 'Visão Geral & Ementas', icon: FileText },
         { id: 'projetos', label: 'Projetos de Lei', icon: FileText },
-        { id: 'votacoes', label: 'Votações & Posicionamentos', icon: Vote },
-        { id: 'resultados', label: 'Resultados & Entregas', icon: CheckCircle2 },
-        { id: 'documentos', label: 'Documentos do Acervo ALRS', icon: FolderOpen },
+        { id: 'votacoes', label: 'Votações', icon: Vote },
+        { id: 'documentos', label: 'Acervo Documental', icon: FolderOpen },
       ],
     },
     { id: 'noticias', label: 'Notícias' },
@@ -115,7 +112,7 @@ export const Navbar: React.FC = () => {
               const active =
                 currentView === item.id ||
                 (item.hasDropdown &&
-                  ['atuacao', 'projetos', 'votacoes', 'resultados', 'documentos'].includes(currentView));
+                  ['atuacao', 'projetos', 'votacoes', 'documentos'].includes(currentView));
 
               if (item.hasDropdown) {
                 return (
@@ -273,17 +270,6 @@ export const Navbar: React.FC = () => {
               <div className="mt-1 pl-2 space-y-1">
                 <button
                   onClick={() => {
-                    setCurrentView('atuacao');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'atuacao' ? 'text-[#00A550] font-bold' : 'text-stone-700'
-                  }`}
-                >
-                  Visão Geral
-                </button>
-                <button
-                  onClick={() => {
                     setCurrentView('projetos');
                     setMobileMenuOpen(false);
                   }}
@@ -303,17 +289,6 @@ export const Navbar: React.FC = () => {
                   }`}
                 >
                   Votações & Posicionamentos
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('resultados');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    currentView === 'resultados' ? 'text-[#00A550] font-bold' : 'text-stone-700'
-                  }`}
-                >
-                  Resultados
                 </button>
                 <button
                   onClick={() => {
