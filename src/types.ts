@@ -144,19 +144,6 @@ export interface EventItem {
   visibility: 'publico' | 'interno';
 }
 
-export interface ProjectItem {
-  id: string;
-  code: string; // e.g. "PL 332/2025"
-  title: string;
-  summary: string;
-  detailedDescription: string;
-  theme: string;
-  status: 'Aprovado / Lei Sancionada' | 'Em Tramitação' | 'Apresentado';
-  linkAlrs?: string;
-  year: number;
-  impacts: string[];
-}
-
 export interface ResultItem {
   id: string;
   title: string;
