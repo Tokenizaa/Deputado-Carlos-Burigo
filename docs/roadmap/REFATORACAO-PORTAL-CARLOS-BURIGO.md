@@ -1350,7 +1350,7 @@ Depois registrar o SHA no checkpoint.
 | 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
 | 3 — Acessibilidade | CONCLUÍDA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Skip link, foco, barra de acessibilidade, tamanho de texto, alto contraste, página `/acessibilidade` e loading institucional registrados em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md` |
 | 4 — Navegação | CONCLUÍDA | b71e02d28a94664dcce3639ecc990ed0e5732c3a | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
-| 5 — Gabinete | PENDENTE | — | |
+| 5 — Gabinete | CONCLUÍDA | 94e5723b6950c45f50ce6133c516ccf450a163e6 | Canal único Fale com o Gabinete, CTA desktop/mobile, fluxo cidadão existente e compatibilidade /cidadao |
 | 6 — Transparência | PENDENTE | — | |
 | 7 — Home V2 | PENDENTE | — | |
 | 8 — Trajetória | PENDENTE | — | |
@@ -1417,14 +1417,15 @@ FASE 1 — CONCLUÍDA
 FASE 2 — CONCLUÍDA
 FASE 3 — CONCLUÍDA
 FASE 4 — CONCLUÍDA
-FASE 5 — PENDENTE
+FASE 5 — CONCLUÍDA
+FASE 6 — PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 5 — Fale com o Gabinete**.
+Executar **FASE 6 — Transparência e política de publicação**.
 
-A Fase 4 foi concluída com o shell de navegação institucional consolidado. A Home não foi reconstruída nesta fase. A auditoria final de acessibilidade permanece prevista para a Fase 14.
+A Fase 5 foi concluída com o canal Fale com o Gabinete consolidado e o fluxo cidadão existente promovido a experiência canônica. A Home não foi reconstruída nesta fase. A auditoria final de acessibilidade permanece prevista para a Fase 14.
 
 ---
 
