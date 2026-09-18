@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
               {[
                 ['home', 'Início'], ['trajetoria', 'Trajetória'], ['atuacao', 'Atuação'],
                 ['noticias', 'Notícias'], ['agenda', 'Agenda'], ['documentos', 'Documentos'],
-                ['acessibilidade', 'Acessibilidade'], ['contato', 'Fale com o Gabinete'],
+                ['acessibilidade', 'Acessibilidade'], ['contato', 'Fale com o Deputado'],
               ].map(([id, label]) => (
                 <a key={id} href={id === 'home' ? '/' : `/${id}`} onClick={(e) => { e.preventDefault(); navigate(id); }} className="min-h-11 inline-flex items-center text-stone-300 hover:text-white focus-visible:outline-2 focus-visible:outline-[#00A550]">{label}</a>
               ))}
@@ -61,7 +61,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3 text-sm">
             <h4 className="text-stone-100 font-bold">Atendimento e transparência</h4>
             <p className="text-stone-300 leading-relaxed">Acesse canais de participação cidadã, documentos públicos e informações institucionais.</p>
-            <button type="button" onClick={() => navigate('contato')} className="w-full min-h-11 rounded-md bg-[#00863f] px-3 font-semibold text-white hover:bg-[#006b32] focus-visible:outline-2 focus-visible:outline-[#00863f]">Fale com o Gabinete</button>
+            <button type="button" onClick={() => navigate('contato')} className="w-full min-h-11 rounded-md bg-[#00863f] px-3 font-semibold text-white hover:bg-[#006b32] focus-visible:outline-2 focus-visible:outline-[#00863f]">Fale com o Deputado</button>
             <button type="button" onClick={() => openProtocolModal()} className="w-full min-h-11 rounded-md border border-stone-600 px-3 font-medium text-stone-200 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-[#00A550]">Consultar Protocolo</button>
           </div>
         </div>
