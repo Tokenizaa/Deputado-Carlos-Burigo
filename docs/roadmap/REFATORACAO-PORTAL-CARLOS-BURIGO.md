@@ -1104,6 +1104,17 @@ Avaliar schemas apropriados sem inventar entidades ou dados.
 
 Cada página pública relevante é encontrável, compreensível e semanticamente conectada.
 
+### Execução
+
+- [x] metadata por rota;
+- [x] canonical;
+- [x] Open Graph;
+- [x] Twitter/X Card;
+- [x] sitemap alinhado às rotas canônicas;
+- [x] robots preservado;
+- [x] JSON-LD institucional mínimo;
+- [x] auditoria registrada em `docs/audits/FASE-12-SEO-INSTITUCIONAL.md`.
+
 ---
 
 # 17. FASE 13 — PWA
@@ -1402,7 +1413,7 @@ Depois registrar o SHA no checkpoint.
 | 9 — Atuação | PENDENTE | — | |
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
 | 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
-| 12 — SEO | PENDENTE | — | |
+| 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
 | 13 — PWA | PENDENTE | — | |
 | 14 — Acessibilidade final | PENDENTE | — | |
 | 15 — QA final | PENDENTE | — | |
