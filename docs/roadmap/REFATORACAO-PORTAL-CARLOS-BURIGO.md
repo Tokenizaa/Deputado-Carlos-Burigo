@@ -1348,7 +1348,7 @@ Depois registrar o SHA no checkpoint.
 | 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
 | 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
 | 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
-| 3 — Acessibilidade | PENDENTE | — | |
+| 3 — Acessibilidade | CONCLUÍDA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Skip link, foco, barra de acessibilidade, tamanho de texto, alto contraste, página `/acessibilidade` e loading institucional registrados em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md` |
 | 4 — Navegação | PENDENTE | — | |
 | 5 — Gabinete | PENDENTE | — | |
 | 6 — Transparência | PENDENTE | — | |
@@ -1402,6 +1402,8 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Fase 2 | Design system usa tokens semânticos com aliases de compatibilidade | Evitar migração destrutiva e segunda arquitetura de estilos | CONCLUÍDA |
 | 2026-09-18 | Fase 2 | Marca verde principal para texto/ação foi ajustada para garantir contraste mínimo; amarelo e vermelho permanecem acentos visuais | Separar identidade de cor de requisitos de legibilidade | CONCLUÍDA |
 | 2026-09-18 | Fase 2 | Glassmorphism foi neutralizado, não substituído por outro padrão complexo | Brand Book proíbe glass e prioriza simplicidade | CONCLUÍDA |
+| 2026-09-18 | Fase 3 | Acessibilidade estrutural entra no shell antes da reconstrução da navegação | Evitar corrigir acessibilidade depois da interface pronta | CONCLUÍDA |
+| 2026-09-18 | Fase 3 | `/acessibilidade` é uma página pública do mesmo portal | Acessibilidade não deve ser uma segunda aplicação | CONCLUÍDA |
 
 ---
 
@@ -1413,14 +1415,15 @@ Não mascarar bloqueador como concluído.
 FASE 0 — CONCLUÍDA
 FASE 1 — CONCLUÍDA
 FASE 2 — CONCLUÍDA
-FASE 3 — PENDENTE
+FASE 3 — CONCLUÍDA
+FASE 4 — PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 3 — Acessibilidade estrutural**.
+Executar **FASE 4 — Navegação e shell do produto**.
 
-A Fase 2 foi concluída com o sistema visual base registrado em `docs/design/DESIGN-TOKENS-V2.md`. A Home não foi reconstruída nesta fase.
+A Fase 3 foi concluída com a camada estrutural de acessibilidade registrada em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md`. A auditoria final de acessibilidade permanece prevista para a Fase 14.
 
 ---
 
