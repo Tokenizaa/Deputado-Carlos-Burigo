@@ -4,11 +4,9 @@ import {
   getPublicMedia,
   getPublicMunicipalities,
   getPublicNews,
-  getPublicProjects,
   getPublicResults,
   getPublicSettings,
   getPublicVideos,
-  getPublicLegislativeVotes,
   getPublicLegislativeItems,
   getPublicPages,
   supabaseAdmin,
@@ -158,19 +156,6 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
-  '/api/projects': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const projects = await getPublicProjects();
-      return Response.json(projects);
-    } catch (error) {
-      console.error('[api/projects]', error);
-      return Response.json(
-        { error: 'Falha ao carregar projetos do acervo' },
-        { status: 500 }
-      );
-    }
-  },
   '/api/results': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     try {
@@ -273,19 +258,6 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       console.error('[api/legislative]', error);
       return Response.json(
         { error: 'Falha ao carregar atividade legislativa do acervo' },
-        { status: 500 }
-      );
-    }
-  },
-  '/api/votes': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const votes = await getPublicLegislativeVotes();
-      return Response.json(votes);
-    } catch (error) {
-      console.error('[api/votes]', error);
-      return Response.json(
-        { error: 'Falha ao carregar votações do acervo' },
         { status: 500 }
       );
     }
