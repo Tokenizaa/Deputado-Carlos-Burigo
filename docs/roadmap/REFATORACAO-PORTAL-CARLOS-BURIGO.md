@@ -1345,8 +1345,8 @@ Depois registrar o SHA no checkpoint.
 
 | Fase | Estado | Commit | Observação |
 |---|---|---|---|
-| 0 — Baseline | PENDENTE | — | |
-| 1 — Auditoria | PENDENTE | — | |
+| 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
+| 1 — Auditoria | PENDENTE | — | Próxima rodada |
 | 2 — Design Tokens | PENDENTE | — | |
 | 3 — Acessibilidade | PENDENTE | — | |
 | 4 — Navegação | PENDENTE | — | |
@@ -1375,11 +1375,11 @@ Estados permitidos:
 
 # 24. Registro de bloqueadores
 
-Quando houver bloqueio, registrar:
-
 | Fase | Bloqueador | Evidência | Próxima ação |
 |---|---|---|---|
-| — | — | — | — |
+| 0 | PR #19 estava aberto antes da execução da Fase 0 | PR #19 documentava ADRs canônicos; foi integrado nesta fase | Resolvido: PR #19 merged |
+| 0 | Metadado `homepage` do repositório ainda aponta para Vercel | `get_repo` retorna `https://deputado-darlos-burigo.vercel.app` | Corrigir durante auditoria/SEO; não reintroduzir Vercel como runtime |
+| 0 | Existem branches históricas/paralelas no repositório | Listagem de branches mostra branches de consolidação, UX, Vercel e outras fases antigas | Não usar essas branches como fonte de verdade; trabalhar a partir de `main` |
 
 Não mascarar bloqueador como concluído.
 
@@ -1394,23 +1394,24 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Comunicação | Fale com o Gabinete é função central | Participação cidadã | CANÔNICA |
 | 2026-09-18 | Transparência | Classificar documentos antes da publicação | Evitar exposição indiscriminada | CANÔNICA |
 | 2026-09-18 | Execução | Integrar fases validadas em main | Evitar acúmulo de branches/PRs | CANÔNICA |
+| 2026-09-18 | Fase 0 | `main` é a única referência operacional da refatoração | Evitar continuidade em branches históricas divergentes | CANÔNICA |
+| 2026-09-18 | Fase 0 | PR #19 foi integrado antes do checkpoint da fase | O ADR documenta decisões arquiteturais que já estavam vigentes | CONCLUÍDA |
+| 2026-09-18 | Fase 0 | Referência Vercel no metadata do repositório é tratada como resíduo a corrigir | Cloudflare é o runtime canônico | PENDENTE |
 
 ---
 
 # 26. Estado atual e próximo passo
 
-**Estado inicial deste plano:**
+**Estado atual:**
 
 ```
-FASE 0 — PENDENTE
+FASE 0 — CONCLUÍDA
 FASE 1 — PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 0.1 → FASE 0.4**.
-
-Depois iniciar **FASE 1**, sem alterar a Home antes da auditoria.
+Executar **FASE 1 — Auditoria integral da interface**, sem alterar a Home antes de consolidar a matriz de auditoria.
 
 A primeira entrega técnica da refatoração deve ser a **matriz de auditoria da interface atual**.
 
