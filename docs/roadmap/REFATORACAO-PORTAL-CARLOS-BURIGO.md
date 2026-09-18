@@ -1414,8 +1414,7 @@ Depois registrar o SHA no checkpoint.
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
 | 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
 | 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
-| 13 — PWA | CONCLUÍDA |  | Manifest, service worker, cache conservador e fallback offline integrados |
-| 13 — PWA | CONCLUÍDA |  | Manifest, service worker, cache conservador e fallback offline integrados |
+| 13 — PWA | CONCLUÍDA | 4daea9c24ca12f3efb1f544c682a948a936a82c8 | Manifest, service worker, cache conservador e fallback offline integrados |
 | 14 — Acessibilidade final | PENDENTE | — | |
 | 15 — QA final | PENDENTE | — | |
 | 16 — Auditoria cidadão | PENDENTE | — | |
