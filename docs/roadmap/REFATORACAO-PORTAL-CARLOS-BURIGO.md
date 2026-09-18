@@ -1407,15 +1407,15 @@ Depois registrar o SHA no checkpoint.
 | 3 — Acessibilidade | CONCLUÍDA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Skip link, foco, barra de acessibilidade, tamanho de texto, alto contraste, página `/acessibilidade` e loading institucional registrados em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md` |
 | 4 — Navegação | CONCLUÍDA | b71e02d28a94664dcce3639ecc990ed0e5732c3a | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
 | 5 — Gabinete | CONCLUÍDA | 94e5723b6950c45f50ce6133c516ccf450a163e6 | Canal único Fale com o Gabinete, CTA desktop/mobile, fluxo cidadão existente e compatibilidade /cidadao |
-| 6 — Transparência | PENDENTE | — | |
-| 7 — Home V2 | PENDENTE | — | |
-| 8 — Trajetória | PENDENTE | — | |
-| 9 — Atuação | PENDENTE | — | |
+| 6 — Transparência | CONCLUÍDA | c0cdac0 | Transparência pública estruturada sem nova arquitetura |
+| 7 — Home V2 | CONCLUÍDA | 0a3a62831388131d178f507620eb644e225a66b0 | Home institucional canônica |
+| 8 — Trajetória | CONCLUÍDA |  | Linha do tempo pública estruturada |
+| 9 — Atuação | CONCLUÍDA | c462a923edae330775e76ea9493bcb8ad91c58fd | Atuação parlamentar e participações estruturadas |
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
 | 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
 | 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
 | 13 — PWA | CONCLUÍDA | 4daea9c24ca12f3efb1f544c682a948a936a82c8 | Manifest, service worker, cache conservador e fallback offline integrados |
-| 14 — Acessibilidade final | PENDENTE | — | |
+| 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE |  | Auditoria estrutural concluída; validação manual de browser/dispositivo permanece pendente |
 | 15 — QA final | PENDENTE | — | |
 | 16 — Auditoria cidadão | PENDENTE | — | |
 
@@ -1522,3 +1522,21 @@ Ao final, o produto deverá ser percebido como:
 **um portal institucional público, simples, legível, acessível e transparente, no qual o cidadão consegue conhecer a trajetória, acompanhar a atuação parlamentar, consultar informações públicas e falar com o gabinete sem fricção.**
 
 A sofisticação do produto deverá vir da **clareza da informação e da qualidade da experiência**, não da quantidade de componentes, efeitos ou complexidade técnica.
+
+## Registro da Fase 14 — 2026-09-18
+
+**Fase 14 — Auditoria final de acessibilidade: CONCLUÍDA PARCIALMENTE**
+
+- [x] auditoria estrutural do código;
+- [x] correção da ordem do skip link;
+- [x] âncora `menu-principal` no header;
+- [x] estado de carregamento anunciado por tecnologia assistiva;
+- [x] SEO atualizado em navegação SPA;
+- [x] reduced motion, foco, alvos de interação e redimensionamento revisados;
+- [x] auditoria registrada em `docs/audits/FASE-14-ACESSIBILIDADE-FINAL.md`;
+- [ ] leitor de tela real;
+- [ ] contraste instrumental;
+- [ ] zoom 200% em browser real;
+- [ ] teste físico em dispositivos.
+
+A fase não mascara validações que exigem browser/dispositivo real. A próxima etapa operacional é a Fase 15 — QA funcional e conteúdo, mantendo essas validações manuais explicitamente pendentes.

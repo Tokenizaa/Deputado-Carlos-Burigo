@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useApp } from '../../context/AppContext';
 
 const SITE_URL = 'https://www.carlosburigo.com.br';
 
@@ -42,6 +43,8 @@ const ensureLink = (rel: string, href: string) => {
 };
 
 export function SEO() {
+  const { currentView } = useApp();
+
   useEffect(() => {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const meta = ROUTE_META[path] || {
@@ -78,7 +81,7 @@ export function SEO() {
     } else if (existing) {
       existing.remove();
     }
-  }, []);
+  }, [currentView]);
 
   return null;
 }

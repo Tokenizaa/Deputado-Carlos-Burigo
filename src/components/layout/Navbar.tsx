@@ -79,7 +79,7 @@ export const Navbar: React.FC = () => {
             </span>
           </a>
 
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Navegação principal">
+          <nav id="menu-principal" className="hidden lg:flex items-center gap-1" aria-label="Navegação principal">
             <a href="/" onClick={(e) => { e.preventDefault(); navigate('home'); }} className={linkClass(currentView === 'home')}>Início</a>
             <a href="/trajetoria" onClick={(e) => { e.preventDefault(); navigate('trajetoria'); }} className={linkClass(currentView === 'trajetoria' || currentView === 'sobre')}>Trajetória</a>
             <a href="/atuacao" onClick={(e) => { e.preventDefault(); navigate('atuacao'); }} className={linkClass(['atuacao','projetos','votacoes'].includes(currentView))}>Atuação</a>

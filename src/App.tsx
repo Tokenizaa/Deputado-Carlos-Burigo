@@ -40,7 +40,7 @@ const MainAppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-stone-900">
         <div className="w-10 h-10 rounded-full border-4 border-stone-200 border-t-emerald-700 animate-spin" aria-hidden="true" />
-        <p className="mt-5 text-base font-semibold">Carregando o portal institucional...</p>
+        <p className="mt-5 text-base font-semibold" role="status" aria-live="polite">Carregando o portal institucional...</p>
       </div>
     );
   }
@@ -50,10 +50,10 @@ const MainAppContent: React.FC = () => {
   }
 
   if (dynamicSlug) {
-    return <div className="min-h-screen bg-white flex flex-col"><AccessibilityBar /><Navbar /><DynamicPageView slug={dynamicSlug} /><Footer /></div>;
+    return <div className="min-h-screen bg-white flex flex-col"><AccessibilityBar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><Navbar /><main id="conteudo-principal" tabIndex={-1} className="flex-1"><DynamicPageView slug={dynamicSlug} /><Footer /></div>;
   }
 
-  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><SEO /><AccessibilityBar /><Navbar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <HomeView />}{currentView === 'sobre' && <AboutView />}{currentView === 'trajetoria' && <TrajectoryView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}{currentView === 'acessibilidade' && <AccessibilityView />}{currentView === 'transparencia' && <TransparencyView />}</main><Footer /><CitizenProtocolModal />{currentView !== 'contato' && currentView !== 'cidadao' && (
+  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><SEO /><AccessibilityBar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><Navbar /><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <HomeView />}{currentView === 'sobre' && <AboutView />}{currentView === 'trajetoria' && <TrajectoryView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}{currentView === 'acessibilidade' && <AccessibilityView />}{currentView === 'transparencia' && <TransparencyView />}</main><Footer /><CitizenProtocolModal />{currentView !== 'contato' && currentView !== 'cidadao' && (
       <a
         href="/contato"
         onClick={(event) => { event.preventDefault(); setCurrentView('contato') }}
