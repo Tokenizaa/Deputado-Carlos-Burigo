@@ -22,6 +22,9 @@ export type LegislativeItemRow = {
   concluded_at?: string | null;
   source_url?: string | null;
   verification_status: string;
+  theme?: string | null;
+  detailed_description?: string | null;
+  impacts?: unknown;
 };
 
 type LegislativeEventRow = {
@@ -143,6 +146,9 @@ export function toPublicLegislativeItemDto(
     concludedAt: row.concluded_at ?? undefined,
     sourceUrl: row.source_url ?? undefined,
     verificationStatus: row.verification_status,
+    theme: row.theme ?? undefined,
+    detailedDescription: row.detailed_description ?? undefined,
+    impacts: Array.isArray(row.impacts) ? row.impacts.filter((impact): impact is string => typeof impact === 'string') : [],
     events: (relations.events ?? []).map(toPublicLegislativeEventDto),
     votes: (relations.votes ?? []).map((vote) => toPublicLegislativeVoteDto(vote, row)),
     roles: (relations.roles ?? []).map(toPublicLegislativeRoleDto),
