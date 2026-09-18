@@ -10,3 +10,4 @@ coverage/
 .dev.vars.*
 .playwright-mcp/
 dist-cf/
+.wrangler/
