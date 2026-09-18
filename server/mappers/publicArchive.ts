@@ -116,11 +116,13 @@ export function mapToPublicMediaDto(row: MediaRow): PublicMediaDto {
 /**
  * Map a video database row to PublicVideoDto
  */
+/**
+ * Map a video database row to PublicVideoDto
+ */
 function youtubeThumbnail(url: string): string | null {
-  const match = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|shorts\\/|embed\\/)|youtu\\.be\\/)([A-Za-z0-9_-]{6,})/);
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
   return match ? `https://i.ytimg.com/vi/${match[1]}/hqdefault.jpg` : null;
 }
-
 export function mapToPublicVideoDto(row: VideoRow): PublicVideoDto {
   return {
     id: row.id,

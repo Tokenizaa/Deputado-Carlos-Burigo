@@ -184,10 +184,10 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       <Users className="mt-0.5 h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
                       <div>
                         <p className="font-semibold">{role.role}</p>
-                        <p className="mt-1 text-sm text-stone-400">{role.legislativeCode} · {role.year}{role.legislativeTitle ? \` · \${role.legislativeTitle}\` : ''}</p>
+                        <p className="mt-1 text-sm text-stone-400">{role.legislativeCode} · {role.year}{role.legislativeTitle ? ` · ${role.legislativeTitle}` : ''}</p>
                       </div>
+                      {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, `Fonte oficial — ${role.legislativeCode}`)} className="min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
                     </div>
-                    {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, \`Fonte oficial — \${role.legislativeCode}\`)} className="min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
                   </article>
                 ))}
               </div>

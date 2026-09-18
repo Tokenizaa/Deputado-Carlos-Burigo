@@ -9,11 +9,10 @@ export const VideosSection: React.FC = () => {
   const mainVideo = videos.find((v) => v.featured) || videos[0];
   const otherVideos = videos.filter((v) => v.id !== mainVideo?.id);
 const getYouTubeId = (url: string) => {
-  const match = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|shorts\\/|embed\\/)|youtu\\.be\\/)([A-Za-z0-9_-]{6,})/);
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
   return match?.[1] || null;
 };
-
-const isShort = (video: VideoItem) => /youtube\\.com\\/shorts\\//i.test(video.url);
+const isShort = (video: VideoItem) => /youtube\.com\/shorts\//i.test(video.url);
 
 const videoTypeLabel = (video: VideoItem) => isShort(video) ? 'SHORT' : 'VÍDEO';
 

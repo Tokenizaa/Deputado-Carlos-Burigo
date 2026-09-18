@@ -46,24 +46,75 @@ const MainAppContent: React.FC = () => {
   }
 
   if (currentView === 'admin' || pathname === 'admin') {
-    return <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}><AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} /></AdminLayout>;
+    return (
+      <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
+        <AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} />
+      </AdminLayout>
+    );
   }
 
   if (dynamicSlug) {
-    return <div className="min-h-screen bg-white flex flex-col"><AccessibilityBar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><Navbar /><main id="conteudo-principal" tabIndex={-1} className="flex-1"><DynamicPageView slug={dynamicSlug} /><Footer /></div>;
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <AccessibilityBar />
+        <a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a>
+        <Navbar />
+        <main id="conteudo-principal" tabIndex={-1} className="flex-1">
+          <DynamicPageView slug={dynamicSlug} />
+          <Footer />
+        </main>
+      </div>
+    );
   }
 
-  return <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white"><SEO /><AccessibilityBar /><a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a><Navbar /><main id="conteudo-principal" tabIndex={-1} className="flex-1">{currentView === 'home' && <HomeView />}{currentView === 'sobre' && <AboutView />}{currentView === 'trajetoria' && <TrajectoryView />}{currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}{currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}{currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}{currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}{currentView === 'resultados' && <ResultsSection />}{currentView === 'noticias' && <NewsSection />}{currentView === 'noticia-detalhe' && <NewsDetail />}{currentView === 'agenda' && <AgendaSection />}{currentView === 'municipios' && <MunicipalitiesSection />}{currentView === 'videos' && <VideosSection />}{(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}{currentView === 'campanha' && <CampaignView />}{currentView === 'privacidade' && <PrivacyPolicyView />}{currentView === 'acessibilidade' && <AccessibilityView />}{currentView === 'transparencia' && <TransparencyView />}</main><Footer /><CitizenProtocolModal />{currentView !== 'contato' && currentView !== 'cidadao' && (
-      <a
-        href="/contato"
-        onClick={(event) => { event.preventDefault(); setCurrentView('contato') }}
-        className="lg:hidden fixed right-4 z-40 min-h-12 min-w-12 rounded-full bg-[#00863f] px-4 text-sm font-bold text-white shadow-lg border-2 border-white flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f] bottom-[calc(4.75rem+env(safe-area-inset-bottom))]"
-        aria-label="Fale com o Deputado"
-      >
-        Fale com o Deputado
-      </a>
-    )}</div>;
+  return (
+    <div className="min-h-screen bg-white flex flex-col selection:bg-[#00A550] selection:text-white">
+      <SEO />
+      <AccessibilityBar />
+      <a href="#conteudo-principal" className="skip-link">Pular para o conteúdo principal</a>
+      <Navbar />
+      <main id="conteudo-principal" tabIndex={-1} className="flex-1">
+        {currentView === 'home' && <HomeView />}
+        {currentView === 'sobre' && <AboutView />}
+        {currentView === 'trajetoria' && <TrajectoryView />}
+        {currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}
+        {currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}
+        {currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}
+        {currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}
+        {currentView === 'resultados' && <ResultsSection />}
+        {currentView === 'noticias' && <NewsSection />}
+        {currentView === 'noticia-detalhe' && <NewsDetail />}
+        {currentView === 'agenda' && <AgendaSection />}
+        {currentView === 'municipios' && <MunicipalitiesSection />}
+        {currentView === 'videos' && <VideosSection />}
+        {(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}
+        {currentView === 'campanha' && <CampaignView />}
+        {currentView === 'privacidade' && <PrivacyPolicyView />}
+        {currentView === 'acessibilidade' && <AccessibilityView />}
+        {currentView === 'transparencia' && <TransparencyView />}
+      </main>
+      <Footer />
+      {currentView !== 'contato' && currentView !== 'cidadao' && (
+        <a
+          href="/contato"
+          onClick={(event) => { event.preventDefault(); setCurrentView('contato') }}
+          className="lg:hidden fixed right-4 z-40 min-h-12 min-w-12 rounded-full bg-[#00863f] px-4 text-sm font-bold text-white shadow-lg border-2 border-white flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f] bottom-[calc(4.75rem+env(safe-area-inset-bottom))]"
+          aria-label="Fale com o Deputado"
+        >
+          Fale com o Deputado
+        </a>
+      )}
+    </div>
+  );
 };
 
-export function App() { return <AppUiProvider><AppProvider><MainAppContent /></AppProvider></AppUiProvider>; }
+export function App() {
+  return (
+    <AppUiProvider>
+      <AppProvider>
+        <MainAppContent />
+      </AppProvider>
+    </AppUiProvider>
+  );
+}
 export default App;
