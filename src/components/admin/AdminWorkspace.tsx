@@ -43,10 +43,10 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão'>, Array<{ id
 };
 
 export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, setActiveModule }) => {
-  const [subTab, setSubTab] = useState('projects');
+  const [subTab, setSubTab] = useState('results');
 
   useEffect(() => {
-    if (activeModule === 'atuação') setSubTab('projects');
+    if (activeModule === 'atuação') setSubTab('results');
     if (activeModule === 'conteúdo') setSubTab('pages');
     if (activeModule === 'acervo') setSubTab('videos');
     if (activeModule === 'administração') setSubTab('users');
