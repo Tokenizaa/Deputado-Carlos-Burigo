@@ -1169,6 +1169,141 @@ O resultado deve separar explicitamente:
 
 ---
 
+## 27. Auditoria real do Supabase — mapa de dados e segurança
+
+A auditoria foi executada diretamente no projeto Supabase de produção identificado como wktanxbpijurimdjgone, sem alteração de schema.
+
+### 27.1 Inventário atual
+
+Foram identificadas 24 tabelas públicas:
+
+```
+audit_logs / demand_history / demand_messages / demands / documents / events
+evidence / legislative_events / legislative_items / legislative_roles / legislative_votes
+media / municipalities / news / page_blocks / page_versions / pages
+parliamentary_participations / profiles / results / site_settings / user_roles / videos
+```
+
+Todas as tabelas listadas estão com RLS habilitado.
+
+### 27.2 Mapa funcional
+
+| Área | Entidades existentes | Decisão |
+|---|---|---|
+| Identidade/equipe | profiles, user_roles | REAPROVEITAR + adaptar permissões |
+| Atendimento | demands, demand_messages, demand_history | REAPROVEITAR |
+| Agenda | events | REAPROVEITAR + adaptar interface |
+| Conteúdo editorial | news, results | REAPROVEITAR + adaptar workflow |
+| Páginas/CMS | pages, page_blocks, page_versions | REAPROVEITAR como infraestrutura |
+| Mídia | media, videos | REAPROVEITAR |
+| Documentos | documents, evidence | REAPROVEITAR + organizar por finalidade |
+| Mandato | legislative_items, legislative_events, legislative_votes, legislative_roles, parliamentary_participations | REAPROVEITAR + criar camada operacional |
+| Municípios | municipalities | REAPROVEITAR + relacionar com operações futuras |
+| Auditoria | audit_logs | REAPROVEITAR |
+| Configuração | site_settings | ADAPTAR e separar conceito de configuração institucional |
+| Tarefas | nenhuma entidade dedicada encontrada | CRIAR somente após definir o modelo mínimo |
+
+### 27.3 Atendimento já possui o núcleo necessário
+
+A tabela demands já possui protocolo, token de acompanhamento, dados do cidadão, município, categoria, assunto, descrição, anexos, responsável, prioridade, status e timestamps. Existem também mensagens e histórico.
+
+Conclusão: **não criar um novo CRM para o gabinete**. O Atendimento deve evoluir sobre essa estrutura.
+
+### 27.4 Agenda já possui entidade própria
+
+events possui título, descrição, início/fim, local, município, mídia, link, participantes, visibilidade, status e criador.
+
+Isso é suficiente para iniciar a reorganização da Agenda sem criar outra tabela de compromissos.
+
+### 27.5 Mandato já possui base documental e verificável
+
+```
+legislative_items
+ ├── legislative_events
+ ├── legislative_votes
+ ├── legislative_roles
+ ├── documents
+ └── parliamentary_participations
+```
+
+Várias entidades possuem source_url e verification_status.
+
+Conclusão: **não criar uma segunda base legislativa para o dashboard**.
+
+### 27.6 CMS atual pode ser mantido como infraestrutura
+
+A estrutura pages → page_blocks → page_versions já suporta páginas, blocos e versionamento.
+
+O redesign deve alterar principalmente a experiência de gestão, não substituir o mecanismo de páginas.
+
+### 27.7 Equipe e permissões
+
+A base atual possui profiles e user_roles, com os papéis ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO e VISUALIZADOR.
+
+Isso é melhor do que codificar cargos específicos do gabinete, mas ainda é um modelo simples de papel único por usuário. A evolução futura deve avaliar permissões por área antes de introduzir uma matriz mais granular.
+
+### 27.8 Segurança — ponto crítico encontrado
+
+A auditoria das políticas RLS encontrou uma política demands_public_select aplicada a anon com condição USING (true).
+
+Isso significa que a tabela demands, que contém nome, e-mail, telefone, município, assunto e descrição do cidadão, está configurada para permitir SELECT anônimo no nível do banco.
+
+Isso é incompatível com o princípio de privacidade esperado para o Atendimento.
+
+**Classificação: BLOQUEADOR DE SEGURANÇA.**
+
+A correção deve ser tratada separadamente do redesign do dashboard e deve preservar o fluxo público de criação e consulta por protocolo/token sem expor a coleção inteira de demandas.
+
+Não alterar a política diretamente nesta etapa de auditoria.
+
+### 27.9 Funções de autorização
+
+As políticas administrativas usam private.is_staff() e private.has_role(role). Ambas são SECURITY DEFINER, estão no schema private, possuem search_path explícito e consultam auth.uid() contra user_roles.
+
+A implementação atual é coerente com a necessidade de consultar autorização sob RLS, mas deve permanecer sob revisão de segurança antes de ampliar o modelo de permissões.
+
+### 27.10 Advisor de segurança
+
+O Security Advisor atual retornou um único alerta: **Leaked Password Protection Disabled**. Esse alerta é independente do redesign do Gabinete OS e deve ser tratado na trilha de segurança/Auth.
+
+### 27.11 Resultado final da classificação
+
+```
+REAPROVEITAR
+├── Atendimento
+├── Agenda
+├── CMS/Page Builder
+├── Notícias
+├── Mídia
+├── Documentos
+├── Mandato
+├── Municípios
+├── Auditoria
+└── Equipe
+
+ADAPTAR
+├── Configurações
+├── Workflow editorial
+├── Permissões
+└── experiência do CMS
+
+CRIAR
+└── Tarefas (modelo mínimo ainda não definido)
+
+BLOQUEADOR
+└── RLS de leitura pública da tabela demands
+```
+
+### 27.12 Regra para a próxima fase
+
+A partir desta auditoria, **não há justificativa para criar uma nova arquitetura de dados do dashboard**. A implementação futura deve trabalhar sobre as entidades existentes e criar somente as lacunas comprovadas.
+
+A próxima etapa de produto passa a ser a definição do **Mapa Operacional do Gabinete**.
+
+Antes disso, o bloqueador de RLS de demands deve ser encaminhado para correção de segurança, independentemente do redesign visual.
+
+---
+
 ## 19. Evolução deste documento
 
 Este documento é o ponto de partida.
