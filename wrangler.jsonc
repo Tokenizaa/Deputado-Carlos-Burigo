@@ -4,8 +4,10 @@
   "main": "./src/worker.ts",
   "compatibility_date": "2026-09-16",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "global_navigator"
   ],
+  "workers_dev": true,
   "assets": {
     "not_found_handling": "single-page-application",
     "run_worker_first": [
@@ -20,5 +22,8 @@
   "vars": {
     "SUPABASE_URL": "https://wktanxbpijurimdjgone.supabase.co",
     "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrdGFueGJwaWp1cmltZGpnb25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDU1NzgsImV4cCI6MjEwNTA4MTU3OH0.QtH4ww22HfLuskuoKCTHcCAth9jKI6p6nDR_LiKe80M"
+  },
+  "observability": {
+    "enabled": true
   }
 }

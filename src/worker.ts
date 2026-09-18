@@ -71,9 +71,33 @@ async function requireAuth(request: Request): Promise<{ userId: string } | Respo
   return { userId };
 }
 
-// Helper to create method-not-allowed response
-function methodNotAllowed(): Response {
-  return Response.json({ error: 'Method Not Allowed' }, { status: 405 });
+// Helper to add security headers
+function addSecurityHeaders(response: Response, isHtml = false): Response {
+  const newHeaders = new Headers(response.headers);
+  newHeaders.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://wktanxbpijurimdjgone.supabase.co https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  newHeaders.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  newHeaders.set('X-Frame-Options', 'DENY');
+  newHeaders.set('X-Content-Type-Options', 'nosniff');
+  newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  newHeaders.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  // Prevent Cloudflare edge caching for HTML (SPA) responses
+  if (isHtml) {
+    newHeaders.set('Cache-Control', 'private, max-age=0, must-revalidate');
+  }
+  const newResponse = new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders,
+  });
+  // Control Cloudflare edge caching via cf property
+  if (isHtml) {
+    (newResponse as any).cf = {
+      cacheTtl: 0,
+      cacheEverything: false,
+      cacheKeys: ['host'],
+    };
+  }
+  return newResponse;
 }
 
 // Helper to extract path parameters
@@ -706,6 +730,9 @@ export default {
 
     const url = new URL(request.url);
     
+    let response: Response;
+    let isHtml = false;
+    
     if (url.pathname.startsWith('/api/')) {
       // Look for exact match first
       let handler = routeHandlers[url.pathname];
@@ -724,17 +751,25 @@ export default {
         }
       }
       
-      if (!handler) return Response.json({ error: 'Not Found' }, { status: 404 });
-      
-      // Inject params into request for handlers that need them
-      const enhancedRequest = request as any;
-      enhancedRequest.params = params;
-      
-      return handler(enhancedRequest);
+      if (!handler) {
+        response = Response.json({ error: 'Not Found' }, { status: 404 });
+      } else {
+        // Inject params into request for handlers that need them
+        const enhancedRequest = request as any;
+        enhancedRequest.params = params;
+        
+        response = await handler(enhancedRequest);
+      }
+    } else {
+      // Non-API requests: serve static assets. `assets.not_found_handling:
+      // single-page-application` handles SPA client routes before reaching here.
+      response = await env.ASSETS.fetch(request);
+      // Detect HTML responses (SPA entry point)
+      const contentType = response.headers.get('content-type') || '';
+      isHtml = contentType.includes('text/html');
     }
     
-    // Non-API requests: serve static assets. `assets.not_found_handling:
-    // single-page-application` handles SPA client routes before reaching here.
-    return env.ASSETS.fetch(request);
+    // Apply security headers to all responses
+    return addSecurityHeaders(response, isHtml);
   },
 };
