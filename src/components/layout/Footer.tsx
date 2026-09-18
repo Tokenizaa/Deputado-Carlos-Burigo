@@ -145,6 +145,13 @@ export const Footer: React.FC = () => {
 
           <div className="flex items-center gap-4">
             <button
+              onClick={() => setCurrentView('acessibilidade')}
+              className="hover:text-stone-300 transition-colors"
+            >
+              Acessibilidade
+            </button>
+            <span>•</span>
+            <button
               onClick={() => setCurrentView('privacidade')}
               className="hover:text-stone-300 transition-colors"
             >
