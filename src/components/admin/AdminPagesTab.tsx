@@ -196,7 +196,29 @@ export const AdminPagesTab: React.FC = () => {
 
       {showHistory && selectedPage && <div className="modal"><div className="modal-card max-w-2xl"><h3 className="text-lg font-black">Histórico da página</h3><div className="space-y-2 mt-4 max-h-[50vh] overflow-y-auto">{(selectedPage.versions || []).map((version) => <div key={version.id} className="border border-stone-200 rounded-xl p-3 flex items-center justify-between gap-3"><div><div className="font-bold text-sm">Versão #{version.versionNumber}</div><div className="text-[10px] text-stone-500">{new Date(version.savedAt).toLocaleString('pt-BR')}</div></div><button onClick={() => restore(version.id)} className="action">Restaurar</button></div>)}{!selectedPage.versions?.length && <div className="text-sm text-stone-500">Nenhuma versão registrada.</div>}</div><button onClick={() => setShowHistory(false)} className="action mt-4">Fechar</button></div></div>}
 
-      {editingBlock && selectedPage && <BlockEditorForm block={editingBlock} pageId={selectedPage.id} totalBlocksCount={draftBlocks.length} onCancel={() => setEditingBlock(null)} onSave={async (updatedBlock) => { setDraftBlocks((prev) => prev.map((item) => item.id === updatedBlock.id ? updatedBlock : item)); setEditingBlock(null); showToast('Bloco atualizado no rascunho. Use Salvar ou Publicar para persistir.', 'success'); return { success: true }; }} />}
+      {editingBlock && selectedPage && <BlockEditorForm block={editingBlock} pageId={selectedPage.id} totalBlocksCount={draftBlocks.length} onCancel={() => setEditingBlock(null)} onSave={async (updatedBlock, commitToBackend = false) => {
+        const nextBlocks = draftBlocks.map((item) => item.id === updatedBlock.id ? updatedBlock : item);
+        setDraftBlocks(nextBlocks);
+        if (!commitToBackend) {
+          setEditingBlock(null);
+          showToast('Bloco atualizado no rascunho. Use Salvar ou Publicar para persistir.', 'success');
+          return { success: true };
+        }
+        const result = await updatePage(selectedPage.id, {
+          title: metadata.title,
+          slug: metadata.slug,
+          description: metadata.description,
+          status: metadata.status,
+          publish: metadata.status === 'publicado',
+          blocks: nextBlocks,
+          note: `Bloco atualizado por ${currentUser.name}`,
+        });
+        if (result.success) {
+          setDraftBlocks([...(result.data?.blocks || nextBlocks)].sort((a, b) => a.order - b.order));
+          setEditingBlock(null);
+        }
+        return result;
+      }} />}
 
       <style>{`.label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:#57534e;margin-bottom:4px}.field{width:100%;border:1px solid #e7e5e4;border-radius:12px;padding:9px 10px;font-size:12px;outline:none;background:#fff}.field:focus{border-color:#00A550}.action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #d6d3d1;background:#fff;color:#44403c;border-radius:10px;padding:8px 11px;font-size:11px;font-weight:800}.action:hover{background:#fafaf9}.action:disabled{opacity:.5}.action-primary{background:#00A550;border-color:#00A550;color:#fff}.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #e7e5e4;border-radius:8px;background:#fff;color:#57534e}.icon-btn:disabled{opacity:.35}.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}.modal-card{width:100%;max-width:520px;background:#fff;border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow:auto}`}</style>
     </div>
