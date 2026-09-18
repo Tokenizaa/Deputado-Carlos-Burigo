@@ -1347,7 +1347,7 @@ Depois registrar o SHA no checkpoint.
 |---|---|---|---|
 | 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
 | 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
-| 2 — Design Tokens | PENDENTE | — | |
+| 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
 | 3 — Acessibilidade | PENDENTE | — | |
 | 4 — Navegação | PENDENTE | — | |
 | 5 — Gabinete | PENDENTE | — | |
@@ -1399,6 +1399,9 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Fase 0 | Referência Vercel no metadata do repositório é tratada como resíduo a corrigir | Cloudflare é o runtime canônico | PENDENTE |
 | 2026-09-18 | Fase 1 | Auditoria deve ser audit-only antes da reconstrução visual | Evitar alterar a Home com diagnóstico incompleto | CONCLUÍDA |
 | 2026-09-18 | Fase 1 | Base atual é aproveitável; priorizar shell, tokens e acessibilidade antes da Home | Evitar segunda arquitetura e retrabalho | CONCLUÍDA |
+| 2026-09-18 | Fase 2 | Design system usa tokens semânticos com aliases de compatibilidade | Evitar migração destrutiva e segunda arquitetura de estilos | CONCLUÍDA |
+| 2026-09-18 | Fase 2 | Marca verde principal para texto/ação foi ajustada para garantir contraste mínimo; amarelo e vermelho permanecem acentos visuais | Separar identidade de cor de requisitos de legibilidade | CONCLUÍDA |
+| 2026-09-18 | Fase 2 | Glassmorphism foi neutralizado, não substituído por outro padrão complexo | Brand Book proíbe glass e prioriza simplicidade | CONCLUÍDA |
 
 ---
 
@@ -1409,14 +1412,15 @@ Não mascarar bloqueador como concluído.
 ```
 FASE 0 — CONCLUÍDA
 FASE 1 — CONCLUÍDA
-FASE 2 — PENDENTE
+FASE 2 — CONCLUÍDA
+FASE 3 — PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 2 — Sistema visual e Design Tokens**.
+Executar **FASE 3 — Acessibilidade estrutural**.
 
-A Fase 1 foi concluída sem alterações de Home. A matriz integral está registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md`.
+A Fase 2 foi concluída com o sistema visual base registrado em `docs/design/DESIGN-TOKENS-V2.md`. A Home não foi reconstruída nesta fase.
 
 ---
 
