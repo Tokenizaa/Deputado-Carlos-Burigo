@@ -1415,8 +1415,8 @@ Depois registrar o SHA no checkpoint.
 | 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
 | 12 — SEO | CONCLUÍDA | c01de41e786d19681679b15449dbb48f3311c82e | Metadata, canonical, OG/Twitter, sitemap, robots e JSON-LD mínimo |
 | 13 — PWA | CONCLUÍDA | 4daea9c24ca12f3efb1f544c682a948a936a82c8 | Manifest, service worker, cache conservador e fallback offline integrados |
-| 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE |  | Auditoria estrutural concluída; validação manual de browser/dispositivo permanece pendente |
-| 15 — QA final | PENDENTE | — | |
+| 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE | ed1cc372b550359176f03c9aaa880483eea52f6b | Auditoria estrutural concluída; validação manual de browser/dispositivo permanece pendente |
+| 15 — QA final | CONCLUÍDA PARCIALMENTE | 82114b3c738510c7a924a04f6e69aaa030ffd590 | QA de dados e rotas realizado; proteção de endpoints administrativos corrigida em `f87e958923147b7b67231b05d9aeced2b9a3acdf`; build/browser/E2E permanecem pendentes |
 | 16 — Auditoria cidadão | PENDENTE | — | |
 
 Estados permitidos:
@@ -1486,9 +1486,16 @@ FASE 13 — CONCLUÍDA
 
 ### Próxima ação obrigatória
 
-A próxima etapa oficial é a **FASE 14 — Auditoria final de acessibilidade**.
+A próxima etapa oficial é **concluir a FASE 15 — QA funcional e conteúdo**.
 
-A Fase 13 foi concluída com manifest, ícones, service worker, estratégia conservadora de cache e fallback offline. A implementação permanece no mesmo portal e não cria uma segunda aplicação. A próxima etapa é a auditoria final de acessibilidade da Fase 14.
+A auditoria já corrigiu uma exposição indevida de endpoints administrativos e validou os dados públicos no Supabase. Permanecem pendentes somente as validações que exigem execução real:
+
+- `npm run build` no estado atual;
+- jornada E2E em navegador;
+- envio real do formulário de contato;
+- abertura real de documentos públicos.
+
+Não avançar para a Fase 16 até esses testes serem executados e registrados.
 
 ---
 
@@ -1522,6 +1529,29 @@ Ao final, o produto deverá ser percebido como:
 **um portal institucional público, simples, legível, acessível e transparente, no qual o cidadão consegue conhecer a trajetória, acompanhar a atuação parlamentar, consultar informações públicas e falar com o gabinete sem fricção.**
 
 A sofisticação do produto deverá vir da **clareza da informação e da qualidade da experiência**, não da quantidade de componentes, efeitos ou complexidade técnica.
+
+## Registro da Fase 15 — 2026-09-18
+
+**Fase 15 — QA funcional e conteúdo: CONCLUÍDA PARCIALMENTE**
+
+- [x] auditoria dos dados públicos no Supabase;
+- [x] auditoria estrutural das rotas públicas;
+- [x] revisão dos estados funcionais existentes;
+- [x] identificação de endpoints administrativos sem proteção;
+- [x] proteção de `/api/auth/me`, `/api/auth/switch-user`, `/api/demands`, `/api/demands/:id` e `/api/audit-logs`;
+- [x] auditoria registrada em `docs/audits/FASE-15-QA-FUNCIONAL-CONTEUDO.md`;
+- [ ] build oficial no commit final;
+- [ ] E2E em navegador;
+- [ ] envio real de manifestação;
+- [ ] abertura real de documentos públicos.
+
+**Checkpoint documental:** `82114b3c738510c7a924a04f6e69aaa030ffd590`
+
+**Checkpoint de correção funcional:** `f87e958923147b7b67231b05d9aeced2b9a3acdf`
+
+A fase permanece parcial até as validações reais serem executadas.
+
+---
 
 ## Registro da Fase 14 — 2026-09-18
 
