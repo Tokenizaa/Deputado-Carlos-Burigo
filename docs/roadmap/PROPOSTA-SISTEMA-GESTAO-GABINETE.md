@@ -627,6 +627,157 @@ O levantamento deve produzir uma matriz:
 
 O objetivo é descobrir **endpoints, arquivos, formatos, autenticação, limites e periodicidade reais**, e não apenas afirmar que "existe uma API".
 
+
+---
+
+## 21. Resultado adicional da investigação — maturidade das APIs legislativas
+
+Foi localizada uma pesquisa acadêmica comparativa sobre transparência programática das Assembleias Legislativas estaduais, publicada como preprint SciELO e baseada em coleta realizada em março/abril de 2025.
+
+Para o **Rio Grande do Sul**, o levantamento classifica a ALRS como:
+
+- portal de transparência: **sim**;
+- portal próprio de dados abertos: **não identificado**;
+- API de dados legislativos documentada: **não identificada**;
+- observação: possibilidade de integração por fontes estaduais.
+
+A pesquisa deve ser tratada como **evidência secundária**, pois não é documentação oficial da ALRS e a coleta é de 2025. Ela, entretanto, é consistente com a investigação atual: não foi localizada documentação pública oficial da ALRS que apresente Swagger, catálogo de endpoints ou API legislativa pública para proposições, votações ou comissões.
+
+Fonte secundária: *Democracia em Formato JSON: As Assembleias Legislativas Estaduais do Portal ao Endpoint*, SciELO Preprints. A própria pesquisa informa que a coleta comparativa ocorreu em março/abril de 2025.
+
+### Consequência prática
+
+Até que uma fonte técnica oficial seja encontrada, o módulo **Mandato** deve tratar os dados legislativos da ALRS como:
+
+**Consulta externa / referência institucional — não como integração API confirmada.**
+
+Isso significa:
+
+- não criar sincronizador contra HTML;
+- não fazer scraping como fundamento do produto;
+- não presumir endpoint REST;
+- não armazenar uma cópia integral das proposições sem necessidade;
+- manter URL/identificador da matéria quando disponível;
+- permitir que a equipe registre status, responsável, tarefa e notas internas;
+- deixar a porta aberta para integração futura caso a ALRS disponibilize API ou arquivo estruturado oficial.
+
+### Exceção importante: dados estaduais
+
+O cenário é diferente para dados publicados pelo **Portal da Transparência RS**.
+
+O portal afirma oficialmente que seu painel de Dados Abertos disponibiliza os dados utilizados pelos próprios painéis em arquivos CSV, com layouts correspondentes, e licença aberta de reutilização. citehttps://www.transparencia.rs.gov.br/dados-abertos/dados-transparencia-rs/dados/
+
+Portanto, para o Gabinete OS:
+
+**Dados abertos estaduais = candidato real a integração automática.**
+
+**Sistemas legislativos internos da ALRS = integração ainda não confirmada.**
+
+---
+
+## 22. Matriz de integração — versão 1
+
+Com a evidência disponível até agora:
+
+| Recurso | Fonte | Estado atual | Estratégia do Gabinete OS |
+|---|---|---|---|
+| Proposições | ALRS | API pública não confirmada | referência + link + gestão interna |
+| Comissões | ALRS | API pública não confirmada | referência + link + gestão interna |
+| Votações | ALRS | API pública não confirmada | referência + link + gestão interna |
+| Atuação parlamentar pública | ALRS | consulta pública disponível | referência externa até confirmação técnica |
+| Emendas estaduais | Transparência RS | dados abertos oficiais | **priorizar integração automática** |
+| Execução de emendas | Transparência RS / FPE-CAGE | dados abertos + atualização diária do painel | **priorizar integração automática** |
+| Despesas estaduais relevantes | Transparência RS / FPE-CAGE | dados abertos | avaliar integração por caso de uso |
+| Contratos/fornecedores relevantes | Transparência RS | dados abertos/painéis | avaliar integração por caso de uso |
+| SEI | ALRS | operação institucional | link/referência/status |
+| E-PRO | ALRS | operação institucional | link/referência/status |
+| Cotas | ALRS | operação institucional | link/referência/status |
+| Diárias | ALRS | operação institucional | link/referência/status |
+| Ouvidoria/manifestação ALRS | ALRS | canal institucional próprio | não substituir; registrar referência quando necessário |
+
+### Regra
+
+Nenhum item deve entrar como "integração automática" no produto apenas porque existe uma página pública.
+
+Para ser classificado como integração automática, precisamos confirmar:
+
+1. endpoint ou arquivo oficial;
+2. formato;
+3. método de acesso;
+4. estabilidade/endereço;
+5. periodicidade;
+6. regras de uso;
+7. identificador confiável;
+8. possibilidade de execução técnica sem autenticação institucional indevida.
+
+---
+
+## 23. Nova prioridade técnica
+
+A investigação agora deve seguir **duas trilhas paralelas**, mas sem iniciar implementação:
+
+### Trilha A — Estado / Transparência RS
+
+Descobrir os arquivos reais de:
+
+- Emendas Parlamentares Estaduais;
+- execução das emendas;
+- despesas relevantes;
+- contratos relevantes;
+- eventualmente convênios e transferências.
+
+Objetivo: obter URL real dos arquivos, nomes, layouts, colunas, tamanho, periodicidade e estratégia de ingestão.
+
+### Trilha B — ALRS
+
+Continuar procurando somente fontes oficiais e documentação técnica para:
+
+- proposições;
+- comissões;
+- votações;
+- presença;
+- agenda legislativa;
+- resultados.
+
+Se não houver API/arquivo oficial, o resultado correto da investigação será **"não confirmado / consulta externa"**, e não uma solução de scraping.
+
+---
+
+## 24. Decisão provisória de arquitetura
+
+A arquitetura de integração do Gabinete OS fica provisoriamente definida assim:
+
+```
+                     FONTES EXTERNAS
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+       Dados estruturados             Consulta externa
+       e reutilizáveis                / sistema oficial
+             │                             │
+             ▼                             ▼
+      Sincronização                 Referência + link
+             │                      + status/tarefa
+             └──────────────┬──────────────┘
+                            ▼
+                    GABINETE OS
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+      Atendimento        Mandato           Tarefas
+      Agenda             Conteúdo          Equipe
+          │                 │                 │
+          └─────────────────┴─────────────────┘
+                            │
+                            ▼
+                    PORTAL PÚBLICO
+```
+
+**A integração deve ser orientada por caso de uso, não por desejo de centralizar todos os sistemas.**
+
+O objetivo é eliminar o trabalho manual desnecessário do gabinete, sem criar dependência de integrações não documentadas ou frágeis.
+
+
 ---
 
 ## 19. Evolução deste documento
