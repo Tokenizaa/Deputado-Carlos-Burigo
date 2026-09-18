@@ -40,7 +40,7 @@ const groups = [
 ];
 
 export const TransparencyView: React.FC = () => (
-  <main id="conteudo-principal" tabIndex={-1} className="flex-1 bg-white">
+  <div className="flex-1 bg-white">
     <section className="border-b border-stone-200 bg-stone-50">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-sm font-semibold text-emerald-700">Transparência</p>
@@ -125,5 +125,5 @@ export const TransparencyView: React.FC = () => (
         <p>Quando uma fonte oficial externa for necessária para comprovação, o portal deve preservar o vínculo com a fonte original em vez de substituir a evidência por texto editorial.</p>
       </div>
     </section>
-  </main>
+  </div>
 );
