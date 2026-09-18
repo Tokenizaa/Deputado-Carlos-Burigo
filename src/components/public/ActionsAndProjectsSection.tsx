@@ -207,20 +207,31 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                   const item = itemById.get(document.legislativeItemId);
                   const url = document.publicUrl || document.originalUrl;
                   return (
-                    <div key={document.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="min-w-0">
+                    <article key={document.id} className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+                      <div className="min-w-0 space-y-3">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-bold bg-stone-800 px-2 py-0.5 rounded">{document.documentType || 'DOCUMENTO'}</span>
+                          <span className="font-bold bg-stone-800 px-2 py-0.5 rounded">LEGISLATIVO</span>
+                          <span className="font-semibold text-[#00A550]">{document.documentType || 'DOCUMENTO'}</span>
                           {item?.code && <span className="font-mono text-stone-400">{item.code}</span>}
                           <span className="text-stone-500">{document.verificationStatus.replace(/_/g, ' ')}</span>
                         </div>
-                        <p className="font-semibold mt-1">{document.title}</p>
-                        <p className="text-xs text-stone-500 mt-1">{item?.title || 'Documento legislativo do acervo'}</p>
+                        <p className="font-semibold text-white">{document.title}</p>
+                        <dl className="grid gap-2 sm:grid-cols-2 text-xs">
+                          <div><dt className="font-semibold text-stone-300">Contexto</dt><dd className="text-stone-500">{item?.title || 'Documento legislativo do acervo'}</dd></div>
+                          <div><dt className="font-semibold text-stone-300">Origem</dt><dd className="text-stone-500">{document.sourceName || 'Fonte não informada no registro'}</dd></div>
+                          <div><dt className="font-semibold text-stone-300">Data</dt><dd className="text-stone-500">{document.downloadedAt || document.createdAt}</dd></div>
+                          <div><dt className="font-semibold text-stone-300">Direitos</dt><dd className="text-stone-500">{document.rightsStatus.replace(/_/g, ' ')}</dd></div>
+                        </dl>
                       </div>
-                      {url && <button type="button" onClick={() => openDocument(url, document.title)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1 shrink-0">
-                        <FileText className="w-3.5 h-3.5" /> Ler documento <ExternalLink className="w-3 h-3" />
-                      </button>}
-                    </div>
+                      {url && <div className="flex flex-wrap gap-3 shrink-0">
+                        <button type="button" onClick={() => openDocument(url, document.title)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
+                          <FileText className="w-3.5 h-3.5" /> Visualizar <ExternalLink className="w-3 h-3" />
+                        </button>
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="min-h-11 border border-stone-700 px-3 inline-flex items-center text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-500">
+                          Baixar arquivo
+                        </a>
+                      </div>}
+                    </article>
                   );
                 })}
               </div>
