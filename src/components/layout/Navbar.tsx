@@ -125,14 +125,11 @@ export const Navbar: React.FC = () => {
             </a>
           </nav>
 
-          <div className="hidden md:flex lg:hidden items-center gap-2">
+          <div className="hidden md:flex lg:hidden items-center">
             <a href="/contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
               <PhoneCall className="h-4 w-4" aria-hidden="true" />
               Fale com o Gabinete
             </a>
-            <button type="button" className="min-h-11 min-w-11 rounded-md border border-stone-200 flex items-center justify-center" aria-label="Navegação disponível na barra inferior">
-              <Menu className="h-5 w-5" aria-hidden="true" />
-            </button>
           </div>
 
           <div className="flex lg:hidden items-center gap-2 md:hidden">
