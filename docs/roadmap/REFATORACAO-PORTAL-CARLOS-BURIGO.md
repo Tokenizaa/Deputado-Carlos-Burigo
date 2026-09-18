@@ -1346,7 +1346,7 @@ Depois registrar o SHA no checkpoint.
 | Fase | Estado | Commit | Observação |
 |---|---|---|---|
 | 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
-| 1 — Auditoria | PENDENTE | — | Próxima rodada |
+| 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
 | 2 — Design Tokens | PENDENTE | — | |
 | 3 — Acessibilidade | PENDENTE | — | |
 | 4 — Navegação | PENDENTE | — | |
@@ -1397,6 +1397,8 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Fase 0 | `main` é a única referência operacional da refatoração | Evitar continuidade em branches históricas divergentes | CANÔNICA |
 | 2026-09-18 | Fase 0 | PR #19 foi integrado antes do checkpoint da fase | O ADR documenta decisões arquiteturais que já estavam vigentes | CONCLUÍDA |
 | 2026-09-18 | Fase 0 | Referência Vercel no metadata do repositório é tratada como resíduo a corrigir | Cloudflare é o runtime canônico | PENDENTE |
+| 2026-09-18 | Fase 1 | Auditoria deve ser audit-only antes da reconstrução visual | Evitar alterar a Home com diagnóstico incompleto | CONCLUÍDA |
+| 2026-09-18 | Fase 1 | Base atual é aproveitável; priorizar shell, tokens e acessibilidade antes da Home | Evitar segunda arquitetura e retrabalho | CONCLUÍDA |
 
 ---
 
@@ -1406,14 +1408,15 @@ Não mascarar bloqueador como concluído.
 
 ```
 FASE 0 — CONCLUÍDA
-FASE 1 — PENDENTE
+FASE 1 — CONCLUÍDA
+FASE 2 — PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-Executar **FASE 1 — Auditoria integral da interface**, sem alterar a Home antes de consolidar a matriz de auditoria.
+Executar **FASE 2 — Sistema visual e Design Tokens**.
 
-A primeira entrega técnica da refatoração deve ser a **matriz de auditoria da interface atual**.
+A Fase 1 foi concluída sem alterações de Home. A matriz integral está registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md`.
 
 ---
 
