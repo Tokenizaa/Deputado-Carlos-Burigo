@@ -836,6 +836,8 @@ A Home deve responder às perguntas institucionais principais sem obrigar o cida
 
 # 12. FASE 8 — Trajetória
 
+**Status:** CONCLUÍDA — checkpoint `315df6ad894f8087aceb611725fe4a6fe6dc789b`
+
 **Objetivo:** tornar o histórico público consultável.
 
 ## 8.1 Estrutura
@@ -873,6 +875,17 @@ Não transformar biografia em slogans.
 ### Critério
 
 O cidadão consegue compreender a trajetória sem depender de notícias dispersas.
+
+### Execução
+
+- [x] página canônica `/trajetoria`;
+- [x] timeline cronológica;
+- [x] períodos, cargos e contextos documentados;
+- [x] fonte indicada em cada etapa;
+- [x] integração no App sem segunda arquitetura;
+- [x] auditoria registrada em `docs/audits/FASE-8-TRAJETORIA.md`.
+
+**Checkpoint da implementação:** `315df6ad894f8087aceb611725fe4a6fe6dc789b`
 
 ---
 
