@@ -989,6 +989,16 @@ Quando necessário:
 
 Nenhum resultado/pauta factual sem base verificável.
 
+### Execução
+
+- [x] auditoria factual aplicada à apresentação dos resultados;
+- [x] vínculo resultado → proposição publicada;
+- [x] base legislativa visível;
+- [x] fonte oficial visível quando disponível;
+- [x] filtros simples por categoria e município;
+- [x] sem nova tabela/API/arquitetura;
+- [x] auditoria registrada em `docs/audits/FASE-10-RESULTADOS-PAUTAS.md`.
+
 ---
 
 # 15. FASE 11 — Documentos e acervo
@@ -1381,7 +1391,7 @@ Depois registrar o SHA no checkpoint.
 | 7 — Home V2 | PENDENTE | — | |
 | 8 — Trajetória | PENDENTE | — | |
 | 9 — Atuação | PENDENTE | — | |
-| 10 — Resultados/Pautas | PENDENTE | — | |
+| 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
 | 11 — Documentos | PENDENTE | — | |
 | 12 — SEO | PENDENTE | — | |
 | 13 — PWA | PENDENTE | — | |
@@ -1445,11 +1455,15 @@ FASE 3 — CONCLUÍDA
 FASE 4 — CONCLUÍDA
 FASE 5 — CONCLUÍDA
 FASE 6 — CONCLUÍDA
+FASE 7 — CONCLUÍDA
+FASE 8 — CONCLUÍDA
+FASE 9 — CONCLUÍDA
+FASE 10 — CONCLUÍDA
 ```
 
 ### Próxima ação obrigatória
 
-FASE 6 foi executada no `main`. A próxima etapa oficial é a **FASE 7 — Reconstrução da Home V2**.
+A próxima etapa oficial é a **FASE 11 — Documentos e acervo**.
 
 A Fase 5 foi concluída com o canal Fale com o Gabinete consolidado e o fluxo cidadão existente promovido a experiência canônica. A Home não foi reconstruída nesta fase. A auditoria final de acessibilidade permanece prevista para a Fase 14.
 
