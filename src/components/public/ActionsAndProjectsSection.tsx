@@ -115,7 +115,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             <FilterBar search={projectQuery} onSearch={setProjectQuery} placeholder="Buscar proposição, ementa ou tema..." selects={[
               { value: projectType, onChange: setProjectType, label: 'Tipo', options: ['TODOS', ...types] },
               { value: projectYear, onChange: setProjectYear, label: 'Ano', options: ['TODOS', ...years.map(String)] },
-              { value: projectParticipation, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
+              { value: projectStatus, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
             ]} />
             {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros." /> : (
               <div className="divide-y divide-stone-800 border-y border-stone-800">
