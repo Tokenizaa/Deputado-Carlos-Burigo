@@ -35,11 +35,9 @@ export const Navbar: React.FC = () => {
       label: 'Atuação',
       hasDropdown: true,
       subItems: [
-        { id: 'atuacao', label: 'Visão Geral & Ementas', icon: FileText },
         { id: 'projetos', label: 'Projetos de Lei', icon: FileText },
-        { id: 'votacoes', label: 'Votações & Posicionamentos', icon: Vote },
-        { id: 'resultados', label: 'Resultados & Entregas', icon: CheckCircle2 },
-        { id: 'documentos', label: 'Documentos do Acervo ALRS', icon: FolderOpen },
+        { id: 'votacoes', label: 'Votações', icon: Vote },
+        { id: 'documentos', label: 'Acervo Documental', icon: FolderOpen },
       ],
     },
     { id: 'noticias', label: 'Notícias' },
@@ -115,7 +113,7 @@ export const Navbar: React.FC = () => {
               const active =
                 currentView === item.id ||
                 (item.hasDropdown &&
-                  ['atuacao', 'projetos', 'votacoes', 'resultados', 'documentos'].includes(currentView));
+                  ['atuacao', 'projetos', 'votacoes', 'documentos'].includes(currentView));
 
               if (item.hasDropdown) {
                 return (
