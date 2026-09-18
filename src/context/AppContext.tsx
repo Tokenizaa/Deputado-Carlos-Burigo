@@ -79,6 +79,23 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const mapTask = (t: any): Task => ({
+  id: t.id,
+  title: t.title,
+  description: t.description,
+  status: t.status,
+  priority: t.priority,
+  assignedTo: t.assigned_to,
+  dueAt: t.due_at,
+  sourceType: t.source_type,
+  sourceId: t.source_id,
+  completionNotes: t.completion_notes,
+  completedAt: t.completed_at,
+  createdBy: t.created_by,
+  createdAt: t.created_at,
+  updatedAt: t.updated_at,
+});
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const ui = useAppUi();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -196,7 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const res = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(task) });
       const data = await res.json().catch(() => null);
       if (!res.ok) { showToast(data?.error || 'Falha ao criar tarefa', 'error'); return false; }
-      setTasks(prev => [data, ...prev]);
+      setTasks(prev => [mapTask(data), ...prev]);
       showToast('Tarefa criada.', 'success');
       return true;
     } catch { showToast('Erro de comunicação ao criar tarefa', 'error'); return false; }
@@ -218,7 +235,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const res = await fetch('/api/tasks/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(body) });
       const data = await res.json().catch(() => null);
       if (!res.ok) { showToast(data?.error || 'Falha ao atualizar tarefa', 'error'); return false; }
-      setTasks(prev => prev.map(t => t.id === id ? { ...t, id: data.id, title: data.title, description: data.description, status: data.status, priority: data.priority, assignedTo: data.assigned_to, dueAt: data.due_at, sourceType: data.source_type, sourceId: data.source_id, completionNotes: data.completion_notes, completedAt: data.completed_at, createdBy: data.created_by, createdAt: data.created_at, updatedAt: data.updated_at } : t));
+      setTasks(prev => prev.map(t => t.id === id ? mapTask(data) : t));
       return true;
     } catch { showToast('Erro de comunicação ao atualizar tarefa', 'error'); return false; }
   };
