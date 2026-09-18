@@ -37,7 +37,7 @@ const VIEW_TO_PATH: Record<string, string> = {
   home: '/', sobre: '/sobre', trajetoria: '/trajetoria', atuacao: '/atuacao', projetos: '/projetos',
   votacoes: '/votacoes', documentos: '/documentos', resultados: '/resultados', noticias: '/noticias',
   agenda: '/agenda', municipios: '/municipios', videos: '/videos', cidadao: '/cidadao', contato: '/contato',
-  campanha: '/campanha', privacidade: '/privacidade', admin: '/admin',
+  campanha: '/campanha', privacidade: '/privacidade', acessibilidade: '/acessibilidade', admin: '/admin',
 };
 
 const PATH_TO_VIEW: Record<string, string> = Object.entries(VIEW_TO_PATH).reduce(
