@@ -532,6 +532,73 @@ export async function getAllDemandsAdmin(): Promise<PublicDemandDto[]> {
   }));
 }
 
+
+export type AdminTaskStatus = 'pendente' | 'em_andamento' | 'aguardando' | 'concluida' | 'cancelada';
+export type AdminTaskPriority = 'baixa' | 'normal' | 'alta' | 'urgente';
+export type AdminTaskSourceType = 'demanda' | 'legislativo' | 'agenda' | 'conteudo' | 'documento' | 'interna';
+
+const TASK_FIELDS = 'id,title,description,status,priority,assigned_to,due_at,source_type,source_id,completion_notes,completed_at,created_by,created_at,updated_at';
+
+export async function getAdminTasks(): Promise<any[]> {
+  const { data, error } = await supabaseAdmin.from('tasks')
+    .select(TASK_FIELDS)
+    .order('due_at', { ascending: true, nullsFirst: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export interface AdminTaskCreate {
+  title: string;
+  description?: string | null;
+  status?: AdminTaskStatus;
+  priority?: AdminTaskPriority;
+  assignedTo?: string | null;
+  dueAt?: string | null;
+  sourceType?: AdminTaskSourceType | null;
+  sourceId?: string | null;
+  completionNotes?: string | null;
+  createdBy: string;
+}
+
+export async function createAdminTask(input: AdminTaskCreate): Promise<any> {
+  const { data, error } = await supabaseAdmin.from('tasks').insert({
+    title: input.title.trim(),
+    description: input.description ?? null,
+    status: input.status ?? 'pendente',
+    priority: input.priority ?? 'normal',
+    assigned_to: input.assignedTo || null,
+    due_at: input.dueAt || null,
+    source_type: input.sourceType || null,
+    source_id: input.sourceId || null,
+    completion_notes: input.completionNotes || null,
+    completed_at: input.status === 'concluida' ? new Date().toISOString() : null,
+    created_by: input.createdBy,
+  }).select(TASK_FIELDS).single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminTask(id: string, patch: Partial<AdminTaskCreate> & { status?: AdminTaskStatus; completedAt?: string | null }): Promise<any | null> {
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (patch.title !== undefined) updates.title = patch.title.trim();
+  if (patch.description !== undefined) updates.description = patch.description;
+  if (patch.status !== undefined) {
+    updates.status = patch.status;
+    updates.completed_at = patch.status === 'concluida' ? (patch.completedAt || new Date().toISOString()) : null;
+  }
+  if (patch.priority !== undefined) updates.priority = patch.priority;
+  if (patch.assignedTo !== undefined) updates.assigned_to = patch.assignedTo || null;
+  if (patch.dueAt !== undefined) updates.due_at = patch.dueAt || null;
+  if (patch.sourceType !== undefined) updates.source_type = patch.sourceType || null;
+  if (patch.sourceId !== undefined) updates.source_id = patch.sourceId || null;
+  if (patch.completionNotes !== undefined) updates.completion_notes = patch.completionNotes;
+  const { data, error } = await supabaseAdmin.from('tasks').update(updates).eq('id', id).select(TASK_FIELDS).maybeSingle();
+  if (error) throw error;
+  return data ?? null;
+}
+
+
 export interface AdminDemandUpdate {
   status?: string;
   priority?: string;
