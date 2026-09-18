@@ -11,6 +11,9 @@ export interface PublicLegislativeItemDto {
   concludedAt?: string;
   sourceUrl?: string;
   verificationStatus: string;
+  theme?: string;
+  detailedDescription?: string;
+  impacts: string[];
   events: PublicLegislativeEventDto[];
   votes: PublicLegislativeVoteDto[];
   roles: PublicLegislativeRoleDto[];
