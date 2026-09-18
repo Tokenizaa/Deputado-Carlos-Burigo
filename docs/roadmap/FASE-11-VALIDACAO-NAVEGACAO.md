@@ -64,4 +64,24 @@ Portanto, a Fase 11 não declara aprovação de build/browser sem executar contr
 
 **Build/browser:** pendente de execução sobre a `main` atual.
 
+A próxima ação técnica deve ser executar o build da `main` atual e, se aprovado, fazer o smoke test visual do `/admin`. Se o build falhar, corrigir apenas o erro real encontrado antes de avançar.### Validação de build/runtime
+
+A infraestrutura canônica do projeto é **Cloudflare Workers**. A Vercel não faz parte do runtime, do processo de deploy ou do mecanismo oficial de validação deste projeto.
+
+A validação de runtime deve ocorrer sobre a main atual, usando o fluxo oficial:
+
+1. npm run build
+2. npm run deploy quando o deploy for necessário
+3. smoke test da aplicação publicada na Cloudflare
+
+Não há workflow GitHub Actions disponível no repositório para executar o build automaticamente.
+
+Portanto, a Fase 11 não declara aprovação de build/browser sem executar contra o código atual na infraestrutura canônica.
+
+## Resultado
+
+**Código da navegação:** validado estruturalmente.
+
+**Build/browser:** pendente de execução sobre a `main` atual.
+
 A próxima ação técnica deve ser executar o build da `main` atual e, se aprovado, fazer o smoke test visual do `/admin`. Se o build falhar, corrigir apenas o erro real encontrado antes de avançar.
