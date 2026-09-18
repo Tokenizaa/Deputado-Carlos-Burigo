@@ -1349,7 +1349,7 @@ Depois registrar o SHA no checkpoint.
 | 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
 | 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
 | 3 — Acessibilidade | CONCLUÍDA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Skip link, foco, barra de acessibilidade, tamanho de texto, alto contraste, página `/acessibilidade` e loading institucional registrados em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md` |
-| 4 — Navegação | CONCLUÍDA | 64ab2216dbdd2f752d5c078f7b5d118baa5cab29 | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
+| 4 — Navegação | CONCLUÍDA | b71e02d28a94664dcce3639ecc990ed0e5732c3a | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
 | 5 — Gabinete | PENDENTE | — | |
 | 6 — Transparência | PENDENTE | — | |
 | 7 — Home V2 | PENDENTE | — | |
