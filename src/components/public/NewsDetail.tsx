@@ -12,7 +12,7 @@ export const NewsDetail: React.FC = () => {
       <div className="py-24 text-center">
         <h2 className="text-2xl font-bold text-stone-800">Notícia não encontrada</h2>
         <button
-          onClick={() => setCurrentView('noticias')}
+          onClick={() => setCurrentView('home')}
           className="mt-4 inline-flex items-center gap-2 bg-[#00A550] text-white px-4 py-2 rounded-lg text-sm font-bold"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar para notícias
