@@ -1048,6 +1048,15 @@ Nunca expor:
 
 Acervo público organizado, contextualizado e sem duplicação.
 
+### Execução
+
+- [x] inventário do contrato público existente;
+- [x] classificação dos documentos existentes como legislativos quando vinculados a proposições;
+- [x] contexto, origem, data, verificação e direitos apresentados;
+- [x] visualização e acesso ao arquivo quando há URL pública;
+- [x] sem nova tabela, API ou Storage paralelo;
+- [x] auditoria registrada em `docs/audits/FASE-11-DOCUMENTOS-ACERVO.md`.
+
 ---
 
 # 16. FASE 12 — SEO institucional
@@ -1392,7 +1401,7 @@ Depois registrar o SHA no checkpoint.
 | 8 — Trajetória | PENDENTE | — | |
 | 9 — Atuação | PENDENTE | — | |
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
-| 11 — Documentos | PENDENTE | — | |
+| 11 — Documentos | CONCLUÍDA | fafa7a92f099ab2ade91b65eaa7b605ed9031edf | Acervo legislativo contextualizado; sem categorias ou documentos inventados |
 | 12 — SEO | PENDENTE | — | |
 | 13 — PWA | PENDENTE | — | |
 | 14 — Acessibilidade final | PENDENTE | — | |
