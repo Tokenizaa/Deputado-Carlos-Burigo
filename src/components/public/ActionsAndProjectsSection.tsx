@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, ExternalLink, FileText } from 'lucide-react';
+import { ArrowRight, ExternalLink, FileText, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppUi } from '../../context/AppUiContext';
 import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
 import { ContextSurface } from '../layout/ContextSurface';
 
 interface ActionsAndProjectsSectionProps {
-  initialSubTab?: 'visao-geral' | 'projetos' | 'votacoes' | 'resultados' | 'documentos';
+  initialSubTab?: 'visao-geral' | 'projetos' | 'votacoes' | 'participacoes' | 'resultados' | 'documentos';
 }
 type Tab = NonNullable<ActionsAndProjectsSectionProps['initialSubTab']>;
 
@@ -16,6 +16,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const [activeTab, setActiveTab] = useState<Tab>(
     currentView === 'projetos' ? 'projetos' :
     currentView === 'votacoes' ? 'votacoes' :
+    currentView === 'participacoes' ? 'participacoes' :
     currentView === 'documentos' ? 'documentos' :
     currentView === 'resultados' ? 'resultados' : initialSubTab,
   );
@@ -24,7 +25,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const [projectQuery, setProjectQuery] = useState('');
   const [projectType, setProjectType] = useState('TODOS');
   const [projectYear, setProjectYear] = useState('TODOS');
-  const [projectParticipation, setProjectParticipation] = useState('TODOS');
+  const [projectStatus, setProjectStatus] = useState('TODOS');
   const [voteQuery, setVoteQuery] = useState('');
   const [voteChoice, setVoteChoice] = useState('TODOS');
   const [documentQuery, setDocumentQuery] = useState('');
@@ -36,16 +37,14 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const types = useMemo(() => [...new Set(publicItems.map((item) => item.type))].sort(), [publicItems]);
   const years = useMemo(() => [...new Set(publicItems.map((item) => item.year))].sort((a, b) => b - a), [publicItems]);
   const documentTypes = useMemo(() => [...new Set(documents.map((item) => item.documentType).filter(Boolean))].sort(), [documents]);
+  const participations = useMemo(() => publicItems.flatMap((item) => item.roles.map((role) => ({ ...role, legislativeCode: item.code, legislativeTitle: item.title, year: item.year }))), [publicItems]);
 
   const filteredItems = publicItems.filter((item) => {
     const q = projectQuery.trim().toLowerCase();
-    const rolePattern =
-      projectParticipation === 'AUTOR' ? /AUTOR|AUTHOR/i :
-      projectParticipation === 'RELATOR' ? /RELATOR|RAPPORTEUR/i : null;
     return (!q || [item.code, item.title, item.summary, item.theme].some((value) => value?.toLowerCase().includes(q)))
       && (projectType === 'TODOS' || item.type === projectType)
       && (projectYear === 'TODOS' || String(item.year) === projectYear)
-      && (!rolePattern || item.roles.some((role) => rolePattern.test(role.role)));
+      && (projectStatus === 'TODOS' || item.status === projectStatus);
   });
 
   const filteredVotes = votes.filter((vote) => {
@@ -69,6 +68,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     { id: 'visao-geral', label: 'VISÃO GERAL' },
     { id: 'projetos', label: 'PROPOSIÇÕES' },
     { id: 'votacoes', label: 'VOTAÇÕES' },
+    { id: 'participacoes', label: 'PARTICIPAÇÕES' },
     { id: 'documentos', label: 'ACERVO DOCUMENTAL' },
   ];
 
@@ -105,6 +105,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <InfoCard eyebrow="PROPOSIÇÕES" title="Projetos e outras proposições" text={`${publicItems.length} registros publicados no acervo legislativo.`} onClick={() => setActiveTab('projetos')} action="Consultar" />
             <InfoCard eyebrow="VOTAÇÕES" title="Votações nominais" text={`${votes.length} registros ligados às matérias publicadas.`} onClick={() => setActiveTab('votacoes')} action="Consultar" />
+            <InfoCard eyebrow="PARTICIPAÇÕES" title="Relatorias e funções registradas" text={`${participations.length} relações públicas vinculadas às proposições publicadas.`} onClick={() => setActiveTab('participacoes')} action="Consultar" />
             <InfoCard eyebrow="DOCUMENTOS" title="Acervo documental" text={`${documents.length} documentos catalogados e armazenados no Supabase.`} onClick={() => setActiveTab('documentos')} action="Consultar" />
           </div>
         )}
@@ -114,7 +115,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             <FilterBar search={projectQuery} onSearch={setProjectQuery} placeholder="Buscar proposição, ementa ou tema..." selects={[
               { value: projectType, onChange: setProjectType, label: 'Tipo', options: ['TODOS', ...types] },
               { value: projectYear, onChange: setProjectYear, label: 'Ano', options: ['TODOS', ...years.map(String)] },
-              { value: projectParticipation, onChange: setProjectParticipation, label: 'Participação', options: ['TODOS', 'AUTOR', 'RELATOR'] },
+              { value: projectParticipation, onChange: setProjectParticipation, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
             ]} />
             {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros." /> : (
               <div className="divide-y divide-stone-800 border-y border-stone-800">
@@ -166,6 +167,34 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'participacoes' && (
+          <div className="space-y-6">
+            <div className="max-w-3xl">
+              <h3 className="text-2xl font-bold">Participações registradas</h3>
+              <p className="mt-2 text-sm leading-6 text-stone-400">Relatorias, autoria e outras funções aparecem somente quando estão vinculadas a um registro legislativo publicado.</p>
+            </div>
+            {participations.length === 0 ? <EmptyState message="Não há participações publicáveis na fonte legislativa canônica." /> : (
+              <div className="border border-stone-800 divide-y divide-stone-800">
+                {participations.map((role) => (
+                  <article key={role.id} className="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="flex gap-3">
+                      <Users className="mt-0.5 h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
+                      <div>
+                        <p className="font-semibold">{role.role}</p>
+                        <p className="mt-1 text-sm text-stone-400">{role.legislativeCode} · {role.year}{role.legislativeTitle ? \` · \${role.legislativeTitle}\` : ''}</p>
+                      </div>
+                    </div>
+                    {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, \`Fonte oficial — \${role.legislativeCode}\`)} className="min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
+                  </article>
+                ))}
+              </div>
+            )}
+            <div className="border border-stone-800 bg-[#141414] p-5 text-sm text-stone-400">
+              <strong className="text-white">Comissões e discursos:</strong> esta área não cria registros paralelos. Quando houver dados públicos estruturados na fonte legislativa canônica, eles poderão ser incorporados ao mesmo acervo.
+            </div>
           </div>
         )}
 
