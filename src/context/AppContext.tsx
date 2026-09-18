@@ -14,7 +14,7 @@ import {
   AuditLog,
 } from '../types';
 import { useAppUi } from './AppUiContext';
-import { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../contracts/publicLegislative';
+import { PublicLegislativeItemDto } from '../contracts/publicLegislative';
 import type { PublicDocumentDto } from '../contracts/publicArchive';
 
 interface AppContextType {
@@ -35,7 +35,6 @@ interface AppContextType {
   media: MediaItem[];
   demands: Demand[];
   auditLogs: AuditLog[];
-  votes: PublicLegislativeVoteDto[];
   legislativeItems: PublicLegislativeItemDto[];
   documents: PublicDocumentDto[];
   isLoading: boolean;
@@ -98,7 +97,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [demands, setDemands] = useState<Demand[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [votes, setVotes] = useState<PublicLegislativeVoteDto[]>([]);
   const [legislativeItems, setLegislativeItems] = useState<PublicLegislativeItemDto[]>([]);
   const [documents, setDocuments] = useState<PublicDocumentDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +123,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         munRes,
         videosRes,
         mediaRes,
-        votesRes,
         legislativeRes,
         documentsRes,
         demandsRes,
@@ -141,7 +138,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/municipalities').then((r) => r.json()),
         fetch('/api/videos').then((r) => r.json()),
         fetch('/api/media').then((r) => r.json()),
-        fetch('/api/votes').then((r) => r.json()),
         fetch('/api/legislative').then((r) => r.json()),
         fetch('/api/documents').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
@@ -158,7 +154,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(munRes)) setMunicipalities(munRes);
       if (Array.isArray(videosRes)) setVideos(videosRes);
       if (Array.isArray(mediaRes)) setMedia(mediaRes);
-      if (Array.isArray(votesRes)) setVotes(votesRes);
       if (Array.isArray(legislativeRes)) setLegislativeItems(legislativeRes);
       if (Array.isArray(documentsRes)) setDocuments(documentsRes);
       if (Array.isArray(demandsRes)) setDemands(demandsRes);
@@ -326,7 +321,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         media,
         demands,
         auditLogs,
-        votes,
         legislativeItems,
         documents,
         isLoading,
