@@ -636,6 +636,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/auth/me': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const userId = (request.headers.get('x-user-id') as string) || undefined;
@@ -649,6 +651,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/auth/switch-user': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'POST') return methodNotAllowed();
     try {
       const { userId } = await request.json();
@@ -663,6 +667,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/demands': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const demands = await getAllDemandsAdmin();
@@ -674,6 +680,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/demands/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
     try {
       const id = (request as any).params?.id;
@@ -697,6 +705,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/audit-logs': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const logs = await getAdminAuditLogs();
