@@ -49,22 +49,6 @@ export interface PublicLegislativeRoleDto {
   verificationStatus: string;
 }
 
-export interface PublicProjectDto {
-  id: string;
-  code: string;
-  title: string;
-  summary: string;
-  detailedDescription: string;
-  theme: string;
-  status: string;
-  linkAlrs?: string;
-  year: number;
-  impacts: string[];
-  source: 'projects_projection';
-  legislativeCode: string;
-  legislativeItemId: string;
-}
-
 export interface PublicResultDto {
   id: string;
   title: string;
