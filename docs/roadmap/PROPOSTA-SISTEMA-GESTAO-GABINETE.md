@@ -473,9 +473,163 @@ A auditoria deve identificar:
 
 Não redesenhar o dashboard com base apenas em hipóteses.
 
+
 ---
 
-## 16. Evolução deste documento
+## 16. Pesquisa institucional — ALRS e integrações
+
+A pesquisa realizada em setembro de 2026 indica que a **Assembleia Legislativa do Rio Grande do Sul (ALRS) opera com um ecossistema de sistemas especializados**, e não com um único ERP/CRM de gabinete.
+
+A própria plataforma de capacitação da ALRS registra, em 2026, treinamentos separados para:
+
+- SEI;
+- Sistema de Cotas;
+- Sistema de Diárias;
+- processo legislativo;
+- FPE;
+- Microsoft 365;
+- plataforma CWA de clipping.
+
+Também há registro de treinamento do **E-PRO**, descrito como sistema de processo eletrônico da ALRS utilizado por coordenadores de bancada, assessorias de gabinetes e secretários de comissão. O material da Escola do Legislativo também registra o **Sistema PRO** para proposições.
+
+Fonte institucional: https://moodle.al.rs.gov.br/course/index.php?categoryid=5
+
+### Evidência adicional de 2026
+
+Contratações públicas registradas para a ALRS mostram manutenção/evolução específica do **e-Pro (NOPAPER)** e contratação de solução própria para **controle das cotas parlamentares**. Isso reforça que essas funções estão apoiadas em sistemas institucionais específicos, e não em um único sistema externo de gabinete. A fonte consultada é um agregador de dados públicos de contratações, devendo ser tratada como evidência secundária.
+
+Fonte: https://ailicita.com/orgao/88243688000181
+
+A ALRS também possui contrato de 2026 para implantação, manutenção, operação, armazenamento e salvamento das informações do aplicativo **Central de Manifestações**, com a PROCERGS. Isso é relevante para o desenho do nosso módulo Atendimento: não devemos presumir que o portal de um gabinete deva substituir sistemas institucionais de manifestação da Assembleia.
+
+Fonte: https://ailicita.com/contrato/88243688000181-2-000004%2F2026
+
+### Dados públicos e integração
+
+O Portal da Transparência RS disponibiliza **dados abertos em CSV/XML**, com arquivos e respectivos layouts, permitindo reutilização em aplicações. O próprio portal informa que os dados são disponibilizados conforme a atualização dos painéis de origem.
+
+Fonte: https://www.transparencia.rs.gov.br/dados-abertos/dados-transparencia-rs/dados/
+
+O painel de Emendas Parlamentares Estaduais informa que os dados de destinação são fornecidos pela SPGG e os dados de execução financeira vêm do FPE/CAGE; o painel também aponta a existência desses dados em formato aberto.
+
+Fonte: https://transparencia.rs.gov.br/emendas-parlamentares/emendas-parlamentares-estaduais/dados/
+
+O Portal da Transparência mantém ainda uma área denominada **ViewApi**, mas a página pública consultada não expõe, no HTML acessível, documentação suficiente dos endpoints para concluir quais APIs podem ser usadas diretamente pelo nosso sistema. Portanto, a existência da área **não deve ser tratada como prova de uma API pública para os sistemas internos da ALRS**.
+
+Fonte: https://www.transparencia.rs.gov.br/viewapi/
+
+### Conclusão arquitetural da pesquisa
+
+A conclusão atual é:
+
+```
+ALRS
+├── Sistemas institucionais
+│   ├── PRO / proposições
+│   ├── E-PRO
+│   ├── SEI
+│   ├── Cotas
+│   ├── Diárias
+│   └── outros sistemas especializados
+│
+├── Dados públicos / transparência
+│   ├── consultas públicas
+│   ├── dados abertos
+│   └── informações de execução/orçamento
+│
+└── Gabinete OS do projeto
+       ↓
+   camada de organização
+   acompanhamento
+   tarefas
+   relacionamento
+   conteúdo
+       ↓
+   Portal público
+```
+
+**Não devemos construir o Gabinete OS como substituto dos sistemas oficiais da ALRS.**
+
+Ele deve funcionar como **camada de gestão e orquestração do gabinete**, integrando dados públicos quando houver fonte oficial reutilizável e mantendo referências/links para operações que precisam continuar nos sistemas institucionais.
+
+### Classificação de integração
+
+Para cada integração futura, devemos classificar o recurso em uma destas categorias:
+
+1. **Integração automática** — existe fonte/API/arquivo oficial reutilizável e tecnicamente acessível.
+2. **Consulta externa** — a informação é pública e pode ser consultada, mas não há integração automatizada documentada suficiente.
+3. **Operação institucional** — exige acesso aos sistemas oficiais da ALRS; o Gabinete OS deve apenas registrar referência, status, tarefa ou link.
+4. **Não confirmado** — existe indício de integração, mas a documentação pública disponível não é suficiente para implementação segura.
+
+Não devemos fazer scraping, engenharia reversa ou automação de sistemas autenticados da ALRS sem autorização e documentação adequada.
+
+---
+
+## 17. Implicação para o desenho do Gabinete OS
+
+A pesquisa fortalece uma parte importante da proposta inicial:
+
+### O sistema não deve tentar ser o "sistema da Assembleia".
+
+Ele deve ser o **sistema operacional do gabinete**, com uma camada própria para:
+
+- relacionamento com cidadãos;
+- organização de demandas;
+- acompanhamento de assuntos legislativos;
+- agenda;
+- tarefas;
+- produção editorial;
+- documentos do gabinete;
+- acompanhamento de emendas;
+- acompanhamento de proposições;
+- histórico e notas internas;
+- referências aos sistemas oficiais;
+- acompanhamento de pendências externas.
+
+Exemplo:
+
+```
+Demanda do cidadão
+       ↓
+Gabinete OS
+       ↓
+Tarefa: consultar / encaminhar / acompanhar
+       ↓
+Sistema oficial da ALRS ou órgão externo
+       ↓
+Gabinete OS registra resultado/status
+       ↓
+Resposta ao cidadão
+```
+
+Isso evita duplicar sistemas institucionais e concentra no gabinete aquilo que atualmente tende a ficar espalhado entre atendimento, e-mail, agenda, planilhas, sistemas da Assembleia e CMS.
+
+---
+
+## 18. Próxima investigação técnica obrigatória
+
+Antes de definir o modelo final do módulo **Mandato**, devemos mapear, com evidência técnica, quais dados públicos da ALRS e do Estado podem ser consumidos automaticamente.
+
+O levantamento deve produzir uma matriz:
+
+| Dado | Fonte | Automático | Método | Atualização | Pode gravar no Gabinete OS? |
+|---|---|---:|---|---|---:|
+| Proposições | ALRS | a confirmar | consulta/API/arquivo | a confirmar | sim, como referência/cache |
+| Comissões | ALRS | a confirmar | consulta/API/arquivo | a confirmar | sim |
+| Votações | ALRS | a confirmar | consulta/API/arquivo | a confirmar | sim |
+| Emendas estaduais | Transparência RS | provável | dados abertos | periódica | sim |
+| Execução de emendas | FPE/CAGE | provável | dados abertos | diária | sim |
+| SEI | ALRS | não confirmado | sistema institucional | — | somente referência |
+| E-PRO | ALRS | não confirmado | sistema institucional | — | somente referência |
+| Cotas | ALRS | não confirmado | sistema institucional | — | somente referência |
+| Diárias | ALRS | não confirmado | sistema institucional | — | somente referência |
+| Manifestações institucionais | ALRS | não confirmado | sistema institucional | — | somente referência |
+
+O objetivo é descobrir **endpoints, arquivos, formatos, autenticação, limites e periodicidade reais**, e não apenas afirmar que "existe uma API".
+
+---
+
+## 19. Evolução deste documento
 
 Este documento é o ponto de partida.
 
@@ -487,22 +641,27 @@ As próximas discussões devem atualizar este arquivo à medida que:
 - funcionalidades forem priorizadas;
 - fluxos forem validados;
 - o modelo de dados for confirmado;
-- o CMS for redesenhado.
+- o CMS for redesenhado;
+- as integrações com fontes oficiais forem tecnicamente confirmadas.
 
 As decisões posteriores devem substituir ou complementar esta proposta neste mesmo documento, evitando que o conhecimento fique disperso no histórico da conversa.
 
 ---
 
-## 17. Status inicial
+## 20. Status atual
 
-**Fase atual: descoberta / auditoria.**
+**Fase atual: descoberta / auditoria / pesquisa institucional.**
 
 Nenhuma decisão de implementação definitiva foi tomada sobre a nova arquitetura do dashboard.
 
-O próximo artefato esperado é:
+### Artefatos esperados
 
-**Auditoria do Dashboard e CMS Atual**
+1. **Auditoria do Dashboard e CMS Atual**
+2. **Mapa Operacional do Gabinete**
+3. **Matriz de Integrações ALRS/Estado**
+4. **Arquitetura funcional**
+5. **Redesign do CMS**
+6. **Implementação incremental**
+7. **QA**
 
-Depois da auditoria:
-
-**Mapa Operacional do Gabinete → Arquitetura funcional → Redesign do CMS → Implementação incremental → QA.**
+**Regra de execução:** não iniciar uma refatoração estrutural do dashboard antes da auditoria do estado atual e da confirmação das entidades, APIs e fluxos que já existem.
