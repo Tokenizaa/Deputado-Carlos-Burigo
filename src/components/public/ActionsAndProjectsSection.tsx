@@ -15,7 +15,7 @@ type Tab = ActionsAndProjectsSectionProps['initialSubTab'];
 export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({
   initialSubTab = 'visao-geral',
 }) => {
-  const { projects, setCurrentView, currentView, votes } = useApp();
+  const { projects, setCurrentView, currentView, votes, legislativeItems, documents } = useApp();
   const { openDocumentViewer } = useAppUi();
   const [activeTab, setActiveTab] = useState<NonNullable<Tab>>(
     currentView === 'projetos'
@@ -30,9 +30,47 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   );
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
+  const [projectQuery, setProjectQuery] = useState('');
+  const [projectType, setProjectType] = useState('TODOS');
+  const [projectYear, setProjectYear] = useState('TODOS');
+  const [projectStatus, setProjectStatus] = useState('TODOS');
+  const [projectRole, setProjectRole] = useState('TODOS');
+  const [voteQuery, setVoteQuery] = useState('');
+  const [voteChoice, setVoteChoice] = useState('TODOS');
+  const [documentQuery, setDocumentQuery] = useState('');
+  const [documentType, setDocumentType] = useState('TODOS');
 
   const publishedProjects = projects.filter((project) => project.status === 'Concluído');
-  const projectDocuments = projects.filter((project) => project.linkAlrs);
+  const legislativeById = new Map(legislativeItems.map((item) => [item.id, item]));
+  const publishedLegislativeItems = legislativeItems.filter((item) => item.status === 'PUBLISHED');
+  const projectYears = [...new Set(publishedLegislativeItems.map((item) => item.year))].sort((a, b) => b - a);
+  const projectStatuses = [...new Set(publishedLegislativeItems.map((item) => item.status))];
+  const documentTypes = [...new Set(documents.map((document) => document.documentType).filter(Boolean))].sort();
+
+  const normalizedProjectQuery = projectQuery.trim().toLowerCase();
+  const filteredProjects = projects.filter((project) => {
+    const item = legislativeById.get(project.legislativeItemId);
+    const roleMatch = projectRole === 'TODOS' || Boolean(item?.roles.some((role) => {
+      const value = role.role.toUpperCase();
+      return projectRole === 'AUTOR' ? /AUTOR|AUTHOR/.test(value) : /RELATOR|RAPPORTEUR/.test(value);
+    }));
+    return (!normalizedProjectQuery || [project.code, project.title, project.summary, project.theme].some((value) => value?.toLowerCase().includes(normalizedProjectQuery)))
+      && (projectType === 'TODOS' || project.code.toUpperCase().startsWith(projectType + ' '))
+      && (projectYear === 'TODOS' || String(project.year) === projectYear)
+      && (projectStatus === 'TODOS' || item?.status === projectStatus)
+      && roleMatch;
+  });
+
+  const filteredVotes = votes.filter((vote) =>
+    (!voteQuery.trim() || [vote.legislativeCode, vote.legislativeTitle, vote.sessionName, vote.voterName].some((value) => value?.toLowerCase().includes(voteQuery.trim().toLowerCase())))
+    && (voteChoice === 'TODOS' || vote.vote.toUpperCase() === voteChoice)
+  );
+
+  const filteredDocuments = documents.filter((document) => {
+    const item = legislativeById.get(document.legislativeItemId);
+    return (!documentQuery.trim() || [document.title, document.documentType, item?.code, item?.title].some((value) => value?.toLowerCase().includes(documentQuery.trim().toLowerCase())))
+      && (documentType === 'TODOS' || document.documentType === documentType);
+  });
 
   const tabs: { id: NonNullable<Tab>; label: string }[] = [
     { id: 'visao-geral', label: 'VISÃO GERAL' },
@@ -56,10 +94,10 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pb-12 mb-12 border-b border-stone-800">
-          <Metric value={projects.length} label="Projetos no acervo" detail="Registros disponíveis no Supabase" />
-          <Metric value={publishedProjects.length} label="Projetos publicados" detail="Itens com status publicado" />
-          <Metric value={projectDocuments.length} label="Com fonte ALRS" detail="Registros com link oficial" />
-          <Metric value={votes.length} label="Votações no acervo" detail="Registros verificados no Supabase" />
+          <Metric value={publishedLegislativeItems.length} label="Proposições publicadas" detail="Registros legislativos verificados" />
+          <Metric value={legislativeItems.reduce((n, item) => n + item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role)).length, 0)} label="Registros de autoria" detail="Autoria identificada no acervo" />
+          <Metric value={documents.length} label="Documentos" detail="Arquivos catalogados no acervo" />
+          <Metric value={votes.length} label="Votos nominais" detail="Registros de votação verificados" />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 border-b border-stone-800 mb-12 pb-3">
@@ -98,25 +136,42 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <h3 className="text-xl font-bold text-white">Projetos de Lei</h3>
               <p className="text-sm text-stone-400 mt-1">Esta lista é alimentada pelo acervo público do Supabase e não por uma lista paralela no frontend.</p>
             </div>
-            {projects.length === 0 ? <EmptyState message="Nenhum projeto publicado no acervo público." /> : (
+            <FilterBar
+              search={projectQuery}
+              onSearch={setProjectQuery}
+              placeholder="Buscar PL, ementa, tema..."
+              selects={[
+                { value: projectType, onChange: setProjectType, label: 'Tipo', options: ['TODOS', ...[...new Set(projects.map((project) => project.code.split(' ')[0]))].sort()] },
+                { value: projectYear, onChange: setProjectYear, label: 'Ano', options: ['TODOS', ...projectYears.map(String)] },
+                { value: projectStatus, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...projectStatuses] },
+                { value: projectRole, onChange: setProjectRole, label: 'Participação', options: ['TODOS', 'AUTOR', 'RELATOR'] },
+              ]}
+            />
+            {filteredProjects.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros selecionados." /> : (
               <div className="divide-y divide-stone-800 border-y border-stone-800">
-                {projects.map((project) => (
-                  <div key={project.id} className="py-6 sm:py-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
-                    <div className="space-y-2 max-w-3xl">
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{project.code}</span>
-                        <span className="text-stone-500">Ano {project.year}</span>
-                        <span className="text-[#00A550] font-semibold">{project.status}</span>
+                {filteredProjects.map((project) => {
+                  const item = legislativeById.get(project.legislativeItemId);
+                  const authorRoles = item?.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role)) ?? [];
+                  const rapporteurRoles = item?.roles.filter((role) => /RELATOR|RAPPORTEUR/i.test(role.role)) ?? [];
+                  return (
+                    <div key={project.id} className="py-6 sm:py-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                      <div className="space-y-2 max-w-3xl">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{project.code}</span>
+                          <span className="text-stone-500">Ano {project.year}</span>
+                          <span className="text-[#00A550] font-semibold">{item?.status ?? project.status}</span>
+                          {authorRoles.length > 0 && <span className="font-bold text-sky-300 bg-sky-950/40 px-2 py-0.5 rounded">AUTORIA</span>}
+                          {rapporteurRoles.length > 0 && <span className="font-bold text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded">RELATORIA</span>}
+                        </div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-white leading-snug">{project.title}</h4>
+                        <p className="text-sm text-stone-300 leading-relaxed">{project.summary}</p>
                       </div>
-                      <h4 className="text-xl sm:text-2xl font-bold text-white leading-snug">{project.title}</h4>
-                      <p className="text-sm text-stone-300 leading-relaxed">{project.summary}</p>
-                      {project.impacts.length > 0 && <p className="text-xs text-stone-500">{project.impacts.length} registro(s) de impacto no acervo.</p>}
+                      <div className="shrink-0 flex items-center gap-3">
+                        <button type="button" onClick={() => setSelectedProject(project)} className="text-sm font-semibold text-[#00A550] hover:text-emerald-400 inline-flex items-center gap-1.5 border border-stone-700 hover:border-[#00A550] bg-transparent px-4 py-2 rounded-md">Ver proposição <ArrowRight className="w-4 h-4" /></button>
+                      </div>
                     </div>
-                    <div className="shrink-0 flex items-center gap-3">
-                      <button type="button" onClick={() => setSelectedProject(project)} className="text-sm font-semibold text-[#00A550] hover:text-emerald-400 inline-flex items-center gap-1.5 border border-stone-700 hover:border-[#00A550] bg-transparent px-4 py-2 rounded-md">Ver projeto <ArrowRight className="w-4 h-4" /></button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -128,10 +183,11 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <h3 className="text-xl font-bold text-white">Votações e posicionamentos</h3>
               <p className="text-sm text-stone-400 mt-2">Posições registradas com fonte oficial vinculada ao acervo público do Supabase.</p>
             </div>
-            {votes.length === 0 ? <EmptyState message="Nenhum voto publicado no acervo público." /> : (
+            <FilterBar search={voteQuery} onSearch={setVoteQuery} placeholder="Buscar matéria, sessão ou votante..." selects={[{ value: voteChoice, onChange: setVoteChoice, label: 'Voto', options: ['TODOS', ...[...new Set(votes.map((vote) => vote.vote.toUpperCase()))].sort()] }]} />
+            {filteredVotes.length === 0 ? <EmptyState message="Nenhuma votação corresponde aos filtros selecionados." /> : (
               <div className="border border-stone-800 rounded-sm overflow-hidden">
                 <div className="divide-y divide-stone-800">
-                  {votes.map((vote) => (
+                  {filteredVotes.map((vote) => (
                     <button key={vote.id} type="button" onClick={() => setSelectedVote(vote)} className="w-full text-left p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00A550]">
                       <div>
                         <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -157,15 +213,28 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <h3 className="text-xl font-bold text-white">Acervo documental</h3>
               <p className="text-sm text-stone-400 mt-1">Projetos com fonte legislativa registrada no acervo público.</p>
             </div>
-            {projectDocuments.length === 0 ? <EmptyState message="Nenhum documento com fonte pública vinculada." /> : (
+            <FilterBar search={documentQuery} onSearch={setDocumentQuery} placeholder="Buscar documento ou proposição..." selects={[{ value: documentType, onChange: setDocumentType, label: 'Tipo de documento', options: ['TODOS', ...documentTypes] }]} />
+            {filteredDocuments.length === 0 ? <EmptyState message="Nenhum documento corresponde aos filtros selecionados." /> : (
               <div className="border border-stone-800 rounded-sm overflow-hidden">
                 <div className="divide-y divide-stone-800">
-                  {projectDocuments.map((project) => (
-                    <div key={project.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div><p className="font-semibold text-white">{project.code} — {project.title}</p><p className="text-xs text-stone-500 mt-1">Fonte oficial vinculada ao registro do projeto.</p></div>
-                      <button type="button" onClick={() => openDocumentViewer(project.linkAlrs!, `${project.code} — ${project.title}`, "external")} className="min-h-11 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"><FileText className="w-3.5 h-3.5" /> Ler fonte oficial <ExternalLink className="w-3 h-3" aria-hidden="true" /></button>
-                    </div>
-                  ))}
+                  {filteredDocuments.map((document) => {
+                    const item = legislativeById.get(document.legislativeItemId);
+                    const source = document.originalUrl;
+                    return (
+                      <div key={document.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 text-xs">
+                            <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded">{document.documentType || 'DOCUMENTO'}</span>
+                            {item?.code && <span className="font-mono text-stone-400">{item.code}</span>}
+                            {document.verificationStatus && <span className="text-stone-500">{document.verificationStatus.replace(/_/g, ' ')}</span>}
+                          </div>
+                          <p className="font-semibold text-white mt-1">{document.title}</p>
+                          <p className="text-xs text-stone-500 mt-1">{item?.title ?? 'Documento legislativo do acervo oficial'}</p>
+                        </div>
+                        {source && <button type="button" onClick={() => openDocumentViewer(source, document.title, "external")} className="min-h-11 text-[#00A550] hover:underline font-semibold text-xs inline-flex items-center gap-1 shrink-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"><FileText className="w-3.5 h-3.5" /> Ler documento <ExternalLink className="w-3 h-3" aria-hidden="true" /></button>}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -207,6 +276,29 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     </section>
   );
 };
+
+const FilterBar: React.FC<{
+  search: string;
+  onSearch: (value: string) => void;
+  placeholder: string;
+  selects?: { value: string; onChange: (value: string) => void; label: string; options: string[] }[];
+}> = ({ search, onSearch, placeholder, selects = [] }) => (
+  <div className="bg-[#141414] border border-stone-800 p-4 sm:p-5 rounded-sm space-y-4">
+    <div className="flex flex-col lg:flex-row gap-3">
+      <input value={search} onChange={(event) => onSearch(event.target.value)} placeholder={placeholder} aria-label={placeholder} className="min-h-11 flex-1 bg-[#0D0D0D] border border-stone-700 rounded-md px-3 text-sm text-white placeholder:text-stone-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00A550]" />
+      <div className="flex flex-wrap gap-2">
+        {selects.map((select) => (
+          <label key={select.label} className="flex items-center gap-2 text-xs text-stone-400">
+            <span className="sr-only">{select.label}</span>
+            <select value={select.value} onChange={(event) => select.onChange(event.target.value)} aria-label={select.label} className="min-h-11 bg-[#0D0D0D] border border-stone-700 rounded-md px-3 text-sm text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00A550]">
+              {select.options.map((option) => <option key={option} value={option}>{option === 'TODOS' ? 'Todos' : option}</option>)}
+            </select>
+          </label>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
   <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>

@@ -9,6 +9,7 @@ import {
   getPublicSettings,
   getPublicVideos,
   getPublicLegislativeVotes,
+  getPublicLegislativeItems,
   getPublicPages,
   supabaseAdmin,
   supabasePublic,
@@ -235,6 +236,19 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       console.error('[api/events]', error);
       return Response.json(
         { error: 'Falha ao carregar eventos do acervo' },
+        { status: 500 }
+      );
+    }
+  },
+  '/api/legislative': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const items = await getPublicLegislativeItems();
+      return Response.json(items);
+    } catch (error) {
+      console.error('[api/legislative]', error);
+      return Response.json(
+        { error: 'Falha ao carregar atividade legislativa do acervo' },
         { status: 500 }
       );
     }
