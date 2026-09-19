@@ -1404,11 +1404,11 @@ Depois registrar o SHA no checkpoint.
 | 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
 | 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
 | 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
-| 3 — Acessibilidade | REABERTA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Estrutura implementada, mas a barra visual de acessibilidade foi considerada inadequada para o design final; precisa ser redesenhada e validada no portal real. |
+| 3 — Acessibilidade | EM ANDAMENTO | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Estrutura mantida; apresentação da barra foi redesenhada para uma faixa institucional leve. Validação visual final ainda pendente. |
 | 4 — Navegação | CONCLUÍDA | b71e02d28a94664dcce3639ecc990ed0e5732c3a | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
 | 5 — Gabinete | CONCLUÍDA | 94e5723b6950c45f50ce6133c516ccf450a163e6 | Canal único Fale com o Gabinete, CTA desktop/mobile, fluxo cidadão existente e compatibilidade /cidadao |
 | 6 — Transparência | CONCLUÍDA | c0cdac0 | Transparência pública estruturada sem nova arquitetura |
-| 7 — Home V2 | REABERTA | 0a3a62831388131d178f507620eb644e225a66b0 | Existe implementação canônica, porém a auditoria atual constatou que o corpo visual da Home ainda não atende ao objetivo institucional; reconstrução visual necessária sem criar segunda arquitetura. |
+| 7 — Home V2 | EM ANDAMENTO | 0a3a62831388131d178f507620eb644e225a66b0 | Home reconstruída sobre a arquitetura existente: novo hero institucional, acesso rápido, hierarquia de informação, transparência e CTA de gabinete. Build/validação visual ainda pendentes. |
 | 8 — Trajetória | CONCLUÍDA |  | Linha do tempo pública estruturada |
 | 9 — Atuação | CONCLUÍDA | c462a923edae330775e76ea9493bcb8ad91c58fd | Atuação parlamentar e participações estruturadas |
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
@@ -1475,11 +1475,11 @@ Não mascarar bloqueador como concluído.
 FASE 0 — CONCLUÍDA
 FASE 1 — CONCLUÍDA
 FASE 2 — CONCLUÍDA
-FASE 3 — REABERTA
+FASE 3 — EM ANDAMENTO
 FASE 4 — CONCLUÍDA
 FASE 5 — CONCLUÍDA
 FASE 6 — CONCLUÍDA
-FASE 7 — REABERTA
+FASE 7 — EM ANDAMENTO
 FASE 8 — CONCLUÍDA
 FASE 9 — CONCLUÍDA
 FASE 10 — CONCLUÍDA
@@ -1495,7 +1495,7 @@ FASE 16 — Auditoria cidadão | PENDENTE
 
 A próxima etapa **não é avançar para a Fase 16 ainda**.
 
-As fases 3 e 7 foram reabertas porque a validação atual do produto demonstrou dois problemas de aceite: a apresentação da acessibilidade ficou visualmente inadequada e a Home ainda não atingiu a qualidade institucional esperada. A execução deve primeiro corrigir esses dois pontos no `main`, sem criar segunda arquitetura.
+As fases 3 e 7 foram reabertas porque a validação atual do produto demonstrou dois problemas de aceite: a apresentação da acessibilidade ficou visualmente inadequada e a Home ainda não atingiu a qualidade institucional esperada. A execução está em andamento no `main`, sem criar segunda arquitetura. Já foram aplicadas a nova composição da Home, o novo hero institucional e a barra de acessibilidade refinada. Ainda falta validar o build e a experiência visual real antes de fechar os checkpoints.
 
 **Ordem operacional obrigatória:**
 
@@ -1536,6 +1536,22 @@ Ao final, o produto deverá ser percebido como:
 **um portal institucional público, simples, legível, acessível e transparente, no qual o cidadão consegue conhecer a trajetória, acompanhar a atuação parlamentar, consultar informações públicas e falar com o gabinete sem fricção.**
 
 A sofisticação do produto deverá vir da **clareza da informação e da qualidade da experiência**, não da quantidade de componentes, efeitos ou complexidade técnica.
+
+## Registro da retomada — 2026-09-19
+
+**Fases 3 e 7 — execução retomada**
+
+- [x] auditoria confirmou que o corpo visual anterior da Home não estava aceito;
+- [x] Hero institucional reconstruído sem arquitetura nova;
+- [x] composição da Home reorganizada para priorizar identidade, acesso rápido, atuação, transparência, atualizações e contato;
+- [x] barra de acessibilidade simplificada visualmente, mantendo conteúdo funcional;
+- [x] gradiente decorativo removido do novo Hero;
+- [ ] build oficial após as alterações;
+- [ ] validação visual em browser real;
+- [ ] validação 200% e contraste real;
+- [ ] fechamento das Fases 3 e 7.
+
+**Commits de execução:** `e4ec1bd097dbd3771022a125dab06df8ad30ebdd`, `a8e5c093d4a6682d1b5f850c3cbac734c9169182`, `2099b8e5ae46e76ac93bfb686749fda15211ee89`, `6c82849023e66a2eda367a1e96733d16fbedef64`, `869576f4c3fdb5dc7012756ca65eda2fbfba763d`.
 
 ## Registro da Fase 14 — 2026-09-18
 
