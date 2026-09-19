@@ -1404,11 +1404,11 @@ Depois registrar o SHA no checkpoint.
 | 0 — Baseline | CONCLUÍDA | 0e8091fad4f1da599a00dbdaf51791390a3d90fe | Baseline arquitetural e operacional confirmado; PR #19 integrado |
 | 1 — Auditoria | CONCLUÍDA | 218bc8bf8a182bd4d3b33c933b6903fb57a8c1a0 | Auditoria integral registrada em `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` |
 | 2 — Design Tokens | CONCLUÍDA | a64d80abe66ecec5972040e75123410447cf88f7 | Tokens semânticos, tipografia, contraste base, redução de motion e neutralização do glass documentados em `docs/design/DESIGN-TOKENS-V2.md` |
-| 3 — Acessibilidade | CONCLUÍDA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Skip link, foco, barra de acessibilidade, tamanho de texto, alto contraste, página `/acessibilidade` e loading institucional registrados em `docs/audits/FASE-3-ACESSIBILIDADE-ESTRUTURAL.md` |
+| 3 — Acessibilidade | REABERTA | 8fb36090f86b066f9118b1a833ce1bab592ef472 | Estrutura implementada, mas a barra visual de acessibilidade foi considerada inadequada para o design final; precisa ser redesenhada e validada no portal real. |
 | 4 — Navegação | CONCLUÍDA | b71e02d28a94664dcce3639ecc990ed0e5732c3a | Header institucional, menu Mais, mobile com 4 itens, Fale com o Gabinete, footer e rota Transparência alinhados ao shell canônico |
 | 5 — Gabinete | CONCLUÍDA | 94e5723b6950c45f50ce6133c516ccf450a163e6 | Canal único Fale com o Gabinete, CTA desktop/mobile, fluxo cidadão existente e compatibilidade /cidadao |
 | 6 — Transparência | CONCLUÍDA | c0cdac0 | Transparência pública estruturada sem nova arquitetura |
-| 7 — Home V2 | CONCLUÍDA | 0a3a62831388131d178f507620eb644e225a66b0 | Home institucional canônica |
+| 7 — Home V2 | REABERTA | 0a3a62831388131d178f507620eb644e225a66b0 | Existe implementação canônica, porém a auditoria atual constatou que o corpo visual da Home ainda não atende ao objetivo institucional; reconstrução visual necessária sem criar segunda arquitetura. |
 | 8 — Trajetória | CONCLUÍDA |  | Linha do tempo pública estruturada |
 | 9 — Atuação | CONCLUÍDA | c462a923edae330775e76ea9493bcb8ad91c58fd | Atuação parlamentar e participações estruturadas |
 | 10 — Resultados/Pautas | CONCLUÍDA | 5cbeb61b5207a0018a3c7b2a0d44fccb04be6e7c | Resultados condicionados a vínculo legislativo verificável |
@@ -1436,6 +1436,8 @@ Estados permitidos:
 | 0 | PR #19 estava aberto antes da execução da Fase 0 | PR #19 documentava ADRs canônicos; foi integrado nesta fase | Resolvido: PR #19 merged |
 | 0 | Metadado `homepage` do repositório ainda aponta para Vercel | `get_repo` retorna `https://deputado-darlos-burigo.vercel.app` | Corrigir durante auditoria/SEO; não reintroduzir Vercel como runtime |
 | 0 | Existem branches históricas/paralelas no repositório | Listagem de branches mostra branches de consolidação, UX, Vercel e outras fases antigas | Não usar essas branches como fonte de verdade; trabalhar a partir de `main` |
+| 3 | Barra global de acessibilidade não atende ao padrão visual final | Implementação atual adicionou uma faixa superior permanente que conflita com a experiência institucional; a estrutura acessível permanece aproveitável | Redesenhar a apresentação sem perder skip links, atalhos, contraste e página `/acessibilidade`; validar no browser |
+| 7 | Home V2 ainda não está visualmente aceita | Auditoria no `main` constatou que a composição do corpo da Home permanece próxima da geração anterior, apesar do checkpoint registrado | Reabrir a Home V2, auditar todos os blocos existentes e reconstruir a hierarquia visual sobre as fontes canônicas já existentes |
 
 Não mascarar bloqueador como concluído.
 
@@ -1460,6 +1462,8 @@ Não mascarar bloqueador como concluído.
 | 2026-09-18 | Fase 2 | Glassmorphism foi neutralizado, não substituído por outro padrão complexo | Brand Book proíbe glass e prioriza simplicidade | CONCLUÍDA |
 | 2026-09-18 | Fase 3 | Acessibilidade estrutural entra no shell antes da reconstrução da navegação | Evitar corrigir acessibilidade depois da interface pronta | CONCLUÍDA |
 | 2026-09-18 | Fase 3 | `/acessibilidade` é uma página pública do mesmo portal | Acessibilidade não deve ser uma segunda aplicação | CONCLUÍDA |
+| 2026-09-19 | Fase 3 | A implementação estrutural da acessibilidade não implica aceitação visual da barra superior | A estrutura é útil, mas a apresentação atual prejudica a interface institucional; a fase foi reaberta para correção visual | REABERTA |
+| 2026-09-19 | Fase 7 | O checkpoint anterior da Home não representa aceitação visual definitiva | A Home atual ainda não responde adequadamente ao objetivo de portal institucional; é necessário corrigir a experiência sem recriar arquitetura | REABERTA |
 
 ---
 
@@ -1471,11 +1475,11 @@ Não mascarar bloqueador como concluído.
 FASE 0 — CONCLUÍDA
 FASE 1 — CONCLUÍDA
 FASE 2 — CONCLUÍDA
-FASE 3 — CONCLUÍDA
+FASE 3 — REABERTA
 FASE 4 — CONCLUÍDA
 FASE 5 — CONCLUÍDA
 FASE 6 — CONCLUÍDA
-FASE 7 — CONCLUÍDA
+FASE 7 — REABERTA
 FASE 8 — CONCLUÍDA
 FASE 9 — CONCLUÍDA
 FASE 10 — CONCLUÍDA
@@ -1484,13 +1488,22 @@ FASE 12 — CONCLUÍDA
 FASE 13 — CONCLUÍDA
 FASE 14 — Acessibilidade final | CONCLUÍDA PARCIALMENTE
 FASE 15 — QA final | CONCLUÍDA
+FASE 16 — Auditoria cidadão | PENDENTE
 ```
 
 ### Próxima ação obrigatória
 
-A próxima etapa oficial é a **FASE 16 — Auditoria final pelo cidadão**.
+A próxima etapa **não é avançar para a Fase 16 ainda**.
 
-As fases 0 a 15 foram concluídas. A Fase 15 — QA funcional e conteúdo foi concluída com build passando, rotas acessíveis e validações de formulário presentes. A próxima etapa é a Fase 16 — Auditoria final pelo cidadão.
+As fases 3 e 7 foram reabertas porque a validação atual do produto demonstrou dois problemas de aceite: a apresentação da acessibilidade ficou visualmente inadequada e a Home ainda não atingiu a qualidade institucional esperada. A execução deve primeiro corrigir esses dois pontos no `main`, sem criar segunda arquitetura.
+
+**Ordem operacional obrigatória:**
+
+1. **Fase 7 — Home V2:** auditar e reconstruir a experiência visual da Home usando os componentes, `page_blocks` e fontes canônicas já existentes.
+2. **Fase 3 — Acessibilidade:** corrigir a apresentação da barra/controles de acessibilidade e validar sua integração com o novo shell/Home.
+3. Executar build, rotas, acessibilidade estrutural e validação visual.
+4. Atualizar os checkpoints somente quando o resultado estiver realmente aceito.
+5. Só então executar a **Fase 16 — Auditoria final pelo cidadão**.
 ---
 
 # 27. Regra de retomada após interrupção
