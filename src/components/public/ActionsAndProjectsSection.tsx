@@ -19,14 +19,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     currentView === 'documentos' ? 'documentos' :
     currentView === 'resultados' ? 'resultados' : initialSubTab ?? 'projetos',
   );
-  const [projectQuery, setProjectQuery] = useState('');
-  const [projectType, setProjectType] = useState('TODOS');
-  const [projectYear, setProjectYear] = useState('TODOS');
-  const [projectStatus, setProjectStatus] = useState('TODOS');
-  const [voteQuery, setVoteQuery] = useState('');
-  const [voteChoice, setVoteChoice] = useState('TODOS');
-  const [documentQuery, setDocumentQuery] = useState('');
-  const [documentType, setDocumentType] = useState('TODOS');
   const [documentPage, setDocumentPage] = useState(1);
 
   const publicItems = useMemo(() => legislativeItems.filter((item) => item.status === 'PUBLISHED'), [legislativeItems]);
@@ -42,61 +34,30 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     return map;
   }, [documents]);
   const itemById = useMemo(() => new Map(legislativeItems.map((item) => [item.id, item])), [legislativeItems]);
-  const types = useMemo(() => [...new Set(publicItems.map((item) => item.type))].sort(), [publicItems]);
-  const years = useMemo(() => [...new Set(publicItems.map((item) => item.year))].sort((a, b) => b - a), [publicItems]);
   const archiveDocuments = useMemo(() => documents.filter((document) => (
     !document.title?.toLowerCase().includes('informativo') &&
     !document.storagePath?.toLowerCase().startsWith('informativos/')
   )), [documents]);
-  const documentTypes = useMemo(() => [...new Set(archiveDocuments.map((item) => item.documentType).filter(Boolean))].sort(), [archiveDocuments]);
   const participations = useMemo(() => publicItems.flatMap((item) => item.roles.map((role) => ({ ...role, itemId: item.id, legislativeCode: item.code, legislativeTitle: item.title, year: item.year }))), [publicItems]);
 
-  const filteredItems = publicItems.filter((item) => {
-    const q = projectQuery.trim().toLowerCase();
-    return (!q || [item.code, item.title, item.summary, item.theme].some((value) => value?.toLowerCase().includes(q)))
-      && (projectType === 'TODOS' || item.type === projectType)
-      && (projectYear === 'TODOS' || String(item.year) === projectYear)
-      && (projectStatus === 'TODOS' || item.status === projectStatus);
-  });
+  const filteredItems = publicItems;
+  const filteredVotes = votes;
 
-  const filteredVotes = votes.filter((vote) => {
-    const q = voteQuery.trim().toLowerCase();
-    return (!q || [vote.legislativeCode, vote.legislativeTitle, vote.sessionName, vote.voterName].some((value) => value?.toLowerCase().includes(q)))
-      && (voteChoice === 'TODOS' || vote.vote.toUpperCase() === voteChoice);
-  });
-
-  const filteredDocuments = useMemo(() => archiveDocuments.filter((document) => {
-    const item = itemById.get(document.legislativeItemId);
-    const q = documentQuery.trim().toLowerCase();
-    return (!q || [document.title, document.documentType, item?.code, item?.title].some((value) => value?.toLowerCase().includes(q)))
-      && (documentType === 'TODOS' || document.documentType === documentType);
-  }).sort((a, b) => {
+  const filteredDocuments = useMemo(() => archiveDocuments.slice().sort((a, b) => {
     const itemA = itemById.get(a.legislativeItemId);
     const itemB = itemById.get(b.legislativeItemId);
     const yearDiff = (itemB?.year || 0) - (itemA?.year || 0);
     if (yearDiff !== 0) return yearDiff;
     const numberDiff = (itemB?.number || 0) - (itemA?.number || 0);
     if (numberDiff !== 0) return numberDiff;
-    const typeOrder: Record<string, number> = {
-      TEXTO_JUSTIFICATIVA: 1,
-      PARECER: 2,
-      OFICIO: 3,
-      ANEXO: 4,
-    };
+    const typeOrder: Record<string, number> = { TEXTO_JUSTIFICATIVA: 1, PARECER: 2, OFICIO: 3, ANEXO: 4 };
     const typeDiff = (typeOrder[a.documentType?.toUpperCase() || ''] || 99) - (typeOrder[b.documentType?.toUpperCase() || ''] || 99);
     if (typeDiff !== 0) return typeDiff;
     const annexA = Number(a.title?.match(/(?:Anexo[- ]?)(\d+)$/i)?.[1] || 0);
     const annexB = Number(b.title?.match(/(?:Anexo[- ]?)(\d+)$/i)?.[1] || 0);
     if (a.documentType?.toUpperCase() === 'ANEXO' && annexA !== annexB) return annexA - annexB;
     return (a.title || '').localeCompare(b.title || '', 'pt-BR');
-  }), [archiveDocuments, documentQuery, documentType, itemById]);
-  const documentsPerPage = 15;
-  const documentTotalPages = Math.max(1, Math.ceil(filteredDocuments.length / documentsPerPage));
-  const safeDocumentPage = Math.min(documentPage, documentTotalPages);
-  const paginatedDocuments = filteredDocuments.slice(
-    (safeDocumentPage - 1) * documentsPerPage,
-    safeDocumentPage * documentsPerPage,
-  );
+  }), [archiveDocuments, itemById]);
 
   const openSource = (url: string | null | undefined, title: string, internal = false) => {
     if (!url) return;
@@ -158,12 +119,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
         {activeTab === 'projetos' && (
           <div className="space-y-8">
-            <FilterBar search={projectQuery} onSearch={setProjectQuery} placeholder="Buscar proposição, ementa ou tema..." selects={[
-              { value: projectType, onChange: setProjectType, label: 'Tipo', options: ['TODOS', ...types] },
-              { value: projectYear, onChange: setProjectYear, label: 'Ano', options: ['TODOS', ...years.map(String)] },
-              { value: projectStatus, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
-            ]} />
-            {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros." /> : (
+
+            {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição publicada foi encontrada." /> : (
               <div className="border-y border-stone-200">
                 {filteredItems.map((item) => {
                   const authors = item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role));
@@ -242,8 +199,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
         {activeTab === 'votacoes' && (
           <div className="space-y-6">
-            <FilterBar search={voteQuery} onSearch={setVoteQuery} placeholder="Buscar matéria, sessão ou votante..." selects={[{ value: voteChoice, onChange: setVoteChoice, label: 'Voto', options: ['TODOS', ...[...new Set(votes.map((vote) => vote.vote.toUpperCase()))].sort()] }]} />
-            {filteredVotes.length === 0 ? <EmptyState message="Nenhuma votação corresponde aos filtros." /> : (
+
+            {filteredVotes.length === 0 ? <EmptyState message="Nenhuma votação publicada foi encontrada." /> : (
               <div className="border-y border-stone-200">
                 {filteredVotes.map((vote) => (
                   <details key={vote.id} className="group border-b border-stone-200 last:border-b-0">
@@ -360,8 +317,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               </div>
               <span className="text-sm font-semibold text-stone-600">{filteredDocuments.length} documentos encontrados</span>
             </div>
-            <FilterBar search={documentQuery} onSearch={(value) => { setDocumentQuery(value); setDocumentPage(1); }} placeholder="Buscar documento, proposição ou título..." selects={[{ value: documentType, onChange: (value) => { setDocumentType(value); setDocumentPage(1); }, label: 'Tipo', options: ['TODOS', ...documentTypes] }]} />
-            {filteredDocuments.length === 0 ? <EmptyState message="Nenhum documento corresponde aos filtros." /> : (
+
+            {filteredDocuments.length === 0 ? <EmptyState message="Nenhum documento foi encontrado." /> : (
               <>
               <div className="border border-stone-200 rounded-sm divide-y divide-stone-800">
                 {paginatedDocuments.map((document) => {
@@ -428,21 +385,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     </section>
   );
 };
-
-const FilterBar: React.FC<{ search: string; onSearch: (value: string) => void; placeholder: string; selects?: { value: string; onChange: (value: string) => void; label: string; options: string[] }[] }> = ({ search, onSearch, placeholder, selects = [] }) => (
-  <div className="bg-stone-50 border border-stone-200 p-4 sm:p-5 rounded-sm">
-    <div className="flex flex-col lg:flex-row gap-3">
-      <input value={search} onChange={(event) => onSearch(event.target.value)} placeholder={placeholder} aria-label={placeholder} className="min-h-11 flex-1 bg-white border border-stone-700 rounded-md px-3 text-sm text-stone-950 placeholder:text-stone-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#008C45]" />
-      <div className="flex flex-wrap gap-2">
-        {selects.map((select) => (
-          <select key={select.label} value={select.value} onChange={(event) => select.onChange(event.target.value)} aria-label={select.label} className="min-h-11 bg-white border border-stone-700 rounded-md px-3 text-sm text-stone-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#008C45]">
-            {select.options.map((option) => <option key={option} value={option}>{option === 'TODOS' ? 'Todos' : option}</option>)}
-          </select>
-        ))}
-      </div>
-    </div>
-  </div>
-);
 
 const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
   <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-sm font-bold text-[#008C45] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-sm text-stone-600 leading-tight">{detail}</p></div>
