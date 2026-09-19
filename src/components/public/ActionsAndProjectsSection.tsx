@@ -184,18 +184,29 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <p className="mt-2 text-sm leading-6 text-stone-400">Relatorias, autoria e outras funções aparecem somente quando estão vinculadas a um registro legislativo publicado.</p>
             </div>
             {participations.length === 0 ? <EmptyState message="Não há participações publicáveis na fonte legislativa canônica." /> : (
-              <div className="border border-stone-800 divide-y divide-stone-800">
+              <div className="border-y border-stone-800">
                 {participations.map((role) => (
-                  <article key={role.id} className="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                    <div className="flex gap-3">
-                      <Users className="mt-0.5 h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
-                      <div>
-                        <p className="font-semibold">{role.role}</p>
-                        <p className="mt-1 text-sm text-stone-400">{role.legislativeCode} · {role.year}{role.legislativeTitle ? ` · ${role.legislativeTitle}` : ''}</p>
+                  <details key={role.id} className="group border-b border-stone-800 last:border-b-0">
+                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
+                      <Users className="h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded">{role.role}</span>
+                          <span className="text-stone-500">{role.year}</span>
+                        </span>
+                        <span className="mt-2 block text-lg font-bold leading-snug">{role.legislativeCode}</span>
+                        {role.legislativeTitle && <span className="mt-1 block text-sm text-stone-400">{role.legislativeTitle}</span>}
+                      </span>
+                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                    </summary>
+                    <div className="pb-7 pl-9 pr-9">
+                      <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{role.role}</p></div>
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Ano</span><p className="font-semibold text-white mt-0.5">{role.year}</p></div>
                       </div>
-                      {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, `Fonte oficial — ${role.legislativeCode}`)} className="min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
+                      {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, `Fonte oficial — ${role.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
                     </div>
-                  </article>
+                  </details>
                 ))}
               </div>
             )}
