@@ -278,7 +278,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                             )}
                           </div>
                         </div>
-                      )}}
+                      )}
                     </div>
                   </details>
                 ))}
