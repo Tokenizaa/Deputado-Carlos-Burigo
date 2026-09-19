@@ -17,7 +17,23 @@ const MORE_ITEMS = [
   ['acessibilidade', 'Acessibilidade'],
 ] as const;
 
-const pathFor = (view: string) => view === 'home' ? '/' : `/${view}`;
+const pathFor = (view: string) => {
+  const anchors: Record<string, string> = {
+    home: '#inicio',
+    trajetoria: '#trajetoria',
+    atuacao: '#atuacao',
+    projetos: '#acervo',
+    votacoes: '#acervo',
+    resultados: '#resultados',
+    agenda: '#agenda',
+    noticias: '#noticias',
+    videos: '#videos',
+    documentos: '#acervo',
+    transparencia: '#transparencia',
+    contato: '#contato',
+  };
+  return anchors[view] ? `/${anchors[view]}` : `/${view}`;
+};
 
 export const Navbar: React.FC = () => {
   const { currentView, setCurrentView, openProtocolModal } = useApp();
@@ -42,7 +58,9 @@ export const Navbar: React.FC = () => {
 
   const navigate = (view: string) => {
     setMoreOpen(false);
-    setCurrentView(view);
+    setCurrentView('home');
+    const anchor = pathFor(view).replace('/#', '');
+    if (anchor) window.setTimeout(() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   };
 
   const activeMore = MORE_ITEMS.some(([id]) => id === currentView);
@@ -81,10 +99,10 @@ export const Navbar: React.FC = () => {
 
           <nav id="menu-principal" className="hidden lg:flex items-center gap-1" aria-label="Navegação principal">
             <a href="/" onClick={(e) => { e.preventDefault(); navigate('home'); }} className={linkClass(currentView === 'home')}>Início</a>
-            <a href="/trajetoria" onClick={(e) => { e.preventDefault(); navigate('trajetoria'); }} className={linkClass(currentView === 'trajetoria' || currentView === 'sobre')}>Trajetória</a>
-            <a href="/atuacao" onClick={(e) => { e.preventDefault(); navigate('atuacao'); }} className={linkClass(['atuacao','projetos','votacoes'].includes(currentView))}>Atuação</a>
-            <a href="/noticias" onClick={(e) => { e.preventDefault(); navigate('noticias'); }} className={linkClass(currentView === 'noticias' || currentView === 'noticia-detalhe')}>Notícias</a>
-            <a href="/agenda" onClick={(e) => { e.preventDefault(); navigate('agenda'); }} className={linkClass(currentView === 'agenda')}>Agenda</a>
+            <a href="/#trajetoria" onClick={(e) => { e.preventDefault(); navigate('trajetoria'); }} className={linkClass(currentView === 'trajetoria' || currentView === 'sobre')}>Trajetória</a>
+            <a href="/#atuacao" onClick={(e) => { e.preventDefault(); navigate('atuacao'); }} className={linkClass(['atuacao','projetos','votacoes'].includes(currentView))}>Atuação</a>
+            <a href="/#noticias" onClick={(e) => { e.preventDefault(); navigate('noticias'); }} className={linkClass(currentView === 'noticias' || currentView === 'noticia-detalhe')}>Notícias</a>
+            <a href="/#agenda" onClick={(e) => { e.preventDefault(); navigate('agenda'); }} className={linkClass(currentView === 'agenda')}>Agenda</a>
 
             <div ref={moreRef} className="relative">
               <button
@@ -116,7 +134,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             <a
-              href="/contato"
+              href="/#contato"
               onClick={(e) => { e.preventDefault(); navigate('contato'); }}
               className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-4 text-sm font-semibold text-white hover:bg-[#006b32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
             >
@@ -126,7 +144,7 @@ export const Navbar: React.FC = () => {
           </nav>
 
           <div className="hidden md:flex lg:hidden items-center">
-            <a href="/contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
+            <a href="/#contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
               <PhoneCall className="h-4 w-4" aria-hidden="true" />
               Fale com o Deputado
             </a>
