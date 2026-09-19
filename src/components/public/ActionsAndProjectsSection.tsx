@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, ExternalLink, FileText, Users } from 'lucide-react';
+import { ArrowRight, ChevronDown, FileText, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppUi } from '../../context/AppUiContext';
-import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
-import { ContextSurface } from '../layout/ContextSurface';
+
 
 interface ActionsAndProjectsSectionProps {
   initialSubTab?: 'projetos' | 'votacoes' | 'participacoes' | 'resultados' | 'documentos';
@@ -20,7 +19,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     currentView === 'documentos' ? 'documentos' :
     currentView === 'resultados' ? 'resultados' : initialSubTab ?? 'projetos',
   );
-  const [selectedItem, setSelectedItem] = useState<PublicLegislativeItemDto | null>(null);
   const [projectQuery, setProjectQuery] = useState('');
   const [projectType, setProjectType] = useState('TODOS');
   const [projectYear, setProjectYear] = useState('TODOS');
@@ -32,10 +30,13 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
   const publicItems = useMemo(() => legislativeItems.filter((item) => item.status === 'PUBLISHED'), [legislativeItems]);
   const votes = useMemo(() => publicItems.flatMap((item) => item.votes), [publicItems]);
-  const sourceDocumentByItemId = useMemo(() => {
-    const map = new Map<string, typeof documents[number]>();
+  const documentsByItemId = useMemo(() => {
+    const map = new Map<string, typeof documents>();
     documents.forEach((document) => {
-      if (document.legislativeItemId && document.publicUrl && !map.has(document.legislativeItemId)) map.set(document.legislativeItemId, document);
+      if (!document.legislativeItemId || !document.publicUrl) return;
+      const current = map.get(document.legislativeItemId) || [];
+      current.push(document);
+      map.set(document.legislativeItemId, current);
     });
     return map;
   }, [documents]);
@@ -74,6 +75,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const openDocument = (url: string | null | undefined, title: string) => {
     if (url) openDocumentViewer(url, title, 'pdf');
   };
+
+  const documentsForItem = (itemId: string) => documentsByItemId.get(itemId) || [];
 
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: 'projetos', label: 'PROPOSIÇÕES' },
@@ -141,9 +144,44 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       <div className="pb-7 pr-9">
                         <p className="max-w-4xl text-sm sm:text-base text-stone-300 leading-relaxed">{item.summary || 'Sem ementa publicada.'}</p>
                         <div className="mt-5 flex flex-wrap gap-4">
-                          <button type="button" onClick={() => setSelectedItem(item)} className="min-h-11 text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-1.5">
-                            Ver proposição <ArrowRight className="w-4 h-4" />
-                          </button>
+                          {item.detailedDescription && (
+                            <div className="w-full border-t border-stone-800 pt-5">
+                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Descrição</span>
+                              <p className="mt-2 max-w-4xl text-sm text-stone-300 leading-relaxed">{item.detailedDescription}</p>
+                            </div>
+                          )}
+                          {item.theme && (
+                            <div className="border-t border-stone-800 pt-5 min-w-[12rem]">
+                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Tema</span>
+                              <p className="mt-1 text-sm font-semibold text-white">{item.theme}</p>
+                            </div>
+                          )}
+                          {item.roles.length > 0 && (
+                            <div className="w-full border-t border-stone-800 pt-5">
+                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Participações</span>
+                              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                                {item.roles.map((role) => (
+                                  <div key={role.id} className="flex justify-between gap-4 text-sm">
+                                    <span className="text-stone-400">{formatRole(role.role)}</span>
+                                    <span className="font-semibold text-white text-right">{role.personName}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {documentsForItem(item.id).length > 0 && (
+                            <div className="w-full border-t border-stone-800 pt-5">
+                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Documentos da proposição</span>
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {documentsForItem(item.id).map((document) => (
+                                  <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
+                                    <FileText className="h-4 w-4 shrink-0" />
+                                    <span className="truncate">{document.title || 'Ver documento'}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </details>
@@ -180,7 +218,19 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
                         {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{formatDate(vote.voteDate)}</p></div>}
                       </div>
-                      {sourceDocumentByItemId.get(vote.legislativeItemId)?.publicUrl && <button type="button" onClick={() => openDocument(sourceDocumentByItemId.get(vote.legislativeItemId)!.publicUrl, `Votação — ${vote.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1 hover:underline">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button>}
+                      {documentsForItem(vote.legislativeItemId).length > 0 && (
+                        <div className="mt-5 border-t border-stone-800 pt-5">
+                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte documental</span>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {documentsForItem(vote.legislativeItemId).map((document) => (
+                              <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || ('Votação — ' + vote.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                {document.title || 'Ver documento'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}}
                     </div>
                   </details>
                 ))}
@@ -216,7 +266,19 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{formatRole(role.role)}</p></div>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Ano</span><p className="font-semibold text-white mt-0.5">{role.year}</p></div>
                       </div>
-                      {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, `Fonte oficial — ${role.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
+                      {documentsForItem(role.itemId).length > 0 && (
+                        <div className="mt-5 border-t border-stone-800 pt-5">
+                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte documental</span>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {documentsForItem(role.itemId).map((document) => (
+                              <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || ('Fonte — ' + role.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                {document.title || 'Ver documento'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}}
                     </div>
                   </details>
                 ))}
@@ -235,7 +297,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <div className="border border-stone-800 rounded-sm divide-y divide-stone-800">
                 {filteredDocuments.map((document) => {
                   const item = itemById.get(document.legislativeItemId);
-                  const url = document.publicUrl || document.originalUrl;
+                  const url = document.publicUrl;
                   const isAnnex = document.documentType?.toUpperCase() === 'ANEXO';
                   const annexMatch = document.title?.match(/(?:Anexo[- ]?)(\\d+)$/i);
                   const displayTitle = isAnnex && annexMatch ? `Anexo ${annexMatch[1]}` : document.title;
@@ -281,17 +343,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           </div>
         )}
 
-        <ContextSurface open={selectedItem !== null} title={selectedItem?.title || selectedItem?.code || 'Proposição'} onClose={() => setSelectedItem(null)}>
-          {selectedItem && (
-            <div className="space-y-6 text-sm text-stone-700">
-              <div><span className="text-xs font-bold text-[#00A550] uppercase tracking-wider block mb-1">{selectedItem.code}</span><p className="font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-sm">{selectedItem.summary || 'Sem ementa publicada.'}</p></div>
-              {selectedItem.detailedDescription && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Descrição</span><p className="leading-relaxed">{selectedItem.detailedDescription}</p></div>}
-              {selectedItem.theme && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Tema</span><p className="font-semibold text-stone-900 mt-0.5">{selectedItem.theme}</p></div>}
-              {selectedItem.roles.length > 0 && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">Participações</span><ul className="space-y-2">{selectedItem.roles.map((role) => <li key={role.id} className="flex justify-between gap-3"><span>{role.role}</span><span className="font-semibold">{role.personName}</span></li>)}</ul></div>}
-              {selectedItem.sourceUrl && <div className="pt-4 border-t border-stone-200"><button type="button" onClick={() => openDocument(selectedItem.sourceUrl, `${selectedItem.code} — fonte oficial`)} className="min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button></div>}
-            </div>
-          )}
-        </ContextSurface>
+
 
       </div>
     </section>
