@@ -148,9 +148,9 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <Metric value={votes.length} label="Votos nominais" detail="Registros ligados às proposições" />
         </div>
 
-        <nav className="flex max-w-full items-center gap-1 overflow-x-auto border-b border-stone-200 mb-10 pb-0 -mx-1 px-1 scrollbar-none" aria-label="Atuação parlamentar">
+        <nav className="grid grid-cols-2 sm:flex sm:max-w-full sm:items-center gap-0 sm:gap-1 border-b border-stone-200 mb-10 -mx-1 px-1" aria-label="Atuação parlamentar">
           {tabs.map((tab) => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`shrink-0 min-h-14 px-4 sm:px-5 py-3 text-lg sm:text-xl font-bold tracking-tight whitespace-nowrap border-b-[3px] ${activeTab === tab.id ? 'border-[#008C45] text-stone-950' : 'border-transparent text-stone-950 hover:text-[#008C45]'}`}>
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`w-full min-w-0 min-h-16 px-3 sm:px-5 py-3 text-base sm:text-xl font-bold tracking-tight leading-tight border-b-[3px] sm:whitespace-nowrap ${activeTab === tab.id ? 'border-[#008C45] text-stone-950' : 'border-stone-200 text-stone-950 hover:text-[#008C45]'}`}>
               {tab.label}
             </button>
           ))}
