@@ -357,8 +357,19 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
     for (const media of activityMedia ?? []) {
       const baseTitle = String(media.title ?? '').replace(/\s+—\s+foto\s+\d+\s*$/i, '').trim();
       const url = media.url || media.original_url;
-      if (baseTitle && url && missingImageTitles.includes(baseTitle) && !mediaByNewsTitle.has(baseTitle)) {
-        mediaByNewsTitle.set(baseTitle, url);
+      if (!baseTitle || !url) continue;
+
+      const exactNewsTitle = missingImageTitles.find((title) => title === baseTitle);
+      const relatedNewsTitle = missingImageTitles.find((title) =>
+        title.includes('Brigada Militar') && baseTitle.includes('Brigada Militar')
+      );
+      const newsTitle = exactNewsTitle ?? relatedNewsTitle;
+      if (!newsTitle) continue;
+
+      const current = mediaByNewsTitle.get(newsTitle);
+      const preferred = /_G\.(?:jpe?g|png)$/i.test(url);
+      if (!current || preferred) {
+        mediaByNewsTitle.set(newsTitle, url);
       }
     }
   }
