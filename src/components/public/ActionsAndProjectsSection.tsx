@@ -85,8 +85,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     };
     const typeDiff = (typeOrder[a.documentType?.toUpperCase() || ''] || 99) - (typeOrder[b.documentType?.toUpperCase() || ''] || 99);
     if (typeDiff !== 0) return typeDiff;
-    const annexA = Number(a.title?.match(/(?:Anexo[- ]?)(\\d+)$/i)?.[1] || 0);
-    const annexB = Number(b.title?.match(/(?:Anexo[- ]?)(\\d+)$/i)?.[1] || 0);
+    const annexA = Number(a.title?.match(/(?:Anexo[- ]?)(\d+)$/i)?.[1] || 0);
+    const annexB = Number(b.title?.match(/(?:Anexo[- ]?)(\d+)$/i)?.[1] || 0);
     if (a.documentType?.toUpperCase() === 'ANEXO' && annexA !== annexB) return annexA - annexB;
     return (a.title || '').localeCompare(b.title || '', 'pt-BR');
   }), [archiveDocuments, documentQuery, documentType, itemById]);
@@ -362,7 +362,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                   const item = itemById.get(document.legislativeItemId);
                   const url = document.publicUrl || document.originalUrl;
                   const isAnnex = document.documentType?.toUpperCase() === 'ANEXO';
-                  const annexMatch = document.title?.match(/(?:Anexo[- ]?)(\\d+)$/i);
+                  const annexMatch = document.title?.match(/(?:Anexo[- ]?)(\d+)$/i);
                   const displayTitle = isAnnex && annexMatch ? `Anexo ${annexMatch[1]}` : document.title;
                   const viewerTitle = item?.code && isAnnex && annexMatch ? `${item.code} — Anexo ${annexMatch[1]}` : displayTitle;
                   return (
