@@ -56,8 +56,8 @@
     min-width: 320px;
     background: var(--surface);
     color: var(--text-primary);
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 1.65;
     font-family: inherit;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
@@ -153,7 +153,37 @@ article p,
 .content-section p,
 .editorial-prose {
   max-width: 65ch;
-  line-height: 1.65;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* Tipografia institucional: leitura confortável em toda a plataforma. */
+button,
+input,
+textarea,
+select {
+  font-size: 1rem;
+}
+
+label,
+dt,
+dd {
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  body {
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  main section p,
+  article p,
+  .content-section p,
+  .editorial-prose {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
 }
 
 /* Existing glass classes intentionally neutralized.
