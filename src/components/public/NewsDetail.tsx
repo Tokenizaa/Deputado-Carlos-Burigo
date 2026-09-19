@@ -92,7 +92,7 @@ export const NewsDetail: React.FC = () => {
           <img
             src={article.mainImage}
             alt={article.title}
-            className="w-full h-auto max-h-[500px] object-cover"
+            className="w-full h-auto max-h-[500px] object-contain"
             referrerPolicy="no-referrer"
           />
         </div>
