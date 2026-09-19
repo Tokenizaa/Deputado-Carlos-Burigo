@@ -323,9 +323,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <button type="button" onClick={() => openDocument(url, viewerTitle)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5" /> Visualizar <ExternalLink className="w-3 h-3" />
                         </button>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="min-h-11 border border-stone-700 px-3 inline-flex items-center text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-500">
-                          Baixar arquivo
-                        </a>
+
                       </div>}
                     </article>
                   );
