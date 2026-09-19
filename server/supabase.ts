@@ -388,6 +388,12 @@ export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
 }
 
 export async function getAdminUserById(id: string): Promise<User | null> {
+  // Supabase Auth user IDs are UUIDs. Guard the boundary so malformed client
+  // values do not reach auth.admin.getUserById() and generate noisy runtime errors.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return null;
+  }
+
   try {
     // Get auth user (includes email)
     const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(id);
