@@ -16,6 +16,9 @@ export interface PublicNewsDto {
   seoTitle?: string;
   seoDescription?: string;
   socialImage?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  imageCredit?: string;
 }
 
 export interface PublicAgendaDto {
