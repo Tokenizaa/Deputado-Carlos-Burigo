@@ -155,7 +155,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/auth/me', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.json()),
         fetch('/api/pages').then((r) => r.json()),
         fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
-        fetch('/api/news?admin=true').then((r) => r.json()),
+        fetch('/api/news').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
         fetch('/api/results').then((r) => r.json()),
         fetch('/api/municipalities').then((r) => r.json()),
