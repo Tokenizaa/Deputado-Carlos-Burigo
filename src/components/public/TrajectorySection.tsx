@@ -1,41 +1,38 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
-import { ArrowRight } from 'lucide-react';
 
-export const TrajectorySection: React.FC = () => {
-  const { setCurrentView } = useApp();
+const timeline = [
+  ['1964–1982', 'Origem e formação', 'Bom Jesus e São José dos Ausentes · RS', 'Nascimento em Bom Jesus/RS e mudança para São Leopoldo aos 18 anos para cursar a faculdade.'],
+  ['1982–1992', 'Formação e início profissional', 'São Leopoldo · RS', 'Formação em Ciências Contábeis pela Unisinos e atuação profissional no setor privado.'],
+  ['1993–2004', 'Administração municipal', 'São José dos Ausentes · RS', 'Atuação como chefe de gabinete e secretário de Administração; prefeito por dois mandatos entre 1997 e 2004.'],
+  ['2005–2014', 'Gestão pública em Caxias do Sul', 'Caxias do Sul · RS', 'Atuação como secretário da Fazenda e depois secretário de Gestão e Finanças.'],
+  ['2015–2018', 'Governo do Estado', 'Porto Alegre · RS', 'Atuação na Secretaria-Geral de Governo e na Secretaria de Planejamento, Governança e Gestão.'],
+  ['2018–2022', 'Primeiro período na Assembleia', 'Porto Alegre · RS', 'Assumiu mandato na Assembleia Legislativa do Rio Grande do Sul em 2019 e exerceu a função até 2022.'],
+  ['2023–atual', 'Segundo período parlamentar', 'Porto Alegre · RS', 'Retornou ao mandato parlamentar em 2023. O acervo público registra sua participação legislativa.'],
+] as const;
 
-  return (
-    <section className="bg-white border-b border-stone-200 py-16 sm:py-20 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="w-2.5 h-2.5 bg-[#00A550]" />
-            <span className="text-xs sm:text-sm font-bold text-[#00A550] uppercase tracking-[0.12em]">TRAJETÓRIA PÚBLICA</span>
-            <span className="text-stone-300">•</span>
-            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">ACERVO DOCUMENTADO</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-stone-900 leading-[1.06]">
-            Uma trajetória parlamentar que pode ser consultada pelo acervo.
-          </h2>
-
-          <p className="mt-4 text-base sm:text-lg text-stone-600 leading-relaxed max-w-[65ch]">
-            A trajetória pública é apresentada por registros documentados e fontes públicas. Projetos de lei, votações e documentos ficam concentrados na área de atuação parlamentar.
-          </p>
-
-          <div className="mt-8">
-            <button
-              type="button"
-              onClick={() => setCurrentView('atuacao')}
-              className="min-h-12 px-6 py-3 bg-stone-900 hover:bg-black text-white font-bold text-sm uppercase tracking-wider rounded-[2px] transition-colors inline-flex items-center gap-3 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"
-            >
-              <span>Ver atuação parlamentar</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+export const TrajectorySection: React.FC = () => (
+  <section id="trajetoria" aria-labelledby="trajetoria-titulo" className="scroll-mt-28 border-b border-stone-200 bg-white py-16 sm:py-20 lg:py-24">
+    <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+      <div className="max-w-3xl">
+        <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#00863f]">Histórico público</p>
+        <h2 id="trajetoria-titulo" className="mt-2 text-3xl font-bold tracking-tight text-stone-950 sm:text-4xl">
+          Trajetória em uma única página
+        </h2>
+        <p className="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
+          Uma linha do tempo objetiva, organizada por período e contexto. As informações abaixo são apresentadas a partir de registros públicos identificados no acervo.
+        </p>
       </div>
-    </section>
-  );
-};
+      <ol className="mt-12 grid gap-0 border-t border-stone-200 lg:grid-cols-7 lg:border-l lg:border-t-0">
+        {timeline.map(([period, title, place, description], index) => (
+          <li key={period} className="relative border-b border-stone-200 py-7 lg:border-b-0 lg:border-r lg:p-6">
+            <span className="text-sm font-bold text-[#00863f]">{period}</span>
+            <h3 className="mt-3 text-lg font-bold leading-snug text-stone-950">{title}</h3>
+            <p className="mt-1 text-sm font-semibold text-stone-500">{place}</p>
+            <p className="mt-4 text-sm leading-6 text-stone-700">{description}</p>
+            {index < timeline.length - 1 && <span className="hidden lg:block absolute -right-1 top-8 h-2 w-2 rounded-full bg-[#00863f]" aria-hidden="true" />}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+);
