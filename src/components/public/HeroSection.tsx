@@ -20,7 +20,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ customTitle, customSub
           <img
             src={image}
             alt={name}
-            className="absolute inset-0 h-full w-full object-cover object-top"
+            className="absolute inset-0 h-full w-full object-contain"
             fetchPriority="high"
             loading="eager"
             width={900}
