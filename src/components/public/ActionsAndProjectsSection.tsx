@@ -133,7 +133,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         <header className="max-w-3xl mb-12">
           <div className="flex items-center gap-3 mb-3">
             <span className="w-2.5 h-2.5 bg-[#00A550]" />
-            <span className="text-sm sm:text-base font-bold text-[#008C45] uppercase tracking-[0.1em]">ATUAÇÃO PARLAMENTAR</span>
+            <span className="text-base sm:text-lg font-bold text-[#008C45] uppercase tracking-[0.1em]">ATUAÇÃO PARLAMENTAR</span>
             <span className="text-stone-950">•</span>
             <span className="text-sm font-semibold text-stone-600 uppercase tracking-wider">ACERVO LEGISLATIVO</span>
           </div>
@@ -150,7 +150,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
         <nav className="flex max-w-full items-center gap-1 overflow-x-auto border-b border-stone-200 mb-10 pb-0 -mx-1 px-1 scrollbar-none" aria-label="Atuação parlamentar">
           {tabs.map((tab) => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`shrink-0 min-h-14 px-4 sm:px-5 py-3 text-base sm:text-lg font-bold tracking-tight whitespace-nowrap border-b-[3px] ${activeTab === tab.id ? 'border-[#008C45] text-stone-950' : 'border-transparent text-stone-950 hover:text-[#008C45]'}`}>
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`shrink-0 min-h-14 px-4 sm:px-5 py-3 text-lg sm:text-xl font-bold tracking-tight whitespace-nowrap border-b-[3px] ${activeTab === tab.id ? 'border-[#008C45] text-stone-950' : 'border-transparent text-stone-950 hover:text-[#008C45]'}`}>
               {tab.label}
             </button>
           ))}
