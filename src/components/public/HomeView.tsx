@@ -20,7 +20,7 @@ export const HomeView: React.FC = () => {
   const { setCurrentView } = useApp();
 
   return (
-    <main className="w-full bg-white text-stone-950">
+    <div className="w-full bg-white text-stone-950">
       <HeroSection />
 
       <section className="border-b border-stone-200 bg-stone-50" aria-labelledby="home-acesso">
@@ -57,7 +57,7 @@ export const HomeView: React.FC = () => {
 
       <TrajectorySection />
 
-      <section className="border-b border-stone-200 bg-[#006b32] text-white" aria-labelledby="home-atuacao">
+      <section id="atuacao" className="scroll-mt-28 border-b border-stone-200 bg-[#006b32] text-white" aria-labelledby="home-atuacao">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-14 lg:flex-row lg:items-end lg:justify-between lg:px-12">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.12em] text-white/75">Atuação parlamentar</p>
@@ -79,10 +79,10 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      <ActionsAndProjectsSection initialSubTab="visao-geral" />
-      <ResultsSection />
+      <div id="acervo" className="scroll-mt-28"><ActionsAndProjectsSection initialSubTab="visao-geral" /></div>
+      <div id="resultados" className="scroll-mt-28"><ResultsSection /></div>
 
-      <section className="border-b border-stone-200 bg-stone-50" aria-labelledby="home-transparencia">
+      <section id="transparencia" className="scroll-mt-28 border-b border-stone-200 bg-stone-50" aria-labelledby="home-transparencia">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#006b32]">Transparência</p>
@@ -104,11 +104,11 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      <AgendaSection />
-      <NewsSection limit={3} />
-      <VideosSection />
+      <div id="agenda" className="scroll-mt-28"><AgendaSection /></div>
+      <div id="noticias" className="scroll-mt-28"><NewsSection limit={3} /></div>
+      <div id="videos" className="scroll-mt-28"><VideosSection /></div>
 
-      <section className="border-t border-stone-200 bg-stone-950 text-white" aria-labelledby="home-contato">
+      <section id="contato" className="scroll-mt-28 border-t border-stone-200 bg-stone-950 text-white" aria-labelledby="home-contato">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.12em] text-stone-400">Participação cidadã</p>
