@@ -23,12 +23,13 @@ import { AboutView } from './components/public/AboutView';
 import { TrajectoryView } from './components/public/TrajectoryView';
 import { CampaignView } from './components/public/CampaignView';
 import { HomeView } from './components/public/HomeView';
+import { InformativosView } from './components/public/InformativosView';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { SEO } from './components/seo/SEO';
 import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { DynamicPageView } from './components/public/DynamicPageView';
 
-const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia']);
+const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
 
 const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView } = useApp();
@@ -81,6 +82,7 @@ const MainAppContent: React.FC = () => {
         {currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}
         {currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}
         {currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}
+        {currentView === 'informativos' && <InformativosView />}
         {currentView === 'resultados' && <ResultsSection />}
         {currentView === 'noticias' && <NewsSection />}
         {currentView === 'noticia-detalhe' && <NewsDetail />}
