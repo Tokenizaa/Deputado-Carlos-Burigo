@@ -139,6 +139,6 @@ export const HomeView: React.FC = () => {
           </button>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
