@@ -101,7 +101,7 @@ export const HomeView: React.FC = () => {
               ['O que não aparece', 'Rascunhos, registros internos e itens sem publicação não são apresentados como informação pública.'],
               ['Fonte', 'Quando houver documento ou fonte oficial externa, o portal preserva o vínculo para permitir a conferência.'],
             ].map(([title, text]) => (
-              <article key={title} className="border-b border-stone-200 p-5 last:border-b-0 md:nth-[2]:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0">
+              <article key={title} className="border-b border-stone-200 p-5 last:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0">
                 <h3 className="text-base font-bold text-stone-950">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-stone-600">{text}</p>
               </article>
