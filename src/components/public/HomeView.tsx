@@ -5,6 +5,7 @@ import { HeroSection } from './HeroSection';
 import { TrajectorySection } from './TrajectorySection';
 import { ActionsAndProjectsSection } from './ActionsAndProjectsSection';
 import { ResultsSection } from './ResultsSection';
+import { MunicipalitiesSection } from './MunicipalitiesSection';
 import { AgendaSection } from './AgendaSection';
 import { NewsSection } from './NewsSection';
 import { VideosSection } from './VideosSection';
@@ -21,6 +22,7 @@ export const HomeView: React.FC = () => {
 
       <div id="acervo" className="scroll-mt-28"><ActionsAndProjectsSection initialSubTab="projetos" /></div>
       <div id="resultados" className="scroll-mt-28"><ResultsSection /></div>
+      <div id="municipios" className="scroll-mt-28"><MunicipalitiesSection /></div>
 
       <div id="agenda" className="scroll-mt-28"><AgendaSection /></div>
       <InformativosSection />
