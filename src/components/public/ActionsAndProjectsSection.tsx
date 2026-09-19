@@ -333,7 +333,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                             )}
                           </div>
                         </div>
-                      )}}
+                      ) : null}
                     </div>
                   </details>
                 ))}
