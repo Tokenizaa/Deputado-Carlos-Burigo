@@ -6,13 +6,11 @@ const MORE_ITEMS = [
   ['trajetoria', 'Trajetória'],
   ['projetos', 'Proposições'],
   ['votacoes', 'Votações'],
-  ['atuacao', 'Comissões'],
   ['resultados', 'Resultados'],
   ['agenda', 'Agenda'],
   ['municipios', 'Municípios'],
   ['videos', 'Vídeos'],
   ['documentos', 'Documentos'],
-  ['transparencia', 'Transparência'],
   ['contato', 'Contato'],
   ['acessibilidade', 'Acessibilidade'],
 ] as const;
@@ -100,7 +98,6 @@ export const Navbar: React.FC = () => {
           <nav id="menu-principal" className="hidden lg:flex items-center gap-1" aria-label="Navegação principal">
             <a href="/" onClick={(e) => { e.preventDefault(); navigate('home'); }} className={linkClass(currentView === 'home')}>Início</a>
             <a href="/#trajetoria" onClick={(e) => { e.preventDefault(); navigate('trajetoria'); }} className={linkClass(currentView === 'trajetoria' || currentView === 'sobre')}>Trajetória</a>
-            <a href="/#atuacao" onClick={(e) => { e.preventDefault(); navigate('atuacao'); }} className={linkClass(['atuacao','projetos','votacoes'].includes(currentView))}>Atuação</a>
             <a href="/#noticias" onClick={(e) => { e.preventDefault(); navigate('noticias'); }} className={linkClass(currentView === 'noticias' || currentView === 'noticia-detalhe')}>Notícias</a>
             <a href="/#agenda" onClick={(e) => { e.preventDefault(); navigate('agenda'); }} className={linkClass(currentView === 'agenda')}>Agenda</a>
 
