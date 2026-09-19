@@ -224,6 +224,10 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                 {filteredDocuments.map((document) => {
                   const item = itemById.get(document.legislativeItemId);
                   const url = document.publicUrl || document.originalUrl;
+                  const isAnnex = document.documentType?.toUpperCase() === 'ANEXO';
+                  const annexMatch = document.title?.match(/(?:Anexo[- ]?)(\\d+)$/i);
+                  const displayTitle = isAnnex && annexMatch ? `Anexo ${annexMatch[1]}` : document.title;
+                  const viewerTitle = item?.code && isAnnex && annexMatch ? `${item.code} — Anexo ${annexMatch[1]}` : displayTitle;
                   return (
                     <article key={document.id} className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-start justify-between gap-5">
                       <div className="min-w-0 space-y-3">
@@ -233,7 +237,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                           {item?.code && <span className="font-mono text-stone-400">{item.code}</span>}
                           <span className="text-stone-500">{document.verificationStatus.replace(/_/g, ' ')}</span>
                         </div>
-                        <p className="font-semibold text-white">{document.title}</p>
+                        <p className="font-semibold text-white">{displayTitle}</p>
                         <dl className="grid gap-2 sm:grid-cols-2 text-xs">
                           <div><dt className="font-semibold text-stone-300">Contexto</dt><dd className="text-stone-500">{item?.title || 'Documento legislativo do acervo'}</dd></div>
                           <div><dt className="font-semibold text-stone-300">Origem</dt><dd className="text-stone-500">{document.sourceName || 'Fonte não informada no registro'}</dd></div>
@@ -242,7 +246,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         </dl>
                       </div>
                       {url && <div className="flex flex-wrap gap-3 shrink-0">
-                        <button type="button" onClick={() => openDocument(url, document.title)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
+                        <button type="button" onClick={() => openDocument(url, viewerTitle)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5" /> Visualizar <ExternalLink className="w-3 h-3" />
                         </button>
                         <a href={url} target="_blank" rel="noopener noreferrer" className="min-h-11 border border-stone-700 px-3 inline-flex items-center text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-500">
