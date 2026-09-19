@@ -53,6 +53,11 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   });
 
   const filteredDocuments = documents.filter((document) => {
+    if (
+      document.title?.toLowerCase().includes('informativo') ||
+      document.storagePath?.toLowerCase().startsWith('informativos/')
+    ) return false;
+
     const item = itemById.get(document.legislativeItemId);
     const q = documentQuery.trim().toLowerCase();
     return (!q || [document.title, document.documentType, item?.code, item?.title].some((value) => value?.toLowerCase().includes(q)))
