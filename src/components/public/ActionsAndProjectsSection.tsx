@@ -10,7 +10,7 @@ interface ActionsAndProjectsSectionProps {
 }
 type Tab = NonNullable<ActionsAndProjectsSectionProps['initialSubTab']>;
 
-export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({ initialSubTab = 'visao-geral' }) => {
+export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({ initialSubTab = 'projetos' }) => {
   const { setCurrentView, currentView, legislativeItems, documents } = useApp();
   const { openDocumentViewer } = useAppUi();
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -159,7 +159,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <span className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-bold bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
                           <span className="font-semibold text-[#00A550]">{vote.vote}</span>
-                          {vote.voteDate && <span className="text-stone-500">• {vote.voteDate}</span>}
+                          {vote.voteDate && <span className="text-stone-500">• {formatDate(vote.voteDate)}</span>}
                         </span>
                         <span className="text-sm font-medium text-stone-300 mt-1.5 block">{vote.sessionName || 'Sessão não informada'}</span>
                         <span className="text-xs text-stone-500 mt-0.5 block">Voto registrado de {vote.voterName}</span>
@@ -171,9 +171,9 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Matéria</span><p className="font-semibold text-white mt-0.5">{vote.legislativeCode}</p></div>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-white mt-0.5">{vote.vote}</p></div>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
-                        {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{vote.voteDate}</p></div>}
+                        {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{formatDate(vote.voteDate)}</p></div>}
                       </div>
-                      {vote.sourceUrl && <button type="button" onClick={() => openDocument(vote.sourceUrl, `Votação — ${vote.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button>}
+                      {vote.sourceUrl && <a href={vote.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1 hover:underline">Ler fonte oficial <ExternalLink className="w-3 h-3" /></a>}
                     </div>
                   </details>
                 ))}
@@ -309,6 +309,8 @@ const FilterBar: React.FC<{ search: string; onSearch: (value: string) => void; p
 const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
   <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>
 );
+
+const formatDate = (value: string) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date); };
 
 const EmptyState: React.FC<{ message: string }> = ({ message }) => <div className="border border-dashed border-stone-700 p-8 text-sm text-stone-400">{message}</div>;
 
