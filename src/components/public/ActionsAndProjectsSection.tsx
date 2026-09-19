@@ -21,7 +21,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     currentView === 'resultados' ? 'resultados' : initialSubTab ?? 'projetos',
   );
   const [selectedItem, setSelectedItem] = useState<PublicLegislativeItemDto | null>(null);
-  const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
   const [projectQuery, setProjectQuery] = useState('');
   const [projectType, setProjectType] = useState('TODOS');
   const [projectYear, setProjectYear] = useState('TODOS');
@@ -147,20 +146,31 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <div className="space-y-6">
             <FilterBar search={voteQuery} onSearch={setVoteQuery} placeholder="Buscar matéria, sessão ou votante..." selects={[{ value: voteChoice, onChange: setVoteChoice, label: 'Voto', options: ['TODOS', ...[...new Set(votes.map((vote) => vote.vote.toUpperCase()))].sort()] }]} />
             {filteredVotes.length === 0 ? <EmptyState message="Nenhuma votação corresponde aos filtros." /> : (
-              <div className="border border-stone-800 rounded-sm divide-y divide-stone-800">
+              <div className="border-y border-stone-800">
                 {filteredVotes.map((vote) => (
-                  <button key={vote.id} type="button" onClick={() => setSelectedVote(vote)} className="w-full text-left p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00A550]">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="font-bold bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
-                        <span className="font-semibold text-[#00A550]">{vote.vote}</span>
-                        {vote.voteDate && <span className="text-stone-500">• {vote.voteDate}</span>}
+                  <details key={vote.id} className="group border-b border-stone-800 last:border-b-0">
+                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-bold bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
+                          <span className="font-semibold text-[#00A550]">{vote.vote}</span>
+                          {vote.voteDate && <span className="text-stone-500">• {vote.voteDate}</span>}
+                        </span>
+                        <span className="text-sm font-medium text-stone-300 mt-1.5 block">{vote.sessionName || 'Sessão não informada'}</span>
+                        <span className="text-xs text-stone-500 mt-0.5 block">Voto registrado de {vote.voterName}</span>
+                      </span>
+                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                    </summary>
+                    <div className="pb-7 pr-9">
+                      <div className="grid gap-4 sm:grid-cols-3 text-sm">
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Matéria</span><p className="font-semibold text-white mt-0.5">{vote.legislativeCode}</p></div>
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-white mt-0.5">{vote.vote}</p></div>
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
+                        {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{vote.voteDate}</p></div>}
                       </div>
-                      <p className="text-sm font-medium text-stone-300 mt-1.5">{vote.sessionName || 'Sessão não informada'}</p>
-                      <p className="text-xs text-stone-500 mt-0.5">Voto registrado de {vote.voterName}</p>
+                      {vote.sourceUrl && <button type="button" onClick={() => openDocument(vote.sourceUrl, `Votação — ${vote.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button>}
                     </div>
-                    <span className="text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">Ver detalhes <ArrowRight className="w-3 h-3" /></span>
-                  </button>
+                  </details>
                 ))}
               </div>
             )}
@@ -256,15 +266,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           )}
         </ContextSurface>
 
-        <ContextSurface open={selectedVote !== null} title={selectedVote?.sessionName || 'Votação'} onClose={() => setSelectedVote(null)}>
-          {selectedVote && (
-            <div className="space-y-6 text-sm text-stone-700">
-              <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">Matéria</span><p className="font-semibold text-stone-900">{selectedVote.legislativeCode}</p></div>
-              <div className="grid gap-4"><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-stone-900">{selectedVote.vote}</p></div><div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-stone-900">{selectedVote.voterName}</p></div>{selectedVote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-stone-900">{selectedVote.voteDate}</p></div>}</div>
-              {selectedVote.sourceUrl && <button type="button" onClick={() => openDocument(selectedVote.sourceUrl, `Votação — ${selectedVote.legislativeCode}`)} className="min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button>}
-            </div>
-          )}
-        </ContextSurface>
       </div>
     </section>
   );
