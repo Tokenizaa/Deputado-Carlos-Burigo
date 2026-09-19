@@ -346,13 +346,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         </dl>
                       </div>
                       {url && <div className="flex flex-wrap gap-3 shrink-0">
-                          <button type="button" onClick={() => {
-                            const mockDocument = {
-                              publicUrl: document.publicUrl,
-                              originalUrl: document.originalUrl
-                            };
-                            openDocumentSource(mockDocument, viewerTitle);
-                          }} className="min-h-11 text-[#008C45] font-semibold text-xs inline-flex items-center gap-1">
+                          <button type="button" onClick={() => openDocumentSource(document, viewerTitle)} className="min-h-11 text-[#008C45] font-semibold text-xs inline-flex items-center gap-1">
                             <FileText className="w-3.5 h-3.5" /> Visualizar documento
                           </button>
                         </div>}
