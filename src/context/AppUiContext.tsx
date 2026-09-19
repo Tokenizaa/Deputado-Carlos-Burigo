@@ -268,7 +268,21 @@ export const AppUiProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     documentKind === 'image' ? <img src={overlay.url} alt={documentLabel} className="w-full h-full object-contain" />
       : documentKind === 'video' ? <video src={overlay.url} controls playsInline className="w-full h-full object-contain" aria-label={documentLabel} />
         : documentKind === 'external' ? <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center"><FileText className="h-10 w-10 text-stone-400" aria-hidden="true" /><p className="max-w-md text-sm text-stone-600">Esta fonte oficial não pode ser incorporada com segurança. Abra a fonte original.</p><a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-800 hover:bg-stone-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">Abrir fonte oficial <ExternalLink className="h-4 w-4" aria-hidden="true" /></a></div>
-          : <iframe src={overlay.url} title={documentLabel} className="w-full h-full border-0" />
+          : <>
+            <iframe src={overlay.url} title={documentLabel} className="hidden sm:block w-full h-full border-0" />
+            <div className="sm:hidden w-full h-full flex flex-col items-center justify-center gap-5 p-6 text-center bg-stone-100">
+              <FileText className="h-10 w-10 text-stone-500" aria-hidden="true" />
+              <div>
+                <p className="text-base font-semibold text-stone-900">Documento oficial</p>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">A leitura integrada em tela pequena depende do suporte do navegador ao PDF.</p>
+              </div>
+              <object data={overlay.url} type="application/pdf" aria-label={documentLabel} className="hidden" />
+              <a data-no-document-viewer href={overlay.url} target="_blank" rel="noreferrer" className="inline-flex min-h-12 w-full max-w-sm items-center justify-center gap-2 rounded-md bg-[#008C45] px-5 text-base font-bold text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]">
+                Abrir documento
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
+          </>
   ) : null;
 
   const renderDocumentOverlay = overlay?.type === 'document' ? (
