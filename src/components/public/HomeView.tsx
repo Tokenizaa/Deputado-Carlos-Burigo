@@ -29,11 +29,11 @@ export const HomeView: React.FC = () => {
               Informação pública em um só lugar.
             </h2>
             <p className="mt-3 text-base leading-7 text-stone-600">
-              Consulte a atuação parlamentar, a trajetória pública, documentos, transparência e canais de participação.
+              Consulte a trajetória pública e os canais de participação.
             </p>
           </div>
 
-          <div className="mt-7 grid grid-cols-1 overflow-hidden border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-7 grid grid-cols-1 overflow-hidden border border-stone-200 bg-stone-200 sm:grid-cols-2">
             {QUICK_LINKS.map(({ view, label, detail, icon: Icon }) => (
               <button
                 key={view}
