@@ -16,7 +16,7 @@ export const AboutView: React.FC = () => {
                 <img
                   src="/assets/carlos_burigo_portrait.png"
                   alt="Carlos Búrigo - Deputado Estadual do Rio Grande do Sul"
-                  className="w-full h-full object-cover object-top filter contrast-[1.03]"
+                  className="w-full h-full object-contain filter contrast-[1.03]"
                   loading="eager"
                   width={800}
                   height={1000}
