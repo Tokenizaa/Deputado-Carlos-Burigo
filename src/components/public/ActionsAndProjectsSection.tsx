@@ -258,6 +258,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         </span>
                         <span className="mt-2 block text-lg font-bold leading-snug">{role.legislativeCode}</span>
                         {role.legislativeTitle && <span className="mt-1 block text-sm text-stone-400">{role.legislativeTitle}</span>}
+                        <span className="mt-1 block text-sm text-stone-500">{role.personName}</span>
                       </span>
                       <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
                     </summary>
@@ -309,14 +310,14 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                           <span className="font-bold bg-stone-800 px-2 py-0.5 rounded">LEGISLATIVO</span>
                           <span className="font-semibold text-[#00A550]">{document.documentType || 'DOCUMENTO'}</span>
                           {item?.code && <span className="font-mono text-stone-400">{item.code}</span>}
-                          <span className="text-stone-500">{document.verificationStatus.replace(/_/g, ' ')}</span>
+                          <span className="text-stone-500">{formatVerification(document.verificationStatus)}</span>
                         </div>
                         <p className="font-semibold text-white">{displayTitle}</p>
                         <dl className="grid gap-2 sm:grid-cols-2 text-xs">
                           <div><dt className="font-semibold text-stone-300">Contexto</dt><dd className="text-stone-500">{item?.title || 'Documento legislativo do acervo'}</dd></div>
                           <div><dt className="font-semibold text-stone-300">Origem</dt><dd className="text-stone-500">{document.sourceName || 'Fonte não informada no registro'}</dd></div>
-                          <div><dt className="font-semibold text-stone-300">Data</dt><dd className="text-stone-500">{document.downloadedAt || document.createdAt}</dd></div>
-                          <div><dt className="font-semibold text-stone-300">Direitos</dt><dd className="text-stone-500">{document.rightsStatus.replace(/_/g, ' ')}</dd></div>
+                          <div><dt className="font-semibold text-stone-300">Data</dt><dd className="text-stone-500">{formatDate(document.downloadedAt || document.createdAt)}</dd></div>
+                          <div><dt className="font-semibold text-stone-300">Direitos</dt><dd className="text-stone-500">{formatRights(document.rightsStatus)}</dd></div>
                         </dl>
                       </div>
                       {url && <div className="flex flex-wrap gap-3 shrink-0">
@@ -370,6 +371,8 @@ const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }
 const formatRole = (value: string) => ({ AUTHOR: 'Autor', COAUTHOR: 'Coautor', RAPPORTEUR: 'Relator' }[value.toUpperCase()] || value);
 
 const formatDate = (value: string) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date); };
+const formatVerification = (value: string) => ({ VERIFIED_PRIMARY: 'Fonte verificada', VERIFIED_SECONDARY: 'Fonte verificada', FOUND_UNVERIFIED: 'Fonte não verificada' }[value.toUpperCase()] || value.replace(/_/g, ' ').toLowerCase());
+const formatRights = (value: string) => ({ PUBLIC: 'Público', UNKNOWN: 'Não informado', RIGHTS_UNKNOWN: 'Não informado' }[value.toUpperCase()] || value.replace(/_/g, ' ').toLowerCase());
 
 const EmptyState: React.FC<{ message: string }> = ({ message }) => <div className="border border-dashed border-stone-700 p-8 text-sm text-stone-400">{message}</div>;
 
