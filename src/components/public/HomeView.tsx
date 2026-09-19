@@ -83,24 +83,34 @@ export const HomeView: React.FC = () => {
       <div id="resultados" className="scroll-mt-28"><ResultsSection /></div>
 
       <section id="transparencia" className="scroll-mt-28 border-b border-stone-200 bg-stone-50" aria-labelledby="home-transparencia">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-18 lg:px-12">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#006b32]">Transparência</p>
-            <h2 id="home-transparencia" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              Fonte, contexto e acesso aos documentos públicos.
+            <h2 id="home-transparencia" className="mt-2 text-3xl font-bold tracking-tight text-stone-950 sm:text-4xl">
+              Consulte a informação junto da sua fonte.
             </h2>
-            <p className="mt-3 text-base leading-7 text-stone-600">
-              Consulte os critérios de publicação e a origem das informações disponibilizadas pelo portal.
+            <p className="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
+              O portal reúne registros públicos e indica de onde cada informação vem. Não transforma rascunho em publicação, nem substitui documento oficial por texto editorial.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setCurrentView('transparencia')}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-stone-950 px-5 text-base font-bold text-white hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b32]"
-          >
-            Ver transparência
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+
+          <div className="mt-10 grid border border-stone-200 bg-white md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['O que é público', 'Atuação, trajetória, documentos, resultados, agenda, notícias e vídeos que estejam publicados no acervo.'],
+              ['Dados pessoais', 'Quando uma informação contiver dado pessoal desnecessário, a publicação deve aplicar minimização ou anonimização.'],
+              ['O que não aparece', 'Rascunhos, registros internos e itens sem publicação não são apresentados como informação pública.'],
+              ['Fonte', 'Quando houver documento ou fonte oficial externa, o portal preserva o vínculo para permitir a conferência.'],
+            ].map(([title, text]) => (
+              <article key={title} className="border-b border-stone-200 p-5 last:border-b-0 md:nth-[2]:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0">
+                <h3 className="text-base font-bold text-stone-950">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <p className="mt-6 text-sm leading-6 text-stone-500">
+            A referência temporal de cada registro é a data indicada no próprio acervo. A classificação do conteúdo não substitui a análise jurídica ou administrativa exigida para cada caso.
+          </p>
         </div>
       </section>
 
