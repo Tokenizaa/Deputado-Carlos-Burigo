@@ -322,7 +322,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       </div>
                       {url && <div className="flex flex-wrap gap-3 shrink-0">
                         <button type="button" onClick={() => openDocument(url, viewerTitle)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5" /> Visualizar <ExternalLink className="w-3 h-3" />
+                          <FileText className="w-3.5 h-3.5" /> Visualizar documento
                         </button>
 
                       </div>}
