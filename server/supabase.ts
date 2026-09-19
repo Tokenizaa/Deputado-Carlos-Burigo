@@ -338,11 +338,38 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
     }
   }
 
+  // Algumas notícias antigas não têm main_media_id preenchido, mas a imagem
+  // correspondente já existe no acervo parlamentar. Reconstitui o vínculo
+  // pelo título-base para não perder a fotografia real publicada pela ALRS.
+  const missingImageTitles = (data ?? [])
+    .filter((row) => !row.main_media_id)
+    .map((row) => row.title.trim())
+    .filter(Boolean);
+  const mediaByNewsTitle = new Map<string, string>();
+  if (missingImageTitles.length) {
+    const { data: activityMedia, error: activityMediaError } = await supabasePublic
+      .from('media')
+      .select('title,url,original_url')
+      .eq('category', 'foto/atividade_parlamentar')
+      .not('url', 'is', null);
+    if (activityMediaError) throw activityMediaError;
+
+    for (const media of activityMedia ?? []) {
+      const baseTitle = String(media.title ?? '').replace(/\s+—\s+foto\s+\d+\s*$/i, '').trim();
+      const url = media.url || media.original_url;
+      if (baseTitle && url && missingImageTitles.includes(baseTitle) && !mediaByNewsTitle.has(baseTitle)) {
+        mediaByNewsTitle.set(baseTitle, url);
+      }
+    }
+  }
+
   return (data ?? []).map((row) => {
     const dto = toPublicNewsDto(row);
     return {
       ...dto,
-      mainImage: row.main_media_id ? mediaById.get(row.main_media_id) : dto.mainImage,
+      mainImage: row.main_media_id
+        ? mediaById.get(row.main_media_id)
+        : mediaByNewsTitle.get(row.title.trim()) ?? dto.mainImage,
     };
   });
 }
