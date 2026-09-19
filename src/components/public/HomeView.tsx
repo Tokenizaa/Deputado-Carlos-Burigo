@@ -26,8 +26,8 @@ export const HomeView: React.FC = () => {
 
       <div id="agenda" className="scroll-mt-28"><AgendaSection /></div>
       <InformativosSection />
-      <div id="noticias" className="scroll-mt-28"><NewsSection limit={3} /></div>
       <div id="videos" className="scroll-mt-28"><VideosSection /></div>
+      <div id="noticias" className="scroll-mt-28"><NewsSection limit={3} /></div>
 
       <section id="contato" className="scroll-mt-28 border-t border-stone-200 bg-stone-950 text-white" aria-labelledby="home-contato">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
