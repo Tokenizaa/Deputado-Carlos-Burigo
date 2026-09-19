@@ -90,7 +90,7 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
               {featuredItem.mainImage ? <img
                 src={featuredItem.mainImage}
                 alt={featuredItem.title}
-                className="w-full h-full object-cover filter contrast-[1.03] group-hover:scale-[1.01] transition-transform duration-500"
+                className="w-full h-full object-contain filter contrast-[1.03] transition-opacity duration-500"
                 loading="lazy"
                 width={1280}
                 height={550}
@@ -175,7 +175,7 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
                       {item.mainImage ? <img
                         src={item.mainImage}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                        className="w-full h-full object-contain transition-opacity duration-300"
                         loading="lazy"
                         width={640}
                         height={400}
