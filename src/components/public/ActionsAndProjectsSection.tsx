@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, FileText, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, FileText, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppUi } from '../../context/AppUiContext';
 
@@ -27,6 +27,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const [voteChoice, setVoteChoice] = useState('TODOS');
   const [documentQuery, setDocumentQuery] = useState('');
   const [documentType, setDocumentType] = useState('TODOS');
+  const [documentPage, setDocumentPage] = useState(1);
 
   const publicItems = useMemo(() => legislativeItems.filter((item) => item.status === 'PUBLISHED'), [legislativeItems]);
   const votes = useMemo(() => publicItems.flatMap((item) => item.votes), [publicItems]);
@@ -43,8 +44,12 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const itemById = useMemo(() => new Map(legislativeItems.map((item) => [item.id, item])), [legislativeItems]);
   const types = useMemo(() => [...new Set(publicItems.map((item) => item.type))].sort(), [publicItems]);
   const years = useMemo(() => [...new Set(publicItems.map((item) => item.year))].sort((a, b) => b - a), [publicItems]);
-  const documentTypes = useMemo(() => [...new Set(documents.map((item) => item.documentType).filter(Boolean))].sort(), [documents]);
-  const participations = useMemo(() => publicItems.flatMap((item) => item.roles.map((role) => ({ ...role, legislativeCode: item.code, legislativeTitle: item.title, year: item.year }))), [publicItems]);
+  const archiveDocuments = useMemo(() => documents.filter((document) => (
+    !document.title?.toLowerCase().includes('informativo') &&
+    !document.storagePath?.toLowerCase().startsWith('informativos/')
+  )), [documents]);
+  const documentTypes = useMemo(() => [...new Set(archiveDocuments.map((item) => item.documentType).filter(Boolean))].sort(), [archiveDocuments]);
+  const participations = useMemo(() => publicItems.flatMap((item) => item.roles.map((role) => ({ ...role, itemId: item.id, legislativeCode: item.code, legislativeTitle: item.title, year: item.year }))), [publicItems]);
 
   const filteredItems = publicItems.filter((item) => {
     const q = projectQuery.trim().toLowerCase();
@@ -60,17 +65,38 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
       && (voteChoice === 'TODOS' || vote.vote.toUpperCase() === voteChoice);
   });
 
-  const filteredDocuments = documents.filter((document) => {
-    if (
-      document.title?.toLowerCase().includes('informativo') ||
-      document.storagePath?.toLowerCase().startsWith('informativos/')
-    ) return false;
-
+  const filteredDocuments = useMemo(() => archiveDocuments.filter((document) => {
     const item = itemById.get(document.legislativeItemId);
     const q = documentQuery.trim().toLowerCase();
     return (!q || [document.title, document.documentType, item?.code, item?.title].some((value) => value?.toLowerCase().includes(q)))
       && (documentType === 'TODOS' || document.documentType === documentType);
-  });
+  }).sort((a, b) => {
+    const itemA = itemById.get(a.legislativeItemId);
+    const itemB = itemById.get(b.legislativeItemId);
+    const yearDiff = (itemB?.year || 0) - (itemA?.year || 0);
+    if (yearDiff !== 0) return yearDiff;
+    const numberDiff = (itemB?.number || 0) - (itemA?.number || 0);
+    if (numberDiff !== 0) return numberDiff;
+    const typeOrder: Record<string, number> = {
+      TEXTO_JUSTIFICATIVA: 1,
+      PARECER: 2,
+      OFICIO: 3,
+      ANEXO: 4,
+    };
+    const typeDiff = (typeOrder[a.documentType?.toUpperCase() || ''] || 99) - (typeOrder[b.documentType?.toUpperCase() || ''] || 99);
+    if (typeDiff !== 0) return typeDiff;
+    const annexA = Number(a.title?.match(/(?:Anexo[- ]?)(\\d+)$/i)?.[1] || 0);
+    const annexB = Number(b.title?.match(/(?:Anexo[- ]?)(\\d+)$/i)?.[1] || 0);
+    if (a.documentType?.toUpperCase() === 'ANEXO' && annexA !== annexB) return annexA - annexB;
+    return (a.title || '').localeCompare(b.title || '', 'pt-BR');
+  }), [archiveDocuments, documentQuery, documentType, itemById]);
+  const documentsPerPage = 15;
+  const documentTotalPages = Math.max(1, Math.ceil(filteredDocuments.length / documentsPerPage));
+  const safeDocumentPage = Math.min(documentPage, documentTotalPages);
+  const paginatedDocuments = filteredDocuments.slice(
+    (safeDocumentPage - 1) * documentsPerPage,
+    safeDocumentPage * documentsPerPage,
+  );
 
   const openSource = (url: string | null | undefined, title: string, internal = false) => {
     if (!url) return;
@@ -112,7 +138,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pb-12 mb-12 border-b border-stone-800">
           <Metric value={publicItems.length} label="Proposições publicadas" detail="Registros legislativos publicados" />
           <Metric value={publicItems.reduce((total, item) => total + item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role)).length, 0)} label="Registros de autoria" detail="Relações documentadas" />
-          <Metric value={documents.length} label="Documentos" detail="Arquivos no acervo canônico" />
+          <Metric value={archiveDocuments.length} label="Documentos" detail="Arquivos no acervo legislativo" />
           <Metric value={votes.length} label="Votos nominais" detail="Registros ligados às proposições" />
         </div>
 
@@ -321,10 +347,18 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
         {activeTab === 'documentos' && (
           <div className="space-y-6">
-            <FilterBar search={documentQuery} onSearch={setDocumentQuery} placeholder="Buscar documento ou proposição..." selects={[{ value: documentType, onChange: setDocumentType, label: 'Tipo', options: ['TODOS', ...documentTypes] }]} />
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold">Acervo documental</h3>
+                <p className="mt-1 text-sm text-stone-400">Organizado por proposição, do registro mais recente ao mais antigo. Dentro de cada proposição, os documentos seguem a ordem: texto/justificativa, parecer, ofício e anexos.</p>
+              </div>
+              <span className="text-xs font-semibold text-stone-500">{filteredDocuments.length} documentos encontrados</span>
+            </div>
+            <FilterBar search={documentQuery} onSearch={(value) => { setDocumentQuery(value); setDocumentPage(1); }} placeholder="Buscar documento, proposição ou título..." selects={[{ value: documentType, onChange: (value) => { setDocumentType(value); setDocumentPage(1); }, label: 'Tipo', options: ['TODOS', ...documentTypes] }]} />
             {filteredDocuments.length === 0 ? <EmptyState message="Nenhum documento corresponde aos filtros." /> : (
+              <>
               <div className="border border-stone-800 rounded-sm divide-y divide-stone-800">
-                {filteredDocuments.map((document) => {
+                {paginatedDocuments.map((document) => {
                   const item = itemById.get(document.legislativeItemId);
                   const url = document.publicUrl || document.originalUrl;
                   const isAnnex = document.documentType?.toUpperCase() === 'ANEXO';
@@ -358,6 +392,18 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                   );
                 })}
               </div>
+              <div className="flex flex-col gap-3 border-t border-stone-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-xs text-stone-500">Página {safeDocumentPage} de {documentTotalPages}</span>
+                <div className="flex items-center gap-2">
+                  <button type="button" disabled={safeDocumentPage <= 1} onClick={() => setDocumentPage((page) => Math.max(1, page - 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#00A550] inline-flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" /> Anterior
+                  </button>
+                  <button type="button" disabled={safeDocumentPage >= documentTotalPages} onClick={() => setDocumentPage((page) => Math.min(documentTotalPages, page + 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#00A550] inline-flex items-center gap-2">
+                    Próxima <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              </>
             )}
           </div>
         )}
