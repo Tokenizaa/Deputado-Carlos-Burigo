@@ -112,7 +112,13 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     openSource(url, title, Boolean(document.publicUrl));
   };
 
-  const documentsForItem = (itemId: string) => documentsByItemId.get(itemId) || [];
+  const documentsForItem = (itemId: string) => {
+    const direct = documentsByItemId.get(itemId) || [];
+    if (direct.length > 0) return direct;
+    const item = itemById.get(itemId);
+    if (!item?.sourceUrl) return [];
+    return documents.filter((document) => document.originalUrl === item.sourceUrl);
+  };
 
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: 'projetos', label: 'PROPOSIÇÕES' },
@@ -442,7 +448,7 @@ const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }
   <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>
 );
 
-const formatRole = (value: string) => ({ AUTHOR: 'Autor', COAUTHOR: 'Coautor', RAPPORTEUR: 'Relator' }[value.toUpperCase()] || value);
+const formatRole = (value: string) => ({ AUTHOR: 'Autor', COAUTHOR: 'Coautor', RAPPORTEUR: 'Relator', RELATOR: 'Relator', PRESIDENTE: 'Presidente', 'VICE-PRESIDENTE': 'Vice-presidente', SUPLENTE: 'Suplente', TITULAR: 'Titular', 'LÍDER DE BANCADA': 'Líder de bancada', PARTICIPANTE: 'Participante', SIM: 'Sim', NÃO: 'Não' }[value.trim().toUpperCase()] || value.trim());
 
 const formatDate = (value: string) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date); };
 const formatVerification = (value: string) => ({ VERIFIED_PRIMARY: 'Fonte verificada', VERIFIED_SECONDARY: 'Fonte verificada', FOUND_UNVERIFIED: 'Fonte não verificada' }[value.toUpperCase()] || value.replace(/_/g, ' ').toLowerCase());
