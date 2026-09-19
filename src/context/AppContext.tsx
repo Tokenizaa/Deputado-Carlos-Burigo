@@ -12,6 +12,7 @@ import {
   MediaItem,
   Demand,
   AuditLog,
+  Task,
 } from '../types';
 import { useAppUi } from './AppUiContext';
 import { PublicLegislativeItemDto } from '../contracts/publicLegislative';
@@ -35,6 +36,7 @@ interface AppContextType {
   media: MediaItem[];
   demands: Demand[];
   auditLogs: AuditLog[];
+  tasks: Task[];
   legislativeItems: PublicLegislativeItemDto[];
   documents: PublicDocumentDto[];
   isLoading: boolean;
@@ -71,9 +73,28 @@ interface AppContextType {
   rollbackPage: (pageId: string, versionId: string) => Promise<{ success: boolean; data?: Page; error?: string }>;
   showToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   refreshAllData: () => Promise<void>;
+  createTask: (task: { title: string; description?: string; priority?: Task['priority']; assignedTo?: string | null; dueAt?: string | null; sourceType?: Task['sourceType']; sourceId?: string | null }) => Promise<boolean>;
+  updateTask: (id: string, patch: Partial<Task>) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const mapTask = (t: any): Task => ({
+  id: t.id,
+  title: t.title,
+  description: t.description,
+  status: t.status,
+  priority: t.priority,
+  assignedTo: t.assigned_to,
+  dueAt: t.due_at,
+  sourceType: t.source_type,
+  sourceId: t.source_id,
+  completionNotes: t.completion_notes,
+  completedAt: t.completed_at,
+  createdBy: t.created_by,
+  createdAt: t.created_at,
+  updatedAt: t.updated_at,
+});
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const ui = useAppUi();
@@ -97,6 +118,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [demands, setDemands] = useState<Demand[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [legislativeItems, setLegislativeItems] = useState<PublicLegislativeItemDto[]>([]);
   const [documents, setDocuments] = useState<PublicDocumentDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -127,6 +149,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         documentsRes,
         demandsRes,
         logsRes,
+        tasksRes,
       ] = await Promise.all([
         fetch('/api/settings').then((r) => r.json()),
         fetch('/api/auth/me', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.json()),
@@ -142,6 +165,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/documents').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
         fetch('/api/audit-logs').then((r) => r.json()),
+        fetch('/api/tasks', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
       ]);
 
       if (settingsRes) setSettings(settingsRes);
@@ -172,6 +196,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (Array.isArray(documentsRes)) setDocuments(documentsRes);
       if (Array.isArray(demandsRes)) setDemands(demandsRes);
       if (Array.isArray(logsRes)) setAuditLogs(logsRes);
+      if (Array.isArray(tasksRes)) setTasks(tasksRes.map((t: any) => ({ id: t.id, title: t.title, description: t.description, status: t.status, priority: t.priority, assignedTo: t.assigned_to, dueAt: t.due_at, sourceType: t.source_type, sourceId: t.source_id, completionNotes: t.completion_notes, completedAt: t.completed_at, createdBy: t.created_by, createdAt: t.created_at, updatedAt: t.updated_at })));
     } catch (err) {
       console.error('Error loading data:', err);
     } finally {
@@ -182,6 +207,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     refreshAllData();
   }, [refreshAllData]);
+
+  const createTask = async (task: { title: string; description?: string; priority?: Task['priority']; assignedTo?: string | null; dueAt?: string | null; sourceType?: Task['sourceType']; sourceId?: string | null }): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(task) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) { showToast(data?.error || 'Falha ao criar tarefa', 'error'); return false; }
+      setTasks(prev => [mapTask(data), ...prev]);
+      showToast('Tarefa criada.', 'success');
+      return true;
+    } catch { showToast('Erro de comunicação ao criar tarefa', 'error'); return false; }
+  };
+
+  const updateTask = async (id: string, patch: Partial<Task>): Promise<boolean> => {
+    try {
+      const body: Record<string, unknown> = {};
+      if (patch.title !== undefined) body.title = patch.title;
+      if (patch.description !== undefined) body.description = patch.description;
+      if (patch.status !== undefined) body.status = patch.status;
+      if (patch.priority !== undefined) body.priority = patch.priority;
+      if (patch.assignedTo !== undefined) body.assignedTo = patch.assignedTo;
+      if (patch.dueAt !== undefined) body.dueAt = patch.dueAt;
+      if (patch.sourceType !== undefined) body.sourceType = patch.sourceType;
+      if (patch.sourceId !== undefined) body.sourceId = patch.sourceId;
+      if (patch.completionNotes !== undefined) body.completionNotes = patch.completionNotes;
+      if (patch.completedAt !== undefined) body.completedAt = patch.completedAt;
+      const res = await fetch('/api/tasks/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(body) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) { showToast(data?.error || 'Falha ao atualizar tarefa', 'error'); return false; }
+      setTasks(prev => prev.map(t => t.id === id ? mapTask(data) : t));
+      return true;
+    } catch { showToast('Erro de comunicação ao atualizar tarefa', 'error'); return false; }
+  };
 
   const switchUser = async (userId: string) => {
     try {
@@ -335,6 +392,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         media,
         demands,
         auditLogs,
+        tasks,
         legislativeItems,
         documents,
         isLoading,
@@ -347,6 +405,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         rollbackPage,
         showToast,
         refreshAllData,
+        createTask,
+        updateTask,
       }}
     >
       {children}

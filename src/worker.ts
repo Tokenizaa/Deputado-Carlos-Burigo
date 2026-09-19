@@ -15,6 +15,9 @@ import {
   getAdminUserById,
   getAllAdminUsers,
   getAdminAuditLogs,
+  getAdminTasks,
+  createAdminTask,
+  updateAdminTask,
   getAllDemandsAdmin,
   updateDemandAdmin,
   getPublicDocuments,
@@ -636,6 +639,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/auth/me': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const userId = (request.headers.get('x-user-id') as string) || undefined;
@@ -649,6 +654,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/auth/switch-user': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'POST') return methodNotAllowed();
     try {
       const { userId } = await request.json();
@@ -662,7 +669,41 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
+
+  '/api/tasks': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'GET') {
+      try { return Response.json(await getAdminTasks()); }
+      catch (error) { console.error('[api/tasks GET]', error); return Response.json({ error: 'Falha ao carregar tarefas' }, { status: 500 }); }
+    }
+    if (request.method === 'POST') {
+      try {
+        const data = await request.json();
+        const createdBy = request.headers.get('x-user-id');
+        if (!createdBy || !data?.title) return Response.json({ error: 'title e x-user-id são obrigatórios' }, { status: 400 });
+        return Response.json(await createAdminTask({ ...data, createdBy }), { status: 201 });
+      } catch (error) { console.error('[api/tasks POST]', error); return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 }); }
+    }
+    return methodNotAllowed();
+  },
+
+  '/api/tasks/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'PUT') return methodNotAllowed();
+    try {
+      const id = (request as any).params?.id;
+      if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+      const updated = await updateAdminTask(id, await request.json());
+      if (!updated) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+      return Response.json(updated);
+    } catch (error) { console.error('[api/tasks/:id]', error); return Response.json({ error: error?.message || 'Falha ao atualizar tarefa' }, { status: 400 }); }
+  },
+
   '/api/demands': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const demands = await getAllDemandsAdmin();
@@ -674,6 +715,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/demands/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
     try {
       const id = (request as any).params?.id;
@@ -697,6 +740,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/audit-logs': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
       const logs = await getAdminAuditLogs();

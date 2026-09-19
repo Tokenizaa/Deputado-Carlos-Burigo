@@ -4,9 +4,11 @@ import {
   LayoutDashboard,
   FileCode2,
   Newspaper,
-  Image,
   Inbox,
   Settings,
+  CalendarDays,
+  ListTodo,
+  Users,
   ArrowLeft,
   ChevronDown,
 } from 'lucide-react';
@@ -30,17 +32,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   ).length;
 
   const navItems = [
-    { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard, badge: null },
-    { id: 'atuação', label: 'Atuação Pública', icon: FileCode2, badge: null },
-    { id: 'conteúdo', label: 'Conteúdo Público', icon: Newspaper, badge: null },
-    { id: 'acervo', label: 'Acervo', icon: Image, badge: null },
+    { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
     {
       id: 'cidadão',
-      label: 'Cidadão',
+      label: 'Atendimento',
       icon: Inbox,
       badge: pendingDemandsCount > 0 ? pendingDemandsCount : null,
     },
-    { id: 'administração', label: 'Administração', icon: Settings, badge: null },
+    { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
+    { id: 'atuação', label: 'Mandato', icon: FileCode2, badge: null },
+    { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
+    { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
+    { id: 'administração', label: 'Equipe', icon: Users, badge: null },
+    { id: 'configurações', label: 'Configurações', icon: Settings, badge: null },
   ];
 
   return (
@@ -114,7 +118,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       <div className="flex-1 flex flex-col md:flex-row">
         <aside className="w-full md:w-64 bg-white border-r border-stone-200 p-4 space-y-1.5 shrink-0">
           <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400">
-            Gestão da Plataforma
+            Sistema de Gestão do Gabinete
           </div>
 
           <nav className="space-y-1">
@@ -151,7 +155,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </nav>
 
           <div className="mt-6 px-3 text-[11px] leading-relaxed text-stone-400">
-            Os módulos agrupam as tarefas por finalidade. As funções detalhadas aparecem dentro de cada módulo.
+            A navegação acompanha o trabalho diário do gabinete. Os detalhes de cada área aparecem dentro do módulo.
           </div>
         </aside>
 

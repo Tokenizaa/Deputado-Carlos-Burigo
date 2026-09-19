@@ -1,32 +1,140 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Inbox, Newspaper, Calendar, Sparkles, AlertCircle, Clock, ArrowRight } from 'lucide-react';
+import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Inbox, ListTodo, Newspaper, Plus, ArrowRight } from 'lucide-react';
 
 export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }> = ({ setActiveTab }) => {
-  const { demands, news, events, auditLogs, settings, updateSettings } = useApp();
-  const pendingDemands = demands.filter((d) => d.status === 'recebida' || d.status === 'em análise');
-  const inProgressDemands = demands.filter((d) => d.status === 'em atendimento' || d.status === 'encaminhada');
-  const mode = settings?.site_mode || 'campaign';
-  const modeDescription = mode === 'campaign' ? 'Presença Digital de Campanha (Eleições 04/10/2026, número eleitoral 15140, MDB e avisos legais TSE ativos).' : mode === 'mandate' ? 'Mandato Parlamentar Ativo (comunicação institucional da Assembleia Legislativa do RS).' : 'Atuação Pública e Memória Institucional.';
-  const metricClass = 'text-left bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-xs hover:border-[#00A550] transition-colors min-h-[132px]';
+  const { demands, news, events, auditLogs, tasks, allUsers, createTask, updateTask } = useApp();
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState<'baixa' | 'normal' | 'alta' | 'urgente'>('normal');
+  const [newTaskDue, setNewTaskDue] = useState('');
+  const [newTaskAssignee, setNewTaskAssignee] = useState('');
+
+  const today = new Date();
+  const startToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  const endToday = startToday + 86400000;
+  const openDemands = demands.filter(d => !['concluída', 'arquivada'].includes(d.status));
+  const triage = demands.filter(d => d.status === 'recebida' || d.status === 'em análise');
+  const overdueTasks = tasks.filter(t => t.status !== 'concluida' && t.status !== 'cancelada' && t.dueAt && new Date(t.dueAt).getTime() < startToday);
+  const todayTasks = tasks.filter(t => t.status !== 'concluida' && t.status !== 'cancelada' && t.dueAt && new Date(t.dueAt).getTime() >= startToday && new Date(t.dueAt).getTime() < endToday);
+  const todayEvents = events.filter(e => {
+    const time = new Date(e.date).getTime();
+    return Number.isFinite(time) && time >= startToday && time < endToday;
+  });
+  const draftNews = news.filter(n => n.status === 'rascunho');
+
+  const activeTasks = useMemo(
+    () => tasks.filter(t => !['concluida', 'cancelada'].includes(t.status)).slice(0, 8),
+    [tasks]
+  );
+
+  const formatDue = (value?: string | null) => value ? new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : 'Sem prazo';
+
+  const handleCreateTask = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newTaskTitle.trim()) return;
+    const ok = await createTask({
+      title: newTaskTitle,
+      priority: newTaskPriority,
+      dueAt: newTaskDue ? new Date(newTaskDue + 'T23:59:00').toISOString() : null,
+      assignedTo: newTaskAssignee || null,
+      sourceType: 'interna',
+    });
+    if (ok) {
+      setNewTaskTitle('');
+      setNewTaskDue('');
+      setNewTaskAssignee('');
+      setNewTaskPriority('normal');
+    }
+  };
+
+  const metricClass = 'text-left bg-white border border-stone-200 rounded-xl p-4 shadow-xs hover:border-[#00A550] transition-colors';
 
   return (
-    <div className="space-y-5 sm:space-y-8">
-      <section className="bg-white border-2 border-[#00A550] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1 min-w-0"><div className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#00A550] shrink-0" /><h2 className="text-base sm:text-lg font-black text-stone-900 truncate">Modo: <span className="uppercase text-[#00A550]">{mode}</span></h2></div><p className="text-xs sm:text-sm text-stone-600 max-w-2xl">{modeDescription}</p></div>
-          <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-lg overflow-x-auto max-w-full" aria-label="Modo da plataforma">{(['campaign', 'mandate', 'institutional'] as const).map((m) => <button key={m} type="button" onClick={() => updateSettings({ site_mode: m })} className={`min-h-[44px] px-3 rounded-md text-xs font-bold whitespace-nowrap transition-colors ${mode === m ? 'bg-[#00A550] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}`}>{m === 'campaign' ? 'Campanha' : m === 'mandate' ? 'Mandato' : 'Institucional'}</button>)}</div>
+    <div className="space-y-6">
+      <header>
+        <p className="text-xs font-bold uppercase tracking-wider text-[#00A550]">Central do Gabinete</p>
+        <h1 className="text-2xl sm:text-3xl font-black text-stone-900 mt-1">O que precisa de atenção</h1>
+        <p className="text-sm text-stone-600 mt-1">Demandas, tarefas, agenda e conteúdo em um único ponto de trabalho.</p>
+      </header>
+
+      <section aria-label="Prioridades" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <button type="button" onClick={() => setActiveTab('cidadão')} className={metricClass}>
+          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Triagem</span><Inbox className="w-4 h-4 text-rose-600" /></div>
+          <strong className="block text-3xl mt-2">{triage.length}</strong>
+          <span className="text-xs text-stone-500">demandas aguardando análise</span>
+        </button>
+        <button type="button" onClick={() => setActiveTab('cidadão')} className={metricClass}>
+          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Atendimento</span><Clock3 className="w-4 h-4 text-indigo-600" /></div>
+          <strong className="block text-3xl mt-2">{openDemands.length}</strong>
+          <span className="text-xs text-stone-500">demandas abertas</span>
+        </button>
+        <div className={metricClass}>
+          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Tarefas vencidas</span><AlertCircle className="w-4 h-4 text-rose-600" /></div>
+          <strong className="block text-3xl mt-2">{overdueTasks.length}</strong>
+          <span className="text-xs text-stone-500">precisam de atenção</span>
+        </div>
+        <div className={metricClass}>
+          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Hoje</span><CalendarDays className="w-4 h-4 text-amber-600" /></div>
+          <strong className="block text-3xl mt-2">{todayTasks.length + todayEvents.length}</strong>
+          <span className="text-xs text-stone-500">tarefas e compromissos</span>
         </div>
       </section>
-      <section aria-label="Indicadores do gabinete" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        <button type="button" onClick={() => setActiveTab('demands')} className={metricClass}><div className="flex items-center justify-between gap-2"><span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Pendentes</span><AlertCircle className="w-4 h-4 text-rose-600 shrink-0" /></div><p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{pendingDemands.length}</p><p className="text-[11px] sm:text-xs text-rose-600 font-semibold mt-1">Triagem necessária</p></button>
-        <button type="button" onClick={() => setActiveTab('demands')} className={metricClass}><div className="flex items-center justify-between gap-2"><span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Atendimento</span><Clock className="w-4 h-4 text-indigo-600 shrink-0" /></div><p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{inProgressDemands.length}</p><p className="text-[11px] sm:text-xs text-stone-500 mt-1">Em andamento</p></button>
-        <button type="button" onClick={() => setActiveTab('news')} className={metricClass}><div className="flex items-center justify-between gap-2"><span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Notícias</span><Newspaper className="w-4 h-4 text-[#00A550] shrink-0" /></div><p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{news.filter((n) => n.status === 'publicado').length}</p><p className="text-[11px] sm:text-xs text-stone-500 mt-1">Publicadas</p></button>
-        <button type="button" onClick={() => setActiveTab('agenda')} className={metricClass}><div className="flex items-center justify-between gap-2"><span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-500">Agenda</span><Calendar className="w-4 h-4 text-amber-600 shrink-0" /></div><p className="text-3xl sm:text-4xl font-black text-stone-900 mt-3">{events.length}</p><p className="text-[11px] sm:text-xs text-stone-500 mt-1">Compromissos</p></button>
+
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+        <div className="xl:col-span-8 bg-white border border-stone-200 rounded-xl p-5 space-y-5">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+            <div className="flex items-center gap-2"><ListTodo className="w-5 h-5 text-[#00A550]" /><h2 className="font-black text-stone-900">Tarefas</h2></div>
+            <span className="text-xs text-stone-500">{tasks.length} no total</span>
+          </div>
+
+          <form onSubmit={handleCreateTask} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-2">
+            <input value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Nova tarefa..." aria-label="Título da nova tarefa" className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00A550]" />
+            <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value as typeof newTaskPriority)} className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm">
+              <option value="normal">Normal</option><option value="baixa">Baixa</option><option value="alta">Alta</option><option value="urgente">Urgente</option>
+            </select>
+            <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} aria-label="Prazo" className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm" />
+            <button type="submit" className="min-h-[44px] px-4 rounded-lg bg-[#00A550] text-white text-sm font-bold flex items-center justify-center gap-2"><Plus className="w-4 h-4" />Criar</button>
+          </form>
+
+          <div className="divide-y divide-stone-100">
+            {activeTasks.length === 0 && <p className="py-8 text-sm text-stone-500 text-center">Nenhuma tarefa aberta.</p>}
+            {activeTasks.map(task => (
+              <div key={task.id} className="py-3 flex items-center gap-3">
+                <button type="button" aria-label={`Concluir tarefa: ${task.title}`} onClick={() => updateTask(task.id, { status: 'concluida' })} className="w-8 h-8 rounded-full border border-stone-300 hover:border-[#00A550] hover:text-[#00A550] flex items-center justify-center shrink-0"><CheckCircle2 className="w-4 h-4" /></button>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-stone-900 truncate">{task.title}</p>
+                  <p className="text-xs text-stone-500">{task.status.replace('_', ' ')} · {formatDue(task.dueAt)}</p>
+                </div>
+                <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded ${task.priority === 'urgente' || task.priority === 'alta' ? 'bg-rose-50 text-rose-700' : 'bg-stone-100 text-stone-600'}`}>{task.priority}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <aside className="xl:col-span-4 space-y-5">
+          <section className="bg-white border border-stone-200 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-3"><h2 className="font-black">Hoje</h2><CalendarDays className="w-4 h-4 text-amber-600" /></div>
+            {todayEvents.slice(0, 4).map(event => <button key={event.id} type="button" onClick={() => setActiveTab('agenda')} className="w-full text-left py-2 border-b border-stone-100"><p className="text-sm font-bold truncate">{event.title}</p><p className="text-xs text-stone-500">{event.municipality || event.location}</p></button>)}
+            {todayEvents.length === 0 && <p className="text-sm text-stone-500">Nenhum compromisso público encontrado para hoje.</p>}
+            <button type="button" onClick={() => setActiveTab('agenda')} className="mt-3 text-xs font-bold text-[#00A550] flex items-center gap-1">Abrir agenda <ArrowRight className="w-3.5 h-3.5" /></button>
+          </section>
+
+          <section className="bg-white border border-stone-200 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-3"><h2 className="font-black">Conteúdo</h2><Newspaper className="w-4 h-4 text-[#00A550]" /></div>
+            <p className="text-2xl font-black">{draftNews.length}</p>
+            <p className="text-xs text-stone-500">notícias em rascunho</p>
+            <button type="button" onClick={() => setActiveTab('conteúdo')} className="mt-3 text-xs font-bold text-[#00A550] flex items-center gap-1">Revisar conteúdo <ArrowRight className="w-3.5 h-3.5" /></button>
+          </section>
+
+          <section className="bg-white border border-stone-200 rounded-xl p-5">
+            <h2 className="font-black mb-3">Atividade recente</h2>
+            {auditLogs.slice(0, 4).map(log => <div key={log.id} className="py-2 border-b border-stone-100 text-xs"><span className="font-bold text-stone-800">{log.userName}</span><p className="text-stone-600 mt-0.5 line-clamp-2">{log.action}</p></div>)}
+          </section>
+        </aside>
       </section>
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
-        <div className="lg:col-span-7 bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs space-y-4"><div className="flex items-center justify-between border-b border-stone-100 pb-3 gap-3"><h3 className="font-black text-stone-900 text-sm sm:text-base flex items-center gap-2 min-w-0"><Inbox className="w-4 h-4 text-[#00A550] shrink-0" /><span className="truncate">Fila de Demandas</span></h3><button type="button" onClick={() => setActiveTab('demands')} className="min-h-[44px] shrink-0 text-xs font-bold text-[#00A550] flex items-center gap-1">Ver todas <ArrowRight className="w-3.5 h-3.5" /></button></div><div className="space-y-2 sm:space-y-3">{demands.slice(0, 4).map((d) => <button type="button" key={d.id} onClick={() => setActiveTab('demands')} className="w-full text-left min-h-[64px] p-3 rounded-lg sm:rounded-xl border border-stone-200 hover:border-[#00A550] hover:bg-stone-50 transition-colors flex items-start justify-between gap-3"><div className="min-w-0"><div className="flex items-center gap-1.5 text-[10px] sm:text-xs min-w-0"><span className="font-mono font-bold text-[#00A550] shrink-0">{d.protocol}</span><span className="text-stone-400">•</span><span className="font-semibold text-stone-700 truncate">{d.citizenName}</span></div><h4 className="font-bold text-stone-900 text-xs sm:text-sm mt-1 leading-snug line-clamp-2">{d.subject}</h4></div><span className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-stone-100 text-stone-700 shrink-0">{d.status}</span></button>)}</div></div>
-        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs space-y-4"><div className="flex items-center justify-between border-b border-stone-100 pb-3 gap-3"><h3 className="font-black text-stone-900 text-sm sm:text-base truncate">Auditoria recente</h3><button type="button" onClick={() => setActiveTab('audit')} className="min-h-[44px] shrink-0 text-xs font-bold text-[#00A550]">Histórico</button></div><div className="space-y-2 sm:space-y-3">{auditLogs.slice(0, 5).map((log) => <div key={log.id} className="text-xs p-3 rounded-lg bg-stone-50 border border-stone-200"><div className="flex items-center justify-between gap-3 text-stone-500"><span className="font-semibold text-stone-800 truncate">{log.userName}</span><span className="shrink-0">{new Date(log.timestamp).toLocaleTimeString('pt-BR')}</span></div><p className="text-stone-700 font-medium mt-1 line-clamp-2">{log.action}</p></div>)}</div></div>
+
+      <section className="text-xs text-stone-500">
+        A Central agrega dados existentes. Demandas, agenda, conteúdo e atuação continuam em suas fontes canônicas.
       </section>
     </div>
   );
