@@ -18,7 +18,7 @@ export const HomeView: React.FC = () => {
 
       <TrajectorySection />
 
-      <div id="acervo" className="scroll-mt-28"><ActionsAndProjectsSection initialSubTab="visao-geral" /></div>
+      <div id="acervo" className="scroll-mt-28"><ActionsAndProjectsSection initialSubTab="projetos" /></div>
       <div id="resultados" className="scroll-mt-28"><ResultsSection /></div>
 
       <div id="agenda" className="scroll-mt-28"><AgendaSection /></div>
