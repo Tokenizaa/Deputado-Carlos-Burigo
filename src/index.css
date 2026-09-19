@@ -220,7 +220,6 @@ article p,
   font-size: 1rem;
   font-weight: 700;
   text-decoration: underline;
-  transition: transform 120ms ease;
 }
 
 .skip-link:focus {
@@ -240,32 +239,55 @@ select {
 }
 
 .accessibility-bar {
-  min-height: 44px;
-  background: #111111;
-  color: #FFFFFF;
-  border-bottom: 1px solid #FFFFFF;
+  min-height: 40px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
 }
 
 .accessibility-link,
 .accessibility-control {
   min-height: 36px;
-  padding: 0.35rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
   border-radius: 0.25rem;
-  color: #FFFFFF;
-  text-decoration: underline;
   white-space: nowrap;
 }
 
+.accessibility-link {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.accessibility-link:hover {
+  color: var(--brand-primary-strong);
+}
+
 .accessibility-control {
-  border: 1px solid #FFFFFF;
-  text-decoration: none;
-  background: transparent;
+  border: 1px solid var(--border);
+  background: #FFFFFF;
+  color: var(--text-secondary);
+}
+
+.accessibility-control:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.accessibility-control[aria-pressed="true"] {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary-strong);
+  background: var(--brand-primary-soft);
 }
 
 .accessibility-link:focus-visible,
 .accessibility-control:focus-visible {
-  outline-color: #FFFFFF;
+  outline-color: var(--focus);
 }
 
 html[data-font-scale="large"] {
@@ -277,14 +299,12 @@ html[data-font-scale="larger"] {
 }
 
 html[data-high-contrast="true"] {
-  filter: contrast(1.12);
-}
-
-html[data-high-contrast="true"] body {
+  filter: none;
   background: #000000;
   color: #FFFFFF;
 }
 
+html[data-high-contrast="true"] body,
 html[data-high-contrast="true"] .surface,
 html[data-high-contrast="true"] .surface-muted {
   background: #000000;
@@ -292,7 +312,17 @@ html[data-high-contrast="true"] .surface-muted {
 }
 
 html[data-high-contrast="true"] a {
+  text-decoration: underline;
   text-decoration-thickness: 2px;
+}
+
+html[data-high-contrast="true"] button,
+html[data-high-contrast="true"] input,
+html[data-high-contrast="true"] textarea,
+html[data-high-contrast="true"] select {
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
 }
 
 @media (max-width: 767px) {
