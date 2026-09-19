@@ -123,6 +123,28 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
                 {featuredItem.summary}
               </p>
 
+              {(featuredItem.sourceName || featuredItem.imageCredit) && (
+                <div className="pt-2 text-xs text-stone-500 space-y-1">
+                  {featuredItem.sourceName && (
+                    <p><span className="font-semibold text-stone-700">Fonte:</span> {featuredItem.sourceName}</p>
+                  )}
+                  {featuredItem.imageCredit && (
+                    <p><span className="font-semibold text-stone-700">Crédito da imagem:</span> {featuredItem.imageCredit}</p>
+                  )}
+                  {featuredItem.sourceUrl && (
+                    <a
+                      href={featuredItem.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      className="inline-block text-[#00A550] font-semibold hover:underline"
+                    >
+                      Ver fonte original
+                    </a>
+                  )}
+                </div>
+              )}
+
               <div className="pt-4 flex items-center gap-2 text-sm font-bold text-stone-900 group-hover:text-[#00A550] transition-colors uppercase tracking-wider">
                 <span>LER MATÉRIA COMPLETA</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -175,6 +197,13 @@ export const NewsSection: React.FC<{ limit?: number; showHeader?: boolean }> = (
                       <p className="text-sm text-stone-600 leading-relaxed line-clamp-3">
                         {item.summary}
                       </p>
+
+                      {(item.sourceName || item.imageCredit) && (
+                        <div className="pt-1 text-[11px] text-stone-500">
+                          {item.sourceName && <span><span className="font-semibold text-stone-700">Fonte:</span> {item.sourceName}</span>}
+                          {item.imageCredit && <span className="ml-2"><span className="font-semibold text-stone-700">Crédito:</span> {item.imageCredit}</span>}
+                        </div>
+                      )}
                     </div>
                   </div>
 
