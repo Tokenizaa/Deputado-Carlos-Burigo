@@ -128,29 +128,29 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   ];
 
   return (
-    <section className="bg-[#0D0D0D] text-white border-b border-stone-850 py-16 sm:py-20 lg:py-24">
+    <section className="border-y border-stone-200 bg-white py-14 sm:py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <header className="max-w-3xl mb-12">
           <div className="flex items-center gap-3 mb-3">
             <span className="w-2.5 h-2.5 bg-[#00A550]" />
-            <span className="text-xs sm:text-sm font-bold text-[#00A550] uppercase tracking-[0.12em]">ATUAÇÃO PARLAMENTAR</span>
-            <span className="text-stone-700">•</span>
-            <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">ACERVO LEGISLATIVO</span>
+            <span className="text-sm sm:text-base font-bold text-[#008C45] uppercase tracking-[0.1em]">ATUAÇÃO PARLAMENTAR</span>
+            <span className="text-stone-950">•</span>
+            <span className="text-sm font-semibold text-stone-600 uppercase tracking-wider">ACERVO LEGISLATIVO</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.06]">Atuação parlamentar em um único acervo.</h2>
-          <p className="mt-4 text-base sm:text-lg text-stone-300 leading-relaxed max-w-[65ch]">Proposições, autoria, relatoria, votações e documentos estão ligados ao mesmo registro legislativo.</p>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.06] text-stone-950">Atuação parlamentar em um único acervo.</h2>
+          <p className="mt-4 text-base sm:text-lg text-stone-600 leading-relaxed max-w-[65ch]">Proposições, autoria, relatoria, votações e documentos estão ligados ao mesmo registro legislativo.</p>
         </header>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pb-12 mb-12 border-b border-stone-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pb-12 mb-12 border-b border-stone-200">
           <Metric value={publicItems.length} label="Proposições publicadas" detail="Registros legislativos publicados" />
           <Metric value={publicItems.reduce((total, item) => total + item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role)).length, 0)} label="Registros de autoria" detail="Relações documentadas" />
           <Metric value={archiveDocuments.length} label="Documentos" detail="Arquivos no acervo legislativo" />
           <Metric value={votes.length} label="Votos nominais" detail="Registros ligados às proposições" />
         </div>
 
-        <nav className="flex flex-wrap items-center gap-2 border-b border-stone-800 mb-12 pb-3" aria-label="Atuação parlamentar">
+        <nav className="flex max-w-full items-center gap-1 overflow-x-auto border-b border-stone-200 mb-10 pb-0 -mx-1 px-1 scrollbar-none" aria-label="Atuação parlamentar">
           {tabs.map((tab) => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-xs sm:text-sm font-bold tracking-wider border-b-2 -mb-[14px] ${activeTab === tab.id ? 'border-[#00A550] text-[#00A550]' : 'border-transparent text-stone-400 hover:text-white hover:border-stone-600'}`}>
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`shrink-0 min-h-14 px-4 sm:px-5 py-3 text-base sm:text-lg font-bold tracking-tight whitespace-nowrap border-b-[3px] ${activeTab === tab.id ? 'border-[#008C45] text-stone-950' : 'border-transparent text-stone-950 hover:text-[#008C45]'}`}>
               {tab.label}
             </button>
           ))}
@@ -164,65 +164,65 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               { value: projectStatus, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
             ]} />
             {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros." /> : (
-              <div className="border-y border-stone-800">
+              <div className="border-y border-stone-200">
                 {filteredItems.map((item) => {
                   const authors = item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role));
                   const rapporteurs = item.roles.filter((role) => /RELATOR|RAPPORTEUR/i.test(role.role));
                   return (
-                    <details key={item.id} className="group border-b border-stone-800 last:border-b-0">
-                      <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
+                    <details key={item.id} className="group border-b border-stone-200 last:border-b-0">
+                      <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#008C45]">
                         <span className="min-w-0 flex-1">
                           <span className="flex flex-wrap items-center gap-2 text-xs">
-                            <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{item.code}</span>
-                            <span className="text-stone-500">{item.year}</span>
-                            {item.concludedAt && <span className="text-[#00A550] font-semibold">Concluída</span>}
-                            {authors.length > 0 && <span className="font-bold text-sky-300 bg-sky-950/40 px-2 py-0.5 rounded">AUTORIA</span>}
-                            {rapporteurs.length > 0 && <span className="font-bold text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded">RELATORIA</span>}
+                            <span className="font-bold text-stone-950 bg-stone-800 px-2 py-0.5 rounded font-mono">{item.code}</span>
+                            <span className="text-stone-600">{item.year}</span>
+                            {item.concludedAt && <span className="text-[#008C45] font-semibold">Concluída</span>}
+                            {authors.length > 0 && <span className="font-bold text-sky-800 bg-sky-50 px-2 py-0.5 rounded">AUTORIA</span>}
+                            {rapporteurs.length > 0 && <span className="font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded">RELATORIA</span>}
                           </span>
                           <span className="mt-2 block text-lg sm:text-xl font-bold leading-snug">{item.title || item.code}</span>
                         </span>
-                        <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                        <ChevronDown className="h-5 w-5 shrink-0 text-stone-600 transition-transform group-open:rotate-180" aria-hidden="true" />
                       </summary>
                       <div className="pb-7 pr-9">
-                        <p className="max-w-4xl text-sm sm:text-base text-stone-300 leading-relaxed">{item.summary || 'Sem ementa publicada.'}</p>
+                        <p className="max-w-4xl text-sm sm:text-base text-stone-950 leading-relaxed">{item.summary || 'Sem ementa publicada.'}</p>
                         <div className="mt-5 flex flex-wrap gap-4">
                           {item.detailedDescription && (
-                            <div className="w-full border-t border-stone-800 pt-5">
-                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Descrição</span>
-                              <p className="mt-2 max-w-4xl text-sm text-stone-300 leading-relaxed">{item.detailedDescription}</p>
+                            <div className="w-full border-t border-stone-200 pt-5">
+                              <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Descrição</span>
+                              <p className="mt-2 max-w-4xl text-sm text-stone-950 leading-relaxed">{item.detailedDescription}</p>
                             </div>
                           )}
                           {item.theme && (
-                            <div className="border-t border-stone-800 pt-5 min-w-[12rem]">
-                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Tema</span>
-                              <p className="mt-1 text-sm font-semibold text-white">{item.theme}</p>
+                            <div className="border-t border-stone-200 pt-5 min-w-[12rem]">
+                              <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Tema</span>
+                              <p className="mt-1 text-sm font-semibold text-stone-950">{item.theme}</p>
                             </div>
                           )}
                           {item.roles.length > 0 && (
-                            <div className="w-full border-t border-stone-800 pt-5">
-                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Participações</span>
+                            <div className="w-full border-t border-stone-200 pt-5">
+                              <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Participações</span>
                               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                                 {item.roles.map((role) => (
                                   <div key={role.id} className="flex justify-between gap-4 text-sm">
-                                    <span className="text-stone-400">{formatRole(role.role)}</span>
-                                    <span className="font-semibold text-white text-right">{role.personName}</span>
+                                    <span className="text-stone-600">{formatRole(role.role)}</span>
+                                    <span className="font-semibold text-stone-950 text-right">{role.personName}</span>
                                   </div>
                                 ))}
                               </div>
                             </div>
                           )}
                           {(documentsForItem(item.id).length > 0 || item.sourceUrl) && (
-                            <div className="w-full border-t border-stone-800 pt-5">
-                              <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Documentos da proposição</span>
+                            <div className="w-full border-t border-stone-200 pt-5">
+                              <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Documentos da proposição</span>
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {documentsForItem(item.id).map((document) => (
-                                  <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
+                                  <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
                                     <FileText className="h-4 w-4 shrink-0" />
                                     <span className="truncate">{document.title || 'Ver documento'}</span>
                                   </button>
                                 ))}
                                 {documentsForItem(item.id).length === 0 && item.sourceUrl && (
-                                  <button type="button" onClick={() => openSource(item.sourceUrl, 'Fonte oficial — ' + item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
+                                  <button type="button" onClick={() => openSource(item.sourceUrl, 'Fonte oficial — ' + item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
                                     <FileText className="h-4 w-4 shrink-0" />
                                     <span>Fonte oficial</span>
                                   </button>
@@ -244,40 +244,40 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <div className="space-y-6">
             <FilterBar search={voteQuery} onSearch={setVoteQuery} placeholder="Buscar matéria, sessão ou votante..." selects={[{ value: voteChoice, onChange: setVoteChoice, label: 'Voto', options: ['TODOS', ...[...new Set(votes.map((vote) => vote.vote.toUpperCase()))].sort()] }]} />
             {filteredVotes.length === 0 ? <EmptyState message="Nenhuma votação corresponde aos filtros." /> : (
-              <div className="border-y border-stone-800">
+              <div className="border-y border-stone-200">
                 {filteredVotes.map((vote) => (
-                  <details key={vote.id} className="group border-b border-stone-800 last:border-b-0">
-                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
+                  <details key={vote.id} className="group border-b border-stone-200 last:border-b-0">
+                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#008C45]">
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-bold bg-stone-800 px-2 py-0.5 rounded font-mono">{vote.legislativeCode}</span>
-                          <span className="font-semibold text-[#00A550]">{vote.vote}</span>
-                          {vote.voteDate && <span className="text-stone-500">• {formatDate(vote.voteDate)}</span>}
+                          <span className="font-semibold text-[#008C45]">{vote.vote}</span>
+                          {vote.voteDate && <span className="text-stone-600">• {formatDate(vote.voteDate)}</span>}
                         </span>
-                        <span className="text-sm font-medium text-stone-300 mt-1.5 block">{vote.sessionName || 'Sessão não informada'}</span>
-                        <span className="text-xs text-stone-500 mt-0.5 block">Voto registrado de {vote.voterName}</span>
+                        <span className="text-sm font-medium text-stone-950 mt-1.5 block">{vote.sessionName || 'Sessão não informada'}</span>
+                        <span className="text-xs text-stone-600 mt-0.5 block">Voto registrado de {vote.voterName}</span>
                       </span>
-                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-600 transition-transform group-open:rotate-180" aria-hidden="true" />
                     </summary>
                     <div className="pb-7 pr-9">
                       <div className="grid gap-4 sm:grid-cols-3 text-sm">
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Matéria</span><p className="font-semibold text-white mt-0.5">{vote.legislativeCode}</p></div>
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Voto</span><p className="font-semibold text-white mt-0.5">{vote.vote}</p></div>
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
-                        {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{formatDate(vote.voteDate)}</p></div>}
+                        <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Matéria</span><p className="font-semibold text-stone-950 mt-0.5">{vote.legislativeCode}</p></div>
+                        <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Voto</span><p className="font-semibold text-stone-950 mt-0.5">{vote.vote}</p></div>
+                        <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Votante</span><p className="font-semibold text-stone-950 mt-0.5">{vote.voterName}</p></div>
+                        {vote.voteDate && <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Data</span><p className="font-semibold text-stone-950 mt-0.5">{formatDate(vote.voteDate)}</p></div>}
                       </div>
                       {documentsForItem(vote.legislativeItemId).length > 0 || vote.sourceUrl ? (
-                        <div className="mt-5 border-t border-stone-800 pt-5">
-                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte</span>
+                        <div className="mt-5 border-t border-stone-200 pt-5">
+                          <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Fonte</span>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {documentsForItem(vote.legislativeItemId).map((document) => (
-                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Votação — ' + vote.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Votação — ' + vote.legislativeCode))} className="min-h-11 text-[#008C45] font-semibold text-sm border border-stone-700 hover:border-[#008C45] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 {document.title || 'Ver documento'}
                               </button>
                             ))}
                             {documentsForItem(vote.legislativeItemId).length === 0 && vote.sourceUrl && (
-                              <button type="button" onClick={() => openSource(vote.sourceUrl, 'Fonte oficial — ' + vote.legislativeCode)} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button type="button" onClick={() => openSource(vote.sourceUrl, 'Fonte oficial — ' + vote.legislativeCode)} className="min-h-11 text-[#008C45] font-semibold text-sm border border-stone-700 hover:border-[#008C45] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 Fonte oficial
                               </button>
@@ -297,42 +297,42 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
           <div className="space-y-6">
             <div className="max-w-3xl">
               <h3 className="text-2xl font-bold">Participações registradas</h3>
-              <p className="mt-2 text-sm leading-6 text-stone-400">Relatorias, autoria e outras funções aparecem somente quando estão vinculadas a um registro legislativo publicado.</p>
+              <p className="mt-2 text-sm leading-6 text-stone-600">Relatorias, autoria e outras funções aparecem somente quando estão vinculadas a um registro legislativo publicado.</p>
             </div>
             {participations.length === 0 ? <EmptyState message="Não há participações publicáveis na fonte legislativa canônica." /> : (
-              <div className="border-y border-stone-800">
+              <div className="border-y border-stone-200">
                 {participations.map((role) => (
-                  <details key={role.id} className="group border-b border-stone-800 last:border-b-0">
-                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
-                      <Users className="h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
+                  <details key={role.id} className="group border-b border-stone-200 last:border-b-0">
+                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#008C45]">
+                      <Users className="h-5 w-5 shrink-0 text-[#008C45]" aria-hidden="true" />
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded">{formatRole(role.role)}</span>
-                          <span className="text-stone-500">{role.year}</span>
+                          <span className="font-bold text-stone-950 bg-stone-800 px-2 py-0.5 rounded">{formatRole(role.role)}</span>
+                          <span className="text-stone-600">{role.year}</span>
                         </span>
                         <span className="mt-2 block text-lg font-bold leading-snug">{role.legislativeCode}</span>
-                        {role.legislativeTitle && <span className="mt-1 block text-sm text-stone-400">{role.legislativeTitle}</span>}
-                        <span className="mt-1 block text-sm text-stone-500">{role.personName}</span>
+                        {role.legislativeTitle && <span className="mt-1 block text-sm text-stone-600">{role.legislativeTitle}</span>}
+                        <span className="mt-1 block text-sm text-stone-600">{role.personName}</span>
                       </span>
-                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                      <ChevronDown className="h-5 w-5 shrink-0 text-stone-600 transition-transform group-open:rotate-180" aria-hidden="true" />
                     </summary>
                     <div className="pb-7 pl-9 pr-9">
                       <div className="grid gap-4 sm:grid-cols-2 text-sm">
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{formatRole(role.role)}</p></div>
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Ano</span><p className="font-semibold text-white mt-0.5">{role.year}</p></div>
+                        <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Função</span><p className="font-semibold text-stone-950 mt-0.5">{formatRole(role.role)}</p></div>
+                        <div><span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Ano</span><p className="font-semibold text-stone-950 mt-0.5">{role.year}</p></div>
                       </div>
                       {documentsForItem(role.itemId).length > 0 || role.sourceUrl ? (
-                        <div className="mt-5 border-t border-stone-800 pt-5">
-                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte</span>
+                        <div className="mt-5 border-t border-stone-200 pt-5">
+                          <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">Fonte</span>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {documentsForItem(role.itemId).map((document) => (
-                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Fonte — ' + role.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Fonte — ' + role.legislativeCode))} className="min-h-11 text-[#008C45] font-semibold text-sm border border-stone-700 hover:border-[#008C45] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 {document.title || 'Ver documento'}
                               </button>
                             ))}
                             {documentsForItem(role.itemId).length === 0 && role.sourceUrl && (
-                              <button type="button" onClick={() => openSource(role.sourceUrl, 'Fonte oficial — ' + role.legislativeCode)} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button type="button" onClick={() => openSource(role.sourceUrl, 'Fonte oficial — ' + role.legislativeCode)} className="min-h-11 text-[#008C45] font-semibold text-sm border border-stone-700 hover:border-[#008C45] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 Fonte oficial
                               </button>
@@ -345,8 +345,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                 ))}
               </div>
             )}
-            <div className="border border-stone-800 bg-[#141414] p-5 text-sm text-stone-400">
-              <strong className="text-white">Comissões e discursos:</strong> esta área não cria registros paralelos. Quando houver dados públicos estruturados na fonte legislativa canônica, eles poderão ser incorporados ao mesmo acervo.
+            <div className="border border-stone-200 bg-stone-50 p-5 text-sm text-stone-600">
+              <strong className="text-stone-950">Comissões e discursos:</strong> esta área não cria registros paralelos. Quando houver dados públicos estruturados na fonte legislativa canônica, eles poderão ser incorporados ao mesmo acervo.
             </div>
           </div>
         )}
@@ -356,14 +356,14 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h3 className="text-2xl font-bold">Acervo documental</h3>
-                <p className="mt-1 text-sm text-stone-400">Organizado por proposição, do registro mais recente ao mais antigo. Dentro de cada proposição, os documentos seguem a ordem: texto/justificativa, parecer, ofício e anexos.</p>
+                <p className="mt-1 text-sm text-stone-600">Organizado por proposição, do registro mais recente ao mais antigo. Dentro de cada proposição, os documentos seguem a ordem: texto/justificativa, parecer, ofício e anexos.</p>
               </div>
-              <span className="text-xs font-semibold text-stone-500">{filteredDocuments.length} documentos encontrados</span>
+              <span className="text-xs font-semibold text-stone-600">{filteredDocuments.length} documentos encontrados</span>
             </div>
             <FilterBar search={documentQuery} onSearch={(value) => { setDocumentQuery(value); setDocumentPage(1); }} placeholder="Buscar documento, proposição ou título..." selects={[{ value: documentType, onChange: (value) => { setDocumentType(value); setDocumentPage(1); }, label: 'Tipo', options: ['TODOS', ...documentTypes] }]} />
             {filteredDocuments.length === 0 ? <EmptyState message="Nenhum documento corresponde aos filtros." /> : (
               <>
-              <div className="border border-stone-800 rounded-sm divide-y divide-stone-800">
+              <div className="border border-stone-200 rounded-sm divide-y divide-stone-800">
                 {paginatedDocuments.map((document) => {
                   const item = itemById.get(document.legislativeItemId);
                   const url = document.publicUrl || document.originalUrl;
@@ -376,20 +376,20 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       <div className="min-w-0 space-y-3">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-bold bg-stone-800 px-2 py-0.5 rounded">LEGISLATIVO</span>
-                          <span className="font-semibold text-[#00A550]">{document.documentType || 'DOCUMENTO'}</span>
-                          {item?.code && <span className="font-mono text-stone-400">{item.code}</span>}
-                          <span className="text-stone-500">{formatVerification(document.verificationStatus)}</span>
+                          <span className="font-semibold text-[#008C45]">{document.documentType || 'DOCUMENTO'}</span>
+                          {item?.code && <span className="font-mono text-stone-600">{item.code}</span>}
+                          <span className="text-stone-600">{formatVerification(document.verificationStatus)}</span>
                         </div>
-                        <p className="font-semibold text-white">{displayTitle}</p>
+                        <p className="font-semibold text-stone-950">{displayTitle}</p>
                         <dl className="grid gap-2 sm:grid-cols-2 text-xs">
-                          <div><dt className="font-semibold text-stone-300">Contexto</dt><dd className="text-stone-500">{item?.title || 'Documento legislativo do acervo'}</dd></div>
-                          <div><dt className="font-semibold text-stone-300">Origem</dt><dd className="text-stone-500">{document.sourceName || 'Fonte não informada no registro'}</dd></div>
-                          <div><dt className="font-semibold text-stone-300">Data</dt><dd className="text-stone-500">{formatDate(document.downloadedAt || document.createdAt)}</dd></div>
-                          <div><dt className="font-semibold text-stone-300">Direitos</dt><dd className="text-stone-500">{formatRights(document.rightsStatus)}</dd></div>
+                          <div><dt className="font-semibold text-stone-950">Contexto</dt><dd className="text-stone-600">{item?.title || 'Documento legislativo do acervo'}</dd></div>
+                          <div><dt className="font-semibold text-stone-950">Origem</dt><dd className="text-stone-600">{document.sourceName || 'Fonte não informada no registro'}</dd></div>
+                          <div><dt className="font-semibold text-stone-950">Data</dt><dd className="text-stone-600">{formatDate(document.downloadedAt || document.createdAt)}</dd></div>
+                          <div><dt className="font-semibold text-stone-950">Direitos</dt><dd className="text-stone-600">{formatRights(document.rightsStatus)}</dd></div>
                         </dl>
                       </div>
                       {url && <div className="flex flex-wrap gap-3 shrink-0">
-                        <button type="button" onClick={() => openDocument(url, viewerTitle)} className="min-h-11 text-[#00A550] font-semibold text-xs inline-flex items-center gap-1">
+                        <button type="button" onClick={() => openDocument(url, viewerTitle)} className="min-h-11 text-[#008C45] font-semibold text-xs inline-flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5" /> Visualizar documento
                         </button>
 
@@ -398,13 +398,13 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                   );
                 })}
               </div>
-              <div className="flex flex-col gap-3 border-t border-stone-800 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-xs text-stone-500">Página {safeDocumentPage} de {documentTotalPages}</span>
+              <div className="flex flex-col gap-3 border-t border-stone-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-xs text-stone-600">Página {safeDocumentPage} de {documentTotalPages}</span>
                 <div className="flex items-center gap-2">
-                  <button type="button" disabled={safeDocumentPage <= 1} onClick={() => setDocumentPage((page) => Math.max(1, page - 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#00A550] inline-flex items-center gap-2">
+                  <button type="button" disabled={safeDocumentPage <= 1} onClick={() => setDocumentPage((page) => Math.max(1, page - 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#008C45] inline-flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" /> Anterior
                   </button>
-                  <button type="button" disabled={safeDocumentPage >= documentTotalPages} onClick={() => setDocumentPage((page) => Math.min(documentTotalPages, page + 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#00A550] inline-flex items-center gap-2">
+                  <button type="button" disabled={safeDocumentPage >= documentTotalPages} onClick={() => setDocumentPage((page) => Math.min(documentTotalPages, page + 1))} className="min-h-11 px-3 border border-stone-700 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#008C45] inline-flex items-center gap-2">
                     Próxima <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -417,8 +417,8 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
         {activeTab === 'resultados' && (
           <div className="max-w-3xl">
             <h3 className="text-xl font-bold">Resultados</h3>
-            <p className="text-sm text-stone-400 mt-2">Resultados públicos são apresentados na seção própria.</p>
-            <button type="button" onClick={() => setCurrentView('resultados')} className="mt-5 text-[#00A550] font-semibold text-sm inline-flex items-center gap-2">Abrir resultados <ArrowRight className="w-4 h-4" /></button>
+            <p className="text-sm text-stone-600 mt-2">Resultados públicos são apresentados na seção própria.</p>
+            <button type="button" onClick={() => setCurrentView('resultados')} className="mt-5 text-[#008C45] font-semibold text-sm inline-flex items-center gap-2">Abrir resultados <ArrowRight className="w-4 h-4" /></button>
           </div>
         )}
 
@@ -430,12 +430,12 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 };
 
 const FilterBar: React.FC<{ search: string; onSearch: (value: string) => void; placeholder: string; selects?: { value: string; onChange: (value: string) => void; label: string; options: string[] }[] }> = ({ search, onSearch, placeholder, selects = [] }) => (
-  <div className="bg-[#141414] border border-stone-800 p-4 sm:p-5 rounded-sm">
+  <div className="bg-stone-50 border border-stone-200 p-4 sm:p-5 rounded-sm">
     <div className="flex flex-col lg:flex-row gap-3">
-      <input value={search} onChange={(event) => onSearch(event.target.value)} placeholder={placeholder} aria-label={placeholder} className="min-h-11 flex-1 bg-[#0D0D0D] border border-stone-700 rounded-md px-3 text-sm text-white placeholder:text-stone-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00A550]" />
+      <input value={search} onChange={(event) => onSearch(event.target.value)} placeholder={placeholder} aria-label={placeholder} className="min-h-11 flex-1 bg-white border border-stone-700 rounded-md px-3 text-sm text-stone-950 placeholder:text-stone-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#008C45]" />
       <div className="flex flex-wrap gap-2">
         {selects.map((select) => (
-          <select key={select.label} value={select.value} onChange={(event) => select.onChange(event.target.value)} aria-label={select.label} className="min-h-11 bg-[#0D0D0D] border border-stone-700 rounded-md px-3 text-sm text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00A550]">
+          <select key={select.label} value={select.value} onChange={(event) => select.onChange(event.target.value)} aria-label={select.label} className="min-h-11 bg-white border border-stone-700 rounded-md px-3 text-sm text-stone-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#008C45]">
             {select.options.map((option) => <option key={option} value={option}>{option === 'TODOS' ? 'Todos' : option}</option>)}
           </select>
         ))}
@@ -445,7 +445,7 @@ const FilterBar: React.FC<{ search: string; onSearch: (value: string) => void; p
 );
 
 const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
-  <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>
+  <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-xs font-bold text-[#008C45] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-600 leading-tight">{detail}</p></div>
 );
 
 const formatRole = (value: string) => ({ AUTHOR: 'Autor', COAUTHOR: 'Coautor', RAPPORTEUR: 'Relator', RELATOR: 'Relator', PRESIDENTE: 'Presidente', 'VICE-PRESIDENTE': 'Vice-presidente', SUPLENTE: 'Suplente', TITULAR: 'Titular', 'LÍDER DE BANCADA': 'Líder de bancada', PARTICIPANTE: 'Participante', SIM: 'Sim', NÃO: 'Não' }[value.trim().toUpperCase()] || value.trim());
@@ -454,11 +454,11 @@ const formatDate = (value: string) => { const date = new Date(value); return Num
 const formatVerification = (value: string) => ({ VERIFIED_PRIMARY: 'Fonte verificada', VERIFIED_SECONDARY: 'Fonte verificada', FOUND_UNVERIFIED: 'Fonte não verificada' }[value.toUpperCase()] || value.replace(/_/g, ' ').toLowerCase());
 const formatRights = (value: string) => ({ PUBLIC: 'Público', UNKNOWN: 'Não informado', RIGHTS_UNKNOWN: 'Não informado' }[value.toUpperCase()] || value.replace(/_/g, ' ').toLowerCase());
 
-const EmptyState: React.FC<{ message: string }> = ({ message }) => <div className="border border-dashed border-stone-700 p-8 text-sm text-stone-400">{message}</div>;
+const EmptyState: React.FC<{ message: string }> = ({ message }) => <div className="border border-dashed border-stone-700 p-8 text-sm text-stone-600">{message}</div>;
 
 const InfoCard: React.FC<{ eyebrow: string; title: string; text: string; action: string; onClick: () => void }> = ({ eyebrow, title, text, action, onClick }) => (
-  <div className="bg-[#141414] border border-stone-800 p-6 rounded-sm space-y-4 flex flex-col justify-between min-h-[200px]">
-    <div className="space-y-3"><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.12em] block">{eyebrow}</span><h4 className="text-2xl font-bold leading-snug">{title}</h4><p className="text-stone-300 text-sm leading-relaxed">{text}</p></div>
-    <button type="button" onClick={onClick} className="text-white hover:text-[#00A550] font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2">{action}<ArrowRight className="w-4 h-4" /></button>
+  <div className="bg-stone-50 border border-stone-200 p-6 rounded-sm space-y-4 flex flex-col justify-between min-h-[200px]">
+    <div className="space-y-3"><span className="text-xs font-bold text-[#008C45] uppercase tracking-[0.12em] block">{eyebrow}</span><h4 className="text-2xl font-bold leading-snug">{title}</h4><p className="text-stone-950 text-sm leading-relaxed">{text}</p></div>
+    <button type="button" onClick={onClick} className="text-stone-950 hover:text-[#008C45] font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2">{action}<ArrowRight className="w-4 h-4" /></button>
   </div>
 );
