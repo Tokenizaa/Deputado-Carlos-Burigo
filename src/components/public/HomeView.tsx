@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, CalendarDays, FileText, Landmark, MessageSquare, Newspaper, Scale, Users } from 'lucide-react';
+import { ArrowRight, FileText, Landmark, MessageSquare, Newspaper, Scale } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { HeroSection } from './HeroSection';
 import { TrajectorySection } from './TrajectorySection';
@@ -10,43 +10,45 @@ import { NewsSection } from './NewsSection';
 import { VideosSection } from './VideosSection';
 
 const QUICK_LINKS = [
-  { view: 'trajetoria', label: 'Trajetória', detail: 'Conheça a história pública', icon: Landmark },
-  { view: 'atuacao', label: 'Atuação parlamentar', detail: 'Proposições, votos e comissões', icon: Scale },
-  { view: 'transparencia', label: 'Transparência', detail: 'Fontes, documentos e critérios', icon: FileText },
-  { view: 'contato', label: 'Fale com o Gabinete', detail: 'Envie uma solicitação', icon: MessageSquare },
+  { view: 'atuacao', label: 'Atuação parlamentar', detail: 'Proposições, votações, participações e documentos', icon: Scale },
+  { view: 'trajetoria', label: 'Trajetória pública', detail: 'História e registros da atuação pública', icon: Landmark },
+  { view: 'transparencia', label: 'Transparência', detail: 'Fontes, critérios e documentos públicos', icon: FileText },
+  { view: 'contato', label: 'Fale com o Gabinete', detail: 'Envie uma solicitação ao canal do portal', icon: MessageSquare },
 ] as const;
 
 export const HomeView: React.FC = () => {
   const { setCurrentView } = useApp();
 
   return (
-    <div className="w-full bg-white">
+    <main className="w-full bg-white text-stone-950">
       <HeroSection />
 
-      <section className="border-b border-stone-200 bg-stone-50" aria-labelledby="acesso-rapido">
-        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-[#006b32]">Acesso rápido</p>
-              <h2 id="acesso-rapido" className="mt-1 text-xl font-bold text-stone-950 sm:text-2xl">Encontre o que procura</h2>
-            </div>
-            <span className="hidden text-sm text-stone-500 sm:block">Informação pública em linguagem direta</span>
+      <section className="border-b border-stone-200 bg-stone-50" aria-labelledby="home-acesso">
+        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-12">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#006b32]">Portal institucional</p>
+            <h2 id="home-acesso" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              Informação pública em um só lugar.
+            </h2>
+            <p className="mt-3 text-base leading-7 text-stone-600">
+              Consulte a atuação parlamentar, a trajetória pública, documentos, transparência e canais de participação.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-px overflow-hidden border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-7 grid grid-cols-1 overflow-hidden border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-4">
             {QUICK_LINKS.map(({ view, label, detail, icon: Icon }) => (
               <button
                 key={view}
                 type="button"
                 onClick={() => setCurrentView(view)}
-                className="group flex min-h-28 items-start gap-4 bg-white p-5 text-left hover:bg-[#f7fbf8] focus-visible:z-10"
+                className="group min-h-32 border-b border-stone-200 bg-white p-5 text-left last:border-b-0 hover:bg-[#f7fbf8] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#006b32] sm:border-r sm:last:border-r-0 lg:border-b-0"
               >
-                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#008740]" aria-hidden="true" />
-                <span className="min-w-0">
-                  <span className="block text-base font-semibold text-stone-950 group-hover:text-[#006b32]">{label}</span>
-                  <span className="mt-1 block text-sm leading-5 text-stone-600">{detail}</span>
+                <span className="flex items-center justify-between gap-4">
+                  <Icon className="h-5 w-5 text-[#008740]" aria-hidden="true" />
+                  <ArrowRight className="h-4 w-4 text-stone-400 transition-transform group-hover:translate-x-1 group-hover:text-[#006b32]" aria-hidden="true" />
                 </span>
-                <ArrowRight className="ml-auto mt-1 h-4 w-4 shrink-0 text-stone-400 group-hover:text-[#006b32]" aria-hidden="true" />
+                <span className="mt-5 block text-base font-bold group-hover:text-[#006b32]">{label}</span>
+                <span className="mt-1 block text-sm leading-5 text-stone-600">{detail}</span>
               </button>
             ))}
           </div>
@@ -55,44 +57,46 @@ export const HomeView: React.FC = () => {
 
       <TrajectorySection />
 
-      <section className="border-b border-stone-200 bg-white py-10 sm:py-14" aria-labelledby="atualizacoes">
-        <div className="mx-auto grid max-w-7xl gap-4 px-5 sm:px-8 md:grid-cols-3 lg:px-12">
-          <div className="border-l-4 border-[#008740] bg-stone-50 p-5">
-            <Landmark className="h-5 w-5 text-[#008740]" aria-hidden="true" />
-            <h2 id="atualizacoes" className="mt-3 text-lg font-bold text-stone-950">Mandato e atuação</h2>
-            <p className="mt-1 text-sm leading-6 text-stone-600">Consulte o acervo parlamentar e a participação pública.</p>
+      <section className="border-b border-stone-200 bg-[#006b32] text-white" aria-labelledby="home-atuacao">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-14 lg:flex-row lg:items-end lg:justify-between lg:px-12">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-white/75">Atuação parlamentar</p>
+            <h2 id="home-atuacao" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Consulte os registros do mandato.
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-white/90">
+              Proposições, votações, participações e documentos permanecem vinculados ao acervo legislativo público.
+            </p>
           </div>
-          <div className="border-l-4 border-stone-300 bg-stone-50 p-5">
-            <CalendarDays className="h-5 w-5 text-stone-700" aria-hidden="true" />
-            <h2 className="mt-3 text-lg font-bold text-stone-950">Agenda pública</h2>
-            <p className="mt-1 text-sm leading-6 text-stone-600">Acompanhe compromissos publicados pelo gabinete.</p>
-          </div>
-          <div className="border-l-4 border-stone-300 bg-stone-50 p-5">
-            <Newspaper className="h-5 w-5 text-stone-700" aria-hidden="true" />
-            <h2 className="mt-3 text-lg font-bold text-stone-950">Notícias</h2>
-            <p className="mt-1 text-sm leading-6 text-stone-600">Veja as publicações mais recentes do portal.</p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setCurrentView('atuacao')}
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 text-base font-bold text-[#006b32] hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            Consultar atuação
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
       </section>
 
       <ActionsAndProjectsSection initialSubTab="visao-geral" />
       <ResultsSection />
 
-      <section className="border-b border-stone-200 bg-stone-50 py-12 sm:py-16" aria-labelledby="transparencia-home">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+      <section className="border-b border-stone-200 bg-stone-50" aria-labelledby="home-transparencia">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-[#006b32]">Transparência</p>
-            <h2 id="transparencia-home" className="mt-2 text-2xl font-bold tracking-tight text-stone-950 sm:text-3xl">
-              Informação pública com fonte e contexto.
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#006b32]">Transparência</p>
+            <h2 id="home-transparencia" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              Fonte, contexto e acesso aos documentos públicos.
             </h2>
             <p className="mt-3 text-base leading-7 text-stone-600">
-              Consulte critérios de publicação, documentos públicos e a origem das informações disponibilizadas no portal.
+              Consulte os critérios de publicação e a origem das informações disponibilizadas pelo portal.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setCurrentView('transparencia')}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-stone-950 px-5 text-base font-semibold text-white hover:bg-stone-800"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-stone-950 px-5 text-base font-bold text-white hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b32]"
           >
             Ver transparência
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -104,27 +108,27 @@ export const HomeView: React.FC = () => {
       <NewsSection limit={3} />
       <VideosSection />
 
-      <section className="border-t border-stone-200 bg-[#006b32] text-white" aria-labelledby="fale-gabinete-home">
+      <section className="border-t border-stone-200 bg-stone-950 text-white" aria-labelledby="home-contato">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-12 sm:px-8 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:px-12">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-white/80">Participação cidadã</p>
-            <h2 id="fale-gabinete-home" className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-stone-400">Participação cidadã</p>
+            <h2 id="home-contato" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               Fale com o Gabinete
             </h2>
-            <p className="mt-3 text-base leading-7 text-white/90">
+            <p className="mt-3 text-base leading-7 text-stone-300">
               Envie uma solicitação, dúvida ou manifestação pelo canal de contato do portal.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setCurrentView('contato')}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-6 text-base font-semibold text-[#006b32] hover:bg-stone-100"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-6 text-base font-bold text-stone-950 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Abrir contato
             <MessageSquare className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
