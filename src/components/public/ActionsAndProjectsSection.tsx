@@ -32,6 +32,13 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
   const publicItems = useMemo(() => legislativeItems.filter((item) => item.status === 'PUBLISHED'), [legislativeItems]);
   const votes = useMemo(() => publicItems.flatMap((item) => item.votes), [publicItems]);
+  const sourceDocumentByItemId = useMemo(() => {
+    const map = new Map<string, typeof documents[number]>();
+    documents.forEach((document) => {
+      if (document.legislativeItemId && document.publicUrl && !map.has(document.legislativeItemId)) map.set(document.legislativeItemId, document);
+    });
+    return map;
+  }, [documents]);
   const itemById = useMemo(() => new Map(legislativeItems.map((item) => [item.id, item])), [legislativeItems]);
   const types = useMemo(() => [...new Set(publicItems.map((item) => item.type))].sort(), [publicItems]);
   const years = useMemo(() => [...new Set(publicItems.map((item) => item.year))].sort((a, b) => b - a), [publicItems]);
@@ -173,7 +180,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
                         {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{formatDate(vote.voteDate)}</p></div>}
                       </div>
-                      {vote.sourceUrl && <a href={vote.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1 hover:underline">Ler fonte oficial <ExternalLink className="w-3 h-3" /></a>}
+                      {sourceDocumentByItemId.get(vote.legislativeItemId)?.publicUrl && <button type="button" onClick={() => openDocument(sourceDocumentByItemId.get(vote.legislativeItemId)!.publicUrl, `Votação — ${vote.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold inline-flex items-center gap-1 hover:underline">Ler fonte oficial <ExternalLink className="w-3 h-3" /></button>}
                     </div>
                   </details>
                 ))}
