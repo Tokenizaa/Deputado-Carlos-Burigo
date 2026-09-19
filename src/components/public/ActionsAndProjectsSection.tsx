@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, ExternalLink, FileText, Users } from 'lucide-react';
+import { ArrowRight, ChevronDown, ExternalLink, FileText, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAppUi } from '../../context/AppUiContext';
 import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../../contracts/publicLegislative';
@@ -118,27 +118,34 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               { value: projectStatus, onChange: setProjectStatus, label: 'Situação', options: ['TODOS', ...[...new Set(publicItems.map((item) => item.status).filter(Boolean))].sort()] },
             ]} />
             {filteredItems.length === 0 ? <EmptyState message="Nenhuma proposição corresponde aos filtros." /> : (
-              <div className="divide-y divide-stone-800 border-y border-stone-800">
+              <div className="border-y border-stone-800">
                 {filteredItems.map((item) => {
                   const authors = item.roles.filter((role) => /AUTOR|AUTHOR/i.test(role.role));
                   const rapporteurs = item.roles.filter((role) => /RELATOR|RAPPORTEUR/i.test(role.role));
                   return (
-                    <article key={item.id} className="py-6 sm:py-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
-                      <div className="space-y-2 max-w-3xl">
-                        <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{item.code}</span>
-                          <span className="text-stone-500">{item.year}</span>
-                          {item.concludedAt && <span className="text-[#00A550] font-semibold">Concluída</span>}
-                          {authors.length > 0 && <span className="font-bold text-sky-300 bg-sky-950/40 px-2 py-0.5 rounded">AUTORIA</span>}
-                          {rapporteurs.length > 0 && <span className="font-bold text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded">RELATORIA</span>}
+                    <details key={item.id} className="group border-b border-stone-800 last:border-b-0">
+                      <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 py-5 text-left [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#00A550]">
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-2 text-xs">
+                            <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded font-mono">{item.code}</span>
+                            <span className="text-stone-500">{item.year}</span>
+                            {item.concludedAt && <span className="text-[#00A550] font-semibold">Concluída</span>}
+                            {authors.length > 0 && <span className="font-bold text-sky-300 bg-sky-950/40 px-2 py-0.5 rounded">AUTORIA</span>}
+                            {rapporteurs.length > 0 && <span className="font-bold text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded">RELATORIA</span>}
+                          </span>
+                          <span className="mt-2 block text-lg sm:text-xl font-bold leading-snug">{item.title || item.code}</span>
+                        </span>
+                        <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" aria-hidden="true" />
+                      </summary>
+                      <div className="pb-7 pr-9">
+                        <p className="max-w-4xl text-sm sm:text-base text-stone-300 leading-relaxed">{item.summary || 'Sem ementa publicada.'}</p>
+                        <div className="mt-5 flex flex-wrap gap-4">
+                          <button type="button" onClick={() => setSelectedItem(item)} className="min-h-11 text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-1.5">
+                            Ver proposição <ArrowRight className="w-4 h-4" />
+                          </button>
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-bold leading-snug">{item.title || item.code}</h3>
-                        <p className="text-sm text-stone-300 leading-relaxed">{item.summary || 'Sem ementa publicada.'}</p>
                       </div>
-                      <button type="button" onClick={() => setSelectedItem(item)} className="min-h-11 shrink-0 text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-1.5">
-                        Ver proposição <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </article>
+                    </details>
                   );
                 })}
               </div>
