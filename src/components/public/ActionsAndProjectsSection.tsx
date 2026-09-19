@@ -6,7 +6,7 @@ import type { PublicLegislativeItemDto, PublicLegislativeVoteDto } from '../../c
 import { ContextSurface } from '../layout/ContextSurface';
 
 interface ActionsAndProjectsSectionProps {
-  initialSubTab?: 'visao-geral' | 'projetos' | 'votacoes' | 'participacoes' | 'resultados' | 'documentos';
+  initialSubTab?: 'projetos' | 'votacoes' | 'participacoes' | 'resultados' | 'documentos';
 }
 type Tab = NonNullable<ActionsAndProjectsSectionProps['initialSubTab']>;
 
@@ -18,7 +18,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     currentView === 'votacoes' ? 'votacoes' :
     currentView === 'participacoes' ? 'participacoes' :
     currentView === 'documentos' ? 'documentos' :
-    currentView === 'resultados' ? 'resultados' : initialSubTab,
+    currentView === 'resultados' ? 'resultados' : initialSubTab ?? 'projetos',
   );
   const [selectedItem, setSelectedItem] = useState<PublicLegislativeItemDto | null>(null);
   const [selectedVote, setSelectedVote] = useState<PublicLegislativeVoteDto | null>(null);
@@ -65,7 +65,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   };
 
   const tabs: Array<{ id: Tab; label: string }> = [
-    { id: 'visao-geral', label: 'VISÃO GERAL' },
     { id: 'projetos', label: 'PROPOSIÇÕES' },
     { id: 'votacoes', label: 'VOTAÇÕES' },
     { id: 'participacoes', label: 'PARTICIPAÇÕES' },
@@ -100,15 +99,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
             </button>
           ))}
         </nav>
-
-        {activeTab === 'visao-geral' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <InfoCard eyebrow="PROPOSIÇÕES" title="Projetos e outras proposições" text={`${publicItems.length} registros publicados no acervo legislativo.`} onClick={() => setActiveTab('projetos')} action="Consultar" />
-            <InfoCard eyebrow="VOTAÇÕES" title="Votações nominais" text={`${votes.length} registros ligados às matérias publicadas.`} onClick={() => setActiveTab('votacoes')} action="Consultar" />
-            <InfoCard eyebrow="PARTICIPAÇÕES" title="Relatorias e funções registradas" text={`${participations.length} relações públicas vinculadas às proposições publicadas.`} onClick={() => setActiveTab('participacoes')} action="Consultar" />
-            <InfoCard eyebrow="DOCUMENTOS" title="Acervo documental" text={`${documents.length} documentos catalogados e armazenados no Supabase.`} onClick={() => setActiveTab('documentos')} action="Consultar" />
-          </div>
-        )}
 
         {activeTab === 'projetos' && (
           <div className="space-y-8">
