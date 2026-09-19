@@ -345,11 +345,11 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
     .filter((row) => !row.main_media_id)
     .map((row) => row.title.trim())
     .filter(Boolean);
-  const mediaByNewsTitle = new Map<string, string>();
+  const mediaByNewsTitle = new Map<string, { url: string; sourceName?: string; sourceUrl?: string }>();
   if (missingImageTitles.length) {
     const { data: activityMedia, error: activityMediaError } = await supabasePublic
       .from('media')
-      .select('title,url,original_url')
+      .select('title,url,original_url,source_name,source_page_url')
       .eq('category', 'foto/atividade_parlamentar')
       .not('url', 'is', null);
     if (activityMediaError) throw activityMediaError;
@@ -369,7 +369,7 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
       const current = mediaByNewsTitle.get(newsTitle);
       const preferred = /_G\.(?:jpe?g|png)$/i.test(url);
       if (!current || preferred) {
-        mediaByNewsTitle.set(newsTitle, url);
+        mediaByNewsTitle.set(newsTitle, { url, sourceName: media.source_name ?? undefined, sourceUrl: media.source_page_url ?? undefined });
       }
     }
   }
@@ -380,7 +380,10 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
       ...dto,
       mainImage: row.main_media_id
         ? mediaById.get(row.main_media_id)
-        : mediaByNewsTitle.get(row.title.trim()) ?? dto.mainImage,
+        : mediaByNewsTitle.get(row.title.trim())?.url ?? dto.mainImage,
+      sourceName: mediaByNewsTitle.get(row.title.trim())?.sourceName,
+      sourceUrl: mediaByNewsTitle.get(row.title.trim())?.sourceUrl,
+      imageCredit: mediaByNewsTitle.get(row.title.trim())?.sourceName,
     };
   });
 }
