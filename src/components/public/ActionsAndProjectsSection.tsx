@@ -33,7 +33,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   const documentsByItemId = useMemo(() => {
     const map = new Map<string, typeof documents>();
     documents.forEach((document) => {
-      if (!document.legislativeItemId || !document.publicUrl) return;
+      if (!document.legislativeItemId || (!document.publicUrl && !document.originalUrl)) return;
       const current = map.get(document.legislativeItemId) || [];
       current.push(document);
       map.set(document.legislativeItemId, current);
@@ -72,11 +72,26 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
       && (documentType === 'TODOS' || document.documentType === documentType);
   });
 
-  const openDocument = (url: string | null | undefined, title: string) => {
-    if (url) openDocumentViewer(url, title, 'pdf');
+  const openSource = (url: string | null | undefined, title: string, internal = false) => {
+    if (!url) return;
+    if (internal) {
+      openDocumentViewer(url, title, 'pdf');
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const openDocumentSource = (document: typeof documents[number], title: string) => {
+    const url = document.publicUrl || document.originalUrl;
+    openSource(url, title, Boolean(document.publicUrl));
   };
 
   const documentsForItem = (itemId: string) => documentsByItemId.get(itemId) || [];
+
+  const itemSourceUrl = (itemId: string) => {
+    const item = itemById.get(itemId);
+    return item?.sourceUrl || documentsForItem(itemId).find((document) => document.originalUrl)?.originalUrl;
+  };
 
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: 'projetos', label: 'PROPOSIÇÕES' },
@@ -169,16 +184,22 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                               </div>
                             </div>
                           )}
-                          {documentsForItem(item.id).length > 0 && (
+                          {(documentsForItem(item.id).length > 0 || item.sourceUrl) && (
                             <div className="w-full border-t border-stone-800 pt-5">
                               <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Documentos da proposição</span>
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {documentsForItem(item.id).map((document) => (
-                                  <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
+                                  <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
                                     <FileText className="h-4 w-4 shrink-0" />
                                     <span className="truncate">{document.title || 'Ver documento'}</span>
                                   </button>
                                 ))}
+                                {documentsForItem(item.id).length === 0 && item.sourceUrl && (
+                                  <button type="button" onClick={() => openSource(item.sourceUrl, 'Fonte oficial — ' + item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#00A550] border border-stone-700 hover:border-[#00A550] px-4 py-2 rounded-md inline-flex items-center gap-2">
+                                    <FileText className="h-4 w-4 shrink-0" />
+                                    <span>Fonte oficial</span>
+                                  </button>
+                                )}
                               </div>
                             </div>
                           )}
@@ -218,16 +239,22 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Votante</span><p className="font-semibold text-white mt-0.5">{vote.voterName}</p></div>
                         {vote.voteDate && <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Data</span><p className="font-semibold text-white mt-0.5">{formatDate(vote.voteDate)}</p></div>}
                       </div>
-                      {documentsForItem(vote.legislativeItemId).length > 0 && (
+                      {documentsForItem(vote.legislativeItemId).length > 0 || vote.sourceUrl ? (
                         <div className="mt-5 border-t border-stone-800 pt-5">
-                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte documental</span>
+                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte</span>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {documentsForItem(vote.legislativeItemId).map((document) => (
-                              <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || ('Votação — ' + vote.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Votação — ' + vote.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 {document.title || 'Ver documento'}
                               </button>
                             ))}
+                            {documentsForItem(vote.legislativeItemId).length === 0 && vote.sourceUrl && (
+                              <button type="button" onClick={() => openSource(vote.sourceUrl, 'Fonte oficial — ' + vote.legislativeCode)} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                Fonte oficial
+                              </button>
+                            )}
                           </div>
                         </div>
                       )}}
@@ -267,16 +294,22 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{formatRole(role.role)}</p></div>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Ano</span><p className="font-semibold text-white mt-0.5">{role.year}</p></div>
                       </div>
-                      {documentsForItem(role.itemId).length > 0 && (
+                      {documentsForItem(role.itemId).length > 0 || role.sourceUrl ? (
                         <div className="mt-5 border-t border-stone-800 pt-5">
-                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte documental</span>
+                          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Fonte</span>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {documentsForItem(role.itemId).map((document) => (
-                              <button key={document.id} type="button" onClick={() => openDocument(document.publicUrl, document.title || ('Fonte — ' + role.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                              <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || ('Fonte — ' + role.legislativeCode))} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
                                 <FileText className="h-4 w-4" />
                                 {document.title || 'Ver documento'}
                               </button>
                             ))}
+                            {documentsForItem(role.itemId).length === 0 && role.sourceUrl && (
+                              <button type="button" onClick={() => openSource(role.sourceUrl, 'Fonte oficial — ' + role.legislativeCode)} className="min-h-11 text-[#00A550] font-semibold text-sm border border-stone-700 hover:border-[#00A550] px-3 py-2 rounded-md inline-flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                Fonte oficial
+                              </button>
+                            )}
                           </div>
                         </div>
                       )}}
@@ -298,7 +331,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
               <div className="border border-stone-800 rounded-sm divide-y divide-stone-800">
                 {filteredDocuments.map((document) => {
                   const item = itemById.get(document.legislativeItemId);
-                  const url = document.publicUrl;
+                  const url = document.publicUrl || document.originalUrl;
                   const isAnnex = document.documentType?.toUpperCase() === 'ANEXO';
                   const annexMatch = document.title?.match(/(?:Anexo[- ]?)(\\d+)$/i);
                   const displayTitle = isAnnex && annexMatch ? `Anexo ${annexMatch[1]}` : document.title;
