@@ -88,11 +88,6 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
 
   const documentsForItem = (itemId: string) => documentsByItemId.get(itemId) || [];
 
-  const itemSourceUrl = (itemId: string) => {
-    const item = itemById.get(itemId);
-    return item?.sourceUrl || documentsForItem(itemId).find((document) => document.originalUrl)?.originalUrl;
-  };
-
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: 'projetos', label: 'PROPOSIÇÕES' },
     { id: 'votacoes', label: 'VOTAÇÕES' },
