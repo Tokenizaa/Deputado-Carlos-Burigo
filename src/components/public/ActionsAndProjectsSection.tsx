@@ -203,7 +203,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                       <Users className="h-5 w-5 shrink-0 text-[#00A550]" aria-hidden="true" />
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded">{role.role}</span>
+                          <span className="font-bold text-white bg-stone-800 px-2 py-0.5 rounded">{formatRole(role.role)}</span>
                           <span className="text-stone-500">{role.year}</span>
                         </span>
                         <span className="mt-2 block text-lg font-bold leading-snug">{role.legislativeCode}</span>
@@ -213,7 +213,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                     </summary>
                     <div className="pb-7 pl-9 pr-9">
                       <div className="grid gap-4 sm:grid-cols-2 text-sm">
-                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{role.role}</p></div>
+                        <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Função</span><p className="font-semibold text-white mt-0.5">{formatRole(role.role)}</p></div>
                         <div><span className="text-xs font-bold text-stone-400 uppercase tracking-wider block">Ano</span><p className="font-semibold text-white mt-0.5">{role.year}</p></div>
                       </div>
                       {role.sourceUrl && <button type="button" onClick={() => openDocument(role.sourceUrl, `Fonte oficial — ${role.legislativeCode}`)} className="mt-5 min-h-11 text-[#00A550] font-semibold text-sm inline-flex items-center gap-1">Fonte oficial <ExternalLink className="h-3.5 w-3.5" /></button>}
@@ -316,6 +316,8 @@ const FilterBar: React.FC<{ search: string; onSearch: (value: string) => void; p
 const Metric: React.FC<{ value: React.ReactNode; label: string; detail: string }> = ({ value, label, detail }) => (
   <div className="space-y-1"><span className="text-4xl sm:text-5xl lg:text-6xl font-black block leading-none">{value}</span><span className="text-xs font-bold text-[#00A550] uppercase tracking-[0.08em] block pt-1">{label}</span><p className="text-xs text-stone-400 leading-tight">{detail}</p></div>
 );
+
+const formatRole = (value: string) => ({ AUTHOR: 'Autor', COAUTHOR: 'Coautor', RAPPORTEUR: 'Relator' }[value.toUpperCase()] || value);
 
 const formatDate = (value: string) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date); };
 
