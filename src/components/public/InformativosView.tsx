@@ -61,7 +61,7 @@ export const InformativosView: React.FC = () => {
                     <img
                       src={capa.url}
                       alt={capa.altText || 'Capa de informativo do gabinete'}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                       loading={index < 3 ? 'eager' : 'lazy'}
                     />
                   </div>
