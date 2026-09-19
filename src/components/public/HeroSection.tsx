@@ -69,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ customTitle, customSub
             referrerPolicy="no-referrer"
             onError={(event) => { (event.target as HTMLImageElement).src = '/assets/carlos_burigo_portrait.png'; }}
           />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-6 pt-24 text-white">
+          <div className="absolute inset-x-0 bottom-0 bg-black/70 p-6 text-white">
             <p className="text-sm font-semibold">{name}</p>
             <p className="mt-1 text-sm text-white/90">{role}</p>
           </div>
