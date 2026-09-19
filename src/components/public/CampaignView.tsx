@@ -59,7 +59,7 @@ export const CampaignView: React.FC = () => {
                 <img
                   src="/assets/carlos_burigo_portrait.png"
                   alt="Carlos Búrigo - Campanha 2026"
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-contain"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -189,7 +189,7 @@ export const CampaignView: React.FC = () => {
                     <img
                       src={v.thumbnail || '/assets/alrs_parlamento.jpg'}
                       alt={v.title}
-                      className="w-full h-full object-cover opacity-90"
+                      className="w-full h-full object-contain opacity-90"
                       referrerPolicy="no-referrer"
                     />
                   </div>
