@@ -10,6 +10,7 @@ import { ResultsSection } from './ResultsSection';
 import { TrajectorySection } from './TrajectorySection';
 import { VideosSection } from './VideosSection';
 import { Page, PageBlock } from '../../types';
+import { SEO } from '../seo/SEO';
 
 export function renderBlock(block: PageBlock) {
   const content = block.content || {};
@@ -37,5 +38,5 @@ export const DynamicPageView: React.FC<{ slug: string }> = ({ slug }) => {
   useEffect(() => { let cancelled = false; fetch(`/api/pages/${encodeURIComponent(slug)}`).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled) setPage(data); }).finally(() => { if (!cancelled) setLoading(false); }); return () => { cancelled = true; }; }, [slug]);
   if (loading) return <div className="min-h-[60vh] flex items-center justify-center text-sm text-stone-500">Carregando página…</div>;
   if (!page) return <div className="min-h-[60vh] flex items-center justify-center text-sm text-stone-500">Página não encontrada.</div>;
-  return <main>{page.blocks.filter((block) => block.visible !== false && block.active !== false).sort((a, b) => a.order - b.order).map(renderBlock)}</main>;
+  return <><SEO title={page.seoTitle || page.title} description={page.seoDescription || page.description} image={page.ogImageUrl} url={`${window.location.origin}/${page.slug}`} /><main>{page.blocks.filter((block) => block.visible !== false && block.active !== false).sort((a, b) => a.order - b.order).map(renderBlock)}</main></>;
 };
