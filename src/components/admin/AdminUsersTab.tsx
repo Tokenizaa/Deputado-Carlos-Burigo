@@ -31,30 +31,7 @@ export const AdminUsersTab: React.FC = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [sending, setSending] = useState(false);
-  const [copied, setCopied] = useState('');
-  const [form, setForm] = useState({ name: '', email: '', cargo: '', role: 'EDITOR' as Role, sendEmail: true });
-
-  const pending = useMemo(() => invites.filter((invite) => ['pendente', 'aprovacao', 'aceito'].includes(invite.status)), [invites]);
-
-  const authHeaders = async () => {
-    const client = await getSupabaseClient();
-    const { data } = await client.auth.getSession();
-    if (!data.session?.access_token) throw new Error('Sessão não autenticada.');
-    return { Authorization: 'Bearer ' + data.session.access_token };
-  };
-
-  const loadInvites = async () => {
-    try {
-      const response = await fetch('/api/admin/invites', { headers: await authHeaders() });
-      const data = await response.json().catch(() => []);
-      if (!response.ok) throw new Error(data?.error || 'Falha ao carregar convites.');
-      setInvites(Array.isArray(data) ? data : []);
-    } catch (error: any) {
-      showToast(error?.message || 'Falha ao carregar convites.', 'error');
-    }
-  };
-
-  useEffect(() => { void loadInvites(); }, []);
+  const [sending, setSending] = useState(false);
 
   const createInvite = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -102,17 +79,6 @@ export const AdminUsersTab: React.FC = () => {
     }
   };
 
-  const copyInviteLink = async (invite: Invite) => {
-    try {
-      const response = await fetch('/api/admin/invites', { headers: await authHeaders() });
-      const data = await response.json();
-      const fresh = Array.isArray(data) ? data.find((item: Invite) => item.id === invite.id) : null;
-      if (!fresh) throw new Error('Convite não encontrado.');
-      showToast('Para gerar novamente um link, crie um novo convite para este email.', 'info');
-    } catch (error: any) {
-      showToast(error?.message || 'Não foi possível copiar o convite.', 'error');
-    }
-  };
 
   return (
     <div className="space-y-8">
