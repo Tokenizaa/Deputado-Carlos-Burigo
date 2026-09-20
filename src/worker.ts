@@ -809,7 +809,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       try {
         const data = await request.json();
         const createdBy = authResult.userId;
-        if (!createdBy || !data?.title) return Response.json({ error: 'title e x-user-id são obrigatórios' }, { status: 400 });
+        if (!createdBy || !data?.title) return Response.json({ error: 'title é obrigatório' }, { status: 400 });
         return Response.json(await createAdminTask({ ...data, createdBy }), { status: 201 });
       } catch (error) { console.error('[api/tasks POST]', error); return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 }); }
     }
