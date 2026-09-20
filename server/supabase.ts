@@ -844,6 +844,108 @@ return {
   }
 }
 
+
+export async function bootstrapFirstAdmin(input: {
+  name: string;
+  cargo: string;
+  email: string;
+  password: string;
+}): Promise<User> {
+  const name = input.name.trim();
+  const cargo = input.cargo.trim();
+  const email = input.email.trim().toLowerCase();
+
+  if (!name || !cargo || !email || !input.password) throw new Error('Nome, cargo, e-mail e senha são obrigatórios.');
+  if (input.password.length < 8) throw new Error('A senha deve ter pelo menos 8 caracteres.');
+
+  const { data: admins, error: adminsError } = await supabaseAdmin
+    .from('user_roles')
+    .select('user_id')
+    .eq('role', 'ADMIN')
+    .limit(1);
+  if (adminsError) throw adminsError;
+  if ((admins ?? []).length > 0) throw new Error('O cadastro inicial já foi encerrado.');
+
+  const { data: claim, error: claimError } = await supabaseAdmin
+    .from('admin_bootstrap')
+    .update({
+      claimed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', true)
+    .is('claimed_at', null)
+    .is('completed_at', null)
+    .select('id')
+    .maybeSingle();
+  if (claimError) throw claimError;
+  if (!claim) throw new Error('O cadastro inicial já está em andamento ou foi concluído.');
+
+  let createdUserId: string | null = null;
+  try {
+    const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: input.password,
+      email_confirm: true,
+      user_metadata: { name },
+    });
+    if (createError) throw createError;
+    if (!created.user?.id) throw new Error('Supabase não retornou o usuário criado.');
+    createdUserId = created.user.id;
+
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .upsert({
+        id: createdUserId,
+        name,
+        cargo,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' });
+    if (profileError) throw profileError;
+
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .upsert({
+        user_id: createdUserId,
+        role: 'ADMIN',
+      }, { onConflict: 'user_id' });
+    if (roleError) throw roleError;
+
+    const { error: completeError } = await supabaseAdmin
+      .from('admin_bootstrap')
+      .update({
+        claimed_user_id: createdUserId,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', true);
+    if (completeError) throw completeError;
+
+    const user = await getAdminUserById(createdUserId);
+    if (!user) throw new Error('O usuário foi criado, mas o perfil administrativo não pôde ser confirmado.');
+    return user;
+  } catch (error) {
+    if (createdUserId) {
+      try {
+        await supabaseAdmin.from('user_roles').delete().eq('user_id', createdUserId);
+        await supabaseAdmin.from('profiles').delete().eq('id', createdUserId);
+        await supabaseAdmin.auth.admin.deleteUser(createdUserId);
+      } catch (rollbackError) {
+        console.error('Falha no rollback do primeiro administrador:', rollbackError);
+      }
+    }
+    await supabaseAdmin
+      .from('admin_bootstrap')
+      .update({
+        claimed_at: null,
+        claimed_user_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', true)
+      .is('completed_at', null);
+    throw error;
+  }
+}
+
 export async function getAllAdminUsers(): Promise<User[]> {
   try {
     // Get all auth users (admin API)
