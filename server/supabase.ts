@@ -171,6 +171,161 @@ export async function getPublicSettings() {
   };
 }
 
+export async function getAdminResults() {
+  const { data, error } = await supabaseAdmin
+    .from('results')
+    .select('id,title,category,description,metrics,municipality,result_date')
+    .order('result_date', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function createAdminResult(input: {
+  title: string;
+  category: string;
+  description: string;
+  metrics?: string | null;
+  municipality?: string | null;
+  date?: string | null;
+}) {
+  const { data, error } = await supabaseAdmin
+    .from('results')
+    .insert({
+      title: String(input.title ?? '').trim(),
+      category: String(input.category ?? '').trim(),
+      description: String(input.description ?? '').trim(),
+      metrics: input.metrics ? String(input.metrics).trim() : null,
+      municipality: input.municipality ? String(input.municipality).trim() : null,
+      result_date: input.date ? String(input.date).trim() : null,
+    })
+    .select('id,title,category,description,metrics,municipality,result_date')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminResult(id: string, input: {
+  title?: string;
+  category?: string;
+  description?: string;
+  metrics?: string | null;
+  municipality?: string | null;
+  date?: string | null;
+}) {
+  const patch: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries({
+    title: input.title,
+    category: input.category,
+    description: input.description,
+    metrics: input.metrics,
+    municipality: input.municipality,
+    result_date: input.date,
+  })) {
+    if (value !== undefined) patch[key] = typeof value === 'string' ? value.trim() : value;
+  }
+  const { data, error } = await supabaseAdmin
+    .from('results')
+    .update(patch)
+    .eq('id', id)
+    .select('id,title,category,description,metrics,municipality,result_date')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminResult(id: string) {
+  const { data, error } = await supabaseAdmin
+    .from('results')
+    .delete()
+    .eq('id', id)
+    .select('id')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getAdminMunicipalities() {
+  const { data, error } = await supabaseAdmin
+    .from('municipalities')
+    .select('id,name,region,population,key_deliveries')
+    .order('name', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((item) => ({
+    id: item.id,
+    name: item.name,
+    region: item.region,
+    population: item.population,
+    keyDeliveries: Array.isArray(item.key_deliveries) ? item.key_deliveries : [],
+  }));
+}
+
+export async function createAdminMunicipality(input: {
+  name: string;
+  region: string;
+  population?: string | null;
+  keyDeliveries: string[];
+}) {
+  const { data, error } = await supabaseAdmin
+    .from('municipalities')
+    .insert({
+      name: String(input.name ?? '').trim(),
+      region: String(input.region ?? '').trim(),
+      population: input.population ? String(input.population).trim() : null,
+      key_deliveries: Array.isArray(input.keyDeliveries) ? input.keyDeliveries : [],
+    })
+    .select('id,name,region,population,key_deliveries')
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    name: data.name,
+    region: data.region,
+    population: data.population,
+    keyDeliveries: Array.isArray(data.key_deliveries) ? data.key_deliveries : [],
+  };
+}
+
+export async function updateAdminMunicipality(id: string, input: {
+  name?: string;
+  region?: string;
+  population?: string | null;
+  keyDeliveries?: string[];
+}) {
+  const patch: Record<string, unknown> = {};
+  if (input.name !== undefined) patch.name = String(input.name).trim();
+  if (input.region !== undefined) patch.region = String(input.region).trim();
+  if (input.population !== undefined) patch.population = input.population ? String(input.population).trim() : null;
+  if (input.keyDeliveries !== undefined) patch.key_deliveries = Array.isArray(input.keyDeliveries) ? input.keyDeliveries : [];
+
+  const { data, error } = await supabaseAdmin
+    .from('municipalities')
+    .update(patch)
+    .eq('id', id)
+    .select('id,name,region,population,key_deliveries')
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    id: data.id,
+    name: data.name,
+    region: data.region,
+    population: data.population,
+    keyDeliveries: Array.isArray(data.key_deliveries) ? data.key_deliveries : [],
+  };
+}
+
+export async function deleteAdminMunicipality(id: string) {
+  const { data, error } = await supabaseAdmin
+    .from('municipalities')
+    .delete()
+    .eq('id', id)
+    .select('id')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getPublicResults() {
   const publishedIndex = await getPublishedLegislativeIndex();
   const publishedCodes = new Set(publishedIndex.keys());
