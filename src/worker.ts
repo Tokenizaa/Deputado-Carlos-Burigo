@@ -31,6 +31,14 @@ import {
   createAdminAgenda,
   updateAdminAgenda,
   deleteAdminAgenda,
+  getAdminResults,
+  createAdminResult,
+  updateAdminResult,
+  deleteAdminResult,
+  getAdminMunicipalities,
+  createAdminMunicipality,
+  updateAdminMunicipality,
+  deleteAdminMunicipality,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -173,30 +181,110 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
   '/api/results': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const results = await getPublicResults();
-      return Response.json(results);
-    } catch (error) {
-      console.error('[api/results]', error);
-      return Response.json(
-        { error: 'Falha ao carregar resultados do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicResults());
+      } catch (error) {
+        console.error('[api/results GET]', error);
+        return Response.json({ error: 'Falha ao carregar resultados do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const data = await request.json();
+        if (!data?.title || !data?.category || !data?.description) return Response.json({ error: 'title, category e description são obrigatórios' }, { status: 400 });
+        return Response.json(await createAdminResult(data), { status: 201 });
+      } catch (error) {
+        console.error('[api/results POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar resultado' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+  '/api/results/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const updated = await updateAdminResult(id, await request.json());
+        if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/results/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar resultado' }, { status: 400 });
+      }
+    }
+    if (request.method === 'DELETE') {
+      if (!can(authResult.role as any, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const deleted = await deleteAdminResult(id);
+        if (!deleted) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/results/:id DELETE]', error);
+        return Response.json({ error: error?.message || 'Falha ao excluir resultado' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
   },
   '/api/municipalities': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const municipalities = await getPublicMunicipalities();
-      return Response.json(municipalities);
-    } catch (error) {
-      console.error('[api/municipalities]', error);
-      return Response.json(
-        { error: 'Falha ao carregar municípios do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicMunicipalities());
+      } catch (error) {
+        console.error('[api/municipalities GET]', error);
+        return Response.json({ error: 'Falha ao carregar municípios do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const data = await request.json();
+        if (!data?.name || !data?.region || !Array.isArray(data?.keyDeliveries)) return Response.json({ error: 'name, region e keyDeliveries são obrigatórios' }, { status: 400 });
+        return Response.json(await createAdminMunicipality(data), { status: 201 });
+      } catch (error) {
+        console.error('[api/municipalities POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar município' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+  '/api/municipalities/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const updated = await updateAdminMunicipality(id, await request.json());
+        if (!updated) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/municipalities/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar município' }, { status: 400 });
+      }
+    }
+    if (request.method === 'DELETE') {
+      if (!can(authResult.role as any, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const deleted = await deleteAdminMunicipality(id);
+        if (!deleted) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/municipalities/:id DELETE]', error);
+        return Response.json({ error: 'Falha ao excluir município' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
   },
   '/api/videos': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
@@ -911,6 +999,7 @@ export default {
         else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];\n        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
+        else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
 
         if (requiredRoles !== null) {
