@@ -342,7 +342,6 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
-      if (!can(authResult.role as any, 'tarefas', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       if (!can(authResult.role as any, 'conteúdo', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const pages = await getAdminPages();
@@ -667,10 +666,12 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method === 'GET') {
+      if (!can(authResult.role as any, 'tarefas', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try { return Response.json(await getAdminTasks()); }
       catch (error) { console.error('[api/tasks GET]', error); return Response.json({ error: 'Falha ao carregar tarefas' }, { status: 500 }); }
     }
     if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'tarefas', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const data = await request.json();
         const createdBy = authResult.userId;
@@ -685,6 +686,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
+    if (!can(authResult.role as any, 'tarefas', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const id = (request as any).params?.id;
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
@@ -698,6 +700,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
+    if (!can(authResult.role as any, 'cidadão', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const demands = await getAllDemandsAdmin();
       return Response.json(demands);
@@ -711,6 +714,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
+    if (!can(authResult.role as any, 'cidadão', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const id = (request as any).params?.id;
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
