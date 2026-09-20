@@ -428,6 +428,18 @@ export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
   return pages.map((page) => toPublicPageDto(page, blocksByPage.get(page.id) ?? []));
 }
 
+export async function getAuthenticatedAdminUser(accessToken: string): Promise<User | null> {
+  if (!accessToken) return null;
+  try {
+    const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
+    if (error || !data.user) return null;
+    return getAdminUserById(data.user.id);
+  } catch (error) {
+    console.error('Error resolving authenticated admin user:', error);
+    return null;
+  }
+}
+
 export async function getAdminUserById(id: string): Promise<User | null> {
   // Supabase Auth user IDs are UUIDs. Guard the boundary so malformed client
   // values do not reach auth.admin.getUserById() and generate noisy runtime errors.
