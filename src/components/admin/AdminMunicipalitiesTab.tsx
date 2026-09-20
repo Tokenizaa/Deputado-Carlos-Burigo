@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Plus, Edit2, Trash2, MapPin, Save, Check } from 'lucide-react';
 import { Municipality } from '../../types';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminMunicipalitiesTab: React.FC = () => {
-  const { municipalities, currentUser, refreshAllData, showToast } = useApp();
+  const { municipalities, refreshAllData, showToast } = useApp();
   const [editingMun, setEditingMun] = useState<Municipality | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -41,6 +42,9 @@ export const AdminMunicipalitiesTab: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const deliveries = deliveriesText
         .split('\n')
         .map((s) => s.trim())
@@ -53,7 +57,7 @@ export const AdminMunicipalitiesTab: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           name,
@@ -80,9 +84,12 @@ export const AdminMunicipalitiesTab: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir este município?')) return;
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const res = await fetch(`/api/municipalities/${id}`, {
         method: 'DELETE',
-        headers: { 'x-user-id': currentUser.id },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
         showToast('Município excluído.', 'success');
