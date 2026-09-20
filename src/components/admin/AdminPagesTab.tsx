@@ -4,6 +4,7 @@ import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
 import { renderBlock } from '../public/DynamicPageView';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }> = [
   { type: 'hero', label: 'Hero', description: 'Destaque principal com texto e mídia' },
@@ -46,7 +47,8 @@ export const AdminPagesTab: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', status: 'rascunho' as 'rascunho' | 'publicado' });
+  const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
+  const [uploadingOg, setUploadingOg] = useState(false);
   const [newPage, setNewPage] = useState({ title: '', slug: '', description: '' });
 
   const selectedPage = useMemo(() => adminPages.find((page) => page.id === selectedPageId) || adminPages[0], [adminPages, selectedPageId]);
@@ -63,6 +65,9 @@ export const AdminPagesTab: React.FC = () => {
       title: selectedPage.title,
       slug: selectedPage.slug,
       description: selectedPage.description || '',
+      seoTitle: selectedPage.seoTitle || '',
+      seoDescription: selectedPage.seoDescription || '',
+      ogImageUrl: selectedPage.ogImageUrl || '',
       status: selectedPage.status,
     });
   }, [selectedPage?.id, selectedPage?.updatedAt]);
@@ -72,7 +77,7 @@ export const AdminPagesTab: React.FC = () => {
     if (!page) return;
     setSelectedPageId(id);
     setDraftBlocks([...page.blocks].sort((a, b) => a.order - b.order));
-    setMetadata({ title: page.title, slug: page.slug, description: page.description || '', status: page.status });
+    setMetadata({ title: page.title, slug: page.slug, description: page.description || '', seoTitle: page.seoTitle || '', seoDescription: page.seoDescription || '', ogImageUrl: page.ogImageUrl || '', status: page.status });
   };
 
   const moveBlock = (index: number, direction: -1 | 1) => {
@@ -106,6 +111,24 @@ export const AdminPagesTab: React.FC = () => {
     setShowBlocks(false);
   };
 
+  const uploadOg = async (file: File) => {
+    setUploadingOg(true);
+    try {
+      const client = await getSupabaseClient();
+      const { data } = await client.auth.getSession();
+      if (!data.session?.access_token) throw new Error('Sessão não autenticada');
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/admin/og-image', { method: 'POST', headers: { Authorization: `Bearer ${data.session.access_token}` }, body: form });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Falha ao enviar imagem');
+      setMetadata((current) => ({ ...current, ogImageUrl: json.url }));
+      showToast('Imagem Open Graph enviada. Salve a página para vincular a imagem.', 'success');
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao enviar imagem Open Graph', 'error');
+    } finally { setUploadingOg(false); }
+  };
+
   const save = async (publish: boolean) => {
     if (!selectedPage) return;
     setSaving(true);
@@ -113,6 +136,9 @@ export const AdminPagesTab: React.FC = () => {
       title: metadata.title,
       slug: metadata.slug,
       description: metadata.description,
+      seoTitle: metadata.seoTitle,
+      seoDescription: metadata.seoDescription,
+      ogImageUrl: metadata.ogImageUrl,
       status: publish ? 'publicado' : 'rascunho',
       publish,
       blocks: draftBlocks,
@@ -248,6 +274,9 @@ export const AdminPagesTab: React.FC = () => {
           title: metadata.title,
           slug: metadata.slug,
           description: metadata.description,
+          seoTitle: metadata.seoTitle,
+          seoDescription: metadata.seoDescription,
+          ogImageUrl: metadata.ogImageUrl,
           status: metadata.status,
           publish: metadata.status === 'publicado',
           blocks: nextBlocks,
