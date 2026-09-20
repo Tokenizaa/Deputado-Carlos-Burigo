@@ -53,3 +53,28 @@ As demandas existentes sem `citizen_user_id` não serão atribuídas automaticam
 ## Observação
 
 A criação usa e-mail + senha no Supabase Auth. A configuração atual de confirmação de e-mail deve ser verificada antes de definir o comportamento final pós-cadastro; não será criado um mecanismo paralelo de autenticação.
+
+## Execução atual
+
+### Etapa 1 — concluída
+- `demands.citizen_user_id` criado no Supabase.
+- RLS público de leitura/escrita removido de demandas, mensagens e histórico.
+- Políticas de propriedade por `auth.uid()` criadas.
+- As 3 demandas reais existentes permanecem preservadas e sem vinculação automática.
+
+### Etapa 2 — implementada
+- Criação de conta integrada ao formulário de Fale com o Gabinete.
+- Login existente integrado ao envio da demanda.
+- Conta criada no Supabase Auth no servidor, com e-mail confirmado para permitir conclusão imediata do fluxo.
+- Telefone normalizado para formato internacional compatível com WhatsApp, sem confirmação por código.
+- API de criação exige sessão e grava `citizen_user_id`.
+
+### Etapa 3 — implementada
+- Área `/minhas-demandas` criada.
+- Listagem limitada às demandas da conta autenticada.
+- Abertura da demanda e mensagens protegidas por sessão + propriedade.
+- Acompanhamento público por protocolo removido da interface e o componente antigo foi excluído.
+
+## Verificação
+
+A estrutura e as políticas foram verificadas diretamente no Supabase. O build local não pôde ser executado nesta rodada porque o ambiente de execução não conseguiu resolver `github.com`; portanto, o build permanece pendente de verificação no ambiente local do projeto.
