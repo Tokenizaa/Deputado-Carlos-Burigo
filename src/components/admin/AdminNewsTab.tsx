@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Plus, Edit2, Trash2, Eye, Calendar, MapPin, Check, Save } from 'lucide-react';
 import { News, NewsCategory } from '../../types';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminNewsTab: React.FC = () => {
-  const { news, currentUser, refreshAllData, showToast } = useApp();
+  const { news, refreshAllData, showToast } = useApp();
   const [editingNews, setEditingNews] = useState<News | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -64,6 +65,9 @@ export const AdminNewsTab: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const client = await getSupabaseClient();
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session?.access_token) throw new Error('Sessão não autenticada');
       const url = editingNews ? `/api/news/${editingNews.id}` : '/api/news';
       const method = editingNews ? 'PUT' : 'POST';
 
@@ -71,7 +75,7 @@ export const AdminNewsTab: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
+          Authorization: `Bearer ${sessionData.session.access_token}`,
         },
         body: JSON.stringify({
           title,
@@ -107,9 +111,12 @@ export const AdminNewsTab: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Tem certeza que deseja remover esta notícia?')) return;
     try {
+      const client = await getSupabaseClient();
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session?.access_token) throw new Error('Sessão não autenticada');
       const res = await fetch(`/api/news/${id}`, {
         method: 'DELETE',
-        headers: { 'x-user-id': currentUser.id },
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
       });
       if (res.ok) {
         showToast('Notícia removida com sucesso.', 'success');
