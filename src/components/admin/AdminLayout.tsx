@@ -96,7 +96,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 <LogOut className="w-3.5 h-3.5" /> Sair
               </button>
             </div>
-          )}}
+          )}
         </div>
       </header>
 
