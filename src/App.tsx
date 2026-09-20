@@ -28,11 +28,12 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { SEO } from './components/seo/SEO';
 import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { DynamicPageView } from './components/public/DynamicPageView';
+import { AdminAuthView } from './components/auth/AdminAuthView';
 
 const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
 
 const MainAppContent: React.FC = () => {
-  const { currentView, isLoading, setCurrentView } = useApp();
+  const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
   const [adminTab, setAdminTab] = useState('dashboard');
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
@@ -47,6 +48,12 @@ const MainAppContent: React.FC = () => {
   }
 
   if (currentView === 'admin' || pathname === 'admin') {
+    if (!authReady) {
+      return <div className="min-h-screen bg-white flex items-center justify-center"><p className="text-sm font-semibold text-stone-600">Verificando acesso…</p></div>;
+    }
+    if (!currentUser) {
+      return <AdminAuthView onAuthenticated={() => { void refreshAllData(); }} />;
+    }
     return (
       <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
         <AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} />
