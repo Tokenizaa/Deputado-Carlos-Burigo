@@ -388,6 +388,105 @@ export async function getPublicNews(): Promise<PublicNewsDto[]> {
   });
 }
 
+export async function getAdminNews() {
+  const { data, error } = await supabaseAdmin.from('news').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+function slugifyAdmin(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+export async function createAdminNews(input: Record<string, unknown>, actorId: string) {
+  const title = String(input.title ?? '').trim();
+  if (!title) throw new Error('Título é obrigatório');
+  const slug = slugifyAdmin(String(input.slug ?? title));
+  const status = input.status === 'rascunho' ? 'rascunho' : 'publicado';
+  const { data, error } = await supabaseAdmin.from('news').insert({
+    title,
+    slug,
+    summary: String(input.summary ?? ''),
+    content: String(input.content ?? ''),
+    category: String(input.category ?? ''),
+    municipality: input.municipality ? String(input.municipality) : null,
+    main_media_id: input.mainImage ? String(input.mainImage) : null,
+    featured: Boolean(input.featured),
+    status,
+    published_at: status === 'publicado' ? new Date().toISOString() : null,
+    author_id: actorId,
+  }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminNews(id: string, input: Record<string, unknown>) {
+  const patch: Record<string, unknown> = {};
+  for (const key of ['title','summary','content','category','municipality','featured','status']) {
+    if (key in input) patch[key] = input[key];
+  }
+  if ('mainImage' in input) patch.main_media_id = input.mainImage || null;
+  if ('slug' in input) patch.slug = slugifyAdmin(String(input.slug ?? ''));
+  if (patch.status === 'publicado') patch.published_at = new Date().toISOString();
+  const { data, error } = await supabaseAdmin.from('news').update(patch).eq('id', id).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminNews(id: string) {
+  const { error } = await supabaseAdmin.from('news').delete().eq('id', id);
+  if (error) throw error;
+  return { id };
+}
+
+export async function getAdminAgenda() {
+  const { data, error } = await supabaseAdmin.from('events').select('*').order('starts_at', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+function agendaStartsAt(input: Record<string, unknown>): string {
+  const date = String(input.date ?? '').trim();
+  const time = String(input.time ?? '00:00').trim();
+  const value = new Date(date + 'T' + time + ':00');
+  if (Number.isNaN(value.getTime())) throw new Error('Data e horário inválidos');
+  return value.toISOString();
+}
+
+export async function createAdminAgenda(input: Record<string, unknown>, actorId: string) {
+  const title = String(input.title ?? '').trim();
+  if (!title) throw new Error('Título é obrigatório');
+  const { data, error } = await supabaseAdmin.from('events').insert({
+    title,
+    description: String(input.description ?? ''),
+    starts_at: agendaStartsAt(input),
+    location: String(input.location ?? ''),
+    municipality: String(input.municipality ?? ''),
+    visibility: input.visibility === 'interno' ? 'interno' : 'publico',
+    status: 'publicado',
+    created_by: actorId,
+  }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminAgenda(id: string, input: Record<string, unknown>) {
+  const patch: Record<string, unknown> = {};
+  for (const key of ['title','description','location','municipality','visibility']) {
+    if (key in input) patch[key] = input[key];
+  }
+  if ('date' in input || 'time' in input) patch.starts_at = agendaStartsAt(input);
+  const { data, error } = await supabaseAdmin.from('events').update(patch).eq('id', id).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminAgenda(id: string) {
+  const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
+  if (error) throw error;
+  return { id };
+}
+
 export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
   const { data, error } = await supabasePublic.from('events')
     .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
