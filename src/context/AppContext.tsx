@@ -209,9 +209,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshAllData();
   }, [refreshAllData]);
 
+  const getAuthHeaders = async (includeContentType = false): Promise<Record<string, string>> => {
+    const client = await getSupabaseClient();
+    const { data } = await client.auth.getSession();
+    if (!data.session?.access_token) throw new Error('Sessão não autenticada');
+    return {
+      ...(includeContentType ? { 'Content-Type': 'application/json' } : {}),
+      Authorization: `Bearer ${data.session.access_token}`,
+    };
+  };
+
   const createTask = async (task: { title: string; description?: string; priority?: Task['priority']; assignedTo?: string | null; dueAt?: string | null; sourceType?: Task['sourceType']; sourceId?: string | null }): Promise<boolean> => {
     try {
-      const res = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(task) });
+      const res = await fetch('/api/tasks', { method: 'POST', headers: await getAuthHeaders(true), body: JSON.stringify(task) });
       const data = await res.json().catch(() => null);
       if (!res.ok) { showToast(data?.error || 'Falha ao criar tarefa', 'error'); return false; }
       setTasks(prev => [mapTask(data), ...prev]);
@@ -233,7 +243,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (patch.sourceId !== undefined) body.sourceId = patch.sourceId;
       if (patch.completionNotes !== undefined) body.completionNotes = patch.completionNotes;
       if (patch.completedAt !== undefined) body.completedAt = patch.completedAt;
-      const res = await fetch('/api/tasks/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id }, body: JSON.stringify(body) });
+      const res = await fetch('/api/tasks/' + id, { method: 'PUT', headers: await getAuthHeaders(true), body: JSON.stringify(body) });
       const data = await res.json().catch(() => null);
       if (!res.ok) { showToast(data?.error || 'Falha ao atualizar tarefa', 'error'); return false; }
       setTasks(prev => prev.map(t => t.id === id ? mapTask(data) : t));
