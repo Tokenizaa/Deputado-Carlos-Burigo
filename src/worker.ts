@@ -75,6 +75,25 @@ async function respond(fn: JsonHandler, label: string, errorMessage: string): Pr
   }
 }
 
+async function requireCitizenAuth(request: Request): Promise<{ userId: string; email: string; name?: string } | Response> {
+  const authorization = request.headers.get('authorization') ?? '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  if (!match) return Response.json({ error: 'Não autenticado' }, { status: 401 });
+  const { data, error } = await supabaseAdmin.auth.getUser(match[1]);
+  if (error || !data.user) return Response.json({ error: 'Sessão inválida' }, { status: 401 });
+  return {
+    userId: data.user.id,
+    email: data.user.email ?? '',
+    name: typeof data.user.user_metadata?.name === 'string' ? data.user.user_metadata.name : undefined,
+  };
+}
+
+function normalizeBrazilPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('55')) return `+${digits}`;
+  return `+55${digits}`;
+}
+
 async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -764,208 +783,163 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
   
   // Citizen demand endpoints
+  '/api/citizen/account': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+    try {
+      const { email, password, name, phone } = await request.json();
+      if (typeof email !== 'string' || typeof password !== 'string' || typeof name !== 'string' || typeof phone !== 'string') {
+        return Response.json({ error: 'Nome, e-mail, telefone e senha são obrigatórios.' }, { status: 400 });
+      }
+      if (password.length < 8) return Response.json({ error: 'A senha deve ter pelo menos 8 caracteres.' }, { status: 400 });
+      const normalizedEmail = email.trim().toLowerCase();
+      const normalizedPhone = normalizeBrazilPhone(phone);
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: normalizedEmail,
+        password,
+        email_confirm: true,
+        user_metadata: { name: name.trim(), phone: normalizedPhone },
+      });
+      if (error || !data.user) {
+        console.error('[api/citizen/account]', error);
+        return Response.json({ error: 'Não foi possível criar a conta com esses dados.' }, { status: 400 });
+      }
+      return Response.json({ success: true, user: { id: data.user.id, email: data.user.email } });
+    } catch (error) {
+      console.error('[api/citizen/account]', error);
+      return Response.json({ error: 'Falha ao criar a conta.' }, { status: 500 });
+    }
+  },
+
   '/api/citizen/demand': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
-    
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
       const data = await request.json();
-      
-      // Extract and validate required fields
       const {
-        citizenName,
-        citizenEmail,
-        citizenPhone,
+        citizenName, citizenEmail, citizenPhone, municipality, neighborhood,
+        category, subject, description, attachments = [], lgpdConsent
+      } = data;
+
+      if (!citizenName || !citizenEmail || !citizenPhone || !municipality || !category || !subject || !description) {
+        return Response.json({ error: 'Campos obrigatórios faltando.' }, { status: 400 });
+      }
+      if (!lgpdConsent) return Response.json({ error: 'Consentimento LGPD é obrigatório.' }, { status: 400 });
+      if (citizenEmail.trim().toLowerCase() !== auth.email.toLowerCase()) {
+        return Response.json({ error: 'O e-mail da demanda deve ser o mesmo da conta.' }, { status: 400 });
+      }
+
+      const normalizedPhone = normalizeBrazilPhone(citizenPhone);
+      let protocol: string | null = null;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const candidateProtocol = `#2026-${Math.floor(100000 + Math.random() * 900000)}`;
+        const { data: existingDemand } = await supabaseAdmin.from('demands').select('id').eq('protocol', candidateProtocol).maybeSingle();
+        if (!existingDemand) { protocol = candidateProtocol; break; }
+      }
+      if (!protocol) return Response.json({ error: 'Não foi possível gerar um protocolo único.' }, { status: 500 });
+
+      const trackingTokenHash = await sha256Hex(`${protocol}:${auth.userId}:${crypto.randomUUID()}`);
+      const now = new Date().toISOString();
+      const { data: demand, error: demandError } = await supabaseAdmin.from('demands').insert({
+        protocol,
+        tracking_token_hash: trackingTokenHash,
+        citizen_user_id: auth.userId,
+        citizen_name: citizenName.trim(),
+        citizen_email: auth.email.toLowerCase(),
+        citizen_phone: normalizedPhone,
         municipality,
-        neighborhood,
+        neighborhood: neighborhood || null,
         category,
         subject,
         description,
-        attachments = [],
-        lgpdConsent
-      } = data;
-      
-      // Validate required fields
-      if (!citizenName || !citizenEmail || !citizenPhone || !municipality || !category || !subject || !description) {
-        return Response.json(
-          { error: 'Campos obrigatórios faltando: citizenName, citizenEmail, citizenPhone, municipality, category, subject, description' },
-          { status: 400 }
-        );
-      }
-      
-      // Validate LGPD consent
-      if (!lgpdConsent) {
-        return Response.json(
-          { error: 'Consentimento LGPD é obrigatório' },
-          { status: 400 }
-        );
-      }
-      
-      // Generate unique protocol in format '#2026-XXXXXX'
-      let protocol = null;
-      const maxAttempts = 5;
-      
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const randomNum = Math.floor(100000 + Math.random() * 900000); // 6-digit number
-        const candidateProtocol = `#2026-${randomNum.toString()}`;
-        
-        // Check if protocol already exists
-        const { data: existingDemand } = await supabasePublic
-          .from('demands')
-          .select('protocol')
-          .eq('protocol', candidateProtocol)
-          .single();
-          
-        if (!existingDemand) {
-          protocol = candidateProtocol;
-          break;
-        }
-      }
-      
-      if (!protocol) {
-        return Response.json(
-          { error: 'Não foi possível gerar um protocolo único após várias tentativas' },
-          { status: 500 }
-        );
-      }
-      
-      const trackingTokenHash = await sha256Hex(protocol + citizenEmail);
-      
-      // Insert demand into demands table
-      const now = new Date().toISOString();
-      const { error: demandError } = await supabaseAdmin
-        .from('demands')
-        .insert({
-          protocol,
-          tracking_token_hash: trackingTokenHash,
-          citizen_name: citizenName,
-          citizen_email: citizenEmail,
-          citizen_phone: citizenPhone,
-          municipality,
-          neighborhood: neighborhood || null,
-          category,
-          subject,
-          description,
-          attachments,
-          priority: 'média',
-          status: 'recebida',
-          created_at: now,
-          updated_at: now
-        });
-        
-      if (demandError) throw demandError;
-      
-      const fullDemand = await getPublicDemandByProtocol(protocol);
-      if (!fullDemand) return Response.json({ error: 'Demanda criada mas não encontrada' }, { status: 500 });
-      
-      // Insert initial history entry
-      const { error: historyError } = await supabaseAdmin
-        .from('demand_history')
-        .insert({
-          demand_id: fullDemand.id,
-          action: 'Criação da demanda',
-          new_status: 'recebida',
-          actor_id: null,
-          actor_name: 'Sistema',
-          actor_role: 'system',
-          note: 'Demanda criada via portal do cidadão',
-          created_at: now
-        });
-      if (historyError) throw historyError;
-      
-      return Response.json({
-        success: true,
-        protocol,
-        demand: fullDemand,
-        message: 'Demanda protocolada com sucesso. Guarde o número de protocolo para acompanhamento.'
+        attachments: Array.isArray(attachments) ? attachments : [],
+        priority: 'média',
+        status: 'recebida',
+        created_at: now,
+        updated_at: now,
+      }).select('id,protocol,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,priority,status,created_at,updated_at').single();
+      if (demandError || !demand) throw demandError ?? new Error('Demanda não criada');
+
+      const { error: historyError } = await supabaseAdmin.from('demand_history').insert({
+        demand_id: demand.id,
+        action: 'Criação da demanda',
+        new_status: 'recebida',
+        actor_id: auth.userId,
+        actor_name: demand.citizen_name,
+        actor_role: 'citizen',
+        note: 'Demanda criada via portal do cidadão',
+        created_at: now,
       });
+      if (historyError) throw historyError;
+
+      return Response.json({ success: true, protocol, demand, message: 'Demanda protocolada com sucesso.' });
     } catch (error) {
       console.error('[api/citizen/demand]', error);
-      return Response.json(
-        { error: 'Falha ao processar demanda' },
-        { status: 500 }
-      );
+      return Response.json({ error: 'Falha ao processar demanda.' }, { status: 500 });
     }
   },
-  
+
   '/api/citizen/lookup': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
-    
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
       const url = new URL(request.url);
-      const protocol = url.searchParams.get('protocol');
-      
-      if (!protocol) {
-        return Response.json(
-          { error: 'Parâmetro protocol é obrigatório' },
-          { status: 400 }
-        );
-      }
-      
-      const demand = await getPublicDemandByProtocol(protocol);
-      
-      if (!demand) {
-        return Response.json(
-          { error: 'Demanda não encontrada' },
-          { status: 404 }
-        );
-      }
-      
-      return Response.json(demand);
+      const id = url.searchParams.get('id');
+      if (!id) return Response.json({ error: 'Parâmetro id é obrigatório.' }, { status: 400 });
+      const { data: demand } = await supabaseAdmin.from('demands')
+        .select('id,protocol,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,priority,status,created_at,updated_at')
+        .eq('id', id).eq('citizen_user_id', auth.userId).maybeSingle();
+      if (!demand) return Response.json({ error: 'Demanda não encontrada.' }, { status: 404 });
+      const [{ data: messages }, { data: history }] = await Promise.all([
+        supabaseAdmin.from('demand_messages').select('id,demand_id,sender_type,sender_name,text,attachments,created_at').eq('demand_id', id).order('created_at', { ascending: true }),
+        supabaseAdmin.from('demand_history').select('id,demand_id,action,previous_status,new_status,actor_name,note,created_at').eq('demand_id', id).order('created_at', { ascending: true }),
+      ]);
+      return Response.json({ ...demand, messages: messages ?? [], history: history ?? [] });
     } catch (error) {
       console.error('[api/citizen/lookup]', error);
-      return Response.json(
-        { error: 'Falha ao buscar demanda' },
-        { status: 500 }
-      );
+      return Response.json({ error: 'Falha ao buscar demanda.' }, { status: 500 });
     }
   },
 
-  '/api/auth/me': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
+  '/api/citizen/demands': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
-      const allUsers = authResult.user.role === 'ADMIN' ? await getAllAdminUsers() : [];
-      return Response.json({ user: authResult.user, allUsers });
+      const { data, error } = await supabaseAdmin.from('demands')
+        .select('id,protocol,citizen_name,municipality,category,subject,priority,status,created_at,updated_at')
+        .eq('citizen_user_id', auth.userId).order('created_at', { ascending: false });
+      if (error) throw error;
+      return Response.json(data ?? []);
     } catch (error) {
-      console.error('[api/auth/me] error:', error);
-      return Response.json({ user: null, allUsers: [] }, { status: 500 });
+      console.error('[api/citizen/demands]', error);
+      return Response.json({ error: 'Falha ao carregar suas demandas.' }, { status: 500 });
     }
   },
 
-
-  '/api/tasks': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method === 'GET') {
-      if (!can(authResult.role as any, 'tarefas', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try { return Response.json(await getAdminTasks()); }
-      catch (error) { console.error('[api/tasks GET]', error); return Response.json({ error: 'Falha ao carregar tarefas' }, { status: 500 }); }
-    }
-    if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'tarefas', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const data = await request.json();
-        const createdBy = authResult.userId;
-        if (!createdBy || !data?.title) return Response.json({ error: 'title é obrigatório' }, { status: 400 });
-        return Response.json(await createAdminTask({ ...data, createdBy }), { status: 201 });
-      } catch (error) { console.error('[api/tasks POST]', error); return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 }); }
-    }
-    return methodNotAllowed();
-  },
-
-  '/api/tasks/:id': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method !== 'PUT') return methodNotAllowed();
-    if (!can(authResult.role as any, 'tarefas', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+  '/api/citizen/messages': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
-      const id = (request as any).params?.id;
-      if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
-      const updated = await updateAdminTask(id, await request.json());
-      if (!updated) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
-      return Response.json(updated);
-    } catch (error) { console.error('[api/tasks/:id]', error); return Response.json({ error: error?.message || 'Falha ao atualizar tarefa' }, { status: 400 }); }
+      const { demandId, text, attachments = [] } = await request.json();
+      if (!demandId || !text?.trim()) return Response.json({ error: 'Mensagem e demanda são obrigatórias.' }, { status: 400 });
+      const { data: demand } = await supabaseAdmin.from('demands').select('id,citizen_name').eq('id', demandId).eq('citizen_user_id', auth.userId).maybeSingle();
+      if (!demand) return Response.json({ error: 'Demanda não encontrada.' }, { status: 404 });
+      const { data, error } = await supabaseAdmin.from('demand_messages').insert({
+        demand_id: demandId,
+        sender_type: 'citizen',
+        sender_name: demand.citizen_name,
+        text: text.trim(),
+        attachments: Array.isArray(attachments) ? attachments : [],
+      }).select('id,demand_id,sender_type,sender_name,text,attachments,created_at').single();
+      if (error) throw error;
+      return Response.json(data);
+    } catch (error) {
+      console.error('[api/citizen/messages]', error);
+      return Response.json({ error: 'Falha ao enviar mensagem.' }, { status: 500 });
+    }
   },
 
   '/api/demands': async (request) => {
