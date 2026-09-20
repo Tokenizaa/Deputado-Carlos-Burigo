@@ -1,6 +1,5 @@
 import {
   getPublicAgenda,
-  getPublicDemandByProtocol,
   getPublicMedia,
   getPublicMunicipalities,
   getPublicNews,
