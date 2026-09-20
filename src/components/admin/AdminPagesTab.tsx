@@ -3,6 +3,7 @@ import { Eye, FilePlus2, GripVertical, History, Layout, Pencil, Plus, Save, Send
 import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
+import { renderBlock } from '../public/DynamicPageView';
 
 const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }> = [
   { type: 'hero', label: 'Hero', description: 'Destaque principal com texto e mídia' },
@@ -200,31 +201,7 @@ export const AdminPagesTab: React.FC = () => {
                   {draftBlocks.map((block, index) => {
                     const selected = selectedBlockId === block.id;
                     const content = block.content || {};
-                    const mediaUrl = content.mediaUrl || content.imageUrl;
-                    return (
-                      <div
-                        key={block.id}
-                        draggable
-                        onDragStart={() => setDraggedBlockId(block.id)}
-                        onDragEnd={() => setDraggedBlockId(null)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => draggedBlockId && moveBlockByDrag(draggedBlockId, block.id)}
-                        onClick={() => setSelectedBlockId(block.id)}
-                        className={`relative group border-2 border-transparent hover:border-emerald-300 ${selected ? 'border-emerald-500 ring-1 ring-emerald-200' : ''} ${block.visible === false ? 'opacity-50' : ''}`}
-                      >
-                        <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                          <GripVertical className="w-3.5 h-3.5 text-stone-400 cursor-grab" />
-                          <span className="text-[9px] font-black uppercase text-stone-500">{index + 1} · {block.type}</span>
-                        </div>
-                        <div className={`p-8 sm:p-12 ${content.alignment === 'center' ? 'text-center' : 'text-left'}`}>
-                          {content.badge && <span className="inline-block text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full mb-3">{content.badge}</span>}
-                          <h3 className="text-2xl sm:text-4xl font-black text-stone-900">{content.headline || block.title || 'Bloco'}</h3>
-                          {(content.leadText || content.text || content.description || block.subtitle) && <p className="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-stone-600">{content.leadText || content.text || content.description || block.subtitle}</p>}
-                          {mediaUrl && <img src={mediaUrl} alt={content.altText || block.title} className="mt-5 max-h-64 w-full object-cover rounded-xl border border-stone-100" />}
-                          {content.buttonText && <span className="inline-flex mt-5 bg-[#00A550] text-white px-4 py-2 rounded-lg text-xs font-bold">{content.buttonText}</span>}
-                        </div>
-                        {selected && <div className="absolute right-3 top-3 flex gap-1"><button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm"><Pencil className="w-3.5 h-3.5" /> Editar</button><button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm"><Trash2 className="w-3.5 h-3.5" /></button></div>}
-                      </div>
+                    const renderedBlock = renderBlock(block);
                     );
                   })}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
