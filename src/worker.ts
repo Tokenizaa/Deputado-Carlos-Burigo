@@ -34,6 +34,7 @@ import {
 } from '../server/pagesAdmin';
 
 import type { User } from '../src/types';
+import { can } from '../src/config/adminPermissions';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -341,6 +342,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
+      if (!can(authResult.role as any, 'tarefas', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!can(authResult.role as any, 'conteúdo', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const pages = await getAdminPages();
         return Response.json(pages);
@@ -352,6 +355,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         );
       }
     } else if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const data = await request.json();
         const page = await createAdminPage(data);
@@ -379,6 +383,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
+      if (!can(authResult.role as any, 'conteúdo', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -405,6 +410,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         );
       }
     } else if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -445,6 +451,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id/rollback', url.pathname);
