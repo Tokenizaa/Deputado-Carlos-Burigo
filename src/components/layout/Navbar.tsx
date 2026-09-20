@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, PhoneCall, ChevronDown } from 'lucide-react';
+import { Search, PhoneCall, ChevronDown, LayoutDashboard } from 'lucide-react';
 
 const MORE_ITEMS = [
   ['trajetoria', 'Trajetória'],
@@ -137,6 +137,13 @@ export const Navbar: React.FC = () => {
             >
               <PhoneCall className="h-4 w-4" aria-hidden="true" />
               Fale com o Deputado
+            </a>
+            <a
+              href="/admin"
+              className="ml-1 inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 hover:bg-stone-50 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              Acesso do gabinete
             </a>
           </nav>
 
