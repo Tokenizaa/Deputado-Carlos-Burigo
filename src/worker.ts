@@ -255,7 +255,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'POST') return methodNotAllowed();
-    if (!can(authResult.role as any, 'configurações', 'manage_settings')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!can(authResult.role as any, 'configurações', 'manage_settings') && !can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const form = await request.formData();
       const file = form.get('file');
@@ -1139,7 +1139,8 @@ export default {
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
-        else if ((url.pathname === '/api/settings' && method !== 'GET') || url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
 
         if (requiredRoles !== null) {
           const auth = await requireAuth(enhancedRequest);
