@@ -45,6 +45,8 @@ export const AdminPagesTab: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [draftBlocks, setDraftBlocks] = useState<PageBlock[]>([]);
   const [saving, setSaving] = useState(false);
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [newPage, setNewPage] = useState({ title: '', slug: '', description: '' });
 
@@ -84,6 +86,20 @@ export const AdminPagesTab: React.FC = () => {
 
   const removeBlock = (id: string) => {
     setDraftBlocks((prev) => prev.filter((block) => block.id !== id).map((block, index) => ({ ...block, order: index + 1 })));
+    setSelectedBlockId((current) => current === id ? null : current);
+  };
+
+  const moveBlockByDrag = (sourceId: string, targetId: string) => {
+    if (sourceId === targetId) return;
+    setDraftBlocks((prev) => {
+      const sourceIndex = prev.findIndex((block) => block.id === sourceId);
+      const targetIndex = prev.findIndex((block) => block.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(sourceIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      return next.map((block, index) => ({ ...block, order: index + 1 }));
+    });
   };
 
   const addBlock = (type: BlockType) => {
@@ -175,15 +191,44 @@ export const AdminPagesTab: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-5 space-y-3">
-                {draftBlocks.map((block, index) => (
-                  <div key={block.id} className="border border-stone-200 rounded-xl p-3 flex items-center gap-3">
-                    <GripVertical className="w-4 h-4 text-stone-300" />
-                    <div className="flex-1 min-w-0"><div className="flex items-center gap-2"><span className="text-[9px] uppercase font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">{block.type}</span><span className="font-bold text-sm text-stone-900 truncate">{block.title}</span></div><div className="text-[10px] text-stone-400 mt-1">{block.subtitle || 'Sem descrição'} · {block.visible ? 'visível' : 'oculto'}</div></div>
-                    <div className="flex items-center gap-1"><button onClick={() => moveBlock(index, -1)} disabled={index === 0} className="icon-btn">↑</button><button onClick={() => moveBlock(index, 1)} disabled={index === draftBlocks.length - 1} className="icon-btn">↓</button><button onClick={() => setEditingBlock(block)} className="icon-btn"><Pencil className="w-3.5 h-3.5" /></button><button onClick={() => removeBlock(block.id)} className="icon-btn text-rose-600"><Trash2 className="w-3.5 h-3.5" /></button></div>
-                  </div>
-                ))}
-                {!draftBlocks.length && <div className="border border-dashed border-stone-300 rounded-xl p-8 text-center text-sm text-stone-500">Esta página ainda não tem blocos.</div>}
+              <div className="p-5 bg-stone-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div><div className="text-[10px] uppercase tracking-wider font-black text-emerald-700">Editor visual</div><p className="text-xs text-stone-500">Arraste os blocos para reordenar. Clique em um bloco para editar.</p></div>
+                  <span className="text-[10px] font-bold text-stone-400">{draftBlocks.length} blocos</span>
+                </div>
+                <div className="mx-auto max-w-4xl bg-white min-h-[520px] rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                  {draftBlocks.map((block, index) => {
+                    const selected = selectedBlockId === block.id;
+                    const content = block.content || {};
+                    const mediaUrl = content.mediaUrl || content.imageUrl;
+                    return (
+                      <div
+                        key={block.id}
+                        draggable
+                        onDragStart={() => setDraggedBlockId(block.id)}
+                        onDragEnd={() => setDraggedBlockId(null)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => draggedBlockId && moveBlockByDrag(draggedBlockId, block.id)}
+                        onClick={() => setSelectedBlockId(block.id)}
+                        className={`relative group border-2 border-transparent hover:border-emerald-300 ${selected ? 'border-emerald-500 ring-1 ring-emerald-200' : ''} ${block.visible === false ? 'opacity-50' : ''}`}
+                      >
+                        <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                          <GripVertical className="w-3.5 h-3.5 text-stone-400 cursor-grab" />
+                          <span className="text-[9px] font-black uppercase text-stone-500">{index + 1} · {block.type}</span>
+                        </div>
+                        <div className={`p-8 sm:p-12 ${content.alignment === 'center' ? 'text-center' : 'text-left'}`}>
+                          {content.badge && <span className="inline-block text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full mb-3">{content.badge}</span>}
+                          <h3 className="text-2xl sm:text-4xl font-black text-stone-900">{content.headline || block.title || 'Bloco'}</h3>
+                          {(content.leadText || content.text || content.description || block.subtitle) && <p className="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-stone-600">{content.leadText || content.text || content.description || block.subtitle}</p>}
+                          {mediaUrl && <img src={mediaUrl} alt={content.altText || block.title} className="mt-5 max-h-64 w-full object-cover rounded-xl border border-stone-100" />}
+                          {content.buttonText && <span className="inline-flex mt-5 bg-[#00A550] text-white px-4 py-2 rounded-lg text-xs font-bold">{content.buttonText}</span>}
+                        </div>
+                        {selected && <div className="absolute right-3 top-3 flex gap-1"><button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm"><Pencil className="w-3.5 h-3.5" /> Editar</button><button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm"><Trash2 className="w-3.5 h-3.5" /></button></div>}
+                      </div>
+                    );
+                  })}
+                  {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
+                </div>
               </div>
             </>
           )}
