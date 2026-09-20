@@ -200,9 +200,30 @@ export const AdminPagesTab: React.FC = () => {
                 <div className="mx-auto max-w-4xl bg-white min-h-[520px] rounded-xl border border-stone-200 shadow-sm overflow-hidden">
                   {draftBlocks.map((block, index) => {
                     const selected = selectedBlockId === block.id;
-                    const content = block.content || {};
                     const renderedBlock = renderBlock(block);
+                    return (
+                      <div
+                        key={block.id}
+                        draggable
+                        onDragStart={() => setDraggedBlockId(block.id)}
+                        onDragEnd={() => setDraggedBlockId(null)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => draggedBlockId && moveBlockByDrag(draggedBlockId, block.id)}
+                        onClick={() => setSelectedBlockId(block.id)}
+                        className={`relative group border-2 border-transparent hover:border-emerald-300 ${selected ? 'border-emerald-500 ring-1 ring-emerald-200' : ''} ${block.visible === false ? 'opacity-50' : ''}`}
+                      >
+                        <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                          <GripVertical className="w-3.5 h-3.5 text-stone-400 cursor-grab" />
+                          <span className="text-[9px] font-black uppercase text-stone-500">{index + 1} · {block.type}</span>
+                        </div>
+                        <div className="pointer-events-none">{renderedBlock}</div>
+                        {selected && <div className="absolute right-3 top-3 flex gap-1">
+                          <button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm"><Pencil className="w-3.5 h-3.5" /> Editar</button>
+                          <button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>}
+                      </div>
                     );
+                  })}
                   })}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
                 </div>
