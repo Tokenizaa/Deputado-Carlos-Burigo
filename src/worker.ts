@@ -15,6 +15,7 @@ import {
   getAdminUserById,
   getAuthenticatedAdminUser,
   getAllAdminUsers,
+  bootstrapFirstAdmin,
   getAdminAuditLogs,
   getAdminTasks,
   createAdminTask,
@@ -231,6 +232,38 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
 let runtimeEnv: Env | null = null;
 
 const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
+  '/api/auth/bootstrap-status': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'ADMIN')
+        .limit(1);
+      if (error) throw error;
+      return Response.json({ available: (data ?? []).length === 0 });
+    } catch (error) {
+      console.error('[api/auth/bootstrap-status]', error);
+      return Response.json({ error: 'Não foi possível verificar o primeiro acesso.' }, { status: 500 });
+    }
+  },
+  '/api/auth/bootstrap-admin': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+    try {
+      const body = await request.json();
+      const name = typeof body?.name === 'string' ? body.name : '';
+      const cargo = typeof body?.cargo === 'string' ? body.cargo : '';
+      const email = typeof body?.email === 'string' ? body.email : '';
+      const password = typeof body?.password === 'string' ? body.password : '';
+      const passwordConfirmation = typeof body?.passwordConfirmation === 'string' ? body.passwordConfirmation : '';
+      if (password !== passwordConfirmation) return Response.json({ error: 'As senhas não coincidem.' }, { status: 400 });
+      const user = await bootstrapFirstAdmin({ name, cargo, email, password });
+      return Response.json({ user }, { status: 201 });
+    } catch (error) {
+      console.error('[api/auth/bootstrap-admin]', error);
+      return Response.json({ error: error?.message || 'Não foi possível criar o administrador principal.' }, { status: 400 });
+    }
+  },
   '/api/auth/config': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     return Response.json({
