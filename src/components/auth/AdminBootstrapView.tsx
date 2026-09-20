@@ -57,7 +57,15 @@ export const AdminBootstrapView: React.FC = () => {
 
         <label className="block mt-4 text-sm font-bold text-stone-800">
           Cargo
-          <input value={cargo} onChange={(e) => setCargo(e.target.value)} autoComplete="organization-title" required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+          <select value={cargo} onChange={(e) => setCargo(e.target.value)} required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3">
+            <option value="" disabled>Selecione o cargo</option>
+            <option value="Chefe de Gabinete">Chefe de Gabinete</option>
+            <option value="Assessor Parlamentar">Assessor Parlamentar</option>
+            <option value="Assessor de Comunicação">Assessor de Comunicação</option>
+            <option value="Atendimento ao Cidadão">Atendimento ao Cidadão</option>
+            <option value="Administrativo">Administrativo</option>
+            <option value="Outro">Outro</option>
+          </select>
         </label>
 
         <label className="block mt-4 text-sm font-bold text-stone-800">
