@@ -666,7 +666,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (request.method === 'POST') {
       try {
         const data = await request.json();
-        const createdBy = request.headers.get('x-user-id');
+        const createdBy = authResult.userId;
         if (!createdBy || !data?.title) return Response.json({ error: 'title e x-user-id são obrigatórios' }, { status: 400 });
         return Response.json(await createAdminTask({ ...data, createdBy }), { status: 201 });
       } catch (error) { console.error('[api/tasks POST]', error); return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 }); }
@@ -709,7 +709,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
       const body = await request.json();
       const actor: { id?: string; name?: string; role?: string } = {
-        id: request.headers.get('x-user-id') || undefined,
+        id: authResult.userId,
       };
       // Resolve actor name/role for history entries when possible
       if (actor.id) {
