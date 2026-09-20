@@ -773,13 +773,16 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/invites/:token/accept': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
     if (request.method !== 'POST') return methodNotAllowed();
+    const authorization = request.headers.get('authorization') ?? '';
+    const match = authorization.match(/^Bearer\\s+(.+)$/i);
+    if (!match) return Response.json({ error: 'Não autenticado.' }, { status: 401 });
+    const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(match[1]);
+    if (authError || !authData.user?.id || !authData.user.email) return Response.json({ error: 'Sessão de convite inválida.' }, { status: 401 });
     const token = (request as any).params?.token;
     if (!token) return Response.json({ error: 'Token do convite é obrigatório.' }, { status: 400 });
     try {
-      return Response.json(await acceptAdminInvite(token, authResult.userId, authResult.user.email));
+      return Response.json(await acceptAdminInvite(token, authData.user.id, authData.user.email));
     } catch (error) {
       console.error('[api/invites/:token/accept]', error);
       return Response.json({ error: error?.message || 'Não foi possível aceitar o convite.' }, { status: 400 });
