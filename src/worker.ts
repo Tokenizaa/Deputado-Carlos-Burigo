@@ -23,6 +23,14 @@ import {
   updateDemandAdmin,
   getPublicDocuments,
   getPublicEvidence,
+  getAdminNews,
+  createAdminNews,
+  updateAdminNews,
+  deleteAdminNews,
+  getAdminAgenda,
+  createAdminAgenda,
+  updateAdminAgenda,
+  deleteAdminAgenda,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -219,30 +227,68 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
   '/api/news': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const news = await getPublicNews();
-      return Response.json(news);
-    } catch (error) {
-      console.error('[api/news]', error);
-      return Response.json(
-        { error: 'Falha ao carregar notícias do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicNews());
+      } catch (error) {
+        console.error('[api/news]', error);
+        return Response.json({ error: 'Falha ao carregar notícias do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => createAdminNews(await request.json(), authResult.userId), 'news POST', 'Falha ao criar notícia');
+    }
+    return methodNotAllowed();
   },
   '/api/agenda': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const agenda = await getPublicAgenda();
-      return Response.json(agenda);
-    } catch (error) {
-      console.error('[api/agenda]', error);
-      return Response.json(
-        { error: 'Falha ao carregar agenda do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicAgenda());
+      } catch (error) {
+        console.error('[api/agenda]', error);
+        return Response.json({ error: 'Falha ao carregar agenda do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'agenda', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => createAdminAgenda(await request.json(), authResult.userId), 'agenda POST', 'Falha ao criar compromisso');
+    }
+    return methodNotAllowed();
+  },
+  '/api/news/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = extractPathParams('/api/news/:id', new URL(request.url))?.id;
+    if (!id) return Response.json({ error: 'ID da notícia não fornecido' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
+    }
+    if (request.method === 'DELETE') {
+      if (!can(authResult.role as any, 'conteúdo', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => deleteAdminNews(id), 'news DELETE', 'Falha ao excluir notícia');
+    }
+    return methodNotAllowed();
+  },
+  '/api/agenda/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = extractPathParams('/api/agenda/:id', new URL(request.url))?.id;
+    if (!id) return Response.json({ error: 'ID do compromisso não fornecido' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'agenda', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => updateAdminAgenda(id, await request.json()), 'agenda PUT', 'Falha ao atualizar compromisso');
+    }
+    if (request.method === 'DELETE') {
+      if (!can(authResult.role as any, 'agenda', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => deleteAdminAgenda(id), 'agenda DELETE', 'Falha ao excluir compromisso');
+    }
+    return methodNotAllowed();
   },
   '/api/events': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
@@ -863,6 +909,8 @@ export default {
           ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
         else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];\n        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
+        else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
+        else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
 
         if (requiredRoles !== null) {
