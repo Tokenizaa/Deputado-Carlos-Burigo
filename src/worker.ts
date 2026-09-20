@@ -263,7 +263,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/news/:id': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    const id = extractPathParams('/api/news/:id', new URL(request.url))?.id;
+    const id = extractPathParams('/api/news/:id', new URL(request.url).pathname)?.id;
     if (!id) return Response.json({ error: 'ID da notícia não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
       if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
@@ -278,7 +278,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/agenda/:id': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    const id = extractPathParams('/api/agenda/:id', new URL(request.url))?.id;
+    const id = extractPathParams('/api/agenda/:id', new URL(request.url).pathname)?.id;
     if (!id) return Response.json({ error: 'ID do compromisso não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
       if (!can(authResult.role as any, 'agenda', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
