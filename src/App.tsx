@@ -13,7 +13,7 @@ import { AgendaSection } from './components/public/AgendaSection';
 import { MunicipalitiesSection } from './components/public/MunicipalitiesSection';
 import { VideosSection } from './components/public/VideosSection';
 import { CitizenPortalView } from './components/citizen/CitizenPortalView';
-import { CitizenProtocolModal } from './components/citizen/CitizenProtocolModal';
+import { CitizenAccountView } from './components/citizen/CitizenAccountView';
 import { PrivacyPolicyView } from './components/public/PrivacyPolicyView';
 import { AccessibilityView } from './components/public/AccessibilityView';
 import { TransparencyView } from './components/public/TransparencyView';
@@ -31,13 +31,16 @@ import { DynamicPageView } from './components/public/DynamicPageView';
 import { AdminAuthView } from './components/auth/AdminAuthView';
 import { AdminInviteAcceptView } from './components/auth/AdminInviteAcceptView';
 
-const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
+const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
 
 const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
   const [adminTab, setAdminTab] = useState('dashboard');
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
-  if (pathname === 'convite') return <AdminInviteAcceptView />;\n\n  const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
+  if (pathname === 'convite') return <AdminInviteAcceptView />;
+  if (pathname === 'minhas-demandas') return <CitizenAccountView />;
+
+  const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
 
   if (isLoading) {
     return (
