@@ -291,7 +291,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch('/api/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        headers: await getAuthHeaders(true),
         body: JSON.stringify(newSettings),
       });
       if (!res.ok) {
@@ -324,7 +324,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        headers: await getAuthHeaders(true),
         body: JSON.stringify(pageData),
       });
       const json = await res.json().catch(() => ({}));
@@ -359,7 +359,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch('/api/admin/pages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        headers: await getAuthHeaders(true),
         body: JSON.stringify(pageData),
       });
       const json = await res.json().catch(() => ({}));
@@ -384,7 +384,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch(`/api/admin/pages/${pageId}/rollback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+        headers: await getAuthHeaders(true),
         body: JSON.stringify({ versionId }),
       });
       const json = await res.json().catch(() => ({}));
