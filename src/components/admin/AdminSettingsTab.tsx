@@ -11,6 +11,10 @@ export const AdminSettingsTab: React.FC = () => {
   const [campaignSlogan, setCampaignSlogan] = useState(settings?.campaign_slogan || '');
   const [coalition, setCoalition] = useState(settings?.campaign_coalition || '');
   const [cnpj, setCnpj] = useState(settings?.campaign_cnpj || '');
+  const [seoTitle, setSeoTitle] = useState(settings?.seo_default_title || '');
+  const [seoDescription, setSeoDescription] = useState(settings?.seo_default_description || '');
+  const [seoImageUrl, setSeoImageUrl] = useState(settings?.seo_default_image_url || '');
+  const [uploadingOg, setUploadingOg] = useState(false);
 
   const [addressPoa, setAddressPoa] = useState(settings?.gabinete_address_poa || '');
   const [addressCaxias, setAddressCaxias] = useState(settings?.gabinete_address_caxias || '');
@@ -24,6 +28,26 @@ export const AdminSettingsTab: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
 
+  const handleOgImageUpload = async (file: File) => {
+    setUploadingOg(true);
+    try {
+      const client = await import('../../lib/supabaseClient').then((module) => module.getSupabaseClient());
+      const { data } = await client.auth.getSession();
+      if (!data.session?.access_token) throw new Error('Sessão não autenticada');
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/admin/og-image', { method: 'POST', headers: { Authorization: `Bearer ${data.session.access_token}` }, body: form });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Falha ao enviar imagem');
+      setSeoImageUrl(json.url);
+      showToast('Imagem Open Graph enviada. Salve as configurações para publicar.', 'success');
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao enviar imagem Open Graph', 'error');
+    } finally {
+      setUploadingOg(false);
+    }
+  };
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -33,6 +57,9 @@ export const AdminSettingsTab: React.FC = () => {
       campaign_slogan: campaignSlogan,
       campaign_coalition: coalition,
       campaign_cnpj: cnpj,
+      seo_default_title: seoTitle,
+      seo_default_description: seoDescription,
+      seo_default_image_url: seoImageUrl,
       gabinete_address_poa: addressPoa,
       gabinete_address_caxias: addressCaxias,
       gabinete_phone: phone,
@@ -178,6 +205,23 @@ export const AdminSettingsTab: React.FC = () => {
                 onChange={(e) => setCampaignSlogan(e.target.value)}
                 className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
               />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div>
+            <h3 className="font-bold text-stone-900 text-base">Open Graph e compartilhamento</h3>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1">Configuração padrão usada no compartilhamento do site. Cada landing page pode substituir estes dados por um Open Graph próprio.</p>
+          </div>
+          <div className="space-y-4">
+            <div><label className="block text-xs font-bold text-stone-700 mb-1">Título para compartilhamento</label><input type="text" value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5" /></div>
+            <div><label className="block text-xs font-bold text-stone-700 mb-1">Descrição para compartilhamento</label><textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5" rows={3} /></div>
+            <div>
+              <label className="block text-xs font-bold text-stone-700 mb-1">Imagem Open Graph</label>
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center"><input type="file" accept="image/jpeg,image/png" disabled={uploadingOg} onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleOgImageUpload(file); }} className="w-full text-xs" />{uploadingOg && <span className="text-xs font-semibold text-stone-500">Enviando…</span>}</div>
+              {seoImageUrl && <div className="mt-3 rounded-xl border border-stone-200 overflow-hidden bg-stone-50"><img src={seoImageUrl} alt="Prévia da imagem Open Graph" className="w-full max-h-64 object-contain" /></div>}
+              <p className="text-[11px] text-stone-500 mt-2">JPEG ou PNG, até 10 MB. A imagem enviada é armazenada no Supabase e usada como imagem padrão de compartilhamento.</p>
             </div>
           </div>
         </div>
