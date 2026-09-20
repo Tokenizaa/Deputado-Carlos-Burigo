@@ -53,6 +53,9 @@ export interface PublicPageDto {
   title: string;
   slug: string;
   description?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImageUrl?: string;
   status: 'publicado';
   updatedAt: string;
   updatedBy?: string;
