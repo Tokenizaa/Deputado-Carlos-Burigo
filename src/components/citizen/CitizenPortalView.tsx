@@ -16,7 +16,7 @@ export const CitizenPortalView: React.FC = () => {
     lgpdConsent: false,
   });
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [accountStep, setAccountStep] = useState<'idle' | 'login' | 'signup'>('idle');
+  const [accountStep, setAccountStep] = useState<'idle' | 'choice' | 'login' | 'signup'>('idle');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -43,9 +43,11 @@ export const CitizenPortalView: React.FC = () => {
     if (sessionData.session) return true;
 
     if (accountStep === 'idle') {
-      setAccountStep('signup');
+      setAccountStep('choice');
       return false;
     }
+
+    if (accountStep === 'choice') return false;
 
     if (accountStep === 'login') {
       const { error: signInError } = await client.auth.signInWithPassword({
@@ -186,24 +188,33 @@ export const CitizenPortalView: React.FC = () => {
 
               {accountStep !== 'idle' && (
                 <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-5">
-                  <div className="flex items-start gap-3">
-                    {accountStep === 'login' ? <LogIn className="w-5 h-5 text-[#00863f] mt-0.5" /> : <UserPlus className="w-5 h-5 text-[#00863f] mt-0.5" />}
-                    <div className="flex-1">
-                      <h3 className="font-black text-stone-900">{accountStep === 'login' ? 'Entre na sua conta' : 'Crie sua conta para acompanhar'}</h3>
-                      <p className="mt-1 text-sm text-stone-600">Sua demanda ficará vinculada à sua conta e aparecerá em Minhas demandas.</p>
-                      <label className="block mt-4 text-sm font-bold text-stone-700">Senha
-                        <input required minLength={8} type="password" autoComplete={accountStep === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
-                      </label>
-                      {accountStep === 'signup' && (
-                        <label className="block mt-4 text-sm font-bold text-stone-700">Confirmar senha
-                          <input required minLength={8} type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
-                        </label>
-                      )}
-                      <button type="button" onClick={() => { setAccountStep(accountStep === 'login' ? 'signup' : 'login'); setPassword(''); setConfirmPassword(''); }} className="mt-3 text-sm font-bold text-[#00863f] underline">
-                        {accountStep === 'login' ? 'Ainda não tenho conta' : 'Já tenho uma conta'}
-                      </button>
+                  {accountStep === 'choice' ? (
+                    <div>
+                      <h3 className="font-black text-stone-900">Como você quer acompanhar sua demanda?</h3>
+                      <p className="mt-1 text-sm text-stone-600">A demanda será vinculada à sua conta.</p>
+                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setAccountStep('login')} className="min-h-11 rounded-lg bg-white border border-stone-300 font-bold text-stone-800 flex items-center justify-center gap-2"><LogIn className="w-4 h-4" /> Já tenho conta</button>
+                        <button type="button" onClick={() => setAccountStep('signup')} className="min-h-11 rounded-lg bg-[#00863f] text-white font-bold flex items-center justify-center gap-2"><UserPlus className="w-4 h-4" /> Criar conta</button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex items-start gap-3">
+                      {accountStep === 'login' ? <LogIn className="w-5 h-5 text-[#00863f] mt-0.5" /> : <UserPlus className="w-5 h-5 text-[#00863f] mt-0.5" />}
+                      <div className="flex-1">
+                        <h3 className="font-black text-stone-900">{accountStep === 'login' ? 'Entre na sua conta' : 'Crie sua conta para acompanhar'}</h3>
+                        <p className="mt-1 text-sm text-stone-600">Sua demanda ficará vinculada à sua conta e aparecerá em Minhas demandas.</p>
+                        <label className="block mt-4 text-sm font-bold text-stone-700">Senha
+                          <input required minLength={8} type="password" autoComplete={accountStep === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
+                        </label>
+                        {accountStep === 'signup' && (
+                          <label className="block mt-4 text-sm font-bold text-stone-700">Confirmar senha
+                            <input required minLength={8} type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
+                          </label>
+                        )}
+                        <button type="button" onClick={() => { setAccountStep('choice'); setPassword(''); setConfirmPassword(''); }} className="mt-3 text-sm font-bold text-[#00863f] underline">Escolher outra opção</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
