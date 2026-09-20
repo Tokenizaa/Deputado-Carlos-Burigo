@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { can } from '../../config/adminPermissions';
 import {
@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   ChevronDown,
   LogOut,
+  Menu,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -26,8 +27,42 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-  const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
+   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // toggle state: true = user opened sidebar
+   const [isMobile, setIsMobile] = useState(() => {
+     return typeof window !== 'undefined' ? window.innerWidth < 768 : true;
+});
+    
+   const headerRef = useRef(null);
+   const [headerHeight, setHeaderHeight] = useState(0);
+
+   useEffect(() => {
+     const updateHeaderHeight = () => {
+       if (headerRef.current) {
+         setHeaderHeight(headerRef.current.getBoundingClientRect().height);
+       }
+     };
+     updateHeaderHeight();
+     window.addEventListener('resize', updateHeaderHeight);
+     return () => window.removeEventListener('resize', updateHeaderHeight);
+   }, []);
+   
+   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      // Note: we don't set isSidebarOpen here because it's the user's toggle state
+      // The combination !isMobile || isSidebarOpen controls sidebar visibility
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Initial check in case SSR
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const pendingDemandsCount = demands.filter(
     (d) => d.status === 'recebida' || d.status === 'em análise'
@@ -46,108 +81,108 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col">
-      <header className="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between">
+<header ref={headerRef} className="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-4">
+          {/* Mobile menu button */}
           <button
-            onClick={() => setCurrentView('home')}
-            className="flex items-center gap-1.5 text-xs font-bold text-stone-300 hover:text-white bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded-lg transition-colors"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="md:hidden flex items-center gap-2.5 bg-stone-800 hover:bg-stone-700 text-stone-200 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-700 transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Voltar ao Site Público</span>
+            <Menu className="w-4 h-4" />
           </button>
-
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00A550]" />
-            <span className="text-sm font-black text-white tracking-tight">
-              PAINEL DO GABINETE • CARLOS BÚRIGO
-            </span>
-            <span className="bg-[#00A550] text-white text-[10px] font-black uppercase px-2 py-0.5 rounded">
-              {settings?.site_mode?.toUpperCase()}
-            </span>
-          </div>
         </div>
 
-        <div className="relative">
-          <button
-            onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-            className="flex items-center gap-2.5 bg-stone-800 hover:bg-stone-700 text-stone-200 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-700 transition-colors"
-          >
-            <div className="w-6 h-6 rounded-full bg-[#00A550] text-white flex items-center justify-center font-bold text-[10px]">
-              {currentUser.name.charAt(0)}
-            </div>
-            <div className="text-left hidden sm:block">
-              <span className="font-bold text-white block leading-tight">{currentUser.name}</span>
-              <span className="text-[10px] text-[#E1F200] block uppercase">{currentUser.role}</span>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
-          </button>
-
-          {userDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 py-2 z-50 animate-fade-in">
-              <div className="px-3 py-2 border-b border-stone-100">
-                <p className="text-xs font-bold text-stone-900">{currentUser?.name}</p>
-                <p className="text-[10px] text-stone-500 uppercase">{currentUser?.role}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => { setUserDropdownOpen(false); void signOut(); }}
-                className="w-full text-left px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-100 flex items-center gap-2"
-              >
-                <LogOut className="w-3.5 h-3.5" /> Sair
-              </button>
-            </div>
-          )}
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-sm font-black text-white tracking-tight">
+            PAINEL DO GABINETE • CARLOS BÚRIGO
+          </span>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col md:flex-row">
-        <aside className="w-full md:w-64 bg-white border-r border-stone-200 p-4 space-y-1.5 shrink-0">
-          <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400">
-            Sistema de Gestão do Gabinete
-          </div>
-
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-                    active
-                      ? 'bg-[#00A550] text-white shadow-xs'
-                      : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-stone-500'}`} />
-                    <span>{item.label}</span>
-                  </div>
-
-                  {item.badge && (
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                        active ? 'bg-white text-[#00A550]' : 'bg-[#ED1C24] text-white'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="mt-6 px-3 text-[11px] leading-relaxed text-stone-400">
-            A navegação acompanha o trabalho diário do gabinete. Os detalhes de cada área aparecem dentro do módulo.
-          </div>
-        </aside>
-
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto max-w-7xl">
-          {children}
-        </main>
-      </div>
+<div className="relative min-h-0 flex-1 flex flex-col md:flex-row">
+  {/* Sidebar */}
+<aside 
+     className={`fixed left-0 w-64 ${(!isMobile || isSidebarOpen) ? 'translate-x-0' : 'translate-x-[-100%]'} transition-transform duration-300 z-30 bg-white border-r border-stone-200`}
+     style={{ top: `${headerHeight}px`, bottom: 0 }}
+   >
+    <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400">
+      Sistema de Gestão do Gabinete
     </div>
-  );
-};
+
+    <nav className="space-y-1">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = activeTab === item.id;
+        return (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+              active
+                ? 'bg-[#00A550] text-white shadow-xs'
+                : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-stone-500'}`} />
+              <span>{item.label}</span>
+            </div>
+
+            {item.badge && (
+              <span
+className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                   active ? 'bg-white text-[#00A550]' : 'bg-[#ED1C24] text-white'
+                 }`}
+              >
+                {item.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </nav>
+
+<div className="mt-6 px-3 text-[11px] leading-relaxed text-stone-400">
+       A navegação acompanha o trabalho diário do gabinete. Os detalhes de cada área aparecem dentro do módulo.
+     </div>
+     
+     {/* User info and site mode indicator in sidebar bottom */}
+     <div className="mt-auto p-4 border-t border-stone-200">
+       <div className="flex items-center gap-3 text-sm">
+         <div className="w-8 h-8 rounded-full bg-[#00A550] text-white flex items-center justify-center font-bold text-[11px]">
+           {currentUser.name.charAt(0)}
+         </div>
+         <div className="flex-1">
+           <span className="block font-medium text-stone-900">{currentUser.name}</span>
+           <span className="text-[10px] text-stone-500 uppercase">{currentUser.role}</span>
+         </div>
+       </div>
+       
+{settings?.site_mode && (
+          <div className="mt-3 text-xs text-stone-500">
+            Modo: {settings.site_mode?.toUpperCase()}
+          </div>
+        )}
+        <button onClick={() => void signOut()}
+                className="mt-4 w-full text-left px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-100 flex items-center gap-2">
+          <LogOut className="w-3.5 h-3.5" /> Sair
+        </button>
+     </div>
+   </aside>
+
+  {/* Backdrop - only on mobile when sidebar is open */}
+  {isMobile && isSidebarOpen && (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20" onClick={() => setIsSidebarOpen(false)} />
+  )}
+
+  {/* Main Content */}
+  <main className={`flex-1 p-4 sm:p-8 overflow-y-auto ${!isMobile ? 'ml-64' : ''} max-w-7xl`}>
+{children}
+</main>
+ </div>
+ </div>
+    );
+  }
+  
+
+ export default AdminLayout;

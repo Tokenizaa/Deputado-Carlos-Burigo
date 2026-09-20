@@ -1117,6 +1117,12 @@ export async function updateAdminTask(id: string, patch: Partial<AdminTaskCreate
   return data ?? null;
 }
 
+export async function deleteAdminTask(id: string): Promise<boolean> {
+  const { error } = await supabaseAdmin.from('tasks').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
 
 export interface AdminDemandUpdate {
   status?: string;

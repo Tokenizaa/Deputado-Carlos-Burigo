@@ -20,6 +20,7 @@ import {
   getAdminTasks,
   createAdminTask,
   updateAdminTask,
+  deleteAdminTask,
   getAllDemandsAdmin,
   updateDemandAdmin,
   getPublicDocuments,
@@ -53,6 +54,13 @@ import {
   updateAdminPage,
   rollbackAdminPage,
 } from '../server/pagesAdmin';
+import {
+  getAdminInvites,
+  createAdminInvite,
+  approveAdminInvite,
+  rejectAdminInvite,
+  acceptAdminInvite,
+} from '../server/invites';
 
 import type { User } from '../src/types';
 import { can } from '../src/config/adminPermissions';
@@ -97,6 +105,10 @@ function normalizeBrazilPhone(phone: string): string {
 async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function methodNotAllowed(): Response {
+  return Response.json({ error: 'Método não permitido' }, { status: 405 });
 }
 
 // Helper to extract user ID from request headers
@@ -271,6 +283,30 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       publishableKey: runtimeEnv?.SUPABASE_PUBLISHABLE_KEY ?? '',
     });
   },
+  '/api/auth/me': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const auth = await requireAuth(request);
+      if (auth instanceof Response) return auth;
+      
+      // Get the admin user details
+      const adminUser = await getAdminUserById(auth.userId);
+      if (!adminUser) {
+        return Response.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      }
+      
+      // Get all admin users for the frontend (if needed)
+      const allUsers = await getAllAdminUsers();
+      
+      return Response.json({
+        user: adminUser,
+        allUsers: allUsers || []
+      });
+    } catch (error) {
+      console.error('[api/auth/me]', error);
+      return Response.json({ error: 'Falha ao obter informações do usuário' }, { status: 500 });
+    }
+  },
   '/api/health': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     return Response.json({
@@ -279,6 +315,111 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       runtime: 'cloudflare',
       timestamp: new Date().toISOString(),
     });
+  },
+  '/api/tasks': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    // Check if user has permission to view tasks (ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO, VISUALIZADOR for GET)
+    if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'].includes(authResult.role)) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    
+    if (request.method === 'GET') {
+      try {
+        const tasks = await getAdminTasks();
+        return Response.json(tasks);
+      } catch (error) {
+        console.error('[api/tasks GET]', error);
+        return Response.json({ error: 'Falha ao carregar tarefas' }, { status: 500 });
+      }
+    }
+    
+    if (request.method === 'POST') {
+      // Check if user has permission to create tasks (ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO)
+      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'].includes(authResult.role)) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const data = await request.json();
+        // Basic validation
+        if (!data?.title) {
+          return Response.json({ error: 'Título é obrigatório' }, { status: 400 });
+        }
+        const task = await createAdminTask({
+          ...data,
+          userId: authResult.userId
+        });
+        return Response.json(task, { status: 201 });
+      } catch (error) {
+        console.error('[api/tasks POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 });
+      }
+    }
+    
+    return methodNotAllowed();
+  },
+  '/api/tasks/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID da tarefa é obrigatório' }, { status: 400 });
+    
+    // Check permissions based on method
+    if (request.method === 'GET') {
+      // View permission: ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO, VISUALIZADOR
+      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'].includes(authResult.role)) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const tasks = await getAdminTasks();
+        const task = tasks.find(t => t.id === id);
+        if (!task) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json(task);
+      } catch (error) {
+        console.error('[api/tasks/:id GET]', error);
+        return Response.json({ error: 'Falha ao carregar tarefa' }, { status: 500 });
+      }
+    }
+    
+    if (request.method === 'PUT') {
+      // Edit permission: ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO
+      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'].includes(authResult.role)) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const data = await request.json();
+        // Basic validation
+        if (!data?.title) {
+          return Response.json({ error: 'Título é obrigatório' }, { status: 400 });
+        }
+        const updated = await updateAdminTask(id, {
+          ...data,
+          userId: authResult.userId
+        });
+        if (!updated) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/tasks/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar tarefa' }, { status: 400 });
+      }
+    }
+    
+    if (request.method === 'DELETE') {
+      // Delete permission: ADMIN only
+      if (authResult.role !== 'ADMIN') {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const deleted = await deleteAdminTask(id);
+        if (!deleted) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/tasks/:id DELETE]', error);
+        return Response.json({ error: 'Falha ao excluir tarefa' }, { status: 500 });
+      }
+    }
+    
+    return methodNotAllowed();
   },
   '/api/settings': async (request) => {
     if (request.method === 'GET') {
