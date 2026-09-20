@@ -6,6 +6,7 @@ import {
   getPublicNews,
   getPublicResults,
   getPublicSettings,
+  updateAdminSettings,
   getPublicVideos,
   getPublicLegislativeItems,
   getPublicPages,
@@ -146,6 +147,69 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
+async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
+  try {
+    const settings = await getPublicSettings();
+    const pathname = url.pathname.replace(/\\/+$/, '') || '/';
+    let title = settings?.seoDefaultTitle || 'Carlos Búrigo | Portal Institucional';
+    let description = settings?.seoDefaultDescription || '';
+    let image = settings?.seoDefaultImageUrl || '';
+    let pageUrl = url.toString();
+
+    const staticMeta: Record<string, { title: string; description: string }> = {
+      '/': { title, description },
+      '/sobre': { title: 'Sobre Carlos Búrigo | Portal Institucional', description: 'Informações institucionais e perfil público de Carlos Búrigo.' },
+      '/trajetoria': { title: 'Trajetória | Carlos Búrigo', description: 'Trajetória pública e profissional de Carlos Búrigo, organizada em linha do tempo.' },
+      '/atuacao': { title: 'Atuação Parlamentar | Carlos Búrigo', description: 'Consulte proposições, votações, participações e registros da atuação parlamentar.' },
+      '/projetos': { title: 'Proposições | Carlos Búrigo', description: 'Consulte proposições legislativas publicadas no acervo do portal.' },
+      '/votacoes': { title: 'Votações | Carlos Búrigo', description: 'Consulte registros de votações disponíveis no acervo público.' },
+      '/documentos': { title: 'Documentos | Carlos Búrigo', description: 'Acervo público de documentos legislativos e suas fontes.' },
+      '/resultados': { title: 'Resultados e pautas | Carlos Búrigo', description: 'Resultados documentados e vinculados a proposições legislativas publicadas.' },
+      '/noticias': { title: 'Notícias | Carlos Búrigo', description: 'Notícias e informações recentes publicadas no portal institucional.' },
+      '/agenda': { title: 'Agenda | Carlos Búrigo', description: 'Agenda pública e compromissos disponíveis no portal institucional.' },
+      '/municipios': { title: 'Municípios | Carlos Búrigo', description: 'Informações públicas relacionadas aos municípios disponíveis no portal.' },
+      '/videos': { title: 'Vídeos | Carlos Búrigo', description: 'Vídeos publicados no portal institucional.' },
+      '/contato': { title: 'Fale com o Deputado | Carlos Búrigo', description: 'Canal institucional para enviar solicitações, mensagens e demandas ao gabinete.' },
+      '/campanha': { title: 'Campanha | Carlos Búrigo', description: settings?.seoDefaultDescription || '' },
+    };
+    if (staticMeta[pathname]) {
+      title = staticMeta[pathname].title;
+      description = staticMeta[pathname].description;
+    } else {
+      const pages = await getPublicPages(pathname.replace(/^\\//, ''));
+      const page = pages[0];
+      if (page) {
+        title = page.seoTitle || page.title;
+        description = page.seoDescription || page.description || description;
+        image = page.ogImageUrl || image;
+      }
+    }
+    const html = await response.text();
+    const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tags = [
+      `<meta property="og:title" content="${esc(title)}">`,
+      `<meta property="og:description" content="${esc(description)}">`,
+      `<meta property="og:type" content="website">`,
+      `<meta property="og:url" content="${esc(pageUrl)}">`,
+      `<meta property="og:locale" content="pt_BR">`,
+      image ? `<meta property="og:image" content="${esc(image)}">` : '',
+      image ? `<meta property="og:image:width" content="1200">` : '',
+      image ? `<meta property="og:image:height" content="630">` : '',
+      `<meta name="twitter:card" content="summary_large_image">`,
+      `<meta name="twitter:title" content="${esc(title)}">`,
+      `<meta name="twitter:description" content="${esc(description)}">`,
+      image ? `<meta name="twitter:image" content="${esc(image)}">` : '',
+    ].filter(Boolean).join('');
+    const patched = html.replace('</head>', `${tags}</head>`);
+    const headers = new Headers(response.headers);
+    headers.set('Content-Type', 'text/html; charset=UTF-8');
+    return new Response(patched, { status: response.status, statusText: response.statusText, headers });
+  } catch (error) {
+    console.error('[open-graph]', error);
+    return response;
+  }
+}
+
 let runtimeEnv: Env | null = null;
 
 const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
@@ -166,22 +230,52 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     });
   },
   '/api/settings': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const settings = await getPublicSettings();
-      if (!settings) {
-        return Response.json(
-          { error: 'Configurações públicas não encontradas no acervo' },
-          { status: 404 }
-        );
+    if (request.method === 'GET') {
+      try {
+        const settings = await getPublicSettings();
+        if (!settings) return Response.json({ error: 'Configurações públicas não encontradas no acervo' }, { status: 404 });
+        return Response.json(settings);
+      } catch (error) {
+        console.error('[api/settings GET]', error);
+        return Response.json({ error: 'Falha ao carregar configurações do acervo' }, { status: 500 });
       }
-      return Response.json(settings);
+    }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'PUT') return methodNotAllowed();
+    if (!can(authResult.role as any, 'configurações', 'manage_settings')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    try {
+      return Response.json(await updateAdminSettings(await request.json()));
     } catch (error) {
-      console.error('[api/settings]', error);
-      return Response.json(
-        { error: 'Falha ao carregar configurações do acervo' },
-        { status: 500 }
-      );
+      console.error('[api/settings PUT]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar configurações' }, { status: 400 });
+    }
+  },
+  '/api/admin/og-image': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'POST') return methodNotAllowed();
+    if (!can(authResult.role as any, 'configurações', 'manage_settings')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    try {
+      const form = await request.formData();
+      const file = form.get('file');
+      if (!(file instanceof File)) return Response.json({ error: 'Arquivo de imagem é obrigatório' }, { status: 400 });
+      if (!['image/jpeg','image/png'].includes(file.type)) return Response.json({ error: 'Use uma imagem JPEG ou PNG' }, { status: 400 });
+      if (file.size > 10 * 1024 * 1024) return Response.json({ error: 'A imagem deve ter no máximo 10 MB' }, { status: 400 });
+      const extension = file.type === 'image/png' ? 'png' : 'jpg';
+      const storagePath = `site/${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabaseAdmin.storage.from('og-images').upload(storagePath, file, {
+        contentType: file.type,
+        upsert: false,
+        cacheControl: '3600',
+      });
+      if (error) throw error;
+      const baseUrl = runtimeEnv?.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
+      const url = new URL(`/storage/v1/object/public/og-images/${storagePath}`, baseUrl).toString();
+      return Response.json({ url, storagePath });
+    } catch (error) {
+      console.error('[api/admin/og-image]', error);
+      return Response.json({ error: error?.message || 'Falha ao enviar imagem Open Graph' }, { status: 400 });
     }
   },
   '/api/results': async (request) => {
@@ -1045,7 +1139,7 @@ export default {
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
-        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
+        else if ((url.pathname === '/api/settings' && method !== 'GET') || url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN'];
 
         if (requiredRoles !== null) {
           const auth = await requireAuth(enhancedRequest);
@@ -1060,9 +1154,11 @@ export default {
       // Non-API requests: serve static assets. `assets.not_found_handling:
       // single-page-application` handles SPA client routes before reaching here.
       response = await env.ASSETS.fetch(request);
-      // Detect HTML responses (SPA entry point)
       const contentType = response.headers.get('content-type') || '';
       isHtml = contentType.includes('text/html');
+      if (isHtml) {
+        response = await injectOpenGraphMetadata(response, url);
+      }
     }
     
     // Apply security headers to all responses
