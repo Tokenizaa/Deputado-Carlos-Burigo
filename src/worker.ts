@@ -83,7 +83,7 @@ async function sha256Hex(input: string): Promise<string> {
 // Helper to extract user ID from request headers
 async function requireAuth(request: Request): Promise<{ userId: string; role: string; user: User } | Response> {
   const authorization = request.headers.get('authorization') ?? '';
-  const match = authorization.match(/^Bearer\\s+(.+)$/i);
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
   if (!match) return Response.json({ error: 'Não autenticado' }, { status: 401 });
   const user = await getAuthenticatedAdminUser(match[1]);
   if (!user) return Response.json({ error: 'Sessão inválida ou usuário sem perfil de gabinete' }, { status: 401 });
@@ -150,7 +150,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
 async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
   try {
     const settings = await getPublicSettings();
-    const pathname = url.pathname.replace(/\\/+$/, '') || '/';
+    const pathname = url.pathname.replace(/\/+$/, '') || '/';
     let title = settings?.seoDefaultTitle || 'Carlos Búrigo | Portal Institucional';
     let description = settings?.seoDefaultDescription || '';
     let image = settings?.seoDefaultImageUrl || '';
@@ -176,7 +176,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       title = staticMeta[pathname].title;
       description = staticMeta[pathname].description;
     } else {
-      const pages = await getPublicPages(pathname.replace(/^\\//, ''));
+      const pages = await getPublicPages(pathname.replace(/^\//, ''));
       const page = pages[0];
       if (page) {
         title = page.seoTitle || page.title;
@@ -1058,7 +1058,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/invites/:token/accept': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
     const authorization = request.headers.get('authorization') ?? '';
-    const match = authorization.match(/^Bearer\\s+(.+)$/i);
+    const match = authorization.match(/^Bearer\s+(.+)$/i);
     if (!match) return Response.json({ error: 'Não autenticado.' }, { status: 401 });
     const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(match[1]);
     if (authError || !authData.user?.id || !authData.user.email) return Response.json({ error: 'Sessão de convite inválida.' }, { status: 401 });
@@ -1134,7 +1134,8 @@ export default {
         else if (url.pathname === '/api/demands' || url.pathname.startsWith('/api/demands/')) requiredRoles = method === 'GET'
           ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
-        else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];\n        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
