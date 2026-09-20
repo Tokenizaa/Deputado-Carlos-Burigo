@@ -59,6 +59,14 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     return (a.title || '').localeCompare(b.title || '', 'pt-BR');
   }), [archiveDocuments, itemById]);
 
+  const DOCUMENTS_PER_PAGE = 12;
+  const documentTotalPages = Math.max(1, Math.ceil(filteredDocuments.length / DOCUMENTS_PER_PAGE));
+  const safeDocumentPage = Math.min(documentTotalPages, Math.max(1, documentPage));
+  const paginatedDocuments = filteredDocuments.slice(
+    (safeDocumentPage - 1) * DOCUMENTS_PER_PAGE,
+    safeDocumentPage * DOCUMENTS_PER_PAGE,
+  );
+
   const openSource = (url: string | null | undefined, title: string, internal = false) => {
     if (!url) return;
     if (internal) {
