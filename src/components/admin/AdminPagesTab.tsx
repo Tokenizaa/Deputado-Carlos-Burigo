@@ -224,7 +224,6 @@ export const AdminPagesTab: React.FC = () => {
                       </div>
                     );
                   })}
-                  })}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
                 </div>
               </div>
