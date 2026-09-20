@@ -13,6 +13,8 @@ import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
 import { AdminTasksTab } from './AdminTasksTab';
 import { AdminSettingsTab } from './AdminSettingsTab';
+import { useApp } from '../../context/AppContext';
+import { can } from '../../config/adminPermissions';
 
 interface AdminWorkspaceProps {
   activeModule: string;
@@ -43,6 +45,7 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' |
 };
 
 export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, setActiveModule }) => {
+  const { currentUser } = useApp();
   const [subTab, setSubTab] = useState('results');
 
   useEffect(() => {
@@ -51,6 +54,15 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
     if (activeModule === 'administração') setSubTab('users');
     if (activeModule === 'configurações') setSubTab('settings');
   }, [activeModule]);
+
+  if (!currentUser || !can(currentUser.role, activeModule as ModuleId)) {
+    return (
+      <div className="bg-white border border-stone-200 rounded-2xl p-8">
+        <h2 className="text-lg font-black text-stone-900">Acesso não autorizado</h2>
+        <p className="mt-2 text-sm text-stone-600">Seu papel não possui acesso a este módulo.</p>
+      </div>
+    );
+  }
 
   const renderSubTab = () => {
     switch (subTab) {
