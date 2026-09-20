@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Video, Plus, Edit2, Trash2, ExternalLink, Star, Play } from 'lucide-react';
 import { VideoItem } from '../../types';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminVideosTab: React.FC = () => {
-  const { videos, currentUser, refreshAllData, showToast } = useApp();
+  const { videos, refreshAllData, showToast } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
 
@@ -24,7 +25,7 @@ export const AdminVideosTab: React.FC = () => {
     setUrl('');
     setPlatform('YouTube');
     setCategory('Discurso em Plenário');
-    setThumbnail('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=600&q=80');
+    setThumbnail('');
     setFeatured(false);
     setModalOpen(true);
   };
@@ -45,6 +46,9 @@ export const AdminVideosTab: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const payload = {
         title,
         description,
@@ -64,7 +68,7 @@ export const AdminVideosTab: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -87,9 +91,12 @@ export const AdminVideosTab: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Tem certeza que deseja excluir este vídeo?')) return;
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const res = await fetch(`/api/videos/${id}`, {
         method: 'DELETE',
-        headers: { 'x-user-id': currentUser.id },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
         showToast('Vídeo removido.', 'success');
