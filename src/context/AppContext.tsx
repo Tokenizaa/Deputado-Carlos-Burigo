@@ -15,12 +15,13 @@ import {
   Task,
 } from '../types';
 import { useAppUi } from './AppUiContext';
+import { getSupabaseClient } from '../lib/supabaseClient';
 import { PublicLegislativeItemDto } from '../contracts/publicLegislative';
 import type { PublicDocumentDto } from '../contracts/publicArchive';
 
 interface AppContextType {
   settings: SiteSettings | null;
-  currentUser: User;
+  currentUser: User | null;
   allUsers: User[];
   currentView: string;
   selectedNewsSlug: string | null;
@@ -47,7 +48,8 @@ interface AppContextType {
   openNewsDetail: (slug: string) => void;
   openProtocolModal: (protocol?: string) => void;
   closeProtocolModal: () => void;
-  switchUser: (userId: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  authReady: boolean;
   updateSettings: (newSettings: Partial<SiteSettings>) => Promise<boolean>;
   updatePage: (
     pageId: string,
@@ -99,14 +101,9 @@ const mapTask = (t: any): Task => ({
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const ui = useAppUi();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [currentUser, setCurrentUser] = useState<User>({
-    id: 'usr-1',
-    name: 'Carlos Búrigo',
-    email: 'carlos.burigo@al.rs.gov.br',
-    role: 'ADMIN',
-    cargo: 'Deputado Estadual / Titular',
-  });
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [authReady, setAuthReady] = useState(false);
 
   const [pages, setPages] = useState<Page[]>([]);
   const [adminPages, setAdminPages] = useState<Page[]>([]);
@@ -134,6 +131,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const refreshAllData = useCallback(async () => {
     try {
+      const session = (await getSupabaseClient()).auth.getSession ? (await (await getSupabaseClient()).auth.getSession()).data.session : null;
+      const accessToken = session?.access_token;
+      const authHeaders = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
       const [
         settingsRes,
         authRes,
@@ -152,9 +152,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tasksRes,
       ] = await Promise.all([
         fetch('/api/settings').then((r) => r.json()),
-        fetch('/api/auth/me', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.json()),
+        accessToken ? fetch('/api/auth/me', { headers: authHeaders }).then((r) => r.ok ? r.json() : ({ user: null, allUsers: [] })) : Promise.resolve({ user: null, allUsers: [] }),
         fetch('/api/pages').then((r) => r.json()),
-        fetch('/api/admin/pages', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
+        accessToken ? fetch('/api/admin/pages', { headers: authHeaders }).then((r) => r.ok ? r.json() : []) : Promise.resolve([]),
         fetch('/api/news').then((r) => r.json()),
         fetch('/api/agenda?admin=true').then((r) => r.json()),
         fetch('/api/results').then((r) => r.json()),
@@ -165,10 +165,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/documents').then((r) => r.json()),
         fetch('/api/demands').then((r) => r.json()),
         fetch('/api/audit-logs').then((r) => r.json()),
-        fetch('/api/tasks', { headers: { 'x-user-id': currentUser.id } }).then((r) => r.ok ? r.json() : []),
+        accessToken ? fetch('/api/tasks', { headers: authHeaders }).then((r) => r.ok ? r.json() : []) : Promise.resolve([]),
       ]);
 
       if (settingsRes) setSettings(settingsRes);
+      if (authRes?.user) setCurrentUser(authRes.user);
       if (authRes?.allUsers) setAllUsers(authRes.allUsers);
       if (Array.isArray(pagesRes)) setPages(pagesRes);
       if (Array.isArray(adminPagesRes)) setAdminPages(adminPagesRes);
@@ -202,7 +203,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } finally {
       setIsLoading(false);
     }
-  }, [currentUser.id]);
+  }, []);
 
   useEffect(() => {
     refreshAllData();
@@ -240,22 +241,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch { showToast('Erro de comunicação ao atualizar tarefa', 'error'); return false; }
   };
 
-  const switchUser = async (userId: string) => {
+  const signOut = async () => {
     try {
-      const res = await fetch('/api/auth/switch-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
-      const data = await res.json();
-      if (data.user) {
-        setCurrentUser(data.user);
-        showToast(`Sessão alterada para: ${data.user.name} (${data.user.role})`, 'info');
-      }
-    } catch (err) {
-      showToast('Falha ao alternar usuário', 'error');
+      const client = await getSupabaseClient();
+      await client.auth.signOut();
+    } finally {
+      setCurrentUser(null);
+      setAllUsers([]);
     }
   };
+
+  useEffect(() => {
+    let mounted = true;
+    let unsubscribe: (() => void) | undefined;
+    (async () => {
+      try {
+        const client = await getSupabaseClient();
+        const { data } = client.auth.onAuthStateChange((_event, session) => {
+          if (!mounted) return;
+          if (!session) {
+            setCurrentUser(null);
+            setAllUsers([]);
+          } else {
+            void refreshAllData();
+          }
+          setAuthReady(true);
+        });
+        unsubscribe = () => data.subscription.unsubscribe();
+        await refreshAllData();
+      } catch (error) {
+        console.error('Error initializing authentication:', error);
+        if (mounted) setAuthReady(true);
+      }
+    })();
+    return () => { mounted = false; unsubscribe?.(); };
+  }, [refreshAllData]);
 
   const updateSettings = async (newSettings: Partial<SiteSettings>): Promise<boolean> => {
     try {
@@ -398,7 +418,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoading,
         toastMessage,
         toastType,
-        switchUser,
+        signOut,
+        authReady,
         updateSettings,
         updatePage,
         createPage,
