@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { can } from '../../config/adminPermissions';
 import {
   LayoutDashboard,
   FileCode2,
@@ -11,6 +12,7 @@ import {
   Users,
   ArrowLeft,
   ChevronDown,
+  LogOut,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -24,7 +26,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-  const { currentUser, allUsers, switchUser, setCurrentView, demands, settings } = useApp();
+  const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const pendingDemandsCount = demands.filter(
@@ -33,19 +35,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
-    {
-      id: 'cidadão',
-      label: 'Atendimento',
-      icon: Inbox,
-      badge: pendingDemandsCount > 0 ? pendingDemandsCount : null,
-    },
+    { id: 'cidadão', label: 'Atendimento', icon: Inbox, badge: pendingDemandsCount > 0 ? pendingDemandsCount : null },
     { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
     { id: 'atuação', label: 'Mandato', icon: FileCode2, badge: null },
     { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
     { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
     { id: 'administração', label: 'Equipe', icon: Users, badge: null },
     { id: 'configurações', label: 'Configurações', icon: Settings, badge: null },
-  ];
+  ].filter((item) => currentUser && can(currentUser.role, item.id));
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col">
@@ -86,32 +83,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </button>
 
           {userDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 py-2 z-50 animate-fade-in">
-              <div className="px-3 py-1.5 border-b border-stone-100 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                Simular Papel / Usuário (RBAC)
+            <div className="absolute right-0 mt-2 w-56 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 py-2 z-50 animate-fade-in">
+              <div className="px-3 py-2 border-b border-stone-100">
+                <p className="text-xs font-bold text-stone-900">{currentUser?.name}</p>
+                <p className="text-[10px] text-stone-500 uppercase">{currentUser?.role}</p>
               </div>
-              {allUsers.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    switchUser(u.id);
-                    setUserDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-stone-100 flex items-center justify-between ${
-                    currentUser.id === u.id ? 'bg-emerald-50 text-[#00A550] font-bold' : ''
-                  }`}
-                >
-                  <div>
-                    <p className="font-semibold">{u.name}</p>
-                    <p className="text-[10px] text-stone-500">{u.cargo}</p>
-                  </div>
-                  <span className="text-[10px] font-mono uppercase bg-stone-200 px-1.5 py-0.5 rounded text-stone-700">
-                    {u.role}
-                  </span>
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => { setUserDropdownOpen(false); void signOut(); }}
+                className="w-full text-left px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-100 flex items-center gap-2"
+              >
+                <LogOut className="w-3.5 h-3.5" /> Sair
+              </button>
             </div>
-          )}
+          )}}
         </div>
       </header>
 
