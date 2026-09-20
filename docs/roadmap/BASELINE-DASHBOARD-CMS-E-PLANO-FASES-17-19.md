@@ -110,7 +110,7 @@ Verificação arquitetural: o Dashboard continua consumindo `AppContext`, APIs e
 
 # FASE 19 — CMS Visual / Page Builder
 
-Status: EM EXECUÇÃO — primeira entrega concluída.
+Status: EM VALIDAÇÃO — canvas visual implementado e alinhado aos blocos realmente persistidos.
 
 Implementado:
 
@@ -125,9 +125,9 @@ Implementado:
 - manutenção de versões e restauração;
 - reutilização dos dados e mídias reais já carregados pelo sistema.
 
-Commit da primeira entrega visual: `447f3206d906b300a3a0ff0ffa3f0868ff8cbd39`
+Commits da implementação visual atual: `a0037e2d3f63e1184e2c821bae4dc6459d4b3b0e`, `f3fd14db1a081d16141d1ad2d4c51df33cafbb57`, `f7be7c7a6839459823cb2d592aa8dd9efb7caa7c`, `20c5c4cc4769c85dc35385e9364f1e7b5c63e351` e `95757d9a0e8c6fc74754355afd72cabea2dc551d`.
 
-Ainda não considerar a Fase 19 encerrada: falta validar o fluxo completo no navegador e ajustar o canvas para os tipos de bloco que possuem renderização pública específica, sem criar um segundo renderizador permanente.
+A validação estrutural confirmou que o canvas reutiliza `renderBlock` e que os `page_blocks` atualmente persistidos no Supabase são apenas `hero`, `trajectory`, `projects`, `results`, `news`, `agenda`, `municipalities` e `videos`. As opções de criação do CMS foram alinhadas a esse conjunto para impedir a criação de blocos sem renderização pública existente. Ainda não considerar a Fase 19 encerrada: falta validar o fluxo completo no navegador.
 
 Objetivo: evoluir o CMS existente para uma experiência visual inspirada na lógica de editores como Elementor, sem criar outro CMS.
 
