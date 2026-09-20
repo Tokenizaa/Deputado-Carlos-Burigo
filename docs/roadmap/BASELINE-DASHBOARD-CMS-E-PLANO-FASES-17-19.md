@@ -86,6 +86,28 @@ Critério de saída:
 
 O Dashboard deve responder, com dados reais, o que exige atenção da equipe sem introduzir uma nova fonte de dados.
 
+# FASE 18 — Execução
+
+Status: CONCLUÍDA
+
+Implementado sobre a arquitetura existente:
+
+- Central operacional orientada às pendências reais;
+- triagem e demandas abertas usando dados existentes;
+- tarefas vencidas com acesso direto ao módulo Tarefas;
+- criação de tarefas pelo Dashboard;
+- atribuição opcional usando a equipe real carregada pelo sistema;
+- prazo e prioridade usando os campos existentes;
+- conclusão de tarefas usando a API existente;
+- compromissos de hoje e acesso direto à Agenda;
+- notícias em rascunho e acesso direto ao Conteúdo;
+- atividade recente baseada na auditoria existente;
+- nenhuma tabela, API ou fonte de dados paralela criada.
+
+Commit da execução: `552de19af4e1471093cf91e0a4e37770655a0745`
+
+Verificação arquitetural: o Dashboard continua consumindo `AppContext`, APIs existentes e dados reais; nenhuma funcionalidade existente foi reconstruída.
+
 # FASE 19 — CMS Visual / Page Builder
 
 Objetivo: evoluir o CMS existente para uma experiência visual inspirada na lógica de editores como Elementor, sem criar outro CMS.
