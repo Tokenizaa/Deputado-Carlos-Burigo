@@ -355,6 +355,68 @@ export async function getPublicMunicipalities() {
   }));
 }
 
+export async function getAdminVideos() {
+  const { data, error } = await supabaseAdmin
+    .from('videos')
+    .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status,created_at,source_name,verification_status,rights_status')
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function createAdminVideo(input: {
+  title: string;
+  description: string;
+  url: string;
+  platform: string;
+  category: string;
+  thumbnail?: string | null;
+  featured?: boolean;
+  status?: string;
+}) {
+  const { data, error } = await supabaseAdmin
+    .from('videos')
+    .insert({
+      title: String(input.title ?? '').trim(),
+      description: String(input.description ?? '').trim(),
+      url: String(input.url ?? '').trim(),
+      platform: String(input.platform ?? '').trim(),
+      category: String(input.category ?? '').trim(),
+      thumbnail_url: input.thumbnail ? String(input.thumbnail).trim() : null,
+      featured: Boolean(input.featured),
+      status: input.status ? String(input.status).trim() : 'ativo',
+      published_at: new Date().toISOString(),
+    })
+    .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status,created_at,source_name,verification_status,rights_status')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminVideo(id: string, input: Record<string, unknown>) {
+  const patch: Record<string, unknown> = {};
+  const fields: Record<string, string> = {
+    title: 'title', description: 'description', url: 'url', platform: 'platform',
+    category: 'category', thumbnail: 'thumbnail_url', status: 'status', featured: 'featured',
+  };
+  for (const [key, column] of Object.entries(fields)) {
+    if (input[key] !== undefined) patch[column] = typeof input[key] === 'string' ? String(input[key]).trim() : input[key];
+  }
+  const { data, error } = await supabaseAdmin
+    .from('videos').update(patch).eq('id', id)
+    .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status,created_at,source_name,verification_status,rights_status')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminVideo(id: string) {
+  const { data, error } = await supabaseAdmin.from('videos').delete().eq('id', id).select('id').maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getPublicVideos() {
   const { data, error } = await supabasePublic.from('videos')
     .select('id,title,description,url,platform,category,published_at,thumbnail_url,featured,status,created_at,source_name,verification_status,rights_status')
