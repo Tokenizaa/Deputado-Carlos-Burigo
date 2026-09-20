@@ -30,14 +30,16 @@ import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { DynamicPageView } from './components/public/DynamicPageView';
 import { AdminAuthView } from './components/auth/AdminAuthView';
 import { AdminInviteAcceptView } from './components/auth/AdminInviteAcceptView';
+import { AdminBootstrapView } from './components/auth/AdminBootstrapView';
 
-const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
+const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos', 'primeiro-acesso']);
 
 const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
   const [adminTab, setAdminTab] = useState('dashboard');
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
   if (pathname === 'convite') return <AdminInviteAcceptView />;
+  if (pathname === 'primeiro-acesso') return <AdminBootstrapView />;
   if (pathname === 'minhas-demandas') return <CitizenAccountView />;
 
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
