@@ -39,6 +39,10 @@ import {
   createAdminMunicipality,
   updateAdminMunicipality,
   deleteAdminMunicipality,
+  getAdminVideos,
+  createAdminVideo,
+  updateAdminVideo,
+  deleteAdminVideo,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -287,18 +291,58 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     return methodNotAllowed();
   },
   '/api/videos': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const videos = await getPublicVideos();
-      const mappedVideos = videos.map(mapToPublicVideoDto);
-      return Response.json(mappedVideos);
-    } catch (error) {
-      console.error('[api/videos]', error);
-      return Response.json(
-        { error: 'Falha ao carregar vídeos do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        const videos = await getPublicVideos();
+        return Response.json(videos.map(mapToPublicVideoDto));
+      } catch (error) {
+        console.error('[api/videos GET]', error);
+        return Response.json({ error: 'Falha ao carregar vídeos do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const data = await request.json();
+        if (!data?.title || !data?.url || !data?.platform || !data?.category) return Response.json({ error: 'title, url, platform e category são obrigatórios' }, { status: 400 });
+        return Response.json(await createAdminVideo(data), { status: 201 });
+      } catch (error) {
+        console.error('[api/videos POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar vídeo' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+  '/api/videos/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const updated = await updateAdminVideo(id, await request.json());
+        if (!updated) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/videos/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar vídeo' }, { status: 400 });
+      }
+    }
+    if (request.method === 'DELETE') {
+      if (!can(authResult.role as any, 'conteúdo', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const deleted = await deleteAdminVideo(id);
+        if (!deleted) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/videos/:id DELETE]', error);
+        return Response.json({ error: 'Falha ao excluir vídeo' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
   },
   '/api/media': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
@@ -1000,6 +1044,7 @@ export default {
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
+        else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
 
         if (requiredRoles !== null) {
