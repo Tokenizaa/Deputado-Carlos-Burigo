@@ -110,7 +110,7 @@ Verificação arquitetural: o Dashboard continua consumindo `AppContext`, APIs e
 
 # FASE 19 — CMS Visual / Page Builder
 
-Status: EM VALIDAÇÃO — canvas visual implementado e alinhado aos blocos realmente persistidos.
+Status: CONCLUÍDA.
 
 Implementado:
 
