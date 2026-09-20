@@ -14,6 +14,7 @@ import {
   ChevronDown,
   LogOut,
   Menu,
+  X,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -105,8 +106,11 @@ const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
      className={`fixed left-0 w-64 ${(!isMobile || isSidebarOpen) ? 'translate-x-0' : 'translate-x-[-100%]'} transition-transform duration-300 z-30 bg-white border-r border-stone-200`}
      style={{ top: `${headerHeight}px`, bottom: 0 }}
    >
-    <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400">
+    <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-stone-400 relative">
       Sistema de Gestão do Gabinete
+      <button onClick={() => setIsSidebarOpen(false)} className="absolute top-2 right-2 p-1 text-stone-500 hover:text-stone-900">
+        <X className="w-4 h-4" />
+      </button>
     </div>
 
     <nav className="space-y-1">
@@ -114,14 +118,14 @@ const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
         const Icon = item.icon;
         const active = activeTab === item.id;
         return (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-              active
-                ? 'bg-[#00A550] text-white shadow-xs'
-                : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
-            }`}
+<button
+             key={item.id}
+             onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+               active
+                 ? 'bg-[#00A550] text-white shadow-xs'
+                 : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
+             }`}
           >
             <div className="flex items-center gap-3">
               <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-stone-500'}`} />
