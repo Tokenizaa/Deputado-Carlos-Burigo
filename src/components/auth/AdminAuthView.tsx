@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminAuthView: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
@@ -6,6 +6,14 @@ export const AdminAuthView: React.FC<{ onAuthenticated: () => void }> = ({ onAut
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bootstrapAvailable, setBootstrapAvailable] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/bootstrap-status')
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => setBootstrapAvailable(Boolean(payload?.available)))
+      .catch(() => setBootstrapAvailable(false));
+  }, []);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,6 +46,11 @@ export const AdminAuthView: React.FC<{ onAuthenticated: () => void }> = ({ onAut
         <button disabled={loading} className="mt-6 w-full min-h-11 rounded-lg bg-[#00863f] text-white font-bold disabled:opacity-60">
           {loading ? 'Entrando…' : 'Entrar'}
         </button>
+        {bootstrapAvailable && (
+          <a href="/primeiro-acesso" className="mt-4 block text-center text-sm font-bold text-[#00863f]">
+            Primeiro acesso administrativo
+          </a>
+        )}
       </form>
     </main>
   );
