@@ -43,6 +43,7 @@ const ensureLink = (rel: string, href: string) => {
 };
 
 export function SEO(props: { title?: string; description?: string; image?: string; url?: string }) {
+  const { title, description, image, url } = props;
   const { currentView, settings } = useApp();
 
   useEffect(() => {
