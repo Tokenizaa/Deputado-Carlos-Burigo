@@ -13,6 +13,7 @@ import {
   supabasePublic,
   configureSupabaseAdmin,
   getAdminUserById,
+  getAuthenticatedAdminUser,
   getAllAdminUsers,
   getAdminAuditLogs,
   getAdminTasks,
@@ -31,6 +32,8 @@ import {
   updateAdminPage,
   rollbackAdminPage,
 } from '../server/pagesAdmin';
+
+import type { User } from '../src/types';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -56,21 +59,13 @@ async function sha256Hex(input: string): Promise<string> {
 }
 
 // Helper to extract user ID from request headers
-function getUserId(request: Request): string | null {
-  const userId = request.headers.get('x-user-id');
-  return userId ?? null;
-}
-
-// Helper to require authentication for admin endpoints
-async function requireAuth(request: Request): Promise<{ userId: string } | Response> {
-  const userId = getUserId(request);
-  if (!userId) {
-    return Response.json(
-      { error: 'Unauthorized: Missing x-user-id header' },
-      { status: 401 }
-    );
-  }
-  return { userId };
+async function requireAuth(request: Request): Promise<{ userId: string; role: string; user: User } | Response> {
+  const authorization = request.headers.get('authorization') ?? '';
+  const match = authorization.match(/^Bearer\\s+(.+)$/i);
+  if (!match) return Response.json({ error: 'Não autenticado' }, { status: 401 });
+  const user = await getAuthenticatedAdminUser(match[1]);
+  if (!user) return Response.json({ error: 'Sessão inválida ou usuário sem perfil de gabinete' }, { status: 401 });
+  return { userId: user.id, role: user.role, user };
 }
 
 // Helper to add security headers
@@ -130,7 +125,16 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
+let runtimeEnv: Env | null = null;
+
 const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
+  '/api/auth/config': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    return Response.json({
+      url: runtimeEnv?.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co',
+      publishableKey: runtimeEnv?.SUPABASE_PUBLISHABLE_KEY ?? '',
+    });
+  },
   '/api/health': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     return Response.json({
@@ -643,29 +647,11 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
     try {
-      const userId = (request.headers.get('x-user-id') as string) || undefined;
-      const user = userId ? await getAdminUserById(userId) : null;
-      const allUsers = await getAllAdminUsers();
-      return Response.json({ user, allUsers });
+      const allUsers = authResult.user.role === 'ADMIN' ? await getAllAdminUsers() : [];
+      return Response.json({ user: authResult.user, allUsers });
     } catch (error) {
       console.error('[api/auth/me] error:', error);
       return Response.json({ user: null, allUsers: [] }, { status: 500 });
-    }
-  },
-
-  '/api/auth/switch-user': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method !== 'POST') return methodNotAllowed();
-    try {
-      const { userId } = await request.json();
-      if (!userId) return Response.json({ error: 'userId é obrigatório' }, { status: 400 });
-      const user = await getAdminUserById(userId);
-      if (!user) return Response.json({ error: 'Usuário não encontrado' }, { status: 404 });
-      return Response.json({ success: true, user });
-    } catch (error) {
-      console.error('[api/auth/switch-user] error:', error);
-      return Response.json({ error: 'Falha ao alternar usuário' }, { status: 500 });
     }
   },
 
@@ -755,6 +741,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    runtimeEnv = env;
     // Cloudflare Worker: bindings live on env, not process.env. Upgrade the
     // admin client once the service key arrives so admin/auth routes work.
     if (env.SUPABASE_SERVICE_ROLE_KEY) configureSupabaseAdmin(env.SUPABASE_SERVICE_ROLE_KEY);
@@ -785,11 +772,32 @@ export default {
       if (!handler) {
         response = Response.json({ error: 'Not Found' }, { status: 404 });
       } else {
-        // Inject params into request for handlers that need them
         const enhancedRequest = request as any;
         enhancedRequest.params = params;
-        
-        response = await handler(enhancedRequest);
+
+        const method = request.method;
+        let requiredRoles: string[] | null = null;
+        if (url.pathname === '/api/auth/me' || url.pathname === '/api/auth/config') requiredRoles = [];
+        else if (url.pathname.startsWith('/api/admin/pages')) requiredRoles = method === 'GET'
+          ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'VISUALIZADOR']
+          : ['ADMIN', 'EDITOR', 'COMUNICACAO'];
+        else if (url.pathname === '/api/tasks' || url.pathname.startsWith('/api/tasks/')) requiredRoles = method === 'GET'
+          ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR']
+          : ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'];
+        else if (url.pathname === '/api/demands' || url.pathname.startsWith('/api/demands/')) requiredRoles = method === 'GET'
+          ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
+          : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
+        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
+
+        if (requiredRoles !== null) {
+          const auth = await requireAuth(enhancedRequest);
+          if (auth instanceof Response) response = auth;
+          else if (requiredRoles.length && !requiredRoles.includes(auth.role)) response = Response.json({ error: 'Acesso negado para este papel' }, { status: 403 });
+          else response = await handler(enhancedRequest);
+        } else {
+          response = await handler(enhancedRequest);
+        }
       }
     } else {
       // Non-API requests: serve static assets. `assets.not_found_handling:
