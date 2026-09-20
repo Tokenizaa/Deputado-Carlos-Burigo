@@ -70,6 +70,9 @@ interface AppContextType {
     title: string;
     slug: string;
     description?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    ogImageUrl?: string;
     status?: 'publicado' | 'rascunho';
     blocks?: PageBlock[];
     publish?: boolean;
