@@ -1,6 +1,6 @@
 export type SiteMode = 'campaign' | 'mandate' | 'institutional';
 
-export type UserRole = 'ADMIN' | 'EDITOR' | 'COMUNICAÇÃO' | 'ATENDIMENTO' | 'VISUALIZADOR';
+export type UserRole = 'ADMIN' | 'EDITOR' | 'COMUNICACAO' | 'ATENDIMENTO' | 'VISUALIZADOR';
 export type Role = UserRole;
 
 export interface User {
