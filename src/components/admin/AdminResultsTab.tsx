@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Plus, Edit2, Trash2, Award, Save } from 'lucide-react';
 import { ResultItem } from '../../types';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminResultsTab: React.FC = () => {
-  const { results, currentUser, refreshAllData, showToast } = useApp();
+  const { results, refreshAllData, showToast } = useApp();
   const [editingItem, setEditingItem] = useState<ResultItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -44,6 +45,9 @@ export const AdminResultsTab: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const url = editingItem ? `/api/results/${editingItem.id}` : '/api/results';
       const method = editingItem ? 'PUT' : 'POST';
 
@@ -51,7 +55,7 @@ export const AdminResultsTab: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           title,
@@ -79,9 +83,12 @@ export const AdminResultsTab: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir este item de prestação de contas?')) return;
     try {
+      const { data: sessionData } = await (await getSupabaseClient()).auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) { showToast('Sessão expirada. Entre novamente.', 'error'); return; }
       const res = await fetch(`/api/results/${id}`, {
         method: 'DELETE',
-        headers: { 'x-user-id': currentUser.id },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
         showToast('Item removido com sucesso.', 'success');
