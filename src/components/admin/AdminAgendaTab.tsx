@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Calendar, Plus, Edit2, Trash2, Clock, MapPin, Lock, Globe, Save } from 'lucide-react';
 import { EventItem } from '../../types';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminAgendaTab: React.FC = () => {
-  const { events, currentUser, refreshAllData, showToast } = useApp();
+  const { events, refreshAllData, showToast } = useApp();
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -50,6 +51,9 @@ export const AdminAgendaTab: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const client = await getSupabaseClient();
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session?.access_token) throw new Error('Sessão não autenticada');
       const url = editingEvent ? `/api/agenda/${editingEvent.id}` : '/api/agenda';
       const method = editingEvent ? 'PUT' : 'POST';
 
@@ -57,7 +61,7 @@ export const AdminAgendaTab: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
+          Authorization: `Bearer ${sessionData.session.access_token}`,
         },
         body: JSON.stringify({
           title,
@@ -90,9 +94,12 @@ export const AdminAgendaTab: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir este compromisso?')) return;
     try {
+      const client = await getSupabaseClient();
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session?.access_token) throw new Error('Sessão não autenticada');
       const res = await fetch(`/api/agenda/${id}`, {
         method: 'DELETE',
-        headers: { 'x-user-id': currentUser.id },
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
       });
       if (res.ok) {
         showToast('Compromisso excluído com sucesso.', 'success');
