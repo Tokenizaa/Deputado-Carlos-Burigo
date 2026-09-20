@@ -1144,10 +1144,14 @@ export default {
         else if (url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
 
         if (requiredRoles !== null) {
-          const auth = await requireAuth(enhancedRequest);
-          if (auth instanceof Response) response = auth;
-          else if (requiredRoles.length && !requiredRoles.includes(auth.role)) response = Response.json({ error: 'Acesso negado para este papel' }, { status: 403 });
-          else response = await handler(enhancedRequest);
+          if (requiredRoles.length === 0) {
+            response = await handler(enhancedRequest);
+          } else {
+            const auth = await requireAuth(enhancedRequest);
+            if (auth instanceof Response) response = auth;
+            else if (!requiredRoles.includes(auth.role)) response = Response.json({ error: 'Acesso negado para este papel' }, { status: 403 });
+            else response = await handler(enhancedRequest);
+          }
         } else {
           response = await handler(enhancedRequest);
         }
