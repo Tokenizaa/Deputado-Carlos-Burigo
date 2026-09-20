@@ -465,7 +465,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     if (request.method === 'POST') {
       if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      return respond(() => createAdminNews(await request.json(), authResult.userId), 'news POST', 'Falha ao criar notícia');
+      return respond(async () => createAdminNews(await request.json(), authResult.userId), 'news POST', 'Falha ao criar notícia');
     }
     return methodNotAllowed();
   },
@@ -482,7 +482,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     if (request.method === 'POST') {
       if (!can(authResult.role as any, 'agenda', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      return respond(() => createAdminAgenda(await request.json(), authResult.userId), 'agenda POST', 'Falha ao criar compromisso');
+      return respond(async () => createAdminAgenda(await request.json(), authResult.userId), 'agenda POST', 'Falha ao criar compromisso');
     }
     return methodNotAllowed();
   },
@@ -493,7 +493,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (!id) return Response.json({ error: 'ID da notícia não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
       if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      return respond(() => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
+      return respond(async () => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
     }
     if (request.method === 'DELETE') {
       if (!can(authResult.role as any, 'conteúdo', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
@@ -508,7 +508,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (!id) return Response.json({ error: 'ID do compromisso não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
       if (!can(authResult.role as any, 'agenda', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      return respond(() => updateAdminAgenda(id, await request.json()), 'agenda PUT', 'Falha ao atualizar compromisso');
+      return respond(async () => updateAdminAgenda(id, await request.json()), 'agenda PUT', 'Falha ao atualizar compromisso');
     }
     if (request.method === 'DELETE') {
       if (!can(authResult.role as any, 'agenda', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
