@@ -167,6 +167,48 @@ export async function getPublicSettings() {
     socialWhatsapp: data.social_whatsapp,
     seoDefaultTitle: data.seo_default_title,
     seoDefaultDescription: data.seo_default_description,
+    seoDefaultImageUrl: data.seo_default_image_url,
+    privacyPolicyText: data.privacy_policy_text,
+  };
+}
+
+export async function updateAdminSettings(input: Record<string, unknown>) {
+  const allowed = [
+    'site_mode','electoral_number','campaign_slogan','campaign_coalition','campaign_cnpj',
+    'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_whatsapp',
+    'gabinete_email','social_instagram','social_facebook','social_youtube','seo_default_title',
+    'seo_default_description','seo_default_image_url'
+  ];
+  const patch: Record<string, unknown> = {};
+  for (const key of allowed) if (key in input) patch[key] = input[key] === null ? null : String(input[key] ?? '').trim();
+  if ('site_mode' in input) patch.site_mode = input.site_mode;
+  const { data, error } = await supabaseAdmin.from('site_settings').update(patch).eq('id', true).select('*').single();
+  if (error) throw error;
+  return {
+    ...data,
+    candidateTitle: data.candidate_title,
+    mandateTitle: data.mandate_title,
+    institutionalTitle: data.institutional_title,
+    candidateName: data.candidate_name,
+    electoralNumber: data.electoral_number,
+    partyNumber: data.party_number,
+    partyName: data.party_name,
+    campaignSlogan: data.campaign_slogan,
+    campaignCnpj: data.campaign_cnpj,
+    campaignCoalition: data.campaign_coalition,
+    officialElectionDate: data.official_election_date,
+    gabineteAddressPoa: data.gabinete_address_poa,
+    gabineteAddressCaxias: data.gabinete_address_caxias,
+    gabinetePhone: data.gabinete_phone,
+    gabineteWhatsapp: data.gabinete_whatsapp,
+    gabineteEmail: data.gabinete_email,
+    socialInstagram: data.social_instagram,
+    socialFacebook: data.social_facebook,
+    socialYoutube: data.social_youtube,
+    socialWhatsapp: data.social_whatsapp,
+    seoDefaultTitle: data.seo_default_title,
+    seoDefaultDescription: data.seo_default_description,
+    seoDefaultImageUrl: data.seo_default_image_url,
     privacyPolicyText: data.privacy_policy_text,
   };
 }
@@ -716,7 +758,7 @@ export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
 
 export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
   let query = supabasePublic.from('pages')
-    .select('id,title,slug,description,status,updated_by,updated_at')
+    .select('id,title,slug,description,seo_title,seo_description,og_image_url,status,updated_by,updated_at')
     .eq('status', 'publicado')
     .order('slug', { ascending: true });
   if (slug) query = query.eq('slug', slug);
