@@ -58,6 +58,9 @@ interface AppContextType {
       title?: string;
       slug?: string;
       description?: string;
+      seoTitle?: string;
+      seoDescription?: string;
+      ogImageUrl?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
