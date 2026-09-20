@@ -163,8 +163,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetch('/api/media').then((r) => r.json()),
         fetch('/api/legislative').then((r) => r.json()),
         fetch('/api/documents').then((r) => r.json()),
-        fetch('/api/demands').then((r) => r.json()),
-        fetch('/api/audit-logs').then((r) => r.json()),
+        accessToken ? fetch('/api/demands', { headers: authHeaders }).then((r) => r.ok ? r.json() : []) : Promise.resolve([]),
+        accessToken ? fetch('/api/audit-logs', { headers: authHeaders }).then((r) => r.ok ? r.json() : []) : Promise.resolve([]),
         accessToken ? fetch('/api/tasks', { headers: authHeaders }).then((r) => r.ok ? r.json() : []) : Promise.resolve([]),
       ]);
 
