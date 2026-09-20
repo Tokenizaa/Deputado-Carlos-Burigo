@@ -11,7 +11,7 @@ import { TrajectorySection } from './TrajectorySection';
 import { VideosSection } from './VideosSection';
 import { Page, PageBlock } from '../../types';
 
-function renderBlock(block: PageBlock) {
+export function renderBlock(block: PageBlock) {
   const content = block.content || {};
   switch (block.type) {
     case 'hero': return <HeroSection key={block.id} customTitle={block.title} customSubtitle={block.subtitle} customContent={content} />;
