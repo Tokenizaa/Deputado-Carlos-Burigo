@@ -139,6 +139,12 @@ export const Navbar: React.FC = () => {
               Fale com o Deputado
             </a>
             <a
+              href="/minhas-demandas"
+              className="inline-flex items-center min-h-11 px-3 rounded-md text-sm font-semibold text-stone-700 hover:text-stone-900 hover:bg-stone-100"
+            >
+              Minhas demandas
+            </a>
+            <a
               href="/admin"
               className="ml-1 inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 hover:bg-stone-50 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
             >
