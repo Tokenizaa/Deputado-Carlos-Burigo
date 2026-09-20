@@ -68,11 +68,11 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
           <strong className="block text-3xl mt-2">{openDemands.length}</strong>
           <span className="text-xs text-stone-500">demandas abertas</span>
         </button>
-        <div className={metricClass}>
+        <button type="button" onClick={() => setActiveTab('tarefas')} className={metricClass}>
           <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Tarefas vencidas</span><AlertCircle className="w-4 h-4 text-rose-600" /></div>
           <strong className="block text-3xl mt-2">{overdueTasks.length}</strong>
           <span className="text-xs text-stone-500">precisam de atenção</span>
-        </div>
+        </button>
         <div className={metricClass}>
           <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Hoje</span><CalendarDays className="w-4 h-4 text-amber-600" /></div>
           <strong className="block text-3xl mt-2">{todayTasks.length + todayEvents.length}</strong>
@@ -92,6 +92,10 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
             <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value as typeof newTaskPriority)} className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm">
               <option value="normal">Normal</option><option value="baixa">Baixa</option><option value="alta">Alta</option><option value="urgente">Urgente</option>
             </select>
+            <select value={newTaskAssignee} onChange={e => setNewTaskAssignee(e.target.value)} aria-label="Responsável" className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm">
+              <option value="">Sem responsável</option>
+              {allUsers.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
+            </select>
             <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} aria-label="Prazo" className="min-h-[44px] border border-stone-300 rounded-lg px-3 text-sm" />
             <button type="submit" className="min-h-[44px] px-4 rounded-lg bg-[#00A550] text-white text-sm font-bold flex items-center justify-center gap-2"><Plus className="w-4 h-4" />Criar</button>
           </form>
@@ -103,7 +107,7 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
                 <button type="button" aria-label={`Concluir tarefa: ${task.title}`} onClick={() => updateTask(task.id, { status: 'concluida' })} className="w-8 h-8 rounded-full border border-stone-300 hover:border-[#00A550] hover:text-[#00A550] flex items-center justify-center shrink-0"><CheckCircle2 className="w-4 h-4" /></button>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-stone-900 truncate">{task.title}</p>
-                  <p className="text-xs text-stone-500">{task.status.replace('_', ' ')} · {formatDue(task.dueAt)}</p>
+                  <p className="text-xs text-stone-500">{task.status.replace('_', ' ')} · {formatDue(task.dueAt)}{task.assignedTo ? ` · ${allUsers.find(user => user.id === task.assignedTo)?.name || 'Responsável definido'}` : ''}</p>
                 </div>
                 <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded ${task.priority === 'urgente' || task.priority === 'alta' ? 'bg-rose-50 text-rose-700' : 'bg-stone-100 text-stone-600'}`}>{task.priority}</span>
               </div>
