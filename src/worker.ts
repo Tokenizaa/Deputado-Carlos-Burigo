@@ -725,6 +725,67 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
+  '/api/admin/invites': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar convites.' }, { status: 403 });
+    if (request.method === 'GET') {
+      return respond(() => getAdminInvites(), 'admin/invites', 'Falha ao carregar convites.');
+    }
+    if (request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const origin = new URL(request.url).origin;
+        const result = await createAdminInvite({
+          email: body.email,
+          name: body.name,
+          cargo: body.cargo,
+          role: body.role,
+          invitedBy: authResult.userId,
+          origin,
+          sendEmail: body.sendEmail !== false,
+        });
+        return Response.json(result, { status: 201 });
+      } catch (error) {
+        console.error('[api/admin/invites POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar convite.' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+
+  '/api/admin/invites/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar convites.' }, { status: 403 });
+    if (request.method !== 'PATCH') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do convite é obrigatório.' }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (body.action === 'approve') return Response.json(await approveAdminInvite(id, authResult.userId));
+      if (body.action === 'reject') return Response.json(await rejectAdminInvite(id, authResult.userId));
+      return Response.json({ error: 'Ação de convite inválida.' }, { status: 400 });
+    } catch (error) {
+      console.error('[api/admin/invites/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar convite.' }, { status: 400 });
+    }
+  },
+
+  '/api/invites/:token/accept': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'POST') return methodNotAllowed();
+    const token = (request as any).params?.token;
+    if (!token) return Response.json({ error: 'Token do convite é obrigatório.' }, { status: 400 });
+    try {
+      return Response.json(await acceptAdminInvite(token, authResult.userId, authResult.user.email));
+    } catch (error) {
+      console.error('[api/invites/:token/accept]', error);
+      return Response.json({ error: error?.message || 'Não foi possível aceitar o convite.' }, { status: 400 });
+    }
+  },
+
   '/api/audit-logs': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
@@ -787,7 +848,7 @@ export default {
         else if (url.pathname === '/api/demands' || url.pathname.startsWith('/api/demands/')) requiredRoles = method === 'GET'
           ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
-        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
+        else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];\n        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
 
         if (requiredRoles !== null) {
