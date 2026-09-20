@@ -110,6 +110,25 @@ Verificação arquitetural: o Dashboard continua consumindo `AppContext`, APIs e
 
 # FASE 19 — CMS Visual / Page Builder
 
+Status: EM EXECUÇÃO — primeira entrega concluída.
+
+Implementado:
+
+- canvas visual dentro do CMS existente;
+- os blocos reais da página aparecem em uma composição visual;
+- seleção direta do bloco;
+- edição do bloco selecionado usando o editor existente;
+- drag-and-drop nativo para reordenar blocos;
+- ordem persistida através do mesmo `page_blocks`;
+- remoção de bloco no rascunho;
+- manutenção do fluxo existente de salvar rascunho/publicar;
+- manutenção de versões e restauração;
+- reutilização dos dados e mídias reais já carregados pelo sistema.
+
+Commit da primeira entrega visual: `447f3206d906b300a3a0ff0ffa3f0868ff8cbd39`
+
+Ainda não considerar a Fase 19 encerrada: falta validar o fluxo completo no navegador e ajustar o canvas para os tipos de bloco que possuem renderização pública específica, sem criar um segundo renderizador permanente.
+
 Objetivo: evoluir o CMS existente para uma experiência visual inspirada na lógica de editores como Elementor, sem criar outro CMS.
 
 Experiência desejada:
