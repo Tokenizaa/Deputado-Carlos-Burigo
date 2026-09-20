@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Copy, Mail, Plus, RefreshCw, ShieldCheck, UserCheck, UserX } from 'lucide-react';
+import { Mail, Plus, RefreshCw, ShieldCheck, UserCheck, UserX } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { Role } from '../../types';
@@ -31,7 +31,29 @@ export const AdminUsersTab: React.FC = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [sending, setSending] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', cargo: '', role: 'EDITOR' as Role, sendEmail: true });
+
+  const pending = useMemo(() => invites.filter((invite) => ['pendente', 'aprovacao', 'aceito'].includes(invite.status)), [invites]);
+
+  const authHeaders = async () => {
+    const client = await getSupabaseClient();
+    const { data } = await client.auth.getSession();
+    if (!data.session?.access_token) throw new Error('Sessão não autenticada.');
+    return { Authorization: 'Bearer ' + data.session.access_token };
+  };
+
+  const loadInvites = async () => {
+    try {
+      const response = await fetch('/api/admin/invites', { headers: await authHeaders() });
+      const data = await response.json().catch(() => []);
+      if (!response.ok) throw new Error(data?.error || 'Falha ao carregar convites.');
+      setInvites(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao carregar convites.', 'error');
+    }
+  };
+
+  useEffect(() => { void loadInvites(); }, []);
 
   const createInvite = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -49,8 +71,6 @@ export const AdminUsersTab: React.FC = () => {
       setShowForm(false);
       if (!form.sendEmail && data.link) {
         await navigator.clipboard.writeText(data.link);
-        setCopied(data.invite.id);
-        window.setTimeout(() => setCopied(''), 2500);
         showToast('Convite criado e link copiado.', 'success');
       } else {
         showToast('Convite enviado por email.', 'success');
@@ -78,7 +98,6 @@ export const AdminUsersTab: React.FC = () => {
       showToast(error?.message || 'Falha ao atualizar convite.', 'error');
     }
   };
-
 
   return (
     <div className="space-y-8">
@@ -112,7 +131,7 @@ export const AdminUsersTab: React.FC = () => {
           <div className="flex justify-end gap-2">
             <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-stone-600">Cancelar</button>
             <button disabled={sending} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900 text-white text-sm font-bold disabled:opacity-50">
-              {form.sendEmail ? <Mail className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {form.sendEmail ? <Mail className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
               {sending ? 'Processando...' : form.sendEmail ? 'Enviar convite' : 'Gerar e copiar link'}
             </button>
           </div>
