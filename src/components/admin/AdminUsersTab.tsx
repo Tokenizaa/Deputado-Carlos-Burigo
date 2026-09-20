@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Users, Shield, CheckCircle, UserCheck } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Role } from '../../types';
 
 export const AdminUsersTab: React.FC = () => {
-  const { allUsers, currentUser, switchUser } = useApp();
+  const { allUsers, currentUser } = useApp();
 
   const roleDescriptions: Record<Role, { title: string; desc: string }> = {
     ADMIN: {
@@ -36,7 +36,7 @@ export const AdminUsersTab: React.FC = () => {
           Equipe do Gabinete & Perfis de Acesso (RBAC)
         </h2>
         <p className="text-stone-600 text-xs sm:text-sm">
-          Controle granular de papéis para assessoria parlamentar, comunicação e atendimento ao cidadão.
+          Perfis e permissões definidos pela autenticação real do gabinete.
         </p>
       </div>
 
@@ -81,15 +81,7 @@ export const AdminUsersTab: React.FC = () => {
                     {user.role}
                   </span>
 
-                  {!isCurrent && (
-                    <button
-                      onClick={() => switchUser(user.id)}
-                      className="bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
-                    >
-                      <UserCheck className="w-3.5 h-3.5 text-[#00A550]" />
-                      <span>Simular Papel</span>
-                    </button>
-                  )}
+
                 </div>
               </div>
             );
