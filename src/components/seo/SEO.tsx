@@ -42,8 +42,8 @@ const ensureLink = (rel: string, href: string) => {
   element.href = href;
 };
 
-export function SEO() {
-  const { currentView } = useApp();
+export function SEO(props: { title?: string; description?: string; image?: string; url?: string }) {
+  const { currentView, settings } = useApp();
 
   useEffect(() => {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
@@ -60,9 +60,15 @@ export function SEO() {
     ensureMeta('property', 'og:type', 'website');
     ensureMeta('property', 'og:url', canonical);
     ensureMeta('property', 'og:locale', 'pt_BR');
+    if (image) ensureMeta('property', 'og:image', image);
+    else document.head.querySelector('meta[property="og:image"]')?.remove();
+    ensureMeta('property', 'og:image:width', '1200');
+    ensureMeta('property', 'og:image:height', '630');
     ensureMeta('name', 'twitter:card', 'summary_large_image');
-    ensureMeta('name', 'twitter:title', meta.title);
-    ensureMeta('name', 'twitter:description', meta.description);
+    ensureMeta('name', 'twitter:title', title);
+    ensureMeta('name', 'twitter:description', description);
+    if (image) ensureMeta('name', 'twitter:image', image);
+    else document.head.querySelector('meta[name="twitter:image"]')?.remove();
     ensureLink('canonical', canonical);
 
     const existing = document.head.querySelector<HTMLScriptElement>('script[data-structured-data="portal"]');
@@ -81,7 +87,7 @@ export function SEO() {
     } else if (existing) {
       existing.remove();
     }
-  }, [currentView]);
+  }, [currentView, settings, props.title, props.description, props.image, props.url]);
 
   return null;
 }
