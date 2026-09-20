@@ -29,6 +29,7 @@ import { SEO } from './components/seo/SEO';
 import { AdminWorkspace } from './components/admin/AdminWorkspace';
 import { DynamicPageView } from './components/public/DynamicPageView';
 import { AdminAuthView } from './components/auth/AdminAuthView';
+import { AdminInviteAcceptView } from './components/auth/AdminInviteAcceptView';
 
 const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos']);
 
@@ -36,7 +37,7 @@ const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
   const [adminTab, setAdminTab] = useState('dashboard');
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
-  const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
+  if (pathname === 'convite') return <AdminInviteAcceptView />;\n\n  const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
 
   if (isLoading) {
     return (
