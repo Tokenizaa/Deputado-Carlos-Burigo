@@ -10,7 +10,6 @@ const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }
   { type: 'text', label: 'Texto editorial', description: 'Texto livre com título e CTA' },
   { type: 'text_image', label: 'Texto + mídia', description: 'Texto acompanhado de imagem ou vídeo' },
   { type: 'image', label: 'Mídia em destaque', description: 'Imagem ou vídeo em destaque' },
-  { type: 'gallery', label: 'Galeria', description: 'Conjunto de imagens do acervo' },
   { type: 'trajectory', label: 'Trajetória', description: 'Componente institucional existente' },
   { type: 'projects', label: 'Projetos', description: 'Projetos de lei do acervo' },
   { type: 'results', label: 'Resultados', description: 'Resultados e entregas do acervo' },
@@ -20,7 +19,6 @@ const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }
   { type: 'videos', label: 'Vídeos', description: 'Vídeos publicados' },
   { type: 'citizen_cta', label: 'CTA Cidadão', description: 'Entrada para demandas' },
   { type: 'contact', label: 'Contato', description: 'Canais de contato' },
-  { type: 'cta', label: 'CTA', description: 'Chamada para ação' },
 ];
 
 function newBlock(type: BlockType, order: number): PageBlock {
