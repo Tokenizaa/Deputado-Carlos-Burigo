@@ -57,6 +57,21 @@ No momento da execução havia 3 perfis reais no Supabase:
 
 Não foram criados usuários de teste pela fase.
 
+## Implementação executada
+
+Status atual: **IMPLEMENTADA — validação final de build pendente**.
+
+Commits principais desta execução:
+
+- `4f4dd0728aeade3e78ea3c90f38acaf6c4a3b79b` — identidade autenticada resolvida pelo Supabase.
+- `ea2e9421b506fa688d3175aa0bde1ec266c76fea` — autenticação Bearer e RBAC na API administrativa.
+- `090172b7d70b1295241fd48a89484cb793c88386` — remoção da identidade inicial fictícia.
+- `10b77774d5622f449b27906fc424e67253a3f7ff` — menu filtrado pela role real.
+- `b21bdaf67d49cd4368539395a1fb8165b65c5c90` — proteção contra acesso direto a módulo.
+- `fff5905d7c4356708c6ea53c25212db88b63357e` — tela de autenticação do gabinete.
+- `34ec7aa9081cc32fc9f505bd5167457daf096260` — operações administrativas passam a usar Bearer token.
+- `58ecee6a2037280944f4af1e92f9aeb46b577a49` — ator de tarefas/demandas derivado da sessão autenticada.
+
 ## Critério de conclusão
 
 - sessão Supabase real;
