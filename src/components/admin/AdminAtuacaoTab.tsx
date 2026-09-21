@@ -38,7 +38,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [filterCategory, setFilterCategory] = useState('TODOS');
   const [page, setPage] = useState(1);
-  const GROUPS_PER_PAGE = 8;
+  const [groupsPerPage, setGroupsPerPage] = useState(8);
 
   const loadDocuments = async () => {
     try {
@@ -104,10 +104,10 @@ export const AdminAtuacaoTab: React.FC = () => {
       .sort((a, b) => b.year - a.year || a.code.localeCompare(b.code, 'pt-BR'));
   }, [filteredDocuments, itemById]);
 
-  const totalPages = Math.max(1, Math.ceil(grouped.length / GROUPS_PER_PAGE));
-  const visibleGroups = grouped.slice((page - 1) * GROUPS_PER_PAGE, page * GROUPS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(grouped.length / groupsPerPage));
+  const visibleGroups = grouped.slice((page - 1) * groupsPerPage, page * groupsPerPage);
 
-  useEffect(() => { setPage(1); }, [filterCategory]);
+  useEffect(() => { setPage(1); }, [filterCategory, groupsPerPage]);
 
   const openCreateFromLegislativeItem = (item: (typeof legislativeItems)[number]) => {
     openCreate();
@@ -240,7 +240,15 @@ export const AdminAtuacaoTab: React.FC = () => {
               <button key={item} type="button" onClick={() => setFilterCategory(item)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filterCategory === item ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-600'}`}>{item}</button>
             ))}
           </div>
-          <span className="text-xs text-stone-500">{filteredDocuments.length} documento{filteredDocuments.length === 1 ? '' : 's'}</span>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs text-stone-500">
+              Por página
+              <select value={groupsPerPage} onChange={(e) => setGroupsPerPage(Number(e.target.value))} className="rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs font-bold text-stone-700">
+                {[5, 8, 10, 15, 20].map((value) => <option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+            <span className="text-xs text-stone-500">{filteredDocuments.length} documento{filteredDocuments.length === 1 ? '' : 's'}</span>
+          </div>
         </div>
       )}
 
@@ -303,7 +311,7 @@ export const AdminAtuacaoTab: React.FC = () => {
         </div>
       )}
 
-      {grouped.length > 0 && totalPages > 1 && (
+      {grouped.length > 0 && (
         <div className="flex items-center justify-between border-t border-stone-200 pt-3">
           <span className="text-xs text-stone-500">Página {page} de {totalPages}</span>
           <div className="flex gap-2">
