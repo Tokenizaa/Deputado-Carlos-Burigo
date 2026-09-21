@@ -233,11 +233,13 @@ export const AdminAtuacaoTab: React.FC = () => {
                 <label className="mb-1 block text-xs font-bold text-stone-700">Título</label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" />
               </div>
-                <div>
-                  <label className="mb-1 block text-xs font-bold text-stone-700">Link do documento</label>
-                  <input type="url" value={originalUrl} onChange={(e) => setOriginalUrl(e.target.value)} placeholder="https://..." className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" />
-                  <p className="mt-1 text-[11px] text-stone-400">Link externo usado como fonte do documento.</p>
-                </div>
+                <AdminAssetInput
+                  value={originalUrl}
+                  onChange={setOriginalUrl}
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png,image/webp"
+                  label="Arquivo ou link do documento"
+                  hint="Envie PDF/DOC/DOCX/TXT/imagem ou informe uma fonte externa."
+                />
                 <div>
                 <label className="mb-1 block text-xs font-bold text-stone-700">Tipo</label>
                 <select value={documentType} onChange={(e) => setDocumentType(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
