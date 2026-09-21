@@ -18,37 +18,25 @@ import {
 } from 'lucide-react';
 
 export const AdminContentTab: React.FC = () => {
-  const { settings, currentUser, refreshAllData, showToast } = useApp();
+  const { settings, refreshAllData, showToast } = useApp();
 
   const [campaignSlogan, setCampaignSlogan] = useState(settings?.campaign_slogan || '');
-  const [mandateSlogan, setMandateSlogan] = useState(
-    'Responsabilidade fiscal, apoio ao setor produtivo e defesa contínua dos municípios da Serra Gaúcha e de todo o Estado.'
-  );
-  const [phoneAlrs, setPhoneAlrs] = useState(settings?.contact_phone_alrs || '(51) 3210-4000');
-  const [phoneCaxias, setPhoneCaxias] = useState(settings?.contact_phone_caxias || '(54) 3218-1200');
-  const [whatsapp, setWhatsapp] = useState(settings?.contact_whatsapp || '54999887766');
-  const [emailOfficial, setEmailOfficial] = useState(settings?.contact_email || 'carlos.burigo@al.rs.gov.br');
-  const [electionCnpj, setElectionCnpj] = useState(settings?.election_cnpj || '58.123.456/0001-89');
-  const [campaignName, setCampaignName] = useState(
-    settings?.campaign_official_name || 'ELEIÇÃO 2026 CARLOS ROBERTO BÚRIGO DEPUTADO ESTADUAL'
-  );
-  const [coalition, setCoalition] = useState(settings?.coalition_text || 'MDB • Movimento Democrático Brasileiro');
+  const [mandateSlogan, setMandateSlogan] = useState(settings?.mandate_slogan || '');
+  const [phoneAlrs, setPhoneAlrs] = useState(settings?.gabinete_phone || '');
+  const [phoneCaxias, setPhoneCaxias] = useState(settings?.gabinete_phone_caxias || '');
+  const [whatsapp, setWhatsapp] = useState(settings?.gabinete_whatsapp || '');
+  const [emailOfficial, setEmailOfficial] = useState(settings?.gabinete_email || '');
+  const [electionCnpj, setElectionCnpj] = useState(settings?.campaign_cnpj || '');
+  const [campaignName, setCampaignName] = useState(settings?.campaign_official_name || '');
+  const [coalition, setCoalition] = useState(settings?.campaign_coalition || '');
 
-  const [instagram, setInstagram] = useState('https://instagram.com/carlosburigo');
-  const [facebook, setFacebook] = useState('https://facebook.com/carlosburigors');
-  const [youtube, setYoutube] = useState('https://youtube.com/@carlosburigors');
+  const [instagram, setInstagram] = useState(settings?.social_instagram || '');
+  const [facebook, setFacebook] = useState(settings?.social_facebook || '');
+  const [youtube, setYoutube] = useState(settings?.social_youtube || '');
 
-  const [bioHighlights, setBioHighlights] = useState([
-    'Prefeito de São José dos Ausentes por dois mandatos',
-    '9 anos Secretário da Fazenda de Caxias do Sul',
-    'Secretário-Geral e Planejamento do Governo do RS',
-    'Autor da Lei da Silvicultura (PL 332/2025)',
-  ]);
-
-  const [ctaTitle, setCtaTitle] = useState('Fale com o Gabinete de Carlos Búrigo');
-  const [ctaSubtitle, setCtaSubtitle] = useState(
-    'Apresente demandas para o seu bairro, solicitações de apoio hospitalar ou sugestões para novos projetos de lei com protocolo rastreável.'
-  );
+  const [bioHighlights, setBioHighlights] = useState(settings?.bio_highlights || []);
+  const [ctaTitle, setCtaTitle] = useState(settings?.cta_title || '');
+  const [ctaSubtitle, setCtaSubtitle] = useState(settings?.cta_subtitle || '');
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -58,19 +46,23 @@ export const AdminContentTab: React.FC = () => {
     try {
       const res = await fetch('/api/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUser.id,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           campaign_slogan: campaignSlogan,
-          contact_phone_alrs: phoneAlrs,
-          contact_phone_caxias: phoneCaxias,
-          contact_whatsapp: whatsapp,
-          contact_email: emailOfficial,
-          election_cnpj: electionCnpj,
+          mandate_slogan: mandateSlogan,
+          gabinete_phone: phoneAlrs,
+          gabinete_phone_caxias: phoneCaxias,
+          gabinete_whatsapp: whatsapp,
+          gabinete_email: emailOfficial,
+          campaign_cnpj: electionCnpj,
           campaign_official_name: campaignName,
-          coalition_text: coalition,
+          campaign_coalition: coalition,
+          social_instagram: instagram,
+          social_facebook: facebook,
+          social_youtube: youtube,
+          bio_highlights: bioHighlights,
+          cta_title: ctaTitle,
+          cta_subtitle: ctaSubtitle,
         }),
       });
 
@@ -126,7 +118,7 @@ export const AdminContentTab: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Slogan de Campanha (Modo Eleitoral 2026)
+                Slogan de Campanha
               </label>
               <textarea
                 rows={3}
@@ -136,7 +128,7 @@ export const AdminContentTab: React.FC = () => {
                 placeholder="Ex.: Trabalho sério, presença constante e resultados reais para o Rio Grande."
               />
               <span className="text-[11px] text-stone-400">
-                Exibido com destaque nas Eleições 2026 junto ao número de urna 15140.
+                Texto eleitoral público, quando aplicável.
               </span>
             </div>
 
@@ -160,7 +152,7 @@ export const AdminContentTab: React.FC = () => {
             <ShieldCheck className="w-5 h-5 text-[#00A550]" />
             <div>
               <h3 className="text-base font-bold text-stone-900">Dados Eleitorais Obrigatórios (TSE)</h3>
-              <p className="text-xs text-stone-500">Exibidos no rodapé em cumprimento à legislação</p>
+              <p className="text-xs text-stone-500">Informações eleitorais públicas, quando aplicáveis</p>
             </div>
           </div>
 
