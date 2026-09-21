@@ -26,7 +26,7 @@ import {
   getPublicDocuments,
   getPublicEvidence,
   getAdminDocuments,
-  updateAdminDocumentVisibility,
+  updateAdminDocument,
   getAdminNews,
   createAdminNews,
   updateAdminNews,
@@ -810,8 +810,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (!id) return Response.json({ error: 'ID do documento é obrigatório' }, { status: 400 });
     try {
       const body = await request.json();
-      if (typeof body?.visible !== 'boolean') return Response.json({ error: 'O campo visible deve ser booleano' }, { status: 400 });
-      const document = await updateAdminDocumentVisibility(id, body.visible);
+      const document = await updateAdminDocument(id, body);
       if (!document) return Response.json({ error: 'Documento não encontrado' }, { status: 404 });
       return Response.json(document);
     } catch (error) {
