@@ -6,10 +6,18 @@ import { useAppUi } from '../../context/AppUiContext';
 
 interface ActionsAndProjectsSectionProps {
   initialSubTab?: 'projetos' | 'votacoes' | 'participacoes' | 'resultados' | 'documentos';
+  adminMode?: boolean;
+  adminDocuments?: import('../../contracts/publicArchive').PublicDocumentDto[];
+  onToggleDocumentVisibility?: (document: import('../../contracts/publicArchive').PublicDocumentDto) => void;
 }
 type Tab = NonNullable<ActionsAndProjectsSectionProps['initialSubTab']>;
 
-export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({ initialSubTab = 'projetos' }) => {
+export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps> = ({
+  initialSubTab = 'projetos',
+  adminMode = false,
+  adminDocuments,
+  onToggleDocumentVisibility,
+}) => {
   const { setCurrentView, currentView, legislativeItems, documents } = useApp();
   const { openDocumentViewer } = useAppUi();
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -21,20 +29,21 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   );
   const [documentPage, setDocumentPage] = useState(1);
 
+  const sourceDocuments = adminMode && adminDocuments ? adminDocuments : documents;
   const publicItems = useMemo(() => legislativeItems.filter((item) => item.status === 'PUBLISHED'), [legislativeItems]);
   const votes = useMemo(() => publicItems.flatMap((item) => item.votes), [publicItems]);
   const documentsByItemId = useMemo(() => {
-    const map = new Map<string, typeof documents>();
-    documents.forEach((document) => {
+    const map = new Map<string, typeof sourceDocuments>();
+    sourceDocuments.forEach((document) => {
       if (!document.legislativeItemId || (!document.publicUrl && !document.originalUrl)) return;
       const current = map.get(document.legislativeItemId) || [];
       current.push(document);
       map.set(document.legislativeItemId, current);
     });
     return map;
-  }, [documents]);
+  }, [sourceDocuments]);
   const itemById = useMemo(() => new Map(legislativeItems.map((item) => [item.id, item])), [legislativeItems]);
-  const archiveDocuments = useMemo(() => documents.filter((document) => (
+  const archiveDocuments = useMemo(() => sourceDocuments.filter((document) => (
     document.visible !== false &&
     !document.title?.toLowerCase().includes('informativo') &&
     !document.storagePath?.toLowerCase().startsWith('informativos/')
@@ -77,7 +86,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const openDocumentSource = (document: typeof documents[number], title: string) => {
+  const openDocumentSource = (document: typeof sourceDocuments[number], title: string) => {
     const url = document.publicUrl || document.originalUrl;
     openSource(url, title, Boolean(document.publicUrl));
   };
@@ -87,7 +96,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     if (direct.length > 0) return direct;
     const item = itemById.get(itemId);
     if (!item?.sourceUrl) return [];
-    return documents.filter((document) => document.originalUrl === item.sourceUrl);
+    return sourceDocuments.filter((document) => document.originalUrl === item.sourceUrl);
   };
 
   const tabs: Array<{ id: Tab; label: string }> = [
@@ -185,7 +194,17 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                                   <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
                                     <FileText className="h-4 w-4 shrink-0" />
                                     <span className="truncate">{document.title || 'Ver documento'}</span>
+                                    {adminMode && <span className={document.visible ? 'text-emerald-700' : 'text-stone-500'}>{document.visible ? 'Visível' : 'Oculto'}</span>}
                                   </button>
+                                  {adminMode && onToggleDocumentVisibility && (
+                                    <button
+                                      type="button"
+                                      onClick={(event) => { event.stopPropagation(); onToggleDocumentVisibility(document); }}
+                                      className="min-h-11 border border-stone-300 px-3 py-2 text-xs font-bold text-stone-700 hover:border-[#008C45]"
+                                    >
+                                      {document.visible ? 'Ocultar' : 'Mostrar'}
+                                    </button>
+                                  )}
                                 ))}
                                 {documentsForItem(item.id).length === 0 && item.sourceUrl && (
                                   <button type="button" onClick={() => openSource(item.sourceUrl, 'Fonte oficial — ' + item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
