@@ -44,7 +44,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
   }, [sourceDocuments]);
   const itemById = useMemo(() => new Map(legislativeItems.map((item) => [item.id, item])), [legislativeItems]);
   const archiveDocuments = useMemo(() => sourceDocuments.filter((document) => (
-    document.visible !== false &&
+    (adminMode || document.visible !== false) &&
     !document.title?.toLowerCase().includes('informativo') &&
     !document.storagePath?.toLowerCase().startsWith('informativos/')
   )), [documents]);
