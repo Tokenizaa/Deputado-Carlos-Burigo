@@ -47,7 +47,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     (adminMode || document.visible !== false) &&
     !document.title?.toLowerCase().includes('informativo') &&
     !document.storagePath?.toLowerCase().startsWith('informativos/')
-  )), [documents]);
+  )), [sourceDocuments, adminMode]);
   const participations = useMemo(() => publicItems.flatMap((item) => item.roles.map((role) => ({ ...role, itemId: item.id, legislativeCode: item.code, legislativeTitle: item.title, year: item.year }))), [publicItems]);
 
   const filteredItems = publicItems;
@@ -99,12 +99,18 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
     return sourceDocuments.filter((document) => document.originalUrl === item.sourceUrl);
   };
 
-  const tabs: Array<{ id: Tab; label: string }> = [
-    { id: 'projetos', label: 'PROPOSIÇÕES' },
-    { id: 'votacoes', label: 'VOTAÇÕES' },
-    { id: 'participacoes', label: 'PARTICIPAÇÕES' },
-    { id: 'documentos', label: 'ACERVO DOCUMENTAL' },
-  ];
+  const tabs: Array<{ id: Tab; label: string }> = adminMode
+    ? [
+        { id: 'projetos', label: 'PROPOSIÇÕES' },
+        { id: 'votacoes', label: 'VOTAÇÕES' },
+        { id: 'participacoes', label: 'PARTICIPAÇÕES' },
+      ]
+    : [
+        { id: 'projetos', label: 'PROPOSIÇÕES' },
+        { id: 'votacoes', label: 'VOTAÇÕES' },
+        { id: 'participacoes', label: 'PARTICIPAÇÕES' },
+        { id: 'documentos', label: 'ACERVO DOCUMENTAL' },
+      ];
 
   return (
     <section className="border-y border-stone-200 bg-white py-14 sm:py-20 lg:py-24">
