@@ -177,6 +177,34 @@ export async function getPublicSettings() {
   };
 }
 
+export async function getPlatformSettings() {
+  const { data, error } = await supabaseAdmin
+    .from('platform_settings')
+    .select('id,citizen_demand_enabled')
+    .eq('id', true)
+    .single();
+  if (error) throw error;
+  return {
+    citizenDemandEnabled: Boolean(data?.citizen_demand_enabled),
+  };
+}
+
+export async function updatePlatformSettings(input: { citizenDemandEnabled: boolean }) {
+  const { data, error } = await supabaseAdmin
+    .from('platform_settings')
+    .update({
+      citizen_demand_enabled: Boolean(input.citizenDemandEnabled),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', true)
+    .select('id,citizen_demand_enabled')
+    .single();
+  if (error) throw error;
+  return {
+    citizenDemandEnabled: Boolean(data.citizen_demand_enabled),
+  };
+}
+
 export async function updateAdminSettings(input: Record<string, unknown>) {
   const allowed = [
     'mandate_slogan','bio_highlights','cta_title','cta_subtitle',
