@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Eye, FilePlus2, GripVertical, History, Layout, Pencil, Plus, Save, Send, Trash2 } from 'lucide-react';
+import { Check, Eye, FilePlus2, GripVertical, History, Layout, Pencil, Plus, Save, Send, Trash2, X } from 'lucide-react';
 import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
@@ -46,6 +46,7 @@ export const AdminPagesTab: React.FC = () => {
   const [draftBlocks, setDraftBlocks] = useState<PageBlock[]>([]);
   const [saving, setSaving] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [inlineEditing, setInlineEditing] = useState<{ blockId: string; field: 'title' | 'subtitle' | 'text' } | null>(null);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [uploadingOg, setUploadingOg] = useState(false);
@@ -110,6 +111,41 @@ export const AdminPagesTab: React.FC = () => {
     setDraftBlocks((prev) => [...prev, newBlock(type, prev.length + 1)]);
     setShowBlocks(false);
   };
+
+  const getInlineText = (block: PageBlock, field: 'title' | 'subtitle' | 'text') => {
+    if (field === 'title') return block.title || '';
+    if (field === 'subtitle') return block.subtitle || '';
+    const content = block.content || {};
+    return content.text || content.description || content.leadText || '';
+  };
+
+  const setInlineText = (blockId: string, field: 'title' | 'subtitle' | 'text', value: string) => {
+    setDraftBlocks((prev) => prev.map((block) => {
+      if (block.id !== blockId) return block;
+      if (field === 'title') return { ...block, title: value };
+      if (field === 'subtitle') return { ...block, subtitle: value };
+      return {
+        ...block,
+        content: {
+          ...(block.content || {}),
+          text: value,
+          description: value,
+          leadText: block.type === 'hero' ? value : (block.content?.leadText || undefined),
+        },
+      };
+    }));
+  };
+
+  const beginInlineEdit = (blockId: string, field: 'title' | 'subtitle' | 'text') => {
+    setSelectedBlockId(blockId);
+    setInlineEditing({ blockId, field });
+  };
+
+  const cancelInlineEdit = () => setInlineEditing(null);
+
+  const finishInlineEdit = () => setInlineEditing(null);
+
+  const isTextEditable = (block: PageBlock) => ['hero', 'text', 'text_image'].includes(block.type);
 
   const uploadOg = async (file: File) => {
     setUploadingOg(true);
@@ -227,7 +263,11 @@ export const AdminPagesTab: React.FC = () => {
                 <div className="mx-auto max-w-4xl bg-white min-h-[520px] rounded-xl border border-stone-200 shadow-sm overflow-hidden">
                   {draftBlocks.map((block, index) => {
                     const selected = selectedBlockId === block.id;
+                    const editing = inlineEditing?.blockId === block.id;
+                    const editingField = editing ? inlineEditing?.field : null;
                     const renderedBlock = renderBlock(block);
+                    const textValue = getInlineText(block, 'text');
+
                     return (
                       <div
                         key={block.id}
@@ -239,20 +279,101 @@ export const AdminPagesTab: React.FC = () => {
                         onClick={() => setSelectedBlockId(block.id)}
                         className={`relative group border-2 border-transparent hover:border-emerald-300 ${selected ? 'border-emerald-500 ring-1 ring-emerald-200' : ''} ${block.visible === false ? 'opacity-50' : ''}`}
                       >
-                        <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute left-2 top-2 z-20 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                           <GripVertical className="w-3.5 h-3.5 text-stone-400 cursor-grab" />
                           <span className="text-[9px] font-black uppercase text-stone-500">{index + 1} · {block.type}</span>
                         </div>
-                        <div className="pointer-events-none">{renderedBlock}</div>
-                        {selected && <div className="absolute right-3 top-3 flex gap-1">
-                          <button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm"><Pencil className="w-3.5 h-3.5" /> Editar</button>
-                          <button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm"><Trash2 className="w-3.5 h-3.5" /></button>
-                        </div>}
+
+                        <div>{renderedBlock}</div>
+
+                        {selected && (
+                          <div className="absolute right-3 top-3 z-20 flex gap-1">
+                            {isTextEditable(block) && !editing && (
+                              <button
+                                type="button"
+                                onClick={(event) => { event.stopPropagation(); beginInlineEdit(block.id, 'title'); }}
+                                className="action shadow-sm bg-white"
+                              >
+                                <Pencil className="w-3.5 h-3.5" /> Editar no canvas
+                              </button>
+                            )}
+                            <button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm bg-white">
+                              <Pencil className="w-3.5 h-3.5" /> Avançado
+                            </button>
+                            <button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+
+                        {editing && (
+                          <div
+                            className="absolute inset-0 z-30 bg-white/95 p-5 overflow-auto"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider font-black text-emerald-700">Edição inline</div>
+                                <div className="text-xs text-stone-500">A alteração fica no rascunho até você salvar ou publicar.</div>
+                              </div>
+                              <button type="button" onClick={cancelInlineEdit} className="icon-btn"><X className="w-4 h-4" /></button>
+                            </div>
+
+                            <div className="space-y-3 max-w-2xl">
+                              <div>
+                                <label className="label">Título</label>
+                                <input
+                                  autoFocus={editingField === 'title'}
+                                  value={getInlineText(block, 'title')}
+                                  onChange={(event) => setInlineText(block.id, 'title', event.target.value)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === 'Enter') finishInlineEdit();
+                                    if (event.key === 'Escape') cancelInlineEdit();
+                                  }}
+                                  className="field text-base font-bold"
+                                />
+                              </div>
+                              <div>
+                                <label className="label">Subtítulo</label>
+                                <input
+                                  autoFocus={editingField === 'subtitle'}
+                                  value={getInlineText(block, 'subtitle')}
+                                  onChange={(event) => setInlineText(block.id, 'subtitle', event.target.value)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === 'Enter') finishInlineEdit();
+                                    if (event.key === 'Escape') cancelInlineEdit();
+                                  }}
+                                  className="field"
+                                />
+                              </div>
+                              {isTextEditable(block) && (
+                                <div>
+                                  <label className="label">Texto</label>
+                                  <textarea
+                                    autoFocus={editingField === 'text'}
+                                    value={textValue}
+                                    onChange={(event) => setInlineText(block.id, 'text', event.target.value)}
+                                    className="field min-h-32 resize-y"
+                                  />
+                                </div>
+                              )}
+                              <div className="flex justify-end gap-2 pt-1">
+                                <button type="button" onClick={cancelInlineEdit} className="action">
+                                  <X className="w-3.5 h-3.5" /> Cancelar
+                                </button>
+                                <button type="button" onClick={finishInlineEdit} className="action action-primary">
+                                  <Check className="w-3.5 h-3.5" /> Concluir
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
                 </div>
+              </div>
               </div>
             </>
           )}
