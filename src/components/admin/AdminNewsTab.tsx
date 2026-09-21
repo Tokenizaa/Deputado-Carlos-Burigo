@@ -216,18 +216,13 @@ export const AdminNewsTab: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">
-                  URL da Imagem Principal
-                </label>
-                <input
-                  type="url"
-                  required
+              <AdminAssetInput
                   value={mainImage}
-                  onChange={(e) => setMainImage(e.target.value)}
-                  className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
+                  onChange={setMainImage}
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  label="Imagem principal *"
+                  hint="Faça upload da imagem ou informe um link externo."
                 />
-              </div>
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-1">
