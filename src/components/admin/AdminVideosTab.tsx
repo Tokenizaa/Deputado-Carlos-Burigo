@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Video, Plus, Edit2, Trash2, ExternalLink, Star, Play } from 'lucide-react';
 import { VideoItem } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
+import { AdminAssetInput } from './AdminAssetInput';
 
 export const AdminVideosTab: React.FC = () => {
   const { videos, refreshAllData, showToast } = useApp();
