@@ -209,7 +209,7 @@ export const AdminAtuacaoTab: React.FC = () => {
 
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 p-4" role="dialog" aria-modal="true">
-          <form onSubmit={saveDocument} className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+          <form onSubmit={saveDocument} className="flex max-h-[calc(100vh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-stone-200 px-5 py-4">
               <div>
                 <h3 className="font-black text-stone-900">Editar documento</h3>
@@ -217,14 +217,14 @@ export const AdminAtuacaoTab: React.FC = () => {
               </div>
               <button type="button" onClick={closeEdit} className="min-h-10 min-w-10 rounded-lg border border-stone-200" aria-label="Fechar"><X className="mx-auto h-4 w-4" /></button>
             </div>
-            <div className="grid gap-5 px-5 py-5 sm:grid-cols-[220px_1fr]">
-              <div className="overflow-hidden rounded-lg border border-stone-200 bg-stone-100">
+            <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5 md:grid-cols-[minmax(320px,1fr)_minmax(360px,1fr)]">
+              <div className="min-h-[280px] overflow-hidden rounded-lg border border-stone-200 bg-stone-100 md:min-h-[520px]">
                 {editing.mimeType?.startsWith('image/') && editing.publicUrl ? (
-                  <img src={editing.publicUrl} alt={editing.title || 'Pré-visualização'} className="h-64 w-full object-contain bg-white" />
+                  <img src={editing.publicUrl} alt={editing.title || 'Pré-visualização'} className="h-[320px] w-full object-contain bg-white md:h-[520px]" />
                 ) : editing.publicUrl ? (
-                  <iframe src={`${editing.publicUrl}#page=1&view=FitH`} title="Pré-visualização do documento" className="h-64 w-full bg-white" />
+                  <iframe src={`${editing.publicUrl}#page=1&view=FitH`} title="Pré-visualização do documento" className="h-[320px] w-full bg-white md:h-[520px]" />
                 ) : (
-                  <div className="flex h-64 items-center justify-center p-4 text-center text-xs text-stone-500">Pré-visualização indisponível</div>
+                  <div className="flex h-[320px] items-center justify-center p-4 text-center text-xs text-stone-500 md:h-[520px]">Pré-visualização indisponível</div>
                 )}
               </div>
               <div className="space-y-4">
