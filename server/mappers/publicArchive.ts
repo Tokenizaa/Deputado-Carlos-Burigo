@@ -24,6 +24,7 @@ type MediaRow = {
   source_page_url: string | null;
   sha256: string | null;
   published_at: string | null;
+  published_at: string | null;
   downloaded_at: string | null;
   verification_status: string;
   rights_status: string;
@@ -50,7 +51,7 @@ type VideoRow = {
 
 type DocumentRow = {
   id: string;
-  legislative_item_id: string;
+  legislative_item_id: string | null;
   document_type: string;
   title: string;
   original_url: string | null;
@@ -66,6 +67,10 @@ type DocumentRow = {
   created_at: string;
   updated_at: string;
   visible: boolean;
+  category: string;
+  status: string;
+  tags: string[];
+  visibility: string;
 };
 
 type EvidenceRow = {
@@ -105,6 +110,7 @@ export function mapToPublicMediaDto(row: MediaRow): PublicMediaDto {
     sourceName: row.source_name,
     sourcePageUrl: row.source_page_url,
     sha256: row.sha256,
+    publishedAt: row.published_at,
     publishedAt: row.published_at,
     downloadedAt: row.downloaded_at,
     verificationStatus: row.verification_status,
@@ -166,6 +172,10 @@ export function mapToPublicDocumentDto(row: DocumentRow): PublicDocumentDto {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     visible: row.visible !== false,
+    category: row.category,
+    status: row.status,
+    tags: row.tags ?? [],
+    visibility: row.visibility,
   };
 }
 
