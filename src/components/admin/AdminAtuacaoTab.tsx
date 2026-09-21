@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Edit3, Eye, EyeOff, FileText, Save, X } from 'lucide-react';
+import { Edit3, Eye, EyeOff, FileText, Plus, Save, X } from 'lucide-react';
 import type { PublicDocumentDto } from '../../contracts/publicArchive';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
 import { AdminAssetInput } from './AdminAssetInput';
 
-const DOCUMENT_TYPES = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO'];
+const DOCUMENT_TYPES = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO', 'INFORMATIVO'];
+const CATEGORIES = ['parlamentar', 'gabinete', 'comunicacao', 'outros'];
+const STATUSES = ['rascunho', 'publicado', 'arquivado'];
+const VISIBILITIES = ['publico', 'interno', 'restrito'];
 
 export const AdminAtuacaoTab: React.FC = () => {
   const { legislativeItems, showToast } = useApp();
@@ -17,7 +20,19 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [documentType, setDocumentType] = useState('');
   const [visible, setVisible] = useState(true);
   const [originalUrl, setOriginalUrl] = useState('');
+  const [storagePath, setStoragePath] = useState('');
+  const [mimeType, setMimeType] = useState('');
+  const [fileSize, setFileSize] = useState<number | null>(null);
+  const [category, setCategory] = useState('parlamentar');
+  const [status, setStatus] = useState('publicado');
+  const [tags, setTags] = useState('');
+  const [visibility, setVisibility] = useState('publico');
+  const [sourceName, setSourceName] = useState('');
+  const [publishedAt, setPublishedAt] = useState('');
+  const [notes, setNotes] = useState('');
+  const [legislativeItemId, setLegislativeItemId] = useState('');
   const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [filterType, setFilterType] = useState('TODOS');
   const [page, setPage] = useState(1);
   const GROUPS_PER_PAGE = 8;
@@ -70,12 +85,28 @@ export const AdminAtuacaoTab: React.FC = () => {
 
   useEffect(() => { setPage(1); }, [filterType]);
 
+  const openCreate = () => {
+    setEditing({ id: '', legislativeItemId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
+    setTitle(''); setDocumentType(''); setOriginalUrl(''); setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setVisible(true);
+  };
+
   const openEdit = (document: PublicDocumentDto) => {
     setEditing(document);
     setTitle(document.title || '');
     setDocumentType(document.documentType || '');
     setVisible(document.visible !== false);
     setOriginalUrl(document.originalUrl || '');
+    setStoragePath(document.storagePath || '');
+    setMimeType(document.mimeType || '');
+    setFileSize(document.fileSize || null);
+    setCategory(document.category || 'parlamentar');
+    setStatus(document.status || 'publicado');
+    setTags((document.tags || []).join(', '));
+    setVisibility(document.visibility || 'publico');
+    setSourceName(document.sourceName || '');
+    setPublishedAt(document.publishedAt || '');
+    setNotes(document.notes || '');
+    setLegislativeItemId(document.legislativeItemId || '');
   };
 
   const closeEdit = () => {
@@ -84,6 +115,30 @@ export const AdminAtuacaoTab: React.FC = () => {
     setDocumentType('');
     setVisible(true);
     setOriginalUrl('');
+    setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId('');
+  };
+
+  const createDocument = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setCreating(true);
+    try {
+      const client = await getSupabaseClient();
+      const { data } = await client.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error('Sessão expirada. Entre novamente.');
+      const response = await fetch('/api/admin/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim(), storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload?.error || 'Falha ao criar documento.');
+      setDocuments((current) => [payload, ...current]);
+      showToast('Documento criado.', 'success');
+      closeEdit();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Falha ao criar documento.', 'error');
+    } finally { setCreating(false); }
   };
 
   const saveDocument = async (event: React.FormEvent) => {
@@ -99,7 +154,7 @@ export const AdminAtuacaoTab: React.FC = () => {
       const response = await fetch(`/api/admin/documents/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim() || null, visible }),
+        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim() || null, storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao salvar documento.');
@@ -138,6 +193,10 @@ export const AdminAtuacaoTab: React.FC = () => {
         <h2 className="text-xl font-black tracking-tight text-stone-900">Gestão Documental</h2>
         <p className="text-sm text-stone-500">Documentos do gabinete, atuação parlamentar e publicação no site.</p>
       </header>
+
+      <div className="flex justify-end">
+        <button type="button" onClick={openCreate} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-stone-900 px-4 text-xs font-bold text-white"><Plus className="h-4 w-4" /> Novo documento</button>
+      </div>
 
       {loaded && documents.length > 0 && (
         <div className="flex flex-col gap-3 border-y border-stone-200 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -213,8 +272,8 @@ export const AdminAtuacaoTab: React.FC = () => {
           <form onSubmit={saveDocument} className="flex max-h-[calc(100vh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-stone-200 px-5 py-4">
               <div>
-                <h3 className="font-black text-stone-900">Editar documento</h3>
-                <p className="text-xs text-stone-500">As alterações refletem no acervo público.</p>
+                <h3 className="font-black text-stone-900">{editing.id ? 'Editar documento' : 'Novo documento'}</h3>
+                <p className="text-xs text-stone-500">Metadados, arquivo, classificação e publicação.</p>
               </div>
               <button type="button" onClick={closeEdit} className="min-h-10 min-w-10 rounded-lg border border-stone-200" aria-label="Fechar"><X className="mx-auto h-4 w-4" /></button>
             </div>
@@ -236,6 +295,7 @@ export const AdminAtuacaoTab: React.FC = () => {
                 <AdminAssetInput
                   value={originalUrl}
                   onChange={setOriginalUrl}
+                  onUploaded={({ storagePath: nextPath, mimeType: nextMimeType, size }) => { setStoragePath(nextPath); setMimeType(nextMimeType); setFileSize(size); }}
                   accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png,image/webp"
                   label="Arquivo ou link do documento"
                   hint="Envie PDF/DOC/DOCX/TXT/imagem ou informe uma fonte externa."
@@ -245,6 +305,22 @@ export const AdminAtuacaoTab: React.FC = () => {
                 <select value={documentType} onChange={(e) => setDocumentType(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
                   <option value="">Documento</option>
                   {DOCUMENT_TYPES.map((type) => <option key={type} value={type}>{type.replace('_', ' ')}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="block text-xs font-bold text-stone-700">Categoria<select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <label className="block text-xs font-bold text-stone-700">Status<select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <label className="block text-xs font-bold text-stone-700">Visibilidade<select value={visibility} onChange={(e) => setVisibility(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{VISIBILITIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <label className="block text-xs font-bold text-stone-700">Data de publicação<input type="date" value={publishedAt} onChange={(e) => setPublishedAt(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></label>
+              </div>
+              <div><label className="mb-1 block text-xs font-bold text-stone-700">Tags</label><input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="ex.: PL, saúde, orçamento" className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
+              <div><label className="mb-1 block text-xs font-bold text-stone-700">Fonte</label><input value={sourceName} onChange={(e) => setSourceName(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
+              <div><label className="mb-1 block text-xs font-bold text-stone-700">Observações</label><textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
+              <div>
+                <label className="mb-1 block text-xs font-bold text-stone-700">Proposição vinculada</label>
+                <select value={legislativeItemId} onChange={(e) => setLegislativeItemId(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
+                  <option value="">Sem proposição vinculada</option>
+                  {legislativeItems.map((item) => <option key={item.id} value={item.id}>{item.code} — {item.title}</option>)}
                 </select>
               </div>
               <label className="flex items-center justify-between rounded-lg border border-stone-200 px-3 py-3">
@@ -258,7 +334,7 @@ export const AdminAtuacaoTab: React.FC = () => {
             </div>
             <div className="flex justify-end gap-2 border-t border-stone-200 px-5 py-4">
               <button type="button" onClick={closeEdit} className="rounded-lg border border-stone-300 px-4 py-2.5 text-xs font-bold">Cancelar</button>
-              <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#00A550] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-50"><Save className="h-4 w-4" />{saving ? 'Salvando...' : 'Salvar'}</button>
+              <button type="submit" onClick={(event) => { if (!editing?.id) { event.preventDefault(); void createDocument(event); } }} disabled={saving || creating} className="inline-flex items-center gap-2 rounded-lg bg-[#00A550] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-50"><Save className="h-4 w-4" />{saving || creating ? 'Salvando...' : 'Salvar'}</button>
             </div>
           </form>
         </div>
