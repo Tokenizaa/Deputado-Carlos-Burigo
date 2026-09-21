@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Image as ImageIcon, Upload, Copy, Trash2, Check, User, Tag } from 'lucide-react';
 import { MediaItem } from '../../types';
+import { AdminAssetInput } from './AdminAssetInput';
 
 export const AdminMediaTab: React.FC = () => {
   const { media, currentUser, refreshAllData, showToast } = useApp();
