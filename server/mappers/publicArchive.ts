@@ -52,6 +52,7 @@ type VideoRow = {
 type DocumentRow = {
   id: string;
   legislative_item_id: string | null;
+  evidence_id: string | null;
   document_type: string;
   title: string;
   original_url: string | null;
@@ -156,6 +157,7 @@ export function mapToPublicDocumentDto(row: DocumentRow): PublicDocumentDto {
   return {
     id: row.id,
     legislativeItemId: row.legislative_item_id,
+    evidenceId: row.evidence_id,
     documentType: row.document_type,
     title: row.title,
     originalUrl: row.original_url,
