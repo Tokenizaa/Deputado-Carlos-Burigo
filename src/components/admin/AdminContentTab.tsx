@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 import {
   FileText,
   Save,
@@ -37,6 +38,34 @@ export const AdminContentTab: React.FC = () => {
   const [bioHighlights, setBioHighlights] = useState(settings?.bio_highlights || []);
   const [ctaTitle, setCtaTitle] = useState(settings?.cta_title || '');
   const [ctaSubtitle, setCtaSubtitle] = useState(settings?.cta_subtitle || '');
+  const [seoTitle, setSeoTitle] = useState(settings?.seo_default_title || '');
+  const [seoDescription, setSeoDescription] = useState(settings?.seo_default_description || '');
+  const [seoImageUrl, setSeoImageUrl] = useState(settings?.seo_default_image_url || '');
+  const [privacyPolicyText, setPrivacyPolicyText] = useState(settings?.privacy_policy_text || '');
+  const [uploadingOg, setUploadingOg] = useState(false);
+
+  const handleOgImageUpload = async (file: File) => {
+    setUploadingOg(true);
+    try {
+      const session = (await (await getSupabaseClient()).auth.getSession()).data.session;
+      if (!session?.access_token) throw new Error('Sessão não autenticada');
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/admin/og-image', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: form,
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Falha ao enviar imagem');
+      setSeoImageUrl(json.url);
+      showToast('Imagem Open Graph enviada. Salve o conteúdo para publicar.', 'success');
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao enviar imagem Open Graph', 'error');
+    } finally {
+      setUploadingOg(false);
+    }
+  };
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -60,6 +89,10 @@ export const AdminContentTab: React.FC = () => {
         bio_highlights: bioHighlights,
         cta_title: ctaTitle,
         cta_subtitle: ctaSubtitle,
+        seo_default_title: seoTitle,
+        seo_default_description: seoDescription,
+        seo_default_image_url: seoImageUrl,
+        privacy_policy_text: privacyPolicyText,
       });
       if (success) {
         showToast('Conteúdo institucional salvo com sucesso!', 'success');
@@ -323,6 +356,38 @@ export const AdminContentTab: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <section className="border-t border-stone-200 pt-8 space-y-6">
+          <div>
+            <h3 className="text-lg font-black text-stone-900">SEO e compartilhamento</h3>
+            <p className="text-sm text-stone-600 mt-1">Configurações públicas de busca e Open Graph. SEO específico de cada página continua no editor da página.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <label className="block">
+              <span className="block text-xs font-bold text-stone-700 mb-1">Título padrão</span>
+              <input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5" />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-bold text-stone-700 mb-1">Descrição padrão</span>
+              <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} rows={3} className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5" />
+            </label>
+            <div>
+              <span className="block text-xs font-bold text-stone-700 mb-1">Imagem Open Graph</span>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input type="file" accept="image/png,image/jpeg,image/webp" disabled={uploadingOg} onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleOgImageUpload(file); }} className="w-full text-sm" />
+                <input value={seoImageUrl} onChange={(e) => setSeoImageUrl(e.target.value)} placeholder="URL da imagem" className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-stone-200 pt-8 space-y-4">
+          <div>
+            <h3 className="text-lg font-black text-stone-900">Política de Privacidade</h3>
+            <p className="text-sm text-stone-600 mt-1">Texto público exibido na página de privacidade. Regras técnicas de proteção e acesso ficam em Configurações.</p>
+          </div>
+          <textarea value={privacyPolicyText} onChange={(e) => setPrivacyPolicyText(e.target.value)} rows={16} placeholder="Informe a política de privacidade pública." className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-3 leading-relaxed" />
+        </section>
 
       </form>
     </div>
