@@ -73,7 +73,7 @@ const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
     { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
     { id: 'cidadão', label: 'Atendimento', icon: Inbox, badge: pendingDemandsCount > 0 ? pendingDemandsCount : null },
     { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
-    { id: 'atuação', label: 'Mandato', icon: FileCode2, badge: null },
+    { id: 'gestao-documental', label: 'Gestão Documental', icon: FileCode2, badge: null },
     { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
     { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
     { id: 'administração', label: 'Equipe', icon: Users, badge: null },
