@@ -9,6 +9,7 @@ type Props = {
   label?: string;
   hint?: string;
   disabled?: boolean;
+  onUploaded?: (asset: { url: string; storagePath: string; mimeType: string; size: number }) => void;
 };
 
 export const AdminAssetInput: React.FC<Props> = ({
@@ -18,6 +19,7 @@ export const AdminAssetInput: React.FC<Props> = ({
   label = 'Arquivo',
   hint = 'Envie um arquivo ou informe um link externo.',
   disabled = false,
+  onUploaded,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -40,6 +42,7 @@ export const AdminAssetInput: React.FC<Props> = ({
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao enviar arquivo.');
       onChange(payload.url);
+      onUploaded?.({ url: payload.url, storagePath: payload.storagePath, mimeType: payload.mimeType, size: payload.size });
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Falha ao enviar arquivo.');
     } finally {
