@@ -78,12 +78,12 @@ try {
 
         <label className="block mt-4 text-sm font-bold text-stone-800">
           Senha
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" minLength={8} autoComplete="new-password" required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" minLength={12} autoComplete="new-password" required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
         </label>
 
         <label className="block mt-4 text-sm font-bold text-stone-800">
           Confirmar senha
-          <input value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} type="password" minLength={8} autoComplete="new-password" required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+          <input value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} type="password" minLength={12} autoComplete="new-password" required className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
         </label>
 
         {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
