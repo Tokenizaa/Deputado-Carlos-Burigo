@@ -25,7 +25,6 @@ type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'gestao-documental' | 'con
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
   'gestao-documental': [
     { id: 'documentos', label: 'Documentos' },
-    { id: 'atuacao', label: 'Atuação parlamentar' },
   ],
   conteúdo: [
     { id: 'pages', label: 'Páginas' },
@@ -66,7 +65,6 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
   const renderSubTab = () => {
     switch (subTab) {
       case 'documentos': return <AdminAtuacaoTab />;
-      case 'atuacao': return <AdminAtuacaoTab />;
       case 'pages': return <AdminPagesTab />;
       case 'news': return <AdminNewsTab />;
       case 'agenda': return <AdminAgendaTab />;
