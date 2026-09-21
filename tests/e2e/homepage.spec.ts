@@ -1,15 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { trackPageErrors, RENDER_TIMEOUT } from './helpers';
 
-// Bug de console conhecido (não fatal): React key warning no AgendaCalendar,
-// emitido em dev. Reportado no relatório E2E; não bloqueia render da homepage.
-const KNOWN_AGENDA_CALENDAR_KEY_WARNING = /Check the render method of `AgendaCalendar`/;
-
 test('homepage carrega com identidade do deputado visível e sem erros de console', async ({ page }) => {
   test.setTimeout(150_000);
-  const { pageErrors, consoleErrors } = trackPageErrors(page, {
-    allowConsole: [KNOWN_AGENDA_CALENDAR_KEY_WARNING],
-  });
+  const { pageErrors, consoleErrors } = trackPageErrors(page);
 
   await page.goto('/');
 

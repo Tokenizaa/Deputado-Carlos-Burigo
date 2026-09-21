@@ -503,6 +503,14 @@ if (!can(role as UserRole, 'configurações', 'manage_settings')) {
     if (request.method !== 'POST') return methodNotAllowed();
     if (!can(authResult.role as any, 'configurações', 'manage_settings') && !can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
+      // Defensive: formData() throws TypeError when body is empty or not
+      // multipart/form-data (e.g. JSON/axios), leaking the engine message into
+      // the 400. Cheap content-type guard keeps the contract (400) with a
+      // clean, stable error.
+      const contentType = request.headers.get('content-type') ?? '';
+      if (!contentType.includes('multipart/form-data')) {
+        return Response.json({ error: 'Envie o arquivo de imagem como multipart/form-data' }, { status: 400 });
+      }
       const form = await request.formData();
       const file = form.get('file');
       if (!(file instanceof File)) return Response.json({ error: 'Arquivo de imagem é obrigatório' }, { status: 400 });
@@ -644,6 +652,12 @@ if (request.method === 'DELETE') {
     if (!can(authResult.role as any, 'gestao-documental', 'create') && !can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     if (request.method !== 'POST') return methodNotAllowed();
     try {
+      // Defensive: same empty-body/JSON guard as /api/admin/og-image — keeps
+      // the 400 contract stable instead of surfacing a TypeError leak.
+      const contentType = request.headers.get('content-type') ?? '';
+      if (!contentType.includes('multipart/form-data')) {
+        return Response.json({ error: 'Envie o arquivo como multipart/form-data' }, { status: 400 });
+      }
       const form = await request.formData();
       const file = form.get('file');
       const visibility = String(form.get('visibility') || 'publico');
@@ -1455,6 +1469,12 @@ export default {
         else if (url.pathname === '/api/tasks' || url.pathname.startsWith('/api/tasks/')) requiredRoles = method === 'GET'
           ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'];
+        // /api/demands = contrato INTERNO de gabinete (suíte administrativa).
+        // Listagem/edição exige usuário de gabinete autenticado (RBAC); o
+        // cidadão NÃO lista via esta rota — usa /api/citizen/demands, escopada
+        // por citizen_user_id (worker.ts:1255). GET: ADMIN/EDITOR/ATENDIMENTO/
+        // VISUALIZADOR; writes: ADMIN/EDITOR/ATENDIMENTO. COMUNICACAO não vê
+        // demandas em nenhum método.
         else if (url.pathname === '/api/demands' || url.pathname.startsWith('/api/demands/')) requiredRoles = method === 'GET'
           ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];

@@ -188,7 +188,7 @@ export const AgendaCalendar: React.FC<AgendaCalendarProps> = ({
               const isToday = dateKey === todayKey;
 
               return (
-                <div role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="text-left w-full min-h-24 sm:min-h-32 border-r border-b border-stone-200 p-1.5 sm:p-2 hover:bg-stone-50 cursor-pointer">
+                  <div key={dateKey} role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="text-left w-full min-h-24 sm:min-h-32 border-r border-b border-stone-200 p-1.5 sm:p-2 hover:bg-stone-50 cursor-pointer">
                   <div className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold mb-1 ${isToday ? 'bg-[#00A550] text-white' : 'text-stone-700'}`}>
                     {day}
                   </div>

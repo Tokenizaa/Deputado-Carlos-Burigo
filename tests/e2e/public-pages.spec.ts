@@ -1,9 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { trackPageErrors, RENDER_TIMEOUT } from './helpers';
 
-// AgendaCalendar renderiza na página /agenda → mesmo key warning em dev (não fatal).
-const KNOWN_AGENDA_CALENDAR_KEY_WARNING = /Check the render method of `AgendaCalendar`/;
-
 const publicPages = [
   { path: '/noticias', heading: /Notícias & Posicionamentos Oficiais/ },
   { path: '/agenda', heading: /Agenda Pública/ },
@@ -13,9 +10,7 @@ const publicPages = [
 for (const { path, heading } of publicPages) {
   test(`página pública ${path} renderiza sem crash`, async ({ page }) => {
     test.setTimeout(150_000);
-    const { pageErrors, consoleErrors } = trackPageErrors(page, {
-      allowConsole: [KNOWN_AGENDA_CALENDAR_KEY_WARNING],
-    });
+    const { pageErrors, consoleErrors } = trackPageErrors(page);
 
     await page.goto(path);
 
