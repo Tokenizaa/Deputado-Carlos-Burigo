@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, Eye, FilePlus2, GripVertical, History, Image as ImageIcon, Layout, Pencil, Plus, Save, Send, Trash2, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FilePlus2, GripVertical, History, Image as ImageIcon, Layout, Pencil, Plus, Save, Send, Trash2, X } from 'lucide-react';
 import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
@@ -95,6 +95,21 @@ export const AdminPagesTab: React.FC = () => {
     setDraftBlocks((prev) => prev.filter((block) => block.id !== id).map((block, index) => ({ ...block, order: index + 1 })));
     setSelectedBlockId((current) => current === id ? null : current);
   };
+
+  const duplicateBlock = (id: string) => {
+    setDraftBlocks((prev) => {
+      const index = prev.findIndex((block) => block.id === id);
+      if (index < 0) return prev;
+      const source = prev[index];
+      const copy: PageBlock = { ...JSON.parse(JSON.stringify(source)), id: `draft-${Date.now()}-${index + 1}`, title: source.title ? `${source.title} (cópia)` : source.title };
+      const next = [...prev]; next.splice(index + 1, 0, copy);
+      return next.map((block, position) => ({ ...block, order: position + 1 }));
+    });
+    setSelectedBlockId(null);
+    showToast('Bloco duplicado no rascunho. Salve para persistir.', 'success');
+  };
+
+  const toggleBlockVisibility = (id: string) => setDraftBlocks((prev) => prev.map((block) => block.id === id ? { ...block, visible: block.visible === false } : block));
 
   const moveBlockByDrag = (sourceId: string, targetId: string) => {
     if (sourceId === targetId) return;
@@ -414,6 +429,10 @@ export const AdminPagesTab: React.FC = () => {
                             <button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm bg-white">
                               <Pencil className="w-3.5 h-3.5" /> Avançado
                             </button>
+                            <button type="button" title={block.visible === false ? 'Mostrar bloco' : 'Ocultar bloco'} onClick={(event) => { event.stopPropagation(); toggleBlockVisibility(block.id); }} className="icon-btn bg-white shadow-sm">{block.visible === false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}</button>
+                            <button type="button" title="Duplicar bloco" onClick={(event) => { event.stopPropagation(); duplicateBlock(block.id); }} className="icon-btn bg-white shadow-sm"><Copy className="w-3.5 h-3.5" /></button>
+                            <button type="button" title="Mover para cima" disabled={index === 0} onClick={(event) => { event.stopPropagation(); moveBlock(index, -1); }} className="icon-btn bg-white shadow-sm"><ChevronUp className="w-3.5 h-3.5" /></button>
+                            <button type="button" title="Mover para baixo" disabled={index === draftBlocks.length - 1} onClick={(event) => { event.stopPropagation(); moveBlock(index, 1); }} className="icon-btn bg-white shadow-sm"><ChevronDown className="w-3.5 h-3.5" /></button>
                             <button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -520,6 +539,13 @@ export const AdminPagesTab: React.FC = () => {
                       </div>
                     );
                   })}
+                  {draftBlocks.length > 0 && (
+                    <div className="flex justify-center py-2 bg-stone-100">
+                      <button type="button" onClick={() => setShowBlocks(true)} className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-3 py-1.5 text-[10px] font-black text-stone-500 hover:text-emerald-700 hover:border-emerald-400">
+                        <Plus className="w-3 h-3" /> Adicionar seção
+                      </button>
+                    </div>
+                  )}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
                 </div>
               </div>
