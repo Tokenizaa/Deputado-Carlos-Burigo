@@ -47,6 +47,7 @@ export const AdminPagesTab: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [inlineEditing, setInlineEditing] = useState<{ blockId: string; field: 'title' | 'subtitle' | 'text' } | null>(null);
+  const [inlineOriginal, setInlineOriginal] = useState<PageBlock | null>(null);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [uploadingOg, setUploadingOg] = useState(false);
@@ -137,13 +138,25 @@ export const AdminPagesTab: React.FC = () => {
   };
 
   const beginInlineEdit = (blockId: string, field: 'title' | 'subtitle' | 'text') => {
+    const block = draftBlocks.find((item) => item.id === blockId);
+    if (!block) return;
     setSelectedBlockId(blockId);
+    setInlineOriginal(JSON.parse(JSON.stringify(block)));
     setInlineEditing({ blockId, field });
   };
 
-  const cancelInlineEdit = () => setInlineEditing(null);
+  const cancelInlineEdit = () => {
+    if (inlineOriginal) {
+      setDraftBlocks((prev) => prev.map((block) => block.id === inlineOriginal.id ? inlineOriginal : block));
+    }
+    setInlineOriginal(null);
+    setInlineEditing(null);
+  };
 
-  const finishInlineEdit = () => setInlineEditing(null);
+  const finishInlineEdit = () => {
+    setInlineOriginal(null);
+    setInlineEditing(null);
+  };
 
   const isTextEditable = (block: PageBlock) => ['hero', 'text', 'text_image'].includes(block.type);
 
@@ -373,7 +386,6 @@ export const AdminPagesTab: React.FC = () => {
                   })}
                   {!draftBlocks.length && <div className="border-2 border-dashed border-stone-300 m-5 rounded-xl p-16 text-center text-sm text-stone-500">Adicione um bloco para começar a montar esta página.</div>}
                 </div>
-              </div>
               </div>
             </>
           )}
