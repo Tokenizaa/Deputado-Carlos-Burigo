@@ -495,9 +495,18 @@ export async function getAdminDocuments() {
   });
 }
 
-export async function updateAdminDocumentVisibility(id: string, visible: boolean) {
+export async function updateAdminDocument(id: string, input: Record<string, unknown>) {
+  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if ('visible' in input) {
+    if (typeof input.visible !== 'boolean') throw new Error('O campo visible deve ser booleano');
+    patch.visible = input.visible;
+  }
+  if ('title' in input) patch.title = String(input.title ?? '').trim();
+  if ('documentType' in input) patch.document_type = String(input.documentType ?? '').trim();
+  if ('notes' in input) patch.notes = String(input.notes ?? '').trim();
+
   const { data, error } = await supabaseAdmin.from('documents')
-    .update({ visible, updated_at: new Date().toISOString() })
+    .update(patch)
     .eq('id', id)
     .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
     .maybeSingle();
