@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Calendar, Plus, Edit2, Trash2, Clock, MapPin, Lock, Globe, Save } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 import { EventItem } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
+import { AgendaCalendar } from '../shared/AgendaCalendar';
 
 export const AdminAgendaTab: React.FC = () => {
   const { events, refreshAllData, showToast } = useApp();
@@ -259,7 +260,11 @@ export const AdminAgendaTab: React.FC = () => {
         </div>
       )}
 
-      {/* A agenda agora é exibida em calendário mensal; a edição continua sendo feita pelo formulário acima. */}
+      <AgendaCalendar
+        events={events}
+        adminMode
+        onEventClick={startEdit}
+      />
 
     </div>
   );
