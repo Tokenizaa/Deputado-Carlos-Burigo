@@ -15,6 +15,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [title, setTitle] = useState('');
   const [documentType, setDocumentType] = useState('');
   const [visible, setVisible] = useState(true);
+  const [originalUrl, setOriginalUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [filterType, setFilterType] = useState('TODOS');
   const [page, setPage] = useState(1);
@@ -73,6 +74,7 @@ export const AdminAtuacaoTab: React.FC = () => {
     setTitle(document.title || '');
     setDocumentType(document.documentType || '');
     setVisible(document.visible !== false);
+    setOriginalUrl(document.originalUrl || '');
   };
 
   const closeEdit = () => {
@@ -80,6 +82,7 @@ export const AdminAtuacaoTab: React.FC = () => {
     setTitle('');
     setDocumentType('');
     setVisible(true);
+    setOriginalUrl('');
   };
 
   const saveDocument = async (event: React.FormEvent) => {
@@ -95,7 +98,7 @@ export const AdminAtuacaoTab: React.FC = () => {
       const response = await fetch(`/api/admin/documents/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: title.trim(), documentType, visible }),
+        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim() || null, visible }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao salvar documento.');
@@ -214,12 +217,27 @@ export const AdminAtuacaoTab: React.FC = () => {
               </div>
               <button type="button" onClick={closeEdit} className="min-h-10 min-w-10 rounded-lg border border-stone-200" aria-label="Fechar"><X className="mx-auto h-4 w-4" /></button>
             </div>
-            <div className="space-y-4 px-5 py-5">
+            <div className="grid gap-5 px-5 py-5 sm:grid-cols-[220px_1fr]">
+              <div className="overflow-hidden rounded-lg border border-stone-200 bg-stone-100">
+                {editing.mimeType?.startsWith('image/') && editing.publicUrl ? (
+                  <img src={editing.publicUrl} alt={editing.title || 'Pré-visualização'} className="h-64 w-full object-contain bg-white" />
+                ) : editing.publicUrl ? (
+                  <iframe src={`${editing.publicUrl}#page=1&view=FitH`} title="Pré-visualização do documento" className="h-64 w-full bg-white" />
+                ) : (
+                  <div className="flex h-64 items-center justify-center p-4 text-center text-xs text-stone-500">Pré-visualização indisponível</div>
+                )}
+              </div>
+              <div className="space-y-4">
               <div>
                 <label className="mb-1 block text-xs font-bold text-stone-700">Título</label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" />
               </div>
-              <div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-stone-700">Link do documento</label>
+                  <input type="url" value={originalUrl} onChange={(e) => setOriginalUrl(e.target.value)} placeholder="https://..." className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" />
+                  <p className="mt-1 text-[11px] text-stone-400">Link externo usado como fonte do documento.</p>
+                </div>
+                <div>
                 <label className="mb-1 block text-xs font-bold text-stone-700">Tipo</label>
                 <select value={documentType} onChange={(e) => setDocumentType(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
                   <option value="">Documento</option>
@@ -233,6 +251,7 @@ export const AdminAtuacaoTab: React.FC = () => {
                 </span>
                 <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} className="h-5 w-5" />
               </label>
+              </div>
             </div>
             <div className="flex justify-end gap-2 border-t border-stone-200 px-5 py-4">
               <button type="button" onClick={closeEdit} className="rounded-lg border border-stone-300 px-4 py-2.5 text-xs font-bold">Cancelar</button>
