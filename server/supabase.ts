@@ -1138,6 +1138,27 @@ if (!profile) continue; // skip if no profile (should not happen)
   }
 }
 
+export async function createAdminAuditLog(input: {
+  userId: string | null;
+  userName: string;
+  userRole: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  details?: Record<string, unknown>;
+}): Promise<void> {
+  const { error } = await supabaseAdmin.from('audit_logs').insert({
+    user_id: input.userId,
+    user_name: input.userName,
+    user_role: input.userRole,
+    action: input.action,
+    entity_type: input.entityType,
+    entity_id: input.entityId,
+    details: input.details ?? {},
+  });
+  if (error) throw error;
+}
+
 export async function getAdminAuditLogs(): Promise<AuditLog[]> {
   const { data, error } = await supabaseAdmin.from('audit_logs')
     .select('id, user_id, user_name, user_role, action, entity_type, entity_id, details, created_at')
