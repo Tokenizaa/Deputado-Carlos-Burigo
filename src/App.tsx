@@ -21,7 +21,6 @@ import { ContactView } from './components/public/ContactView';
 import { AccessibilityBar } from './components/accessibility/AccessibilityBar';
 import { AboutView } from './components/public/AboutView';
 import { TrajectoryView } from './components/public/TrajectoryView';
-import { CampaignView } from './components/public/CampaignView';
 import { HomeView } from './components/public/HomeView';
 import { InformativosView } from './components/public/InformativosView';
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -35,7 +34,7 @@ import { InternalOnboardingView } from './components/auth/InternalOnboardingView
 import { InternalOnboardingGate } from './components/auth/InternalOnboardingGate';
 import { InternalProfileView } from './components/auth/InternalProfileView';
 
-const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos', 'primeiro-acesso']);
+const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'privacidade', 'acessibilidade', 'transparencia', 'informativos', 'primeiro-acesso']);
 
 const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
@@ -110,7 +109,6 @@ const MainAppContent: React.FC = () => {
         {currentView === 'municipios' && <MunicipalitiesSection />}
         {currentView === 'videos' && <VideosSection />}
         {(currentView === 'cidadao' || currentView === 'contato') && <CitizenPortalView />}
-        {currentView === 'campanha' && <CampaignView />}
         {currentView === 'privacidade' && <PrivacyPolicyView />}
         {currentView === 'acessibilidade' && <AccessibilityView />}
         {currentView === 'transparencia' && <TransparencyView />}
