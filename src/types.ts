@@ -4,13 +4,23 @@ export type UserRole = 'ADMIN' | 'EDITOR' | 'COMUNICACAO' | 'ATENDIMENTO' | 'VIS
 export type Role = UserRole;
 
 export interface User {
-
   id: string;
   name: string;
+  displayName?: string;
   email: string;
   role: UserRole;
   avatar?: string;
   cargo: string;
+  phone?: string;
+  department?: string;
+  functionTitle?: string;
+  responsibilities?: string;
+  bio?: string;
+  institutionalEmail?: string;
+  institutionalPhone?: string;
+  municipality?: string;
+  startedAt?: string;
+  onboardingCompletedAt?: string | null;
 }
 
 export interface SiteSettings {
