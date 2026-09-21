@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react';
 import { EventItem } from '../../types';
+import { getAgendaTagColor } from './agendaTags';
 
 type CalendarView = 'month' | 'week' | 'day';
 
@@ -61,7 +62,7 @@ const EventCard: React.FC<{
     </div>
     {event.tags && event.tags.length > 0 && (
       <div className="mt-1 flex flex-wrap gap-1">
-        {event.tags.slice(0, compact ? 2 : 3).map((tag) => <span key={tag} className="rounded-full bg-white/70 border border-stone-200 px-1.5 py-0.5 text-[9px] font-bold text-stone-600">{tag}</span>)}
+        {event.tags.slice(0, compact ? 2 : 3).map((tag) => <span key={tag} className={`rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${getAgendaTagColor(tag)}`}>{tag}</span>)}
       </div>
     )}
     {!compact && (
