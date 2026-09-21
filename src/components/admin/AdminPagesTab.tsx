@@ -42,6 +42,7 @@ export const AdminPagesTab: React.FC = () => {
   const [editingBlock, setEditingBlock] = useState<PageBlock | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showBlocks, setShowBlocks] = useState(false);
+  const [insertBlockIndex, setInsertBlockIndex] = useState<number | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [draftBlocks, setDraftBlocks] = useState<PageBlock[]>([]);
   const [saving, setSaving] = useState(false);
@@ -125,8 +126,19 @@ export const AdminPagesTab: React.FC = () => {
   };
 
   const addBlock = (type: BlockType) => {
-    setDraftBlocks((prev) => [...prev, newBlock(type, prev.length + 1)]);
+    setDraftBlocks((prev) => {
+      const index = insertBlockIndex === null ? prev.length : insertBlockIndex;
+      const next = [...prev];
+      next.splice(index, 0, newBlock(type, index + 1));
+      return next.map((block, position) => ({ ...block, order: position + 1 }));
+    });
+    setInsertBlockIndex(null);
     setShowBlocks(false);
+  };
+
+  const openBlockPicker = (index?: number) => {
+    setInsertBlockIndex(index ?? null);
+    setShowBlocks(true);
   };
 
   const getInlineText = (block: PageBlock, field: 'title' | 'subtitle' | 'text') => {
@@ -360,7 +372,7 @@ export const AdminPagesTab: React.FC = () => {
                 </div>
                 <div><label className="label">Descrição / contexto</label><textarea value={metadata.description} onChange={(e) => setMetadata({ ...metadata, description: e.target.value })} className="field" rows={2} placeholder="Ex.: Landing da campanha sobre educação." /></div>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => setShowBlocks(true)} className="action"><Plus className="w-4 h-4" /> Adicionar bloco</button>
+                  <button onClick={() => openBlockPicker()} className="action"><Plus className="w-4 h-4" /> Adicionar bloco</button>
                   <button onClick={() => setShowHistory(true)} className="action"><History className="w-4 h-4" /> Versões ({selectedPage.versions?.length || 0})</button>
                   <a href={`/${selectedPage.slug}`} target="_blank" rel="noreferrer" className="action"><Eye className="w-4 h-4" /> Abrir página</a>
                   <button disabled={saving} onClick={() => save(false)} className="action"><Save className="w-4 h-4" /> Salvar rascunho</button>
@@ -385,7 +397,7 @@ export const AdminPagesTab: React.FC = () => {
                       <>
                         {index > 0 && (
                           <div className="flex justify-center py-1 bg-stone-100 group">
-                            <button type="button" onClick={(event) => { event.stopPropagation(); setShowBlocks(true); }} className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-2.5 py-1 text-[9px] font-black text-stone-400 hover:text-emerald-700 hover:border-emerald-400 transition-opacity">
+                            <button type="button" onClick={(event) => { event.stopPropagation(); openBlockPicker(index); }} className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-2.5 py-1 text-[9px] font-black text-stone-400 hover:text-emerald-700 hover:border-emerald-400 transition-opacity">
                               <Plus className="w-3 h-3" /> Inserir seção
                             </button>
                           </div>
@@ -551,7 +563,7 @@ export const AdminPagesTab: React.FC = () => {
                   })}
                   {draftBlocks.length > 0 && (
                     <div className="flex justify-center py-2 bg-stone-100">
-                      <button type="button" onClick={() => setShowBlocks(true)} className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-3 py-1.5 text-[10px] font-black text-stone-500 hover:text-emerald-700 hover:border-emerald-400">
+                      <button type="button" onClick={() => openBlockPicker()} className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-3 py-1.5 text-[10px] font-black text-stone-500 hover:text-emerald-700 hover:border-emerald-400">
                         <Plus className="w-3 h-3" /> Adicionar seção
                       </button>
                     </div>
