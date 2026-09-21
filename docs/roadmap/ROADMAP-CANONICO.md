@@ -1,7 +1,7 @@
 # ROADMAP CANÔNICO — CICLO ATUAL
 
 **Estado operacional:** FASE 4 — SEGURANÇA E ACESSO  
-**Situação do ciclo:** D5 — RECONSTRUÇÃO FINAL DO ROADMAP CONCLUÍDA  
+**Situação do ciclo:** D6 — RECONCILIAÇÃO DE ADRs E GOVERNANÇA CONCLUÍDA  
 **Branch:** `main`
 
 ## Fonte de verdade
@@ -68,7 +68,7 @@ Não classificar uma funcionalidade como ausente apenas porque a validação ain
 
 ## Reconstrução documental — trabalho transversal
 
-Estado do processo: **D0–D5 CONCLUÍDOS**. D6 e D7 permanecem pendentes.
+Estado do processo: **D0–D6 CONCLUÍDOS**. D7 permanece pendente.
 
 Antes de avançar para novas funcionalidades da Fase 4, a documentação foi reconstruída e reconciliada de forma controlada:
 
@@ -77,12 +77,13 @@ Antes de avançar para novas funcionalidades da Fase 4, a documentação foi rec
 - `docs/documentation/RECONSTRUCAO-DOCUMENTAL-LINHA-DO-TEMPO.md`
 - `docs/documentation/MATRIZ-ESTADO-REAL.md`
 - `docs/documentation/RECONCILIACAO-DOCUMENTAL.md`
+- `docs/documentation/D6-RECONCILIACAO-ADRS-GOVERNANCA.md`
 
 Esse trabalho não substitui as fases do produto. Ele corrige a autoridade documental antes da continuidade da execução.
 
 ## Próxima sequência
 
-Depois de encerrada a reconstrução documental D6–D7:
+Depois de encerrada a reconstrução documental D7:
 
 **FASE 4 — validação e conclusão de Segurança e Acesso**
 
