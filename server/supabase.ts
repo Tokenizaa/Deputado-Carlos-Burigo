@@ -27,6 +27,7 @@ import type { PublicLegislativeItemDto } from '../src/contracts/publicLegislativ
 import type { PublicAgendaDto, PublicNewsDto, PublicPageDto } from '../src/contracts/publicCommunication';
 import type { PublicDemandDto, DemandMessageDto, DemandHistoryDto } from '../src/contracts/publicDemand';
 import { extractLegislativeCode } from '../src/contracts/publicLegislative';
+import { validatePassword } from '../src/lib/passwordValidation';
 
 // Public read-only adapter: RLS exposes only the institutional/public rows needed here.
 const url = process.env.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
@@ -1047,7 +1048,8 @@ export async function bootstrapFirstAdmin(input: {
   const email = input.email.trim().toLowerCase();
 
   if (!name || !cargo || !email || !input.password) throw new Error('Nome, cargo, e-mail e senha são obrigatórios.');
-  if (input.password.length < 8) throw new Error('A senha deve ter pelo menos 8 caracteres.');
+  const passwordValidation = validatePassword(input.password);
+  if (!passwordValidation.valid) throw new Error(passwordValidation.error ?? 'Senha inválida.');
 
   const { data: admins, error: adminsError } = await supabaseAdmin
     .from('user_roles')
