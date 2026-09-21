@@ -9,6 +9,7 @@ const DOCUMENT_TYPES = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO', 'IN
 const CATEGORIES = ['parlamentar', 'gabinete', 'comunicacao', 'outros'];
 const STATUSES = ['rascunho', 'publicado', 'arquivado'];
 const VISIBILITIES = ['publico', 'interno', 'restrito'];
+const DOCUMENT_TYPE_ORDER = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO', 'INFORMATIVO'];
 
 export const AdminAtuacaoTab: React.FC = () => {
   const { legislativeItems, showToast } = useApp();
@@ -90,11 +91,12 @@ export const AdminAtuacaoTab: React.FC = () => {
   }, [documents, itemById, search, filterType, filterCategory, filterStatus, filterVisibility]);
 
   const grouped = useMemo(() => {
-    const groups = new Map<string, { code: string; title: string; year: number; documents: PublicDocumentDto[] }>();
+    const groups = new Map<string, { key: string; code: string; title: string; year: number; documents: PublicDocumentDto[] }>();
     for (const document of filteredDocuments) {
       const item = document.legislativeItemId ? itemById.get(document.legislativeItemId) : undefined;
       const key = item?.id ?? 'sem-proposicao';
       const current = groups.get(key) ?? {
+        key,
         code: item?.code ?? 'SEM PROPOSIÇÃO',
         title: item?.title ?? 'Documentos sem proposição vinculada',
         year: item?.year ?? 0,
@@ -103,7 +105,20 @@ export const AdminAtuacaoTab: React.FC = () => {
       current.documents.push(document);
       groups.set(key, current);
     }
-    return [...groups.values()].sort((a, b) => b.year - a.year || a.code.localeCompare(b.code));
+    return [...groups.values()]
+      .map((group) => ({
+        ...group,
+        documents: [...group.documents].sort((a, b) => {
+          const typeA = DOCUMENT_TYPE_ORDER.indexOf(a.documentType || 'INFORMATIVO');
+          const typeB = DOCUMENT_TYPE_ORDER.indexOf(b.documentType || 'INFORMATIVO');
+          const orderA = typeA === -1 ? DOCUMENT_TYPE_ORDER.length : typeA;
+          const orderB = typeB === -1 ? DOCUMENT_TYPE_ORDER.length : typeB;
+          return orderA - orderB
+            || (b.publishedAt || '').localeCompare(a.publishedAt || '')
+            || (a.title || '').localeCompare(b.title || '', 'pt-BR');
+        }),
+      }))
+      .sort((a, b) => b.year - a.year || a.code.localeCompare(b.code, 'pt-BR'));
   }, [filteredDocuments, itemById]);
 
   const totalPages = Math.max(1, Math.ceil(grouped.length / GROUPS_PER_PAGE));
@@ -270,10 +285,10 @@ export const AdminAtuacaoTab: React.FC = () => {
       ) : (
         <div className="border-y border-stone-200">
           {visibleGroups.map((group) => (
-            <section key={group.code} className="border-b border-stone-200 last:border-b-0">
+            <section key={group.key} className="border-b border-stone-200 last:border-b-0">
               <div className="flex items-baseline justify-between gap-4 px-3 py-3 bg-stone-50">
                 <div className="min-w-0">
-                  <span className="font-mono text-xs font-bold text-stone-700">{group.code}</span>
+                  <div className="flex flex-wrap items-center gap-2"><span className="font-mono text-xs font-bold text-stone-700">{group.code}</span>{group.year > 0 && <span className="text-[10px] font-bold uppercase tracking-wide text-stone-400">{group.year}</span>}</div>
                   <h3 className="truncate text-sm font-bold text-stone-900">{group.title}</h3>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
