@@ -31,6 +31,8 @@ import { DynamicPageView } from './components/public/DynamicPageView';
 import { AdminAuthView } from './components/auth/AdminAuthView';
 import { AdminInviteAcceptView } from './components/auth/AdminInviteAcceptView';
 import { AdminBootstrapView } from './components/auth/AdminBootstrapView';
+import { InternalOnboardingView } from './components/auth/InternalOnboardingView';
+import { InternalOnboardingGate } from './components/auth/InternalOnboardingGate';
 
 const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos', 'primeiro-acesso']);
 
@@ -40,6 +42,7 @@ const MainAppContent: React.FC = () => {
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
   if (pathname === 'convite') return <AdminInviteAcceptView />;
   if (pathname === 'primeiro-acesso') return <AdminBootstrapView />;
+  if (pathname === 'onboarding-interno') return <InternalOnboardingView />;
   if (pathname === 'minhas-demandas') return <CitizenAccountView />;
 
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
@@ -61,9 +64,11 @@ const MainAppContent: React.FC = () => {
       return <AdminAuthView onAuthenticated={() => { void refreshAllData(); }} />;
     }
     return (
-      <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
-        <AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} />
-      </AdminLayout>
+      <InternalOnboardingGate>
+        <AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}>
+          <AdminWorkspace activeModule={adminTab} setActiveModule={setAdminTab} />
+        </AdminLayout>
+      </InternalOnboardingGate>
     );
   }
 
