@@ -333,3 +333,23 @@ A regra é coletar apenas o necessário para identidade, operação do gabinete 
 - administrador consegue visualizar o perfil operacional;
 - EDITOR e COMUNICACAO ficam claramente diferenciados na interface;
 - nenhuma segunda tabela de usuários/equipe é criada.
+
+
+### 12.13 — Meu Perfil
+
+Após o onboarding, cada usuário interno terá uma página permanente em /meu-perfil.
+
+A página reutiliza o mesmo modelo de dados do onboarding e permite ao próprio usuário:
+- consultar seus dados;
+- alterar nome e nome de exibição;
+- atualizar avatar;
+- atualizar contatos;
+- atualizar área e função;
+- atualizar responsabilidades e apresentação;
+- atualizar município e data de entrada.
+
+O e-mail de autenticação e o papel institucional são exibidos, mas não podem ser alterados pelo próprio usuário.
+
+O acesso ao perfil será disponibilizado diretamente pela identificação do usuário no painel, sem criar um novo módulo de equipe ou uma segunda identidade.
+
+Critério de aceite: após concluir o onboarding, o usuário consegue retornar ao seu perfil a qualquer momento, alterar seus dados e persistir as alterações em public.profiles.
