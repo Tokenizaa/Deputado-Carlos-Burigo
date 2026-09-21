@@ -34,10 +34,10 @@ const roles: Role[] = ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALI
 
 const roleDescriptions: Record<Role, { title: string; desc: string }> = {
   ADMIN: { title: 'Administrador Geral', desc: 'Acesso completo, equipe, configurações e auditoria.' },
-  EDITOR: { title: 'Editor de Conteúdo', desc: 'Conteúdo, agenda, mandato e tarefas conforme permissões.' },
-  COMUNICACAO: { title: 'Assessoria de Comunicação', desc: 'Conteúdo, agenda e tarefas conforme permissões.' },
+  EDITOR: { title: 'Editor de Conteúdo Institucional', desc: 'Mantém e organiza informações, documentos e conteúdos institucionais conforme permissões.' },
+  COMUNICACAO: { title: 'Assessoria de Comunicação', desc: 'Produz e publica comunicação pública do gabinete conforme permissões.' },
   ATENDIMENTO: { title: 'Equipe de Atendimento', desc: 'Demandas dos cidadãos, agenda e tarefas.' },
-  VISUALIZADOR: { title: 'Visualizador / Auditor', desc: 'Consulta somente leitura aos módulos permitidos.' },
+  VISUALIZADOR: { title: 'Consulta', desc: 'Acesso somente para leitura aos módulos autorizados.' },
 };
 
 const moduleLabels: Record<string, string> = {
@@ -391,9 +391,15 @@ export const AdminUsersTab: React.FC = () => {
         >
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-stone-200 shadow-xl">
             <div className="sticky top-0 bg-white border-b border-stone-200 p-5 flex items-start justify-between gap-4">
-              <div>
-                <h3 id="team-member-title" className="text-xl font-black text-stone-900">{selectedUser.name}</h3>
-                <p className="text-sm text-stone-500 mt-1">{selectedUser.cargo} · {selectedUser.email}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-stone-100 border border-stone-200 flex items-center justify-center shrink-0">
+                  {selectedUser.avatar ? <img src={selectedUser.avatar} alt="" className="w-full h-full object-cover" /> : <span className="text-sm font-black text-stone-500">{selectedUser.name.slice(0, 1).toUpperCase()}</span>}
+                </div>
+                <div>
+                  <h3 id="team-member-title" className="text-xl font-black text-stone-900">{selectedUser.displayName || selectedUser.name}</h3>
+                  <p className="text-sm text-stone-500 mt-1">{selectedUser.cargo} · {selectedUser.email}</p>
+                  {selectedUser.department && <p className="text-xs text-stone-500 mt-1">{selectedUser.department}{selectedUser.functionTitle ? ' · ' + selectedUser.functionTitle : ''}</p>}
+                </div>
               </div>
               <button type="button" onClick={() => setSelectedUser(null)} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg hover:bg-stone-100" aria-label="Fechar">
                 <X className="w-5 h-5" />
