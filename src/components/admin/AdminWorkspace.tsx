@@ -5,11 +5,9 @@ import { AdminPagesTab } from './AdminPagesTab';
 import { AdminContentTab } from './AdminContentTab';
 import { AdminNewsTab } from './AdminNewsTab';
 import { AdminAgendaTab } from './AdminAgendaTab';
-import { AdminResultsTab } from './AdminResultsTab';
-import { AdminMunicipalitiesTab } from './AdminMunicipalitiesTab';
+import { AdminAtuacaoTab } from './AdminAtuacaoTab';
 import { AdminVideosTab } from './AdminVideosTab';
 import { AdminMediaTab } from './AdminMediaTab';
-import { AdminMandatosTab } from './AdminMandatosTab';
 import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
 import { AdminTasksTab } from './AdminTasksTab';
@@ -26,9 +24,7 @@ type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'atuação' | 'conteúdo' 
 
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
   atuação: [
-    { id: 'results', label: 'Atuação' },
-    { id: 'municipalities', label: 'Municípios' },
-    { id: 'mandatos', label: 'Mandatos' },
+    { id: 'atuacao', label: 'Atuação' },
   ],
   conteúdo: [
     { id: 'pages', label: 'Páginas' },
@@ -48,10 +44,10 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' |
 
 export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, setActiveModule }) => {
   const { currentUser } = useApp();
-  const [subTab, setSubTab] = useState('results');
+  const [subTab, setSubTab] = useState('atuacao');
 
   useEffect(() => {
-    if (activeModule === 'atuação') setSubTab('results');
+    if (activeModule === 'atuação') setSubTab('atuacao');
     if (activeModule === 'conteúdo') setSubTab('pages');
     if (activeModule === 'administração') setSubTab('users');
     if (activeModule === 'configurações') setSubTab('settings');
@@ -68,9 +64,7 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
 
   const renderSubTab = () => {
     switch (subTab) {
-      case 'results': return <AdminResultsTab />;
-      case 'municipalities': return <AdminMunicipalitiesTab />;
-      case 'mandatos': return <AdminMandatosTab />;
+      case 'atuacao': return <AdminAtuacaoTab />;
       case 'pages': return <AdminPagesTab />;
       case 'news': return <AdminNewsTab />;
       case 'agenda': return <AdminAgendaTab />;
