@@ -206,7 +206,6 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       '/municipios': { title: 'Municípios | Carlos Búrigo', description: 'Informações públicas relacionadas aos municípios disponíveis no portal.' },
       '/videos': { title: 'Vídeos | Carlos Búrigo', description: 'Vídeos publicados no portal institucional.' },
       '/contato': { title: 'Fale com o Deputado | Carlos Búrigo', description: 'Canal institucional para enviar solicitações, mensagens e demandas ao gabinete.' },
-      '/campanha': { title: 'Campanha | Carlos Búrigo', description: settings?.seoDefaultDescription || '' },
     };
     if (staticMeta[pathname]) {
       title = staticMeta[pathname].title;
