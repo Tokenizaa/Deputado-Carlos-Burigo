@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, Eye, FilePlus2, GripVertical, History, Layout, Pencil, Plus, Save, Send, Trash2, X } from 'lucide-react';
+import { Check, Eye, FilePlus2, GripVertical, History, Image as ImageIcon, Layout, Pencil, Plus, Save, Send, Trash2, X } from 'lucide-react';
 import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
@@ -37,7 +37,7 @@ function newBlock(type: BlockType, order: number): PageBlock {
 }
 
 export const AdminPagesTab: React.FC = () => {
-  const { adminPages, currentUser, createPage, updatePage, rollbackPage, showToast } = useApp();
+  const { adminPages, media, videos, currentUser, createPage, updatePage, rollbackPage, showToast } = useApp();
   const [selectedPageId, setSelectedPageId] = useState<string>('');
   const [editingBlock, setEditingBlock] = useState<PageBlock | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -49,6 +49,7 @@ export const AdminPagesTab: React.FC = () => {
   const [inlineEditing, setInlineEditing] = useState<{ blockId: string; field: 'title' | 'subtitle' | 'text' } | null>(null);
   const [inlineOriginal, setInlineOriginal] = useState<PageBlock | null>(null);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
+  const [mediaPickerBlockId, setMediaPickerBlockId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [uploadingOg, setUploadingOg] = useState(false);
   const [newPage, setNewPage] = useState({ title: '', slug: '', description: '' });
@@ -159,6 +160,74 @@ export const AdminPagesTab: React.FC = () => {
   };
 
   const isTextEditable = (block: PageBlock) => ['hero', 'text', 'text_image'].includes(block.type);
+
+  const isMediaEditable = (block: PageBlock) => ['hero', 'text_image', 'image'].includes(block.type);
+
+  const applyMediaToBlock = (blockId: string, item: any) => {
+    setDraftBlocks((prev) => prev.map((block) => block.id === blockId ? {
+      ...block,
+      content: {
+        ...(block.content || {}),
+        mediaType: 'image',
+        mediaSource: 'library',
+        mediaId: item.id,
+        mediaUrl: item.url,
+        imageUrl: item.url,
+        videoUrl: undefined,
+        altText: item.altText || item.title || block.title,
+        caption: item.credit || item.description || '',
+      },
+    } : block));
+    setSelectedBlockId(blockId);
+    setMediaPickerBlockId(null);
+    showToast('Imagem aplicada ao bloco. Salve o rascunho para persistir.', 'success');
+  };
+
+  const applyVideoToBlock = (blockId: string, item: any) => {
+    setDraftBlocks((prev) => prev.map((block) => block.id === blockId ? {
+      ...block,
+      content: {
+        ...(block.content || {}),
+        mediaType: 'video',
+        mediaSource: 'library',
+        mediaId: item.id,
+        mediaUrl: item.url,
+        imageUrl: undefined,
+        videoUrl: item.url,
+        altText: item.title || block.title,
+      },
+    } : block));
+    setSelectedBlockId(blockId);
+    setMediaPickerBlockId(null);
+    showToast('Vídeo aplicado ao bloco. Salve o rascunho para persistir.', 'success');
+  };
+
+  const removeMediaFromBlock = (blockId: string) => {
+    setDraftBlocks((prev) => prev.map((block) => block.id === blockId ? {
+      ...block,
+      content: {
+        ...(block.content || {}),
+        mediaType: 'none',
+        mediaSource: undefined,
+        mediaId: undefined,
+        mediaUrl: undefined,
+        imageUrl: undefined,
+        videoUrl: undefined,
+      },
+    } : block));
+    setMediaPickerBlockId(null);
+    showToast('Mídia removida do bloco. Salve o rascunho para persistir.', 'success');
+  };
+
+  const getBlockMedia = (block: PageBlock) => {
+    const content = block.content || {};
+    if (content.mediaType === 'video' || content.videoUrl) {
+      const video = videos.find((item) => item.id === content.mediaId);
+      return { kind: 'video' as const, url: content.videoUrl || content.mediaUrl || video?.url || '', label: video?.title || 'Vídeo' };
+    }
+    const item = media.find((entry) => entry.id === content.mediaId);
+    return { kind: 'image' as const, url: content.imageUrl || content.mediaUrl || item?.url || '', label: item?.title || item?.name || 'Imagem' };
+  };
 
   const uploadOg = async (file: File) => {
     setUploadingOg(true);
@@ -297,7 +366,14 @@ export const AdminPagesTab: React.FC = () => {
                           <span className="text-[9px] font-black uppercase text-stone-500">{index + 1} · {block.type}</span>
                         </div>
 
-                        <div>{renderedBlock}</div>
+                        <div className="relative">
+                          {renderedBlock}
+                          {selected && isMediaEditable(block) && getBlockMedia(block).url && !editing && (
+                            <button type="button" onClick={(event) => { event.stopPropagation(); setMediaPickerBlockId(block.id); }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 border border-stone-200 shadow-lg rounded-lg px-3 py-2 text-[10px] font-black text-stone-700">
+                              <ImageIcon className="inline w-3.5 h-3.5 mr-1" /> Alterar mídia
+                            </button>
+                          )}
+                        </div>
 
                         {selected && (
                           <div className="absolute right-3 top-3 z-20 flex gap-1">
@@ -310,12 +386,45 @@ export const AdminPagesTab: React.FC = () => {
                                 <Pencil className="w-3.5 h-3.5" /> Editar no canvas
                               </button>
                             )}
+                            {isMediaEditable(block) && !editing && (
+                              <button
+                                type="button"
+                                onClick={(event) => { event.stopPropagation(); setMediaPickerBlockId(block.id); }}
+                                className="action shadow-sm bg-white"
+                              >
+                                <ImageIcon className="w-3.5 h-3.5" /> Mídia
+                              </button>
+                            )}
                             <button type="button" onClick={(event) => { event.stopPropagation(); setEditingBlock(block); }} className="action shadow-sm bg-white">
                               <Pencil className="w-3.5 h-3.5" /> Avançado
                             </button>
                             <button type="button" onClick={(event) => { event.stopPropagation(); removeBlock(block.id); }} className="icon-btn text-rose-600 bg-white shadow-sm">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
+                          </div>
+                        )}
+
+                        {selected && isMediaEditable(block) && mediaPickerBlockId === block.id && (
+                          <div className="absolute left-3 right-3 top-14 z-30 bg-white border border-stone-200 rounded-xl shadow-xl p-3" onClick={(event) => event.stopPropagation()}>
+                            <div className="flex items-center justify-between gap-3 mb-3">
+                              <div><div className="text-[10px] uppercase tracking-wider font-black text-emerald-700">Mídia do bloco</div><div className="text-xs text-stone-500">Escolha do acervo, vídeo ou remova a mídia atual.</div></div>
+                              <button type="button" onClick={() => setMediaPickerBlockId(null)} className="icon-btn"><X className="w-3.5 h-3.5" /></button>
+                            </div>
+                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-48 overflow-auto">
+                              {media.filter((item) => item.mimeType?.startsWith('image/')).map((item) => (
+                                <button key={item.id} type="button" title={item.title || item.name} onClick={() => applyMediaToBlock(block.id, item)} className="group rounded-lg overflow-hidden border border-stone-200 hover:border-emerald-500 bg-stone-50">
+                                  <img src={item.url} alt={item.altText || item.title} className="w-full aspect-square object-cover" />
+                                  <span className="block truncate px-1 py-1 text-[9px] font-bold text-stone-600">{item.title || item.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                            {!media.some((item) => item.mimeType?.startsWith('image/')) && <div className="text-xs text-stone-500 py-4">Nenhuma imagem disponível na biblioteca.</div>}
+                            {videos.length > 0 && block.type !== 'image' && (
+                              <div className="mt-3 pt-3 border-t border-stone-100"><div className="text-[10px] uppercase font-black text-stone-400 mb-2">Vídeos do acervo</div><div className="flex flex-wrap gap-2">
+                                {videos.slice(0, 8).map((item) => <button key={item.id} type="button" onClick={() => applyVideoToBlock(block.id, item)} className="action">{item.title}</button>)}
+                              </div></div>
+                            )}
+                            {getBlockMedia(block).url && <div className="mt-3 flex items-center justify-between gap-2 border-t border-stone-100 pt-3"><span className="text-[10px] text-stone-500 truncate">Atual: {getBlockMedia(block).label}</span><button type="button" onClick={() => removeMediaFromBlock(block.id)} className="action text-rose-600">Remover mídia</button></div>}
                           </div>
                         )}
 
