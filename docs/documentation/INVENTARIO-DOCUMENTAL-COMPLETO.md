@@ -3,7 +3,7 @@
 **Data:** 21/09/2026  
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`  
 **Branch:** `main`  
-**Total atual detectado:** 107 arquivos
+**Total atual detectado:** 108 arquivos
 
 ## Objetivo
 
@@ -25,7 +25,7 @@ Foram considerados:
 | `.opencode/architecture_review_report.md` | HISTÓRICO | PRESERVAR; NÃO OPERACIONAL |
 | `.opencode/execution_recommendation.md` | HISTÓRICO | PRESERVAR; NÃO OPERACIONAL |
 | `.opencode/validation_report.md` | HISTÓRICO | PRESERVAR; NÃO OPERACIONAL |
-| `AGENTS.md` | GOVERNANÇA | RECONCILIAR TOPOLOGIA |
+| `AGENTS.md` | GOVERNANÇA | RECONCILIADO EM D6 |
 | `VALIDATION_REPORT.md` | HISTÓRICO | PRESERVAR; SUBSTITUÍDO POR VALIDAÇÕES POSTERIORES |
 | `docs/GESTAO-DOCUMENTAL-ROADMAP.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/Inventário Documental Carlos Búrigo.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
@@ -34,9 +34,9 @@ Foram considerados:
 | `docs/P1-PUBLIC-DATA-CONTRACT.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/P1-PUBLIC-DATA-SOURCE-EXECUTION.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/PROJECT-CONTINUATION.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
-| `docs/adr/0001-canonical-single-source-public-platform.md` | ADR | MANTER; RECONCILIAR STATUS |
-| `docs/adr/0002-cloudflare-workers-production-runtime.md` | ADR | MANTER; RECONCILIAR STATUS |
-| `docs/adr/0003-auth-password-protection-enhancements.md` | ADR | MANTER; RECONCILIAR STATUS |
+| `docs/adr/0001-canonical-single-source-public-platform.md` | ADR | STATUS RECONCILIADO EM D6 |
+| `docs/adr/0002-cloudflare-workers-production-runtime.md` | ADR | STATUS RECONCILIADO EM D6 |
+| `docs/adr/0003-auth-password-protection-enhancements.md` | ADR | STATUS RECONCILIADO EM D6 |
 | `docs/audits/FASE-1-AUDITORIA-INTERFACE.md` | AUDITORIA | MANTER COMO EVIDÊNCIA HISTÓRICA |
 | `docs/audits/FASE-1-GESTAO-DOCUMENTAL.md` | AUDITORIA | MANTER COMO EVIDÊNCIA HISTÓRICA |
 | `docs/audits/FASE-10-GESTAO-DOCUMENTAL-HISTORICO-GOVERNANCA.md` | AUDITORIA | MANTER COMO EVIDÊNCIA HISTÓRICA |
@@ -72,7 +72,7 @@ Foram considerados:
 | `docs/design/DESIGN-TOKENS-V2.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/documentation/INVENTARIO-DOCUMENTAL-COMPLETO.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/AUDITORIA-DOCUMENTAL-D0-D3.md` | CANÔNICO | MANTER COMO RESULTADO DA AUDITORIA |
-| `docs/documentation/D6-RECONCILIACAO-ADRS-GOVERNANCA.md` | CANÔNICO | MANTER COMO CHECKPOINT D6 |
+| `docs/documentation/D6-RECONCILIACAO-ADRS-GOVERNANCA.md` | CANÔNICO | CHECKPOINT D6 CONCLUÍDO |
 | `docs/documentation/MAPA-DOCUMENTAL-CANONICO.md` | CANÔNICO | MANTER COMO ÍNDICE OPERACIONAL |
 | `docs/documentation/MATRIZ-ESTADO-REAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/RECONCILIACAO-DOCUMENTAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
@@ -169,6 +169,10 @@ A reconstrução documental continua em D4–D7, mas o estado operacional já po
 - D6 — CONCLUÍDO
 - D7 — PENDENTE
 
-## Próxima etapa
+## Estado final da reconstrução documental
 
-D7 — validação documental final.
+**D0–D7 — CONCLUÍDOS.**
+
+O checkpoint final está em `docs/documentation/D7-VALIDACAO-DOCUMENTAL-FINAL.md`.
+
+A reconstrução documental está encerrada. O trabalho operacional retorna à FASE 4 — SEGURANÇA E ACESSO.
