@@ -46,14 +46,15 @@ O editor administrativo deve se aproximar de um fluxo visual no estilo Elementor
 - Alterações permanecem no rascunho local até Salvar rascunho ou Publicar.
 - Não foi criado novo modelo de dados nem segundo renderer.
 
-### Fase 3 — Controles de bloco
-- Barra contextual.
+### Fase 3 — Controles de bloco ✅
+- Barra contextual no bloco selecionado.
 - Arrastar/reordenar.
 - Mover para cima/baixo.
-- Duplicar.
-- Ocultar/mostrar.
-- Excluir.
-- Adicionar seção entre blocos.
+- Duplicar bloco no rascunho.
+- Ocultar/mostrar bloco.
+- Excluir bloco.
+- Adicionar seção no ponto escolhido entre blocos ou no final.
+- Alterações permanecem no rascunho até Salvar rascunho ou Publicar.
 
 ### Fase 4 — Propriedades avançadas
 - Manter `BlockEditorForm` como painel secundário.
