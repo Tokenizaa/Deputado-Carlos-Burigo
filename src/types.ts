@@ -148,6 +148,7 @@ export interface EventItem {
   image?: string;
   link?: string;
   participants?: string;
+  tags?: string[];
   visibility: 'publico' | 'interno';
 }
 
