@@ -259,65 +259,8 @@ export const AdminAgendaTab: React.FC = () => {
         </div>
       )}
 
-      {/* Events Table */}
-      <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs">
-        <table className="min-w-full divide-y divide-stone-200 text-xs">
-          <thead className="bg-stone-50 text-stone-500 font-bold uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-3 text-left">Data / Hora</th>
-              <th className="px-6 py-3 text-left">Compromisso</th>
-              <th className="px-4 py-3 text-left">Local / Cidade</th>
-              <th className="px-4 py-3 text-left">Visibilidade</th>
-              <th className="px-6 py-3 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-200">
-            {events.map((e) => (
-              <tr key={e.id} className="hover:bg-stone-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="font-bold text-stone-900">{e.date}</div>
-                  <div className="text-stone-500 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#00A550]" /> {e.time}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <h4 className="font-bold text-stone-900 text-sm">{e.title}</h4>
-                  <p className="text-stone-500 line-clamp-1">{e.description}</p>
-                </td>
-                <td className="px-4 py-4 text-stone-700 whitespace-nowrap">
-                  <div>{e.location}</div>
-                  <div className="text-stone-500">{e.municipality}</div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {e.visibility === 'publico' ? (
-                    <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                      <Globe className="w-3 h-3" /> Público
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 bg-stone-200 text-stone-700 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                      <Lock className="w-3 h-3" /> Interno
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-right whitespace-nowrap space-x-2">
-                  <button
-                    onClick={() => startEdit(e)}
-                    className="p-1.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(e.id)}
-                    className="p-1.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* A agenda agora é exibida em calendário mensal; a edição continua sendo feita pelo formulário acima. */}
+
     </div>
   );
 };
