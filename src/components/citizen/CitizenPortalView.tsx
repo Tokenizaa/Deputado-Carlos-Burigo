@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle2, FileText, LockKeyhole, LogIn, Send, Upload, UserPlus } from 'lucide-react';
 import { DemandCategory } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
+import { validatePassword } from '../../lib/passwordValidation';
 
 export const CitizenPortalView: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -74,8 +75,11 @@ export const CitizenPortalView: React.FC = () => {
       return true;
     }
 
-    if (password.length < 8) throw new Error('A senha deve ter pelo menos 8 caracteres.');
-    if (password !== confirmPassword) throw new Error('As senhas não conferem.');
+if (accountStep === 'signup') {
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) throw new Error(passwordValidation.error);
+       if (password !== confirmPassword) throw new Error('As senhas não conferem.');
+     }
 
     const accountResponse = await fetch('/api/citizen/account', {
       method: 'POST',

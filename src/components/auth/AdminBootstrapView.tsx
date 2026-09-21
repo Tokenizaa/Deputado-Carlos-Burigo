@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getSupabaseClient } from '../../lib/supabaseClient';
+import { validatePassword } from '../../lib/passwordValidation';
 
 export const AdminBootstrapView: React.FC = () => {
   const [name, setName] = useState('');
@@ -15,9 +16,11 @@ export const AdminBootstrapView: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    try {
-      if (password.length < 8) throw new Error('A senha deve ter pelo menos 8 caracteres.');
-      if (password !== passwordConfirmation) throw new Error('As senhas não coincidem.');
+try {
+       if (password !== passwordConfirmation) throw new Error('As senhas não coincidem.');
+       
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) throw new Error(passwordValidation.error);
 
       const response = await fetch('/api/auth/bootstrap-admin', {
         method: 'POST',

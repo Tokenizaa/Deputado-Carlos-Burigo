@@ -71,6 +71,7 @@ import {
 
 import type { User, UserRole } from '../src/types';
 import { can } from '../src/config/adminPermissions';
+import { validatePassword } from './lib/passwordValidation';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -266,16 +267,20 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
   '/api/auth/bootstrap-admin': async (request) => {
-    if (request.method !== 'POST') return methodNotAllowed();
-    try {
-      const body = await request.json();
-      const name = typeof body?.name === 'string' ? body.name : '';
-      const cargo = typeof body?.cargo === 'string' ? body.cargo : '';
-      const email = typeof body?.email === 'string' ? body.email : '';
-      const password = typeof body?.password === 'string' ? body.password : '';
-      const passwordConfirmation = typeof body?.passwordConfirmation === 'string' ? body.passwordConfirmation : '';
-      if (password !== passwordConfirmation) return Response.json({ error: 'As senhas não coincidem.' }, { status: 400 });
-      const user = await bootstrapFirstAdmin({ name, cargo, email, password });
+if (request.method !== 'POST') return methodNotAllowed();
+     try {
+       const body = await request.json();
+       const name = typeof body?.name === 'string' ? body.name : '';
+       const cargo = typeof body?.cargo === 'string' ? body.cargo : '';
+       const email = typeof body?.email === 'string' ? body.email : '';
+       const password = typeof body?.password === 'string' ? body.password : '';
+       const passwordConfirmation = typeof body?.passwordConfirmation === 'string' ? body.passwordConfirmation : '';
+       if (password !== passwordConfirmation) return Response.json({ error: 'As senhas não coincidem.' }, { status: 400 });
+       
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) return Response.json({ error: passwordValidation.error }, { status: 400 });
+       
+       const user = await bootstrapFirstAdmin({ name, cargo, email, password });
       return Response.json({ user }, { status: 201 });
     } catch (error) {
       console.error('[api/auth/bootstrap-admin]', error);
@@ -1123,13 +1128,16 @@ if (request.method === 'DELETE') {
   // Citizen demand endpoints
   '/api/citizen/account': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
-    try {
-      const { email, password, name, phone } = await request.json();
-      if (typeof email !== 'string' || typeof password !== 'string' || typeof name !== 'string' || typeof phone !== 'string') {
-        return Response.json({ error: 'Nome, e-mail, telefone e senha são obrigatórios.' }, { status: 400 });
-      }
-      if (password.length < 8) return Response.json({ error: 'A senha deve ter pelo menos 8 caracteres.' }, { status: 400 });
-      const normalizedEmail = email.trim().toLowerCase();
+try {
+       const { email, password, name, phone } = await request.json();
+       if (typeof email !== 'string' || typeof password !== 'string' || typeof name !== 'string' || typeof phone !== 'string') {
+         return Response.json({ error: 'Nome, e-mail, telefone e senha são obrigatórios.' }, { status: 400 });
+       }
+       
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) return Response.json({ error: passwordValidation.error }, { status: 400 });
+       
+       const normalizedEmail = email.trim().toLowerCase();
       const normalizedPhone = normalizeBrazilPhone(phone);
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email: normalizedEmail,
