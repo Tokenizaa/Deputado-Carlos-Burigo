@@ -4,7 +4,6 @@ import { useApp } from '../../context/AppContext';
 const SITE_URL = 'https://www.carlosburigo.com.br';
 
 const ROUTE_META: Record<string, { title: string; description: string }> = {
-  '/': { title: 'Carlos Búrigo | Deputado Estadual • Rio Grande do Sul', description: 'Portal institucional de Carlos Búrigo, com trajetória, atuação parlamentar, notícias, agenda e informações públicas.' },
   '/sobre': { title: 'Sobre Carlos Búrigo | Portal Institucional', description: 'Informações institucionais e perfil público de Carlos Búrigo.' },
   '/trajetoria': { title: 'Trajetória | Carlos Búrigo', description: 'Trajetória pública e profissional de Carlos Búrigo, organizada em linha do tempo.' },
   '/atuacao': { title: 'Atuação Parlamentar | Carlos Búrigo', description: 'Consulte proposições, votações, participações e registros da atuação parlamentar.' },
@@ -49,26 +48,29 @@ export function SEO(props: { title?: string; description?: string; image?: strin
   useEffect(() => {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const meta = ROUTE_META[path] || {
-      title: 'Carlos Búrigo | Portal Institucional',
-      description: 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.',
+      title: settings?.seo_default_title || 'Carlos Búrigo | Portal Institucional',
+      description: settings?.seo_default_description || 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.',
     };
+    const resolvedTitle = title || meta.title;
+    const resolvedDescription = description || meta.description;
+    const resolvedImage = image || settings?.seo_default_image_url || '';
     const canonical = `${SITE_URL}${path === '/' ? '/' : path}`;
 
-    document.title = meta.title;
-    ensureMeta('name', 'description', meta.description);
-    ensureMeta('property', 'og:title', meta.title);
-    ensureMeta('property', 'og:description', meta.description);
+    document.title = resolvedTitle;
+    ensureMeta('name', 'description', resolvedDescription);
+    ensureMeta('property', 'og:title', resolvedTitle);
+    ensureMeta('property', 'og:description', resolvedDescription);
     ensureMeta('property', 'og:type', 'website');
     ensureMeta('property', 'og:url', canonical);
     ensureMeta('property', 'og:locale', 'pt_BR');
-    if (image) ensureMeta('property', 'og:image', image);
+    if (resolvedImage) ensureMeta('property', 'og:image', resolvedImage);
     else document.head.querySelector('meta[property="og:image"]')?.remove();
     ensureMeta('property', 'og:image:width', '1200');
     ensureMeta('property', 'og:image:height', '630');
     ensureMeta('name', 'twitter:card', 'summary_large_image');
-    ensureMeta('name', 'twitter:title', title);
-    ensureMeta('name', 'twitter:description', description);
-    if (image) ensureMeta('name', 'twitter:image', image);
+    ensureMeta('name', 'twitter:title', resolvedTitle);
+    ensureMeta('name', 'twitter:description', resolvedDescription);
+    if (resolvedImage) ensureMeta('name', 'twitter:image', resolvedImage);
     else document.head.querySelector('meta[name="twitter:image"]')?.remove();
     ensureLink('canonical', canonical);
 
