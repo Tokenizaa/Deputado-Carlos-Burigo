@@ -134,8 +134,8 @@ export const AdminAtuacaoTab: React.FC = () => {
   return (
     <div className="space-y-5">
       <header className="flex flex-col gap-1">
-        <h2 className="text-xl font-black tracking-tight text-stone-900">Atuação parlamentar</h2>
-        <p className="text-sm text-stone-500">Documentos, proposições e publicação no site.</p>
+        <h2 className="text-xl font-black tracking-tight text-stone-900">Gestão Documental</h2>
+        <p className="text-sm text-stone-500">Documentos do gabinete, atuação parlamentar e publicação no site.</p>
       </header>
 
       {loaded && documents.length > 0 && (
@@ -153,7 +153,7 @@ export const AdminAtuacaoTab: React.FC = () => {
       {!loaded ? (
         <div className="py-8 text-sm text-stone-500">Carregando...</div>
       ) : grouped.length === 0 ? (
-        <div className="border border-dashed border-stone-300 px-5 py-8 text-sm text-stone-500">Nenhum documento vinculado a proposições.</div>
+        <div className="border border-dashed border-stone-300 px-5 py-8 text-sm text-stone-500">Nenhum documento encontrado.</div>
       ) : (
         <div className="border-y border-stone-200">
           {visibleGroups.map((group) => (
