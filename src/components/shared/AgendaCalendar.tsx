@@ -59,9 +59,9 @@ const EventCard: React.FC<{
     <div className={`mt-0.5 text-[11px] font-bold leading-tight text-stone-900 ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
       {event.title}
     </div>
-    {!compact && event.tags && event.tags.length > 0 && (
+    {event.tags && event.tags.length > 0 && (
       <div className="mt-1 flex flex-wrap gap-1">
-        {event.tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full bg-white/70 border border-stone-200 px-1.5 py-0.5 text-[9px] font-bold text-stone-600">{tag}</span>)}
+        {event.tags.slice(0, compact ? 2 : 3).map((tag) => <span key={tag} className="rounded-full bg-white/70 border border-stone-200 px-1.5 py-0.5 text-[9px] font-bold text-stone-600">{tag}</span>)}
       </div>
     )}
     {!compact && (
