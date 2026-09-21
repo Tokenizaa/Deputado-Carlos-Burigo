@@ -38,7 +38,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [filterCategory, setFilterCategory] = useState('TODOS');
   const [page, setPage] = useState(1);
-  const [groupsPerPage, setGroupsPerPage] = useState(8);
+  const [documentsPerPage, setDocumentsPerPage] = useState(15);
 
   const loadDocuments = async () => {
     try {
@@ -104,10 +104,15 @@ export const AdminAtuacaoTab: React.FC = () => {
       .sort((a, b) => b.year - a.year || a.code.localeCompare(b.code, 'pt-BR'));
   }, [filteredDocuments, itemById]);
 
-  const totalPages = Math.max(1, Math.ceil(grouped.length / groupsPerPage));
-  const visibleGroups = grouped.slice((page - 1) * groupsPerPage, page * groupsPerPage);
+  const orderedDocuments = useMemo(() => grouped.flatMap((group) => group.documents), [grouped]);
+  const totalPages = Math.max(1, Math.ceil(orderedDocuments.length / documentsPerPage));
+  const pageDocuments = orderedDocuments.slice((page - 1) * documentsPerPage, page * documentsPerPage);
+  const visibleIds = new Set(pageDocuments.map((document) => document.id));
+  const visibleGroups = grouped
+    .map((group) => ({ ...group, documents: group.documents.filter((document) => visibleIds.has(document.id)) }))
+    .filter((group) => group.documents.length > 0);
 
-  useEffect(() => { setPage(1); }, [filterCategory, groupsPerPage]);
+  useEffect(() => { setPage(1); }, [filterCategory, documentsPerPage]);
 
   const openCreateFromLegislativeItem = (item: (typeof legislativeItems)[number]) => {
     openCreate();
@@ -242,8 +247,8 @@ export const AdminAtuacaoTab: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-stone-500">
-              Por página
-              <select value={groupsPerPage} onChange={(e) => setGroupsPerPage(Number(e.target.value))} className="rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs font-bold text-stone-700">
+              Documentos por página
+              <select value={documentsPerPage} onChange={(e) => setDocumentsPerPage(Number(e.target.value))} className="rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs font-bold text-stone-700">
                 {[15, 20, 30, 50, 75, 100].map((value) => <option key={value} value={value}>{value}</option>)}
               </select>
             </label>
