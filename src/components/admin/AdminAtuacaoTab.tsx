@@ -341,6 +341,7 @@ export const AdminAtuacaoTab: React.FC = () => {
                   onChange={setOriginalUrl}
                   onUploaded={({ storagePath: nextPath, mimeType: nextMimeType, size }) => { setStoragePath(nextPath); setMimeType(nextMimeType); setFileSize(size); }}
                   accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png,image/webp"
+                  visibility={visibility}
                   label="Arquivo ou link do documento"
                   hint="Envie PDF/DOC/DOCX/TXT/imagem ou informe uma fonte externa."
                 />
