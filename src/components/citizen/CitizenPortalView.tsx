@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle2, FileText, LockKeyhole, LogIn, Send, Upload, UserPlus } from 'lucide-react';
 import { DemandCategory } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
@@ -22,6 +22,22 @@ export const CitizenPortalView: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [generatedProtocol, setGeneratedProtocol] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [citizenDemandEnabled, setCitizenDemandEnabled] = useState(true);
+  const [loadingAvailability, setLoadingAvailability] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/platform-settings')
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted && typeof data?.citizenDemandEnabled === 'boolean') {
+          setCitizenDemandEnabled(data.citizenDemandEnabled);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => { if (mounted) setLoadingAvailability(false); });
+    return () => { mounted = false; };
+  }, []);
 
   const categories: DemandCategory[] = [
     'solicitar atendimento','apresentar demanda','enviar sugestão','solicitar informação',
@@ -133,7 +149,16 @@ export const CitizenPortalView: React.FC = () => {
           </p>
         </div>
 
-        {generatedProtocol ? (
+        {loadingAvailability ? (
+          <div className="bg-white border border-stone-200 rounded-2xl p-8 text-center">
+            <p className="text-sm font-semibold text-stone-600">Verificando disponibilidade do canal…</p>
+          </div>
+        ) : !citizenDemandEnabled ? (
+          <div className="bg-white border border-stone-200 rounded-2xl p-8 sm:p-10 text-center">
+            <h2 className="text-2xl font-black text-stone-900">Canal temporariamente indisponível</h2>
+            <p className="mt-2 text-stone-600">O gabinete pausou o recebimento de novas demandas neste momento. O canal será reaberto quando o atendimento estiver disponível.</p>
+          </div>
+        ) : generatedProtocol ? (
           <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
             <CheckCircle2 className="w-10 h-10 text-[#00863f]" />
             <h2 className="mt-4 text-2xl font-black text-stone-900">Demanda registrada</h2>
