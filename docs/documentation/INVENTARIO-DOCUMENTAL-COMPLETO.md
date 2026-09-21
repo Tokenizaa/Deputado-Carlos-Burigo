@@ -3,7 +3,7 @@
 **Data:** 21/09/2026  
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`  
 **Branch:** `main`  
-**Total atual detectado:** 106 arquivos
+**Total atual detectado:** 107 arquivos
 
 ## Objetivo
 
@@ -72,6 +72,7 @@ Foram considerados:
 | `docs/design/DESIGN-TOKENS-V2.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/documentation/INVENTARIO-DOCUMENTAL-COMPLETO.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/AUDITORIA-DOCUMENTAL-D0-D3.md` | CANÔNICO | MANTER COMO RESULTADO DA AUDITORIA |
+| `docs/documentation/D6-RECONCILIACAO-ADRS-GOVERNANCA.md` | CANÔNICO | MANTER COMO CHECKPOINT D6 |
 | `docs/documentation/MAPA-DOCUMENTAL-CANONICO.md` | CANÔNICO | MANTER COMO ÍNDICE OPERACIONAL |
 | `docs/documentation/MATRIZ-ESTADO-REAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/RECONCILIACAO-DOCUMENTAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
@@ -157,6 +158,17 @@ Nenhum documento histórico reabre uma fase. Para afirmar CONCLUÍDO, EM ANDAMEN
 
 A reconstrução documental continua em D4–D7, mas o estado operacional já possui uma única fonte: docs/roadmap/ROADMAP-CANONICO.md.
 
+## Estado da reconstrução documental
+
+- D0 — CONCLUÍDO
+- D1 — CONCLUÍDO
+- D2 — CONCLUÍDO
+- D3 — CONCLUÍDO
+- D4 — CONCLUÍDO
+- D5 — CONCLUÍDO
+- D6 — CONCLUÍDO
+- D7 — PENDENTE
+
 ## Próxima etapa
 
-D4 — consolidação da arquitetura documental mínima e reconciliação dos documentos canônicos.
+D7 — validação documental final.
