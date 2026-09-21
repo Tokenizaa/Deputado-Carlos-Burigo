@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Edit3, Eye, EyeOff, FileText, Plus, Save, X } from 'lucide-react';
+import { Edit3, Eye, EyeOff, FileText, Plus, Save, Search, X } from 'lucide-react';
 import type { PublicDocumentDto, PublicEvidenceDto } from '../../contracts/publicArchive';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
@@ -36,6 +36,10 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [filterType, setFilterType] = useState('TODOS');
+  const [search, setSearch] = useState('');
+  const [filterCategory, setFilterCategory] = useState('TODOS');
+  const [filterStatus, setFilterStatus] = useState('TODOS');
+  const [filterVisibility, setFilterVisibility] = useState('TODOS');
   const [page, setPage] = useState(1);
   const GROUPS_PER_PAGE = 8;
 
@@ -67,10 +71,27 @@ export const AdminAtuacaoTab: React.FC = () => {
     [legislativeItems],
   );
 
+  const filteredDocuments = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase('pt-BR');
+    return documents.filter((document) => {
+      if (filterType !== 'TODOS' && (document.documentType || 'DOCUMENTO') !== filterType) return false;
+      if (filterCategory !== 'TODOS' && document.category !== filterCategory) return false;
+      if (filterStatus !== 'TODOS' && document.status !== filterStatus) return false;
+      if (filterVisibility !== 'TODOS' && document.visibility !== filterVisibility) return false;
+      if (!term) return true;
+      const item = document.legislativeItemId ? itemById.get(document.legislativeItemId) : undefined;
+      const haystack = [
+        document.title, document.documentType, document.category, document.status,
+        document.visibility, document.sourceName, document.notes,
+        ...(document.tags || []), item?.code, item?.title,
+      ].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+      return haystack.includes(term);
+    });
+  }, [documents, itemById, search, filterType, filterCategory, filterStatus, filterVisibility]);
+
   const grouped = useMemo(() => {
     const groups = new Map<string, { code: string; title: string; year: number; documents: PublicDocumentDto[] }>();
-    for (const document of documents) {
-      if (filterType !== 'TODOS' && (document.documentType || 'DOCUMENTO') !== filterType) continue;
+    for (const document of filteredDocuments) {
       const item = document.legislativeItemId ? itemById.get(document.legislativeItemId) : undefined;
       const key = item?.id ?? 'sem-proposicao';
       const current = groups.get(key) ?? {
@@ -83,12 +104,12 @@ export const AdminAtuacaoTab: React.FC = () => {
       groups.set(key, current);
     }
     return [...groups.values()].sort((a, b) => b.year - a.year || a.code.localeCompare(b.code));
-  }, [documents, itemById, filterType]);
+  }, [filteredDocuments, itemById]);
 
   const totalPages = Math.max(1, Math.ceil(grouped.length / GROUPS_PER_PAGE));
   const visibleGroups = grouped.slice((page - 1) * GROUPS_PER_PAGE, page * GROUPS_PER_PAGE);
 
-  useEffect(() => { setPage(1); }, [filterType]);
+  useEffect(() => { setPage(1); }, [search, filterType, filterCategory, filterStatus, filterVisibility]);
 
   const openCreate = () => {
     setEditing({ id: '', legislativeItemId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
@@ -205,12 +226,29 @@ export const AdminAtuacaoTab: React.FC = () => {
       </div>
 
       {loaded && documents.length > 0 && (
-        <div className="flex flex-col gap-3 border-y border-stone-200 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setFilterType('TODOS')} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filterType === 'TODOS' ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-600'}`}>Todos</button>
-            {DOCUMENT_TYPES.map((type) => <button key={type} type="button" onClick={() => setFilterType(type)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filterType === type ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-600'}`}>{type.replace('_', ' ')}</button>)}
+        <div className="space-y-3 border-y border-stone-200 py-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por título, proposição, fonte ou tag..." className="w-full rounded-lg border border-stone-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-stone-400" />
           </div>
-          <span className="text-xs text-stone-500">{grouped.length} grupo{grouped.length === 1 ? '' : 's'} · {documents.filter((d) => filterType === 'TODOS' || (d.documentType || 'DOCUMENTO') === filterType).length} documento{documents.filter((d) => filterType === 'TODOS' || (d.documentType || 'DOCUMENTO') === filterType).length === 1 ? '' : 's'}</span>
+          <div className="flex flex-wrap gap-2">
+            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-semibold">
+              <option value="TODOS">Todos os tipos</option>{DOCUMENT_TYPES.map((type) => <option key={type} value={type}>{type.replace('_', ' ')}</option>)}
+            </select>
+            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-semibold">
+              <option value="TODOS">Todas as categorias</option>{CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-semibold">
+              <option value="TODOS">Todos os status</option>{STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+            <select value={filterVisibility} onChange={(e) => setFilterVisibility(e.target.value)} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-semibold">
+              <option value="TODOS">Todas as visibilidades</option>{VISIBILITIES.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+            {(search || filterType !== 'TODOS' || filterCategory !== 'TODOS' || filterStatus !== 'TODOS' || filterVisibility !== 'TODOS') && (
+              <button type="button" onClick={() => { setSearch(''); setFilterType('TODOS'); setFilterCategory('TODOS'); setFilterStatus('TODOS'); setFilterVisibility('TODOS'); }} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-bold text-stone-600">Limpar filtros</button>
+            )}
+          </div>
+          <span className="text-xs text-stone-500">{filteredDocuments.length} de {documents.length} documentos</span>
         </div>
       )}
 
