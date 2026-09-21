@@ -178,7 +178,7 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
     'campaign_official_name','mandate_slogan','bio_highlights','cta_title','cta_subtitle',
     'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_phone_caxias',
     'gabinete_whatsapp','gabinete_email','social_instagram','social_facebook','social_youtube',
-    'seo_default_title','seo_default_description','seo_default_image_url'
+    'seo_default_title','seo_default_description','seo_default_image_url','privacy_policy_text'
   ];
   const patch: Record<string, unknown> = {};
   for (const key of allowed) {
