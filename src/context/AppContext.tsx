@@ -322,6 +322,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       title?: string;
       slug?: string;
       description?: string;
+      seoTitle?: string;
+      seoDescription?: string;
+      ogImageUrl?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
@@ -357,6 +360,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     title: string;
     slug: string;
     description?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    ogImageUrl?: string;
     status?: 'publicado' | 'rascunho';
     blocks?: PageBlock[];
     publish?: boolean;
