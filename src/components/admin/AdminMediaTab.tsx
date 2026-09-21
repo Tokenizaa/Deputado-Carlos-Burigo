@@ -100,19 +100,13 @@ export const AdminMediaTab: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-stone-700 mb-1">
-                URL da Imagem *
-              </label>
-              <input
-                type="url"
-                required
-                placeholder="https://..."
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full text-sm bg-stone-50 border border-stone-300 rounded-lg p-2.5"
-              />
-            </div>
+            <AdminAssetInput
+              value={url}
+              onChange={setUrl}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              label="Imagem *"
+              hint="Você pode fazer upload da foto ou usar uma URL externa."
+            />
 
             <div>
               <label className="block text-xs font-bold text-stone-700 mb-1">
