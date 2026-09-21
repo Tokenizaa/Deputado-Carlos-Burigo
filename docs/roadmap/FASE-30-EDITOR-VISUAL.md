@@ -35,13 +35,16 @@ O editor administrativo deve se aproximar de um fluxo visual no estilo Elementor
 - Nenhuma gravação automática no servidor.
 - Remover dependência do modal para alterações simples.
 
-### Fase 2 — Mídia contextual
-- Clicar na imagem abre controles compactos.
-- Trocar pela biblioteca.
-- Trocar por URL.
-- Remover mídia.
-- Alterar texto alternativo e legenda.
+### Fase 2 — Mídia contextual ✅
+- Controles compactos no próprio canvas para blocos com mídia.
+- Seleção de imagens existentes na biblioteca de mídia.
+- Seleção de vídeos existentes no acervo, quando o bloco suportar vídeo.
+- Troca por URL externa.
+- Remoção da mídia sem abrir o editor avançado.
+- Edição contextual de texto alternativo e legenda/crédito.
 - Preview imediato no canvas.
+- Alterações permanecem no rascunho local até Salvar rascunho ou Publicar.
+- Não foi criado novo modelo de dados nem segundo renderer.
 
 ### Fase 3 — Controles de bloco
 - Barra contextual.
@@ -65,6 +68,10 @@ O editor administrativo deve se aproximar de um fluxo visual no estilo Elementor
 - Verificar renderer público.
 - Verificar rollback.
 - Build e testes.
+
+## Critério de conclusão da Fase 2
+
+Um administrador consegue selecionar um bloco com mídia no canvas, abrir os controles contextuais, escolher uma imagem da biblioteca, escolher vídeo quando suportado, informar uma URL externa, editar texto alternativo/legenda e remover a mídia, vendo o resultado no próprio canvas sem abrir o `BlockEditorForm`. A persistência continua condicionada ao comando explícito de salvar/publicar.
 
 ## Critério de conclusão da Fase 1
 
