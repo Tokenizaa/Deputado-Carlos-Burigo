@@ -175,12 +175,24 @@ export async function getPublicSettings() {
 export async function updateAdminSettings(input: Record<string, unknown>) {
   const allowed = [
     'site_mode','electoral_number','campaign_slogan','campaign_coalition','campaign_cnpj',
-    'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_whatsapp',
-    'gabinete_email','social_instagram','social_facebook','social_youtube','seo_default_title',
-    'seo_default_description','seo_default_image_url'
+    'campaign_official_name','mandate_slogan','bio_highlights','cta_title','cta_subtitle',
+    'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_phone_caxias',
+    'gabinete_whatsapp','gabinete_email','social_instagram','social_facebook','social_youtube',
+    'seo_default_title','seo_default_description','seo_default_image_url'
   ];
   const patch: Record<string, unknown> = {};
-  for (const key of allowed) if (key in input) patch[key] = input[key] === null ? null : String(input[key] ?? '').trim();
+  for (const key of allowed) {
+    if (!(key in input)) continue;
+    if (input[key] === null) {
+      patch[key] = null;
+    } else if (key === 'bio_highlights') {
+      patch[key] = Array.isArray(input[key])
+        ? input[key].map((item) => String(item).trim()).filter(Boolean)
+        : [];
+    } else {
+      patch[key] = String(input[key] ?? '').trim();
+    }
+  }
   if ('site_mode' in input) patch.site_mode = input.site_mode;
   const { data, error } = await supabaseAdmin.from('site_settings').update(patch).eq('id', true).select('*').single();
   if (error) throw error;
