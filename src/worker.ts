@@ -831,7 +831,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
-    if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!can(authResult.role as any, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'ID do documento é obrigatório' }, { status: 400 });
     try {
