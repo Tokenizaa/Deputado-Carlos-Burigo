@@ -3,6 +3,7 @@ import { Edit3, Eye, EyeOff, FileText, Save, X } from 'lucide-react';
 import type { PublicDocumentDto } from '../../contracts/publicArchive';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
+import { AdminAssetInput } from './AdminAssetInput';
 
 const DOCUMENT_TYPES = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO'];
 
