@@ -7,7 +7,6 @@ import {
   Sparkles,
   Share2,
   Phone,
-  ShieldCheck,
   Building,
   CheckCircle2,
   Globe,
@@ -21,15 +20,11 @@ import {
 export const AdminContentTab: React.FC = () => {
   const { settings, updateSettings, showToast } = useApp();
 
-  const [campaignSlogan, setCampaignSlogan] = useState(settings?.campaign_slogan || '');
   const [mandateSlogan, setMandateSlogan] = useState(settings?.mandate_slogan || '');
   const [phoneAlrs, setPhoneAlrs] = useState(settings?.gabinete_phone || '');
   const [phoneCaxias, setPhoneCaxias] = useState(settings?.gabinete_phone_caxias || '');
   const [whatsapp, setWhatsapp] = useState(settings?.gabinete_whatsapp || '');
   const [emailOfficial, setEmailOfficial] = useState(settings?.gabinete_email || '');
-  const [electionCnpj, setElectionCnpj] = useState(settings?.campaign_cnpj || '');
-  const [campaignName, setCampaignName] = useState(settings?.campaign_official_name || '');
-  const [coalition, setCoalition] = useState(settings?.campaign_coalition || '');
 
   const [instagram, setInstagram] = useState(settings?.social_instagram || '');
   const [facebook, setFacebook] = useState(settings?.social_facebook || '');
@@ -74,15 +69,11 @@ export const AdminContentTab: React.FC = () => {
     setIsSaving(true);
     try {
       const success = await updateSettings({
-        campaign_slogan: campaignSlogan,
         mandate_slogan: mandateSlogan,
         gabinete_phone: phoneAlrs,
         gabinete_phone_caxias: phoneCaxias,
         gabinete_whatsapp: whatsapp,
         gabinete_email: emailOfficial,
-        campaign_cnpj: electionCnpj,
-        campaign_official_name: campaignName,
-        campaign_coalition: coalition,
         social_instagram: instagram,
         social_facebook: facebook,
         social_youtube: youtube,
@@ -142,79 +133,13 @@ export const AdminContentTab: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Slogan de Campanha
-              </label>
-              <textarea
-                rows={3}
-                value={campaignSlogan}
-                onChange={(e) => setCampaignSlogan(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:bg-white focus:border-[#00A550] focus:ring-1 focus:ring-[#00A550] transition-colors"
-                placeholder="Ex.: Trabalho sério, presença constante e resultados reais para o Rio Grande."
-              />
-              <span className="text-[11px] text-stone-400">
-                Texto eleitoral público, quando aplicável.
-              </span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Slogan de Mandato / Institucional (Assembleia RS)
+                Slogan de Mandato/ / Institucional (Assembleia RS)
               </label>
               <textarea
                 rows={3}
                 value={mandateSlogan}
                 onChange={(e) => setMandateSlogan(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:bg-white focus:border-[#00A550] focus:ring-1 focus:ring-[#00A550] transition-colors"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Informações Eleitorais Oficiais (TSE / CNPJ) */}
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
-          <div className="flex items-center gap-2.5 border-b border-stone-100 pb-3">
-            <ShieldCheck className="w-5 h-5 text-[#00A550]" />
-            <div>
-              <h3 className="text-base font-bold text-stone-900">Dados Eleitorais Obrigatórios (TSE)</h3>
-              <p className="text-xs text-stone-500">Informações eleitorais públicas, quando aplicáveis</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                CNPJ da Campanha Eleitoral
-              </label>
-              <input
-                type="text"
-                value={electionCnpj}
-                onChange={(e) => setElectionCnpj(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]"
-                placeholder="00.000.000/0001-00"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Razão Social da Campanha
-              </label>
-              <input
-                type="text"
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Coligação / Partido
-              </label>
-              <input
-                type="text"
-                value={coalition}
-                onChange={(e) => setCoalition(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]"
               />
             </div>
           </div>
