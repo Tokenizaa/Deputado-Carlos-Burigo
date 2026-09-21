@@ -576,8 +576,10 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
 
 export async function getPublicDocuments() {
   const { data, error } = await supabasePublic.from('documents')
-    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility')
     .eq('visible', true)
+    .eq('status', 'publicado')
+    .eq('visibility', 'publico')
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map((row) => {
