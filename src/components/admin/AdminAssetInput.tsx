@@ -9,6 +9,7 @@ type Props = {
   label?: string;
   hint?: string;
   disabled?: boolean;
+  visibility?: 'publico' | 'interno' | 'restrito';
   onUploaded?: (asset: { url: string; storagePath: string; mimeType: string; size: number }) => void;
 };
 
@@ -19,6 +20,7 @@ export const AdminAssetInput: React.FC<Props> = ({
   label = 'Arquivo',
   hint = 'Envie um arquivo ou informe um link externo.',
   disabled = false,
+  visibility = 'publico',
   onUploaded,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +35,7 @@ export const AdminAssetInput: React.FC<Props> = ({
 
       const form = new FormData();
       form.append('file', file);
+      form.append('visibility', visibility);
 
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
