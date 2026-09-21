@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  UserCircle,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -152,15 +153,21 @@ className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
      
      {/* User info and site mode indicator in sidebar bottom */}
      <div className="mt-auto p-4 border-t border-stone-200">
-       <div className="flex items-center gap-3 text-sm">
-         <div className="w-8 h-8 rounded-full bg-[#00A550] text-white flex items-center justify-center font-bold text-[11px]">
-           {currentUser.name.charAt(0)}
+       <button
+         type="button"
+         onClick={() => { window.location.href = '/meu-perfil'; }}
+         className="w-full flex items-center gap-3 text-sm text-left rounded-xl p-2 -m-2 hover:bg-stone-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00A550]"
+         aria-label="Abrir meu perfil"
+       >
+         <div className="w-9 h-9 rounded-full overflow-hidden bg-[#00A550] text-white flex items-center justify-center font-bold text-[11px] shrink-0">
+           {currentUser.avatar ? <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" /> : currentUser.name.charAt(0)}
          </div>
-         <div className="flex-1">
-           <span className="block font-medium text-stone-900">{currentUser.name}</span>
+         <div className="flex-1 min-w-0">
+           <span className="block font-medium text-stone-900 truncate">{currentUser.displayName || currentUser.name}</span>
            <span className="text-[10px] text-stone-500 uppercase">{currentUser.role}</span>
          </div>
-       </div>
+         <UserCircle className="w-4 h-4 text-stone-400" />
+       </button>
        
 {settings?.site_mode && (
           <div className="mt-3 text-xs text-stone-500">
