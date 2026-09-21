@@ -382,6 +382,14 @@ export const AdminPagesTab: React.FC = () => {
                     const textValue = getInlineText(block, 'text');
 
                     return (
+                      <>
+                        {index > 0 && (
+                          <div className="flex justify-center py-1 bg-stone-100 group">
+                            <button type="button" onClick={(event) => { event.stopPropagation(); setShowBlocks(true); }} className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 bg-white px-2.5 py-1 text-[9px] font-black text-stone-400 hover:text-emerald-700 hover:border-emerald-400 transition-opacity">
+                              <Plus className="w-3 h-3" /> Inserir seção
+                            </button>
+                          </div>
+                        )}
                       <div
                         key={block.id}
                         draggable
@@ -537,6 +545,8 @@ export const AdminPagesTab: React.FC = () => {
                           </div>
                         )}
                       </div>
+                    );
+                      </>
                     );
                   })}
                   {draftBlocks.length > 0 && (
