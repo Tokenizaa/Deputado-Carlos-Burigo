@@ -221,17 +221,13 @@ export const AdminVideosTab: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-stone-700 uppercase mb-1">URL do Vídeo</label>
-                <input
-                  type="text"
-                  required
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 focus:bg-white focus:border-[#00A550]"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
-              </div>
+              <AdminAssetInput
+                value={url}
+                onChange={setUrl}
+                accept="video/mp4,video/webm,video/quicktime"
+                label="Vídeo *"
+                hint="Faça upload de um vídeo ou informe um link do YouTube, Instagram, Facebook ou outro serviço."
+              />
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -259,15 +255,13 @@ export const AdminVideosTab: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-stone-700 uppercase mb-1">URL da Imagem / Thumbnail</label>
-                <input
-                  type="text"
-                  value={thumbnail}
-                  onChange={(e) => setThumbnail(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900"
-                />
-              </div>
+              <AdminAssetInput
+                value={thumbnail}
+                onChange={setThumbnail}
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                label="Thumbnail"
+                hint="Envie uma imagem ou informe uma URL externa para a miniatura."
+              />
 
               <div>
                 <label className="block font-bold text-stone-700 uppercase mb-1">Descrição</label>
