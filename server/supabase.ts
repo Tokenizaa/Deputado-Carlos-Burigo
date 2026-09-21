@@ -483,7 +483,7 @@ export async function getPublicMedia() {
   return data ?? [];
 }
 
-const ADMIN_DOCUMENT_SELECT = 'id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility';
+const ADMIN_DOCUMENT_SELECT = 'id,legislative_item_id,evidence_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility';
 
 function mapAdminDocument(row: any) {
   const dto = mapToPublicDocumentDto(row);
@@ -511,6 +511,7 @@ export async function createAdminDocument(input: Record<string, unknown>) {
 
   const row = {
     legislative_item_id: input.legislativeItemId || null,
+    evidence_id: input.evidenceId || null,
     document_type: documentType,
     title,
     original_url: originalUrl,
@@ -563,6 +564,7 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
   if ('tags' in input) patch.tags = Array.isArray(input.tags) ? input.tags.map((tag) => String(tag).trim()).filter(Boolean) : [];
   if ('visibility' in input) patch.visibility = String(input.visibility || 'publico');
   if ('legislativeItemId' in input) patch.legislative_item_id = input.legislativeItemId || null;
+  if ('evidenceId' in input) patch.evidence_id = input.evidenceId || null;
 
   const { data, error } = await supabaseAdmin.from('documents')
     .update(patch)
@@ -576,7 +578,7 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
 
 export async function getPublicDocuments() {
   const { data, error } = await supabasePublic.from('documents')
-    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility')
+    .select('id,legislative_item_id,evidence_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility')
     .eq('visible', true)
     .eq('status', 'publicado')
     .eq('visibility', 'publico')
@@ -587,6 +589,14 @@ export async function getPublicDocuments() {
     const publicUrl = supabasePublic.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
     return { ...dto, publicUrl };
   });
+}
+
+export async function getAdminEvidence() {
+  const { data, error } = await supabaseAdmin.from('evidence')
+    .select('id,entity_type,entity_id,source_name,source_url,source_type,publication_date,verification_status,notes,verified_at,verified_by,created_at,updated_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapToPublicEvidenceDto);
 }
 
 export async function getPublicEvidence() {
