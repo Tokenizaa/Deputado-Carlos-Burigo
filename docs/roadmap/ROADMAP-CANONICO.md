@@ -56,11 +56,11 @@ Escopo canônico:
 
 ### Estado reconciliado da Fase 4
 
-- **Proteção de senha:** CONCLUÍDA no escopo implementado pelo commit `ca6e172`.
+- **Proteção de senha:** CONCLUÍDA no escopo implementado pelo commit `ca6e172`; inputs e bootstrap foram alinhados à política de 12 caracteres.
 - **Autenticação:** implementação existente; validação de segurança complementar continua sendo auditada.
 - **Admin bootstrap:** implementação existente; validação operacional ainda necessária.
 - **RLS:** implementação existente; testes de autorização ainda necessários.
-- **RBAC:** matriz existente; testes por papel/ação ainda necessários.
+- **RBAC:** matriz e checks de endpoint existentes; lacuna de ADMIN no módulo `atuação` corrigida em `a688bfa`; testes por papel/ação ainda necessários.
 - **Convites:** implementação existente; fluxo ponta a ponta ainda necessário.
 - **Auditoria:** implementação existente; fluxo ponta a ponta ainda necessário.
 
@@ -79,6 +79,7 @@ Antes de avançar para novas funcionalidades da Fase 4, a documentação foi rec
 - `docs/documentation/RECONCILIACAO-DOCUMENTAL.md`
 - `docs/documentation/D6-RECONCILIACAO-ADRS-GOVERNANCA.md`
 - `docs/documentation/D7-VALIDACAO-DOCUMENTAL-FINAL.md`
+- `docs/roadmap/FASE-4-VALIDACAO-SEGURANCA-ACESSO.md`
 
 Esse trabalho não substitui as fases do produto. Ele corrige a autoridade documental antes da continuidade da execução.
 
@@ -86,11 +87,9 @@ Esse trabalho não substitui as fases do produto. Ele corrige a autoridade docum
 
 A reconstrução documental está encerrada.
 
-**Próximo trabalho: FASE 4 — validação e conclusão de Segurança e Acesso**
+**Trabalho atual: FASE 4 — validação e conclusão de Segurança e Acesso**
 
-Depois:
-
-**FASE 5 — próximo bloco funcional definido a partir do estado real.**
+Depois da conclusão objetiva da FASE 4, o próximo bloco será definido a partir do estado real atualizado.
 
 ## Regra definitiva
 
