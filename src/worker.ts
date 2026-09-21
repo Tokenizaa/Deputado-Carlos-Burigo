@@ -26,6 +26,7 @@ import {
   getPublicDocuments,
   getPublicEvidence,
   getAdminDocuments,
+  createAdminDocument,
   updateAdminDocument,
   getAdminNews,
   createAdminNews,
@@ -581,7 +582,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/admin/upload': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!can(authResult.role as any, 'gestao-documental', 'create') && !can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     if (request.method !== 'POST') return methodNotAllowed();
     try {
       const form = await request.formData();
@@ -818,14 +819,26 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   '/api/admin/documents': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (request.method !== 'GET') return methodNotAllowed();
-    if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-    try {
-      return Response.json(await getAdminDocuments());
-    } catch (error) {
-      console.error('[api/admin/documents]', error);
-      return Response.json({ error: 'Falha ao carregar documentos' }, { status: 500 });
+    if (request.method === 'GET') {
+      if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        return Response.json(await getAdminDocuments());
+      } catch (error) {
+        console.error('[api/admin/documents GET]', error);
+        return Response.json({ error: 'Falha ao carregar documentos' }, { status: 500 });
+      }
     }
+    if (request.method === 'POST') {
+      if (!can(authResult.role as any, 'gestao-documental', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const document = await createAdminDocument(await request.json());
+        return Response.json(document, { status: 201 });
+      } catch (error) {
+        console.error('[api/admin/documents POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar documento' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
   },
   '/api/admin/documents/:id': async (request) => {
     const authResult = await requireAuth(request);
