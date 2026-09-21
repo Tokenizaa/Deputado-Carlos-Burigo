@@ -112,7 +112,6 @@ export function mapToPublicMediaDto(row: MediaRow): PublicMediaDto {
     sourcePageUrl: row.source_page_url,
     sha256: row.sha256,
     publishedAt: row.published_at,
-    publishedAt: row.published_at,
     downloadedAt: row.downloaded_at,
     verificationStatus: row.verification_status,
     rightsStatus: row.rights_status,
