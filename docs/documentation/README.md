@@ -8,7 +8,9 @@ Esta pasta é o núcleo da reconstrução documental.
 - `MATRIZ-ESTADO-REAL.md` — estado reconciliado do sistema.
 - `RECONCILIACAO-DOCUMENTAL.md` — regras para resolver divergências.
 - `RECONSTRUCAO-DOCUMENTAL-LINHA-DO-TEMPO.md` — linha do tempo.
-- `INVENTARIO-DOCUMENTAL-COMPLETO.md` — inventário de artefatos.
+- `INVENTARIO-DOCUMENTAL-COMPLETO.md` — inventário e classificação de artefatos.
+- `MAPA-DOCUMENTAL-CANONICO.md` — conjunto mínimo de documentos canônicos.
+- `AUDITORIA-DOCUMENTAL-D0-D3.md` — resultado da auditoria e reconciliação D0–D3.
 
 ## Regras
 
