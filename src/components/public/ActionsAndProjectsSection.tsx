@@ -191,6 +191,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                               <span className="text-sm font-bold text-stone-600 uppercase tracking-wider">Documentos da proposição</span>
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {documentsForItem(item.id).map((document) => (
+                                  <React.Fragment key={document.id}>
                                   <button key={document.id} type="button" onClick={() => openDocumentSource(document, document.title || item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
                                     <FileText className="h-4 w-4 shrink-0" />
                                     <span className="truncate">{document.title || 'Ver documento'}</span>
@@ -205,6 +206,7 @@ export const ActionsAndProjectsSection: React.FC<ActionsAndProjectsSectionProps>
                                       {document.visible ? 'Ocultar' : 'Mostrar'}
                                     </button>
                                   )}
+                                  </React.Fragment>
                                 ))}
                                 {documentsForItem(item.id).length === 0 && item.sourceUrl && (
                                   <button type="button" onClick={() => openSource(item.sourceUrl, 'Fonte oficial — ' + item.code)} className="min-h-11 max-w-full text-left text-sm font-semibold text-[#008C45] border border-stone-700 hover:border-[#008C45] px-4 py-2 rounded-md inline-flex items-center gap-2">
