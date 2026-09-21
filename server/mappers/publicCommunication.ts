@@ -37,6 +37,7 @@ type EventRow = {
   media_id?: string | null;
   link?: string | null;
   participants?: string | null;
+  tags?: unknown;
   visibility: 'publico';
   status: 'publicado';
 };
@@ -109,6 +110,7 @@ export function toPublicAgendaDto(row: EventRow): PublicAgendaDto {
     image: row.media_id ?? undefined,
     link: row.link ?? undefined,
     participants: row.participants ?? undefined,
+    tags: Array.isArray(row.tags) ? row.tags.filter((value): value is string => typeof value === 'string') : [],
     visibility: 'publico',
   };
 }
