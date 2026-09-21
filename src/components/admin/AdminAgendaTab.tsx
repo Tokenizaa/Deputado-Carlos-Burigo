@@ -4,6 +4,7 @@ import { Plus, Save, X, Tag } from 'lucide-react';
 import { EventItem } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { AgendaCalendar } from '../shared/AgendaCalendar';
+import { getAgendaTagColor } from '../shared/agendaTags';
 
 const TAG_SUGGESTIONS = [
   'Reunião',
@@ -246,7 +247,7 @@ export const AdminAgendaTab: React.FC = () => {
                 <label className="block text-xs font-bold text-stone-700 mb-1">Tags</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {tags.map((tag) => (
-                    <button key={tag} type="button" onClick={() => removeTag(tag)} className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
+                    <button key={tag} type="button" onClick={() => removeTag(tag)} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold hover:opacity-80 ${getAgendaTagColor(tag)}`}>
                       <Tag className="w-3 h-3" /> {tag} <span aria-hidden="true">×</span>
                     </button>
                   ))}
