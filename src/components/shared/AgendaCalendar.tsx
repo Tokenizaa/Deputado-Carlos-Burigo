@@ -15,11 +15,6 @@ const WEEKDAYS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
 const HOUR_START = 7;
 const HOUR_END = 22;
 
-const parseDate = (value: string) => {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, (month || 1) - 1, day || 1);
-};
-
 const formatDateKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
@@ -49,7 +44,7 @@ const EventCard: React.FC<{
 }> = ({ event, adminMode, compact = false, onClick }) => (
   <button
     type="button"
-    onClick={onClick}
+    onClick={(event) => { event.stopPropagation(); onClick?.(); }}
     className={`w-full text-left rounded-md border px-2 py-1.5 ${eventColor(event, adminMode)} hover:border-stone-400 transition-colors ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
   >
     <div className="flex items-center gap-1 text-[10px] font-black text-stone-700">
@@ -192,7 +187,7 @@ export const AgendaCalendar: React.FC<AgendaCalendarProps> = ({
               const isToday = dateKey === todayKey;
 
               return (
-                <button type="button" onClick={() => onDateClick?.(date)} className="text-left w-full min-h-24 sm:min-h-32 border-r border-b border-stone-200 p-1.5 sm:p-2">
+                <div role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="text-left w-full min-h-24 sm:min-h-32 border-r border-b border-stone-200 p-1.5 sm:p-2 hover:bg-stone-50 cursor-pointer">
                   <div className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold mb-1 ${isToday ? 'bg-[#00A550] text-white' : 'text-stone-700'}`}>
                     {day}
                   </div>
@@ -207,7 +202,7 @@ export const AgendaCalendar: React.FC<AgendaCalendarProps> = ({
                       />
                     ))}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -239,7 +234,7 @@ export const AgendaCalendar: React.FC<AgendaCalendarProps> = ({
                   {(view === 'week' ? weekDays : [calendarDate]).map((date) => {
                     const eventsForHour = dayEvents(date).filter((event) => Number.parseInt(event.time.replace(/\D/g, '').slice(0, 2) || '-1', 10) === hour);
                     return (
-                      <button type="button" onClick={() => onDateClick?.(date)} className="contents">
+                      <div role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="contents cursor-pointer">
                       <div key={`${formatDateKey(date)}-${hour}`} className="h-16 border-r border-b border-stone-200 p-1 space-y-1">
                         {eventsForHour.map((event) => (
                           <EventCard
