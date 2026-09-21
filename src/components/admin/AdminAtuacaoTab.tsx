@@ -16,6 +16,9 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [documentType, setDocumentType] = useState('');
   const [visible, setVisible] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [filterType, setFilterType] = useState('TODOS');
+  const [page, setPage] = useState(1);
+  const GROUPS_PER_PAGE = 8;
 
   const loadDocuments = async () => {
     try {
@@ -45,15 +48,25 @@ export const AdminAtuacaoTab: React.FC = () => {
   const grouped = useMemo(() => {
     const groups = new Map<string, { code: string; title: string; year: number; documents: PublicDocumentDto[] }>();
     for (const document of documents) {
-      if (!document.legislativeItemId) continue;
-      const item = itemById.get(document.legislativeItemId);
-      if (!item) continue;
-      const current = groups.get(item.id) ?? { code: item.code, title: item.title, year: item.year, documents: [] };
+      if (filterType !== 'TODOS' && (document.documentType || 'DOCUMENTO') !== filterType) continue;
+      const item = document.legislativeItemId ? itemById.get(document.legislativeItemId) : undefined;
+      const key = item?.id ?? 'sem-proposicao';
+      const current = groups.get(key) ?? {
+        code: item?.code ?? 'SEM PROPOSIÇÃO',
+        title: item?.title ?? 'Documentos sem proposição vinculada',
+        year: item?.year ?? 0,
+        documents: [],
+      };
       current.documents.push(document);
-      groups.set(item.id, current);
+      groups.set(key, current);
     }
     return [...groups.values()].sort((a, b) => b.year - a.year || a.code.localeCompare(b.code));
-  }, [documents, itemById]);
+  }, [documents, itemById, filterType]);
+
+  const totalPages = Math.max(1, Math.ceil(grouped.length / GROUPS_PER_PAGE));
+  const visibleGroups = grouped.slice((page - 1) * GROUPS_PER_PAGE, page * GROUPS_PER_PAGE);
+
+  useEffect(() => { setPage(1); }, [filterType]);
 
   const openEdit = (document: PublicDocumentDto) => {
     setEditing(document);
@@ -119,8 +132,18 @@ export const AdminAtuacaoTab: React.FC = () => {
     <div className="space-y-5">
       <header className="flex flex-col gap-1">
         <h2 className="text-xl font-black tracking-tight text-stone-900">Atuação parlamentar</h2>
-        <p className="text-sm text-stone-500">Proposições e documentos vinculados. Edite o documento ou controle sua publicação.</p>
+        <p className="text-sm text-stone-500">Documentos, proposições e publicação no site.</p>
       </header>
+
+      {loaded && documents.length > 0 && (
+        <div className="flex flex-col gap-3 border-y border-stone-200 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setFilterType('TODOS')} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filterType === 'TODOS' ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-600'}`}>Todos</button>
+            {DOCUMENT_TYPES.map((type) => <button key={type} type="button" onClick={() => setFilterType(type)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filterType === type ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-600'}`}>{type.replace('_', ' ')}</button>)}
+          </div>
+          <span className="text-xs text-stone-500">{grouped.length} grupo{grouped.length === 1 ? '' : 's'} · {documents.filter((d) => filterType === 'TODOS' || (d.documentType || 'DOCUMENTO') === filterType).length} documento{documents.filter((d) => filterType === 'TODOS' || (d.documentType || 'DOCUMENTO') === filterType).length === 1 ? '' : 's'}</span>
+        </div>
+      )}
 
       {error && <div className="border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
 
@@ -130,7 +153,7 @@ export const AdminAtuacaoTab: React.FC = () => {
         <div className="border border-dashed border-stone-300 px-5 py-8 text-sm text-stone-500">Nenhum documento vinculado a proposições.</div>
       ) : (
         <div className="border-y border-stone-200">
-          {grouped.map((group) => (
+          {visibleGroups.map((group) => (
             <section key={group.code} className="border-b border-stone-200 last:border-b-0">
               <div className="flex items-baseline justify-between gap-4 px-3 py-3 bg-stone-50">
                 <div className="min-w-0">
@@ -168,6 +191,16 @@ export const AdminAtuacaoTab: React.FC = () => {
               </div>
             </section>
           ))}
+        </div>
+      )}
+
+      {grouped.length > 0 && totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-stone-200 pt-3">
+          <span className="text-xs text-stone-500">Página {page} de {totalPages}</span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-bold disabled:opacity-40">Anterior</button>
+            <button type="button" disabled={page === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))} className="rounded-lg border border-stone-200 px-3 py-2 text-xs font-bold disabled:opacity-40">Próxima</button>
+          </div>
         </div>
       )}
 
