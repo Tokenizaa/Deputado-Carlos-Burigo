@@ -3,7 +3,7 @@
 **Data:** 21/09/2026  
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`  
 **Branch:** `main`  
-**Total atual detectado:** 104 arquivos
+**Total atual detectado:** 106 arquivos
 
 ## Objetivo
 
@@ -71,6 +71,8 @@ Foram considerados:
 | `docs/design/CANONICAL-DESIGN-MEDIA.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/design/DESIGN-TOKENS-V2.md` | REFERÊNCIA | MANTER; VALIDAR CONTRA ESTADO ATUAL |
 | `docs/documentation/INVENTARIO-DOCUMENTAL-COMPLETO.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
+| `docs/documentation/AUDITORIA-DOCUMENTAL-D0-D3.md` | CANÔNICO | MANTER COMO RESULTADO DA AUDITORIA |
+| `docs/documentation/MAPA-DOCUMENTAL-CANONICO.md` | CANÔNICO | MANTER COMO ÍNDICE OPERACIONAL |
 | `docs/documentation/MATRIZ-ESTADO-REAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/RECONCILIACAO-DOCUMENTAL.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
 | `docs/documentation/RECONSTRUCAO-DOCUMENTAL-LINHA-DO-TEMPO.md` | CANÔNICO | MANTER COMO NÚCLEO DOCUMENTAL |
