@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Edit3, Eye, EyeOff, FileText, Plus, Save, X } from 'lucide-react';
-import type { PublicDocumentDto } from '../../contracts/publicArchive';
+import type { PublicDocumentDto, PublicEvidenceDto } from '../../contracts/publicArchive';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { useApp } from '../../context/AppContext';
 import { AdminAssetInput } from './AdminAssetInput';
@@ -13,6 +13,7 @@ const VISIBILITIES = ['publico', 'interno', 'restrito'];
 export const AdminAtuacaoTab: React.FC = () => {
   const { legislativeItems, showToast } = useApp();
   const [documents, setDocuments] = useState<PublicDocumentDto[]>([]);
+  const [evidence, setEvidence] = useState<PublicEvidenceDto[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<PublicDocumentDto | null>(null);
@@ -31,6 +32,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [publishedAt, setPublishedAt] = useState('');
   const [notes, setNotes] = useState('');
   const [legislativeItemId, setLegislativeItemId] = useState('');
+  const [evidenceId, setEvidenceId] = useState('');
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [filterType, setFilterType] = useState('TODOS');
@@ -48,6 +50,9 @@ export const AdminAtuacaoTab: React.FC = () => {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao carregar documentos.');
       setDocuments(Array.isArray(payload) ? payload : []);
+      const evidenceResponse = await fetch('/api/admin/evidence', { headers: { Authorization: `Bearer ${token}` } });
+      const evidencePayload = await evidenceResponse.json();
+      if (evidenceResponse.ok) setEvidence(Array.isArray(evidencePayload) ? evidencePayload : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao carregar documentos.');
     } finally {
@@ -87,7 +92,7 @@ export const AdminAtuacaoTab: React.FC = () => {
 
   const openCreate = () => {
     setEditing({ id: '', legislativeItemId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
-    setTitle(''); setDocumentType(''); setOriginalUrl(''); setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setVisible(true);
+    setTitle(''); setDocumentType(''); setOriginalUrl(''); setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setEvidenceId(''); setVisible(true);
   };
 
   const openEdit = (document: PublicDocumentDto) => {
@@ -107,6 +112,7 @@ export const AdminAtuacaoTab: React.FC = () => {
     setPublishedAt(document.publishedAt || '');
     setNotes(document.notes || '');
     setLegislativeItemId(document.legislativeItemId || '');
+    setEvidenceId(document.evidenceId || '');
   };
 
   const closeEdit = () => {
@@ -115,7 +121,7 @@ export const AdminAtuacaoTab: React.FC = () => {
     setDocumentType('');
     setVisible(true);
     setOriginalUrl('');
-    setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId('');
+    setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setEvidenceId('');
   };
 
   const createDocument = async (event: React.FormEvent) => {
@@ -129,7 +135,7 @@ export const AdminAtuacaoTab: React.FC = () => {
       const response = await fetch('/api/admin/documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim(), storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
+        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim(), evidenceId: evidenceId || null, storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao criar documento.');
@@ -154,7 +160,7 @@ export const AdminAtuacaoTab: React.FC = () => {
       const response = await fetch(`/api/admin/documents/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim() || null, storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
+        body: JSON.stringify({ title: title.trim(), documentType, originalUrl: originalUrl.trim() || null, evidenceId: evidenceId || null, storagePath: storagePath || null, mimeType: mimeType || null, fileSize, category, status, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean), visibility, sourceName: sourceName.trim() || null, publishedAt: publishedAt || null, notes: notes.trim() || null, legislativeItemId: legislativeItemId || null, visible }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || 'Falha ao salvar documento.');
@@ -316,6 +322,14 @@ export const AdminAtuacaoTab: React.FC = () => {
               <div><label className="mb-1 block text-xs font-bold text-stone-700">Tags</label><input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="ex.: PL, saúde, orçamento" className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
               <div><label className="mb-1 block text-xs font-bold text-stone-700">Fonte</label><input value={sourceName} onChange={(e) => setSourceName(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
               <div><label className="mb-1 block text-xs font-bold text-stone-700">Observações</label><textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
+              <div>
+                <label className="mb-1 block text-xs font-bold text-stone-700">Evidência / fonte de verificação</label>
+                <select value={evidenceId} onChange={(e) => setEvidenceId(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
+                  <option value="">Sem evidência vinculada</option>
+                  {evidence.map((item) => <option key={item.id} value={item.id}>{item.sourceName || item.title || item.id} — {item.type}</option>)}
+                </select>
+                {evidenceId && <p className="mt-1 text-[11px] text-stone-500">{evidence.find((item) => item.id === evidenceId)?.description || 'Evidência vinculada ao documento.'}</p>}
+              </div>
               <div>
                 <label className="mb-1 block text-xs font-bold text-stone-700">Proposição vinculada</label>
                 <select value={legislativeItemId} onChange={(e) => setLegislativeItemId(e.target.value)} className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">
