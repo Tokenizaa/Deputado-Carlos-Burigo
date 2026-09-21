@@ -27,16 +27,16 @@ Esta matriz é a referência para reconciliar documentação. O estado funcional
 | Smoke de produção | CONCLUÍDO | smoke registrado e deploy posterior | Nova falha exige nova evidência |
 | Autenticação administrativa | CONCLUÍDO | `requireAuth`, Supabase Auth | Validação adicional de segurança pode existir |
 | Autenticação cidadã | CONCLUÍDO | `requireCitizenAuth`, fluxo cidadão | Validação ponta a ponta pode ser ampliada |
-| Proteção de senha | CONCLUÍDO (escopo atual) | `ca6e172`, `src/lib/passwordValidation.ts` | Política reforçada implementada |
+| Proteção de senha | CONCLUÍDO (escopo atual) | `ca6e172`, política centralizada; inputs e bootstrap alinhados em `ffed0ff`, `6c788c0`, `fd43955` | Política reforçada implementada; advisor ainda aponta proteção contra senhas vazadas desabilitada |
 | Rate limiting de autenticação | PENDENTE | não identificado como implementado no ciclo atual | Futuro item de segurança |
 | Histórico de senhas | PENDENTE | não identificado | Futuro item |
 | Recuperação segura de senha | NÃO VALIDADO | existência deve ser auditada antes de concluir | Não declarar ausente sem verificação |
 | Verificação de e-mail | NÃO VALIDADO | existência deve ser auditada | Não declarar ausente sem verificação |
-| Bootstrap administrativo | NÃO VALIDADO | endpoint e helpers existem | Requer validação real do fluxo |
-| RLS | NÃO VALIDADO | RLS/policies existem | Requer testes de autorização |
-| RBAC | NÃO VALIDADO | matriz de papéis/permissões existe | Requer teste por papel |
-| Convites | NÃO VALIDADO | rotas e camada de invites existem | Requer fluxo real |
-| Auditoria | NÃO VALIDADO | audit logs existem | Requer teste ponta a ponta |
+| Bootstrap administrativo | NÃO VALIDADO | endpoint, claim condicional e tabela `admin_bootstrap` auditados | Requer validação E2E; acesso direto à tabela não está concedido aos papéis expostos |
+| RLS | NÃO VALIDADO | RLS habilitado em todas as tabelas `public` e policies auditadas | Requer testes E2E de autorização; `admin_bootstrap` é serviço-only sem policy |
+| RBAC | NÃO VALIDADO | `adminPermissions.ts` + checks `can()`; lacuna ADMIN/atuação corrigida em `a688bfa` | Requer teste por papel/ação |
+| Convites | NÃO VALIDADO | `server/invites.ts` + RLS + expiração/token hash | Requer fluxo E2E |
+| Auditoria | NÃO VALIDADO | `audit_logs` + políticas + integração em operações administrativas | Requer teste E2E |
 | CMS/Page Builder | NÃO VALIDADO | pages/blocks/versions e rollback existem | Requer validação operacional |
 | Conteúdo público | NÃO VALIDADO | APIs e Supabase existem | Requer validação ponta a ponta |
 | Documentos/evidências | NÃO VALIDADO | APIs, banco e storage existem | Requer upload/publicação/leitura |
