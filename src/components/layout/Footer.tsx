@@ -18,7 +18,7 @@ const MORE_ITEMS = [
 ] as const;
 
 export const Footer: React.FC = () => {
-  const { currentView, setCurrentView, openProtocolModal } = useApp();
+  const { currentView, setCurrentView, openProtocolModal, settings } = useApp();
   const [moreOpen, setMoreOpen] = useState(false);
   const navigate = (view: string) => { setMoreOpen(false); setCurrentView(view); };
 
@@ -38,10 +38,9 @@ export const Footer: React.FC = () => {
             <h4 className="text-stone-100 font-bold">Gabinete Parlamentar</h4>
             <div className="space-y-1.5 text-stone-300">
               <p className="font-semibold text-white">Assembleia Legislativa do RS</p>
-              <p>Praça Marechal Deodoro, 130</p>
-              <p>Centro Histórico • Porto Alegre — RS</p>
-              <p>10º andar — Sala 1002</p>
-              <p>Telefone: (51) 3210-2000</p>
+              <p>{settings?.gabinete_address_poa || 'Assembleia Legislativa do RS'}</p>
+              <p>Porto Alegre — RS</p>
+              <p>Telefone: {settings?.gabinete_phone || 'Não informado'}</p>
             </div>
           </div>
 
