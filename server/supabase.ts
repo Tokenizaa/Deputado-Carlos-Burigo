@@ -485,12 +485,15 @@ export async function getPublicMedia() {
 
 const ADMIN_DOCUMENT_SELECT = 'id,legislative_item_id,evidence_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility';
 
-function mapAdminDocument(row: any) {
+async function mapAdminDocument(row: any) {
   const dto = mapToPublicDocumentDto(row);
-  const publicUrl = row.storage_path
-    ? supabaseAdmin.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl
-    : null;
-  return { ...dto, publicUrl };
+  if (!row.storage_path) return { ...dto, publicUrl: null };
+  if (row.visibility === 'publico') {
+    const publicUrl = supabaseAdmin.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
+    return { ...dto, publicUrl };
+  }
+  const { data } = await supabaseAdmin.storage.from('documents-private').createSignedUrl(row.storage_path, 3600);
+  return { ...dto, publicUrl: data?.signedUrl ?? null };
 }
 
 export async function getAdminDocuments() {
@@ -498,7 +501,7 @@ export async function getAdminDocuments() {
     .select(ADMIN_DOCUMENT_SELECT)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map(mapAdminDocument);
+  return Promise.all((data ?? []).map(mapAdminDocument));
 }
 
 export async function createAdminDocument(input: Record<string, unknown>) {
@@ -538,7 +541,30 @@ export async function createAdminDocument(input: Record<string, unknown>) {
   return mapAdminDocument(data);
 }
 
+async function moveDocumentAsset(storagePath: string, fromBucket: string, toBucket: string) {
+  const { data, error } = await supabaseAdmin.storage.from(fromBucket).download(storagePath);
+  if (error) throw error;
+  const bytes = new Uint8Array(await data.arrayBuffer());
+  const { error: uploadError } = await supabaseAdmin.storage.from(toBucket).upload(storagePath, bytes, {
+    contentType: data.type || 'application/octet-stream',
+    upsert: false,
+  });
+  if (uploadError && !/already exists/i.test(uploadError.message)) throw uploadError;
+  const { error: removeError } = await supabaseAdmin.storage.from(fromBucket).remove([storagePath]);
+  if (removeError) throw removeError;
+}
+
 export async function updateAdminDocument(id: string, input: Record<string, unknown>) {
+  const { data: current, error: currentError } = await supabaseAdmin.from('documents')
+    .select('id,storage_path,visibility')
+    .eq('id', id)
+    .maybeSingle();
+  if (currentError) throw currentError;
+  if (!current) return null;
+
+  const nextVisibility = 'visibility' in input ? String(input.visibility || 'publico') : String(current.visibility || 'publico');
+  if (!['publico', 'interno', 'restrito'].includes(nextVisibility)) throw new Error('Visibilidade inválida');
+
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if ('visible' in input) {
     if (typeof input.visible !== 'boolean') throw new Error('O campo visible deve ser booleano');
@@ -562,9 +588,16 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
   if ('category' in input) patch.category = String(input.category || 'outros');
   if ('status' in input) patch.status = String(input.status || 'publicado');
   if ('tags' in input) patch.tags = Array.isArray(input.tags) ? input.tags.map((tag) => String(tag).trim()).filter(Boolean) : [];
-  if ('visibility' in input) patch.visibility = String(input.visibility || 'publico');
+  if ('visibility' in input) patch.visibility = nextVisibility;
   if ('legislativeItemId' in input) patch.legislative_item_id = input.legislativeItemId || null;
   if ('evidenceId' in input) patch.evidence_id = input.evidenceId || null;
+
+  const currentBucket = current.storage_path ? (current.visibility === 'publico' ? 'documents' : 'documents-private') : null;
+  const targetPath = 'storagePath' in input && input.storagePath ? String(input.storagePath) : current.storage_path;
+  const targetBucket = targetPath ? (nextVisibility === 'publico' ? 'documents' : 'documents-private') : null;
+  if (current.storage_path && targetPath === current.storage_path && currentBucket && targetBucket && currentBucket !== targetBucket) {
+    await moveDocumentAsset(current.storage_path, currentBucket, targetBucket);
+  }
 
   const { data, error } = await supabaseAdmin.from('documents')
     .update(patch)
