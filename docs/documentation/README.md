@@ -11,6 +11,7 @@ Esta pasta é o núcleo da reconstrução documental.
 - `INVENTARIO-DOCUMENTAL-COMPLETO.md` — inventário e classificação de artefatos.
 - `MAPA-DOCUMENTAL-CANONICO.md` — conjunto mínimo de documentos canônicos.
 - `AUDITORIA-DOCUMENTAL-D0-D3.md` — resultado da auditoria e reconciliação D0–D3.
+- `D6-RECONCILIACAO-ADRS-GOVERNANCA.md` — checkpoint de reconciliação de ADRs e governança.
 
 ## Regras
 
