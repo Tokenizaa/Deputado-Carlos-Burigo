@@ -1,77 +1,87 @@
-# Agent Topology — Deputado-Carlos-Burigo
+# AGENTS — GOVERNANÇA DO REPOSITÓRIO
 
-## Agentes de Governança
+**Estado:** reconciliado em D6 da reconstrução documental
+**Branch de referência:** main
 
-| Agente | Papel |
-|--------|-------|
-| Supervisor | Orquestração — distribui tarefas, resolve conflitos, discovery |
-| Architecture Review | Qualidade — revisa PRs, valida SOLID, acoplamento, duplicação, pode vetar mudanças |
-| Context Manager | Documentação — ADRs, topologia de agentes, folder-structure, roadmap e decision-log |
+## Finalidade
 
-## Agentes de Domínio
+Este arquivo define regras operacionais para agentes que trabalham no repositório. Ele não é fonte de verdade sobre o estado funcional do produto.
 
-### agent-dominio-demandas
-- **Objetivo**: Gerencia tudo relacionado a demandas públicas e cidadãs, incluindo protocolo, consulta e conformidade com Lei de Acesso à Informação
-- **Escopo**: 
-  - Permitido: `src/contracts/publicCommunication.ts`, `src/contracts/publicLegislative.ts`, `src/contracts/publicArchive.ts`, `src/components/citizen/**`, `api/documents.ts`, `api/media.ts`, `api/results.ts`, `api/agenda.ts` (parcial), `docs/P1-PUBLIC-*`, `documents/`
-  - Proibido: `src/components/admin/**`, `api/projects.ts`, `api/news.ts`, `api/settings.ts`, `api/municipalities.ts`, `api/evidence.ts`, `api/votes.ts`, `src/types.ts` (exceção para tipos específicos de demandas)
-- **Depende de**: agent-dominio-configuracoes, agent-dominio-municipios, agent-dominio-notificacoes
-- **Dependido por**: Nenhum (agente de domínio primário)
+O estado do produto é determinado por:
+1. código em main;
+2. banco e configuração reais, quando aplicável;
+3. validações executadas;
+4. documentação canônica derivada dessas evidências.
 
-### agent-dominio-admin
-- **Objetivo**: Gerencia tudo relacionado ao domínio administrativo interno, incluindo autenticação, autorização, gestão de usuários e conteúdo institucional
-- **Escopo**: 
-  - Permitido: `src/components/admin/**`, `api/projects.ts`, `api/news.ts`, `api/documents.ts` (parcial), `api/media.ts` (parcial), `api/settings.ts`, `api/agenda.ts` (parcial), `api/votes.ts` (parcial), `api/results.ts` (parcial), `src/types.ts` (para tipos administrativos específicos), `docs/P1-ADMIN-*`
-  - Proibido: `src/components/citizen/**`, `src/contracts/public*.ts`, `api/evidence.ts` (parcial - apenas se relacionado a administração de evidências), `api/municipalities.ts` (domínio de municípios - exceção para administração de dados municipais)
-- **Depende de**: agent-dominio-demandas (para visualizar demandas), agent-dominio-municipios, agent-dominio-configuracoes, agent-dominio-notificacoes
-- **Dependido por**: agent-dominio-demandas (para resposta a demandas), agent-dominio-votos (para apoio legislativo), agent-dominio-projetos (para gestão de projetos)
+A sequência operacional está exclusivamente em docs/roadmap/ROADMAP-CANONICO.md.
 
-### agent-dominio-votos
-- **Objetivo**: Gerencia tudo relacionado ao domínio legislativo e de votações, incluindo processamento de votações, gestão de pautas e calendário legislativo
-- **Escopo**: 
-  - Permitido: `api/votes.ts`, `api/agenda.ts` (parcial - componentes relacionados a votações e pautas), `api/results.ts` (parcial - resultados legislativos), `src/components/legislative/**` (se existir ou for criado), `src/contracts/publicLegislative.ts` (parcial - apenas aspectos legislativos), `docs/P1-LEGISLATIVO-*`, `src/types.ts` (para tipos legislativos específicos)
-  - Proibido: `src/components/citizen/**` (exceto para visualização pública de votações), `src/components/admin/**` (exceto para apoio legislativo interno), `api/documents.ts` (parcial - apenas se relacionado a documentos legislativos), `api/news.ts`, `api/media.ts` (exceto para transmissão de sessões), `api/settings.ts`, `api/municipalities.ts` (exceto para relação com representantes municipais), `api/evidence.ts` (exceto para uso em processos legislativos)
-- **Depende de**: agent-dominio-admin (para apoio administrativo), agent-dominio-midia (para transmissão e gravação), agent-dominio-configuracoes, agent-dominio-notificacoes, agent-dominio-demandas (para relação entre demandas e processos legislativos)
-- **Dependido por**: agent-dominio-projetos (para aprovação legislativa de projetos)
+## Arquitetura atual
 
-### agent-dominio-projetos
-- **Objetivo**: Gerencia tudo relacionado ao domínio de projetos e iniciativas parlamentares, incluindo planejamento, orçamentação, gestão de cronograma e avaliação de resultados
-- **Escopo**: 
-  - Permitido: `api/projects.ts`, `api/documents.ts` (parcial - documentos relacionados a projetos), `src/components/projects/**` (se existir ou for criado), `src/types.ts` (para tipos de projetos específicos), `docs/P1-PROJETOS-*`, `api/results.ts` (parcial - resultados relacionados a projetos), `api/agenda.ts` (parcial - compromissos relacionados a projetos)
-  - Proibido: `src/components/citizen/**` (exceto para visualização pública de projetos), `src/components/admin/**` (exceto para apoio à gestão de projetos), `src/contracts/public*.ts` (exceto para referência a projetos), `api/news.ts` (domínio de notícias institucionais - exceto para divulgação de projetos), `api/media.ts` (domínio de mídia - exceto para cobertura de projetos), `api/settings.ts` (domínio de configurações gerais - exceto para configurações de projetos), `api/municipalities.ts` (domínio de municípios - exceto para projetos municipais específicos), `api/votes.ts` (domínio de votações - exceto para aprovação de projetos legislativos), `api/evidence.ts` (domínio de evidências - exceto para uso em avaliação de projetos)
-- **Depende de**: agent-dominio-admin (para apoio administrativo), agent-dominio-votos (para aprovação legislativa), agent-dominio-configuracoes, agent-dominio-midia (para divulgação de resultados), agent-dominio-notificacoes (para alertas de marcos e entregas), agent-dominio-demandas (para identificação de necessidades que geram projetos)
-- **Dependido por**: agent-dominio-votos (para projetos que requerem aprovação legislativa)
+- Frontend: React 19 + Vite + TypeScript.
+- Runtime de produção: Cloudflare Workers.
+- Persistência e autenticação: Supabase.
+- Servidor: Worker em src/worker.ts, com módulos de acesso ao Supabase em server/.
+- Contratos e tipos compartilhados: src/types.ts e src/contracts/.
+- Autorização administrativa: src/config/adminPermissions.ts + autenticação do Worker.
+- Documentação canônica: docs/documentation/, ADRs em docs/adr/ e roadmap em docs/roadmap/ROADMAP-CANONICO.md.
 
-## Shared Kernel
+## Regras de governança
 
-- **Localização**: `src/types.ts`, `src/contracts/` (contratos públicos compartilhados)
-- **Responsabilidade**: Tipos compartilhados, interfaces, enums e utilitários usados por múltiplos domínios
-- **Acesso**: Todos os agentes podem ler, mas nenhum deve modificar diretamente
-- **Governança**: Alterações exigem ADR e aprovação do Supervisor e Architecture Review
+1. Não criar uma segunda arquitetura para substituir a existente.
+2. Não criar runtime de produção paralelo ao Cloudflare Worker.
+3. Não reintroduzir api/ como camada de produção paralela ao Worker.
+4. Não recriar fontes de dados removidas quando existir uma fonte canônica documentada.
+5. Antes de alterar um domínio, localizar a implementação e a documentação canônica existentes.
+6. Não interpretar documentação histórica como estado atual.
+7. Não classificar como ausente algo apenas porque ainda não foi validado.
+8. Toda mudança de arquitetura relevante deve ter ADR.
+9. Alterações em autenticação, autorização ou RLS devem ser acompanhadas de validação objetiva.
+10. Não duplicar páginas, módulos, mapeadores ou fluxos existentes sem necessidade comprovada.
+11. Preservar histórico Git; correções documentais são feitas por reconciliação, não por reescrita destrutiva.
+12. Backlogs e identificadores históricos permanecem históricos e não definem novas fases.
 
-## Dependências entre Agentes
+## Domínios funcionais
 
-```mermaid
-graph TD
-    A[agent-dominio-admin] --> B[agent-dominio-demandas]
-    A --> C[agent-dominio-votos]
-    A --> D[agent-dominio-projetos]
-    B --> C
-    B --> D
-    C --> D
-    D --> A
-```
+Os domínios devem ser tratados a partir da implementação real, sem pressupor a topologia de agentes descrita em versões antigas deste arquivo:
+- autenticação, autorização e equipe;
+- demandas e atendimento cidadão;
+- conteúdo/CMS;
+- comunicação pública;
+- domínio legislativo;
+- documentos e evidências;
+- agenda, resultados, municípios e vídeos;
+- configurações e infraestrutura.
 
-## Skills Obrigatórias por Agente
+Um agente pode atuar em mais de um domínio quando uma mudança transversal exigir isso. O limite é definido pelo código atual e pelas regras de governança, não por uma lista fixa de agentes.
 
-### agent-dominio-demandas
-- api-patterns, database, ai-seo, web-perf, shadcn-ui, markdown
+## Segurança
 
-### agent-dominio-admin
-- api-patterns, database, auth, react-patterns, testing, web-perf, observability
+- Credenciais e chaves de serviço não devem ser expostas no frontend.
+- Endpoints protegidos devem validar a sessão e a autorização aplicável.
+- Alterações de senha devem respeitar a política centralizada em src/lib/passwordValidation.ts.
+- Mudanças de RLS devem ser tratadas como alterações de segurança e validadas no Supabase.
+- Logs de auditoria não devem ser tratados como substitutos de autorização.
 
-### agent-dominio-votos
-- api-patterns, database, web-perf, shadcn-ui, markdown, csv, observability
+## Documentação
 
-### agent-dominio-projetos
-- api-patterns, database, web-perf, react-patterns, charting, markdown, csv, observability
+Antes de criar um novo documento:
+1. consultar docs/documentation/README.md;
+2. localizar a fonte canônica existente;
+3. atualizar a fonte existente quando o conteúdo pertencer ao mesmo assunto;
+4. criar novo documento somente quando houver uma finalidade distinta.
+
+Documentos históricos podem ser preservados para rastreabilidade, mas não devem ser usados para reabrir trabalho automaticamente.
+
+## Histórico da topologia anterior
+
+As definições anteriores de Supervisor, Architecture Review, Context Manager e agentes de domínio permanecem preservadas no histórico Git. A topologia descrita na versão anterior deste arquivo não é mais considerada uma especificação operacional atual.
+
+## Critério de conclusão
+
+Uma tarefa só deve ser marcada como concluída quando houver evidência objetiva apropriada ao seu tipo:
+- implementação no código;
+- migration/configuração aplicada;
+- teste ou validação executada;
+- smoke de produção, quando aplicável.
+
+NÃO VALIDADO não significa NÃO IMPLEMENTADO.
