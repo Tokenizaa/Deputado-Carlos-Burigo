@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Shield, ArrowLeft, Lock, CheckCircle2 } from 'lucide-react';
 
 export const PrivacyPolicyView: React.FC = () => {
-  const { setCurrentView } = useApp();
+  const { setCurrentView, settings } = useApp();
 
   return (
     <div className="py-12 sm:py-20 bg-white min-h-screen">
@@ -28,33 +28,13 @@ export const PrivacyPolicyView: React.FC = () => {
           </p>
         </div>
 
-        <div className="prose prose-stone max-w-none text-stone-800 space-y-6 text-sm sm:text-base leading-relaxed">
-          <h3 className="text-lg font-bold text-stone-900">1. Coleta e Finalidade dos Dados</h3>
-          <p>
-            Os dados fornecidos voluntariamente pelos cidadãos através do Portal do Cidadão (nome, e-mail, telefone, município, bairro e detalhamento de solicitações) são coletados com o exclusivo objetivo de:
-          </p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Processar, analisar e dar andamento institucional a demandas e sugestões de leis;</li>
-            <li>Elaborar ofícios e pedidos de providências aos órgãos da administração pública estadual e federal;</li>
-            <li>Informar o requerente sobre o andamento e resposta oficial de sua solicitação.</li>
-          </ul>
-
-          <h3 className="text-lg font-bold text-stone-900">2. Segurança e Não Comercialização</h3>
-          <p>
-            Em hipótese alguma os dados cadastrais são comercializados, compartilhados com terceiros para fins comerciais ou utilizados para disparos eleitorais não autorizados.
-          </p>
-
-          <h3 className="text-lg font-bold text-stone-900">3. Direitos do Titular</h3>
-          <p>
-            Nos termos do artigo 18 da LGPD, o titular dos dados tem o direito de solicitar a qualquer tempo a confirmação da existência de tratamento, a retificação de dados incompletos ou a eliminação de seus dados, contatando diretamente a assessoria pelo e-mail institucional do gabinete.
-          </p>
-
-          <h3 className="text-lg font-bold text-stone-900">4. Registro e Auditoria</h3>
-          <p>
-            Todas as alterações administrativas e movimentações de protocolos realizadas pela equipe técnica são devidamente registradas em registros de auditoria interna, garantindo rastreabilidade e integridade das informações públicas.
-          </p>
-        </div>
-      </div>
+        <div className="prose prose-stone max-w-none text-stone-800 text-sm sm:text-base leading-relaxed">
+          {settings?.privacy_policy_text ? (
+            <div className="whitespace-pre-line">{settings.privacy_policy_text}</div>
+          ) : (
+            <p className="text-stone-600">A política de privacidade está sendo atualizada. Para informações sobre tratamento de dados, entre em contato com o gabinete.</p>
+          )}
+        </div> </div>
     </div>
   );
 };
