@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Activity, ClipboardList, FileClock, LockKeyhole, ShieldCheck, Settings, UsersRound } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 
 const Section: React.FC<{
   icon: React.ReactNode;
@@ -34,6 +35,48 @@ const StatusRow: React.FC<{ label: string; value: string; detail?: string }> = (
 
 export const AdminSettingsTab: React.FC = () => {
   const { currentUser, settings, demands, auditLogs } = useApp();
+  const [citizenDemandEnabled, setCitizenDemandEnabled] = useState(true);
+  const [loadingControl, setLoadingControl] = useState(true);
+  const [savingControl, setSavingControl] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/platform-settings')
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted && typeof data?.citizenDemandEnabled === 'boolean') {
+          setCitizenDemandEnabled(data.citizenDemandEnabled);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => { if (mounted) setLoadingControl(false); });
+    return () => { mounted = false; };
+  }, []);
+
+  const toggleCitizenDemand = async () => {
+    setSavingControl(true);
+    try {
+      const client = await getSupabaseClient();
+      const { data } = await client.auth.getSession();
+      if (!data.session?.access_token) throw new Error('Sessão não autenticada');
+      const nextValue = !citizenDemandEnabled;
+      const response = await fetch('/api/platform-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+        body: JSON.stringify({ citizenDemandEnabled: nextValue }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result?.error || 'Não foi possível atualizar o controle');
+      setCitizenDemandEnabled(Boolean(result.citizenDemandEnabled));
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Não foi possível atualizar o controle');
+    } finally {
+      setSavingControl(false);
+    }
+  };
 
   const pendingDemands = demands.filter((d) => d.status === 'recebida' || d.status === 'em análise').length;
   const privacyConfigured = Boolean(settings?.privacy_policy_text?.trim());
@@ -54,6 +97,21 @@ export const AdminSettingsTab: React.FC = () => {
           description="Estado operacional do canal de atendimento e dos protocolos."
         >
           <StatusRow label="Demandas pendentes" value={String(pendingDemands)} detail="Recebidas ou em análise" />
+          <div className="flex items-center justify-between gap-4 py-3 border-t border-stone-100">
+            <div>
+              <p className="text-sm font-semibold text-stone-800">Recebimento de novas demandas</p>
+              <p className="text-xs text-stone-500 mt-0.5">Controla o protocolo público de novas solicitações.</p>
+            </div>
+            <button
+              type="button"
+              onClick={toggleCitizenDemand}
+              disabled={loadingControl || savingControl}
+              className={`min-h-10 rounded-lg px-4 text-xs font-black border transition-colors ${citizenDemandEnabled ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-stone-100 border-stone-300 text-stone-700'} disabled:opacity-50`}
+              aria-pressed={citizenDemandEnabled}
+            >
+              {loadingControl ? 'Carregando…' : savingControl ? 'Salvando…' : citizenDemandEnabled ? 'Ativo' : 'Pausado'}
+            </button>
+          </div>
           <StatusRow label="Rastreamento de protocolo" value="Ativo" detail="Consulta pública de protocolos" />
           <StatusRow label="Dados públicos de contato" value="Conteúdo" detail="Mantidos na fonte editorial canônica" />
         </Section>
