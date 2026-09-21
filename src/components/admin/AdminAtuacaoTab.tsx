@@ -244,7 +244,7 @@ export const AdminAtuacaoTab: React.FC = () => {
             <label className="flex items-center gap-2 text-xs text-stone-500">
               Por página
               <select value={groupsPerPage} onChange={(e) => setGroupsPerPage(Number(e.target.value))} className="rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs font-bold text-stone-700">
-                {[5, 8, 10, 15, 20].map((value) => <option key={value} value={value}>{value}</option>)}
+                {[15, 20, 30, 50, 75, 100].map((value) => <option key={value} value={value}>{value}</option>)}
               </select>
             </label>
             <span className="text-xs text-stone-500">{filteredDocuments.length} documento{filteredDocuments.length === 1 ? '' : 's'}</span>
