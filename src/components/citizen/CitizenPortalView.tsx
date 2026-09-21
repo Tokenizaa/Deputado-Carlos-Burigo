@@ -233,11 +233,11 @@ const data = await response.json();
                         <h3 className="font-black text-stone-900">{accountStep === 'login' ? 'Entre na sua conta' : 'Crie sua conta para acompanhar'}</h3>
                         <p className="mt-1 text-sm text-stone-600">Sua demanda ficará vinculada à sua conta e aparecerá em Minhas demandas.</p>
                         <label className="block mt-4 text-sm font-bold text-stone-700">Senha
-                          <input required minLength={8} type="password" autoComplete={accountStep === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
+                          <input required minLength={12} type="password" autoComplete={accountStep === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
                         </label>
                         {accountStep === 'signup' && (
                           <label className="block mt-4 text-sm font-bold text-stone-700">Confirmar senha
-                            <input required minLength={8} type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
+                            <input required minLength={12} type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3 bg-white" />
                           </label>
                         )}
                         <button type="button" onClick={() => { setAccountStep('choice'); setPassword(''); setConfirmPassword(''); }} className="mt-3 text-sm font-bold text-[#00863f] underline">Escolher outra opção</button>
