@@ -56,14 +56,17 @@ O editor administrativo deve se aproximar de um fluxo visual no estilo Elementor
 - Adicionar seção no ponto escolhido entre blocos ou no final.
 - Alterações permanecem no rascunho até Salvar rascunho ou Publicar.
 
-### Fase 4 — Propriedades avançadas
-- Manter `BlockEditorForm` como painel secundário.
-- Layout/alinhamento.
-- CTA/link.
-- configurações específicas do tipo.
-- preview avançado.
+### Fase 4 — Propriedades avançadas ✅
+- Manter `BlockEditorForm` como painel secundário para propriedades que não precisam ficar no canvas.
+- Layout/alinhamento aplicados pelo renderer público nos blocos compatíveis.
+- CTA/link aplicados pelo renderer público nos blocos editoriais compatíveis.
+- Configurações específicas de mídia, visibilidade e posição preservadas no mesmo `content` do bloco.
+- SEO da página disponível em seção avançada compacta, sem criar novo modelo de dados.
+- Prévia avançada continua disponível no `BlockEditorForm`.
 
 ### Fase 5 — Validação
+- Verificar IDs de blocos novos/duplicados como UUIDs válidos antes da persistência.
+- Confirmar que as propriedades avançadas continuam no mesmo `page_blocks.content` e não criam uma segunda arquitetura.
 - Testar criação, edição, ordenação, exclusão e publicação.
 - Verificar persistência no Supabase.
 - Verificar renderer público.
