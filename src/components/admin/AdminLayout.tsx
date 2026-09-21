@@ -29,7 +29,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-const { currentUser, signOut, setCurrentView, demands, settings } = useApp();
+const { currentUser, signOut, demands } = useApp();
    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // toggle state: true = user opened sidebar
    const [isMobile, setIsMobile] = useState(() => {
      return typeof window !== 'undefined' ? window.innerWidth < 768 : true;
@@ -168,12 +168,7 @@ className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
          </div>
          <UserCircle className="w-4 h-4 text-stone-400" />
        </button>
-       
-{settings?.site_mode && (
-          <div className="mt-3 text-xs text-stone-500">
-            Modo: {settings.site_mode?.toUpperCase()}
-          </div>
-        )}
+
         <button onClick={() => void signOut()}
                 className="mt-4 w-full text-left px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-100 flex items-center gap-2">
           <LogOut className="w-3.5 h-3.5" /> Sair
