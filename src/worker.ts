@@ -588,6 +588,8 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     try {
       const form = await request.formData();
       const file = form.get('file');
+      const visibility = String(form.get('visibility') || 'publico');
+      if (!['publico', 'interno', 'restrito'].includes(visibility)) return Response.json({ error: 'Visibilidade inválida' }, { status: 400 });
       if (!(file instanceof File)) return Response.json({ error: 'Arquivo é obrigatório' }, { status: 400 });
       if (file.size > 50 * 1024 * 1024) return Response.json({ error: 'Arquivo excede o limite de 50 MB' }, { status: 400 });
       const allowed = new Set(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','text/plain','image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime']);
@@ -595,10 +597,16 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'bin';
       const storagePath = `uploads/${crypto.randomUUID()}.${extension}`;
       const bytes = new Uint8Array(await file.arrayBuffer());
-      const { error } = await supabaseAdmin.storage.from('documents').upload(storagePath, bytes, { contentType: file.type, upsert: false });
+      const bucket = visibility === 'publico' ? 'documents' : 'documents-private';
+      const { error } = await supabaseAdmin.storage.from(bucket).upload(storagePath, bytes, { contentType: file.type, upsert: false });
       if (error) throw error;
       const baseUrl = new URL(request.url).origin;
-      const url = new URL(`/storage/v1/object/public/documents/${storagePath}`, baseUrl).toString();
+      let url = new URL(`/storage/v1/object/public/documents/${storagePath}`, baseUrl).toString();
+      if (bucket === 'documents-private') {
+        const signed = await supabaseAdmin.storage.from(bucket).createSignedUrl(storagePath, 3600);
+        if (signed.error || !signed.data?.signedUrl) throw signed.error || new Error('Falha ao gerar URL privada');
+        url = signed.data.signedUrl;
+      }
       return Response.json({ url, storagePath, mimeType: file.type, size: file.size }, { status: 201 });
     } catch (error) {
       console.error('[api/admin/upload]', error);
