@@ -1,5 +1,3 @@
-export type SiteMode = 'campaign' | 'mandate' | 'institutional';
-
 export type UserRole = 'ADMIN' | 'EDITOR' | 'COMUNICACAO' | 'ATENDIMENTO' | 'VISUALIZADOR';
 export type Role = UserRole;
 
@@ -24,18 +22,10 @@ export interface User {
 }
 
 export interface SiteSettings {
-  site_mode: SiteMode;
   candidate_title: string;
   mandate_title: string;
   institutional_title: string;
   candidate_name: string;
-  electoral_number: string;
-  party_number: string;
-  party_name: string;
-  campaign_slogan: string;
-  campaign_cnpj: string;
-  campaign_coalition: string;
-  official_election_date: string;
   gabinete_address_poa: string;
   gabinete_address_caxias: string;
   gabinete_phone: string;
@@ -54,7 +44,6 @@ export interface SiteSettings {
   cta_title: string;
   cta_subtitle: string;
   gabinete_phone_caxias: string;
-  campaign_official_name: string;
 }
 
 export type DemandStatus =
