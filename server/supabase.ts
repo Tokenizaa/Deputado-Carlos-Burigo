@@ -477,9 +477,35 @@ export async function getPublicMedia() {
   return data ?? [];
 }
 
+export async function getAdminDocuments() {
+  const { data, error } = await supabaseAdmin.from('documents')
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => {
+    const dto = mapToPublicDocumentDto(row);
+    const publicUrl = supabaseAdmin.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
+    return { ...dto, publicUrl };
+  });
+}
+
+export async function updateAdminDocumentVisibility(id: string, visible: boolean) {
+  const { data, error } = await supabaseAdmin.from('documents')
+    .update({ visible, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const dto = mapToPublicDocumentDto(data);
+  const publicUrl = supabaseAdmin.storage.from('documents').getPublicUrl(data.storage_path).data.publicUrl;
+  return { ...dto, publicUrl };
+}
+
 export async function getPublicDocuments() {
   const { data, error } = await supabasePublic.from('documents')
-    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at')
+    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .eq('visible', true)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map((row) => {

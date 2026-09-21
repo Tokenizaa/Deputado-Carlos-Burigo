@@ -58,6 +58,7 @@ export interface PublicDocumentDto {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  visible: boolean;
 }
 
 export interface PublicEvidenceDto {

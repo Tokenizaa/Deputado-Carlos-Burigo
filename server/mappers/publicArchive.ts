@@ -65,6 +65,7 @@ type DocumentRow = {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  visible: boolean;
 };
 
 type EvidenceRow = {
@@ -164,6 +165,7 @@ export function mapToPublicDocumentDto(row: DocumentRow): PublicDocumentDto {
     notes: row.notes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    visible: row.visible !== false,
   };
 }
 

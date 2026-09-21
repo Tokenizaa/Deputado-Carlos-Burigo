@@ -9,6 +9,7 @@ import { AdminResultsTab } from './AdminResultsTab';
 import { AdminMunicipalitiesTab } from './AdminMunicipalitiesTab';
 import { AdminVideosTab } from './AdminVideosTab';
 import { AdminMediaTab } from './AdminMediaTab';
+import { AdminMandatosTab } from './AdminMandatosTab';
 import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
 import { AdminTasksTab } from './AdminTasksTab';
@@ -27,6 +28,7 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' |
   atuação: [
     { id: 'results', label: 'Atuação' },
     { id: 'municipalities', label: 'Municípios' },
+    { id: 'mandatos', label: 'Mandatos' },
   ],
   conteúdo: [
     { id: 'pages', label: 'Páginas' },
@@ -68,6 +70,7 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
     switch (subTab) {
       case 'results': return <AdminResultsTab />;
       case 'municipalities': return <AdminMunicipalitiesTab />;
+      case 'mandatos': return <AdminMandatosTab />;
       case 'pages': return <AdminPagesTab />;
       case 'news': return <AdminNewsTab />;
       case 'agenda': return <AdminAgendaTab />;

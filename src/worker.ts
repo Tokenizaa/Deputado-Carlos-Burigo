@@ -25,6 +25,8 @@ import {
   updateDemandAdmin,
   getPublicDocuments,
   getPublicEvidence,
+  getAdminDocuments,
+  updateAdminDocumentVisibility,
   getAdminNews,
   createAdminNews,
   updateAdminNews,
@@ -787,6 +789,36 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
+  '/api/admin/documents': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'GET') return methodNotAllowed();
+    if (!can(authResult.role as any, 'atuação', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    try {
+      return Response.json(await getAdminDocuments());
+    } catch (error) {
+      console.error('[api/admin/documents]', error);
+      return Response.json({ error: 'Falha ao carregar documentos' }, { status: 500 });
+    }
+  },
+  '/api/admin/documents/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'PUT') return methodNotAllowed();
+    if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do documento é obrigatório' }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (typeof body?.visible !== 'boolean') return Response.json({ error: 'O campo visible deve ser booleano' }, { status: 400 });
+      const document = await updateAdminDocumentVisibility(id, body.visible);
+      if (!document) return Response.json({ error: 'Documento não encontrado' }, { status: 404 });
+      return Response.json(document);
+    } catch (error) {
+      console.error('[api/admin/documents/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar documento' }, { status: 400 });
+    }
+  },
   '/api/evidence': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     try {
@@ -1286,6 +1318,7 @@ export default {
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
+        else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = method === 'GET' ? ['ADMIN','EDITOR','VISUALIZADOR'] : ['ADMIN','EDITOR'];
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
         else if (url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
