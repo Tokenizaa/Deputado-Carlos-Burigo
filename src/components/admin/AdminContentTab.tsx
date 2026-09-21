@@ -310,6 +310,37 @@ export const AdminContentTab: React.FC = () => {
             </div>
           </div>
         </div>
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+          <div className="flex items-center gap-2.5 border-b border-stone-100 pb-3">
+            <FileText className="w-5 h-5 text-[#00A550]" />
+            <div>
+              <h3 className="text-base font-bold text-stone-900">Biografia e chamada pública</h3>
+              <p className="text-xs text-stone-500">Conteúdos institucionais editáveis, armazenados no Supabase.</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">Destaques da biografia</label>
+              <textarea
+                rows={5}
+                value={bioHighlights.join('\n')}
+                onChange={(e) => setBioHighlights(e.target.value.split('\n').map((item) => item.trim()).filter(Boolean))}
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]"
+                placeholder="Um destaque por linha"
+              />
+              <span className="text-[11px] text-stone-400">Um destaque por linha.</span>
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">Título do CTA</label>
+              <input type="text" value={ctaTitle} onChange={(e) => setCtaTitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-stone-700 mb-1">Subtítulo do CTA</label>
+              <textarea rows={3} value={ctaSubtitle} onChange={(e) => setCtaSubtitle(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:bg-white focus:border-[#00A550]" />
+            </div>
+          </div>
+        </div>
+
       </form>
     </div>
   );

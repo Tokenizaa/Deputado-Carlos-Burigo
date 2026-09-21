@@ -39,6 +39,12 @@ export interface SiteSettings {
   seo_default_description: string;
   seo_default_image_url: string;
   privacy_policy_text: string;
+  mandate_slogan: string;
+  bio_highlights: string[];
+  cta_title: string;
+  cta_subtitle: string;
+  gabinete_phone_caxias: string;
+  campaign_official_name: string;
 }
 
 export type DemandStatus =
