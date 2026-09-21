@@ -4,7 +4,7 @@ export type AdminModule =
   | 'dashboard'
   | 'cidadão'
   | 'agenda'
-  | 'atuação'
+  | 'gestao-documental'
   | 'conteúdo'
   | 'tarefas'
   | 'administração'
@@ -24,14 +24,14 @@ const ALL: Permission[] = ['view', 'create', 'edit', 'publish', 'delete', 'manag
 
 export const ROLE_PERMISSIONS: Record<UserRole, Partial<Record<AdminModule, Permission[]>>> = {
   ADMIN: {
-    dashboard: ALL, cidadão: ALL, agenda: ALL, atuação: ALL, conteúdo: ALL,
+    dashboard: ALL, cidadão: ALL, agenda: ALL, 'gestao-documental': ALL, conteúdo: ALL,
     tarefas: ALL, administração: ALL, configurações: ALL,
   },
   EDITOR: {
     dashboard: ['view'],
     cidadão: ['view'],
     agenda: ['view', 'create', 'edit', 'delete'],
-    atuação: ['view', 'create', 'edit', 'delete'],
+    'gestao-documental': ['view', 'create', 'edit', 'delete'],
     conteúdo: ['view', 'create', 'edit', 'publish', 'delete'],
     tarefas: ['view', 'create', 'edit'],
   },
@@ -51,7 +51,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Partial<Record<AdminModule, Perm
     dashboard: ['view'],
     cidadão: ['view'],
     agenda: ['view'],
-    atuação: ['view'],
+    'gestao-documental': ['view'],
     conteúdo: ['view'],
     tarefas: ['view'],
   },
