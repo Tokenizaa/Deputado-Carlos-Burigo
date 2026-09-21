@@ -111,6 +111,15 @@ export const AdminAtuacaoTab: React.FC = () => {
 
   useEffect(() => { setPage(1); }, [search, filterType, filterCategory, filterStatus, filterVisibility]);
 
+  const openCreateFromLegislativeItem = (item: (typeof legislativeItems)[number]) => {
+    openCreate();
+    setLegislativeItemId(item.id);
+    setTitle(item.title ? `Documentos — ${item.title}` : `Documentos — ${item.code ?? ''}`);
+    setCategory('parlamentar');
+    setTags([item.code, item.type, item.year ? String(item.year) : ''].filter(Boolean).join(', '));
+    setNotes('Documento preparado a partir da proposição vinculada. Revise os metadados antes de salvar.');
+  };
+
   const openCreate = () => {
     setEditing({ id: '', legislativeItemId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
     setTitle(''); setDocumentType(''); setOriginalUrl(''); setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setEvidenceId(''); setVisible(true);
@@ -267,7 +276,17 @@ export const AdminAtuacaoTab: React.FC = () => {
                   <span className="font-mono text-xs font-bold text-stone-700">{group.code}</span>
                   <h3 className="truncate text-sm font-bold text-stone-900">{group.title}</h3>
                 </div>
-                <span className="shrink-0 text-xs text-stone-500">{group.documents.length} doc{group.documents.length === 1 ? '' : 's'}.</span>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span className="text-xs text-stone-500">{group.documents.length} doc{group.documents.length === 1 ? '' : 's'}.</span>
+                  {group.code !== 'SEM PROPOSIÇÃO' && (() => {
+                    const item = legislativeItems.find((candidate) => candidate.id === group.documents[0]?.legislativeItemId);
+                    return item ? (
+                      <button type="button" onClick={() => openCreateFromLegislativeItem(item)} className="min-h-8 rounded-lg border border-stone-200 px-2.5 text-[11px] font-bold text-stone-700 hover:border-stone-400">
+                        Preparar documento
+                      </button>
+                    ) : null;
+                  })()}
+                </div>
               </div>
               <div className="divide-y divide-stone-100">
                 {group.documents.map((document) => (
