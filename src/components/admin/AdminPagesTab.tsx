@@ -27,6 +27,186 @@ function createDraftId(): string {
   return '00000000-0000-4000-8000-' + Math.random().toString(16).slice(2).padEnd(12, '0').slice(0, 12);
 }
 
+type LandingTemplateId = 'institucional' | 'pauta' | 'prestacao';
+
+const LANDING_TEMPLATES: Array<{
+  id: LandingTemplateId;
+  label: string;
+  description: string;
+  structure: string;
+}> = [
+  {
+    id: 'institucional',
+    label: 'Institucional',
+    description: 'Apresenta uma pauta, projeto ou tema com contexto, trajetória e entrada para o cidadão.',
+    structure: 'Hero → Texto → Texto + mídia → Resultados → CTA cidadão → Contato',
+  },
+  {
+    id: 'pauta',
+    label: 'Pauta / Proposta',
+    description: 'Landing direta para explicar uma pauta, proposta ou compromisso em uma sequência visual de conversão.',
+    structure: 'Hero → Texto central → Texto + mídia → Projetos → CTA cidadão',
+  },
+  {
+    id: 'prestacao',
+    label: 'Prestação de contas',
+    description: 'Foco em entregas, atuação e evidências, com dados públicos e fechamento para participação.',
+    structure: 'Hero → Resultados → Projetos → Municípios → Notícias → CTA cidadão',
+  },
+];
+
+function buildLandingTemplate(templateId: LandingTemplateId): PageBlock[] {
+  const definitions: Record<LandingTemplateId, Array<{ type: BlockType; title: string; subtitle?: string; content?: Record<string, any> }>> = {
+    institucional: [
+      {
+        type: 'hero',
+        title: 'Título da landing',
+        subtitle: 'Linha de apoio que explica rapidamente o tema.',
+        content: {
+          headline: 'Apresente a mensagem principal',
+          leadText: 'Explique em poucas linhas por que esta pauta importa e qual é a ação esperada do visitante.',
+          buttonText: 'Quero participar',
+          buttonLink: '/fale-com-o-deputado',
+          alignment: 'left',
+        },
+      },
+      {
+        type: 'text',
+        title: 'O que está em pauta',
+        subtitle: 'Contexto objetivo para o cidadão.',
+        content: {
+          text: 'Use este espaço para explicar o problema, a proposta e o contexto da pauta.',
+          alignment: 'left',
+        },
+      },
+      {
+        type: 'text_image',
+        title: 'A proposta em detalhes',
+        subtitle: 'Combine texto e uma imagem que ajude a explicar o tema.',
+        content: {
+          text: 'Apresente os principais pontos da proposta, seus objetivos e informações relevantes.',
+          buttonText: 'Saiba mais',
+          buttonLink: '/fale-com-o-deputado',
+          alignment: 'left',
+          imagePosition: 'right',
+          mediaType: 'none',
+        },
+      },
+      {
+        type: 'results',
+        title: 'Resultados e entregas',
+        subtitle: 'Mostre o que já foi realizado relacionado ao tema.',
+      },
+      {
+        type: 'citizen_cta',
+        title: 'Fale com o deputado',
+        subtitle: 'Canal para enviar uma demanda, sugestão ou manifestação.',
+      },
+      {
+        type: 'contact',
+        title: 'Canais oficiais',
+        subtitle: 'Informações institucionais e formas de contato.',
+      },
+    ],
+    pauta: [
+      {
+        type: 'hero',
+        title: 'Nome da pauta',
+        subtitle: 'Uma frase curta que resume a proposta.',
+        content: {
+          headline: 'Uma proposta clara começa com uma mensagem clara',
+          leadText: 'Explique a pauta de forma simples, direta e orientada ao cidadão.',
+          buttonText: 'Enviar uma contribuição',
+          buttonLink: '/fale-com-o-deputado',
+          alignment: 'left',
+        },
+      },
+      {
+        type: 'text',
+        title: 'Por que esta pauta importa',
+        subtitle: 'Contexto e problema que a proposta pretende enfrentar.',
+        content: {
+          text: 'Descreva o contexto, os objetivos e as informações essenciais para compreender a pauta.',
+          alignment: 'center',
+        },
+      },
+      {
+        type: 'text_image',
+        title: 'Como a proposta funciona',
+        subtitle: 'Explique a solução com apoio visual.',
+        content: {
+          text: 'Organize aqui os pontos principais, etapas ou compromissos da proposta.',
+          buttonText: 'Fale sobre esta pauta',
+          buttonLink: '/fale-com-o-deputado',
+          alignment: 'left',
+          imagePosition: 'left',
+          mediaType: 'none',
+        },
+      },
+      {
+        type: 'projects',
+        title: 'Projetos relacionados',
+        subtitle: 'Consulte os projetos de lei e iniciativas relacionados ao tema.',
+      },
+      {
+        type: 'citizen_cta',
+        title: 'Participe',
+        subtitle: 'Envie sua opinião, demanda ou sugestão sobre esta pauta.',
+      },
+    ],
+    prestacao: [
+      {
+        type: 'hero',
+        title: 'Prestação de contas',
+        subtitle: 'Acompanhe a atuação, as entregas e os resultados.',
+        content: {
+          headline: 'O que foi feito',
+          leadText: 'Use esta abertura para apresentar o período ou tema da prestação de contas.',
+          buttonText: 'Fale com o deputado',
+          buttonLink: '/fale-com-o-deputado',
+          alignment: 'left',
+        },
+      },
+      {
+        type: 'results',
+        title: 'Resultados',
+        subtitle: 'Entregas e resultados registrados no mandato.',
+      },
+      {
+        type: 'projects',
+        title: 'Projetos e iniciativas',
+        subtitle: 'Acompanhe as propostas e iniciativas relacionadas.',
+      },
+      {
+        type: 'municipalities',
+        title: 'Presença nos municípios',
+        subtitle: 'Veja a atuação territorial e os municípios atendidos.',
+      },
+      {
+        type: 'news',
+        title: 'Notícias relacionadas',
+        subtitle: 'Atualizações e registros públicos da atuação.',
+      },
+      {
+        type: 'citizen_cta',
+        title: 'Envie sua demanda',
+        subtitle: 'Participe e acompanhe os próximos passos.',
+      },
+    ],
+  };
+
+  return definitions[templateId].map((item, index) => ({
+    id: createDraftId(),
+    type: item.type,
+    title: item.title,
+    subtitle: item.subtitle || '',
+    visible: true,
+    active: true,
+    order: index + 1,
+    content: item.content || {},
+  }));
+}
+
 function newBlock(type: BlockType, order: number): PageBlock {
   const palette = BLOCK_TYPES.find((item) => item.type === type);
   return {
@@ -58,7 +238,7 @@ export const AdminPagesTab: React.FC = () => {
   const [mediaPickerBlockId, setMediaPickerBlockId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [uploadingOg, setUploadingOg] = useState(false);
-  const [newPage, setNewPage] = useState({ title: '', slug: '', description: '' });
+  const [newPage, setNewPage] = useState({ title: '', slug: '', description: '', templateId: 'institucional' as LandingTemplateId });
 
   const selectedPage = useMemo(() => adminPages.find((page) => page.id === selectedPageId) || adminPages[0], [adminPages, selectedPageId]);
 
@@ -326,13 +506,13 @@ export const AdminPagesTab: React.FC = () => {
       seoDescription: '',
       ogImageUrl: '',
       status: 'rascunho',
-      blocks: [newBlock('hero', 1)],
-      note: `Landing criada por ${currentUser.name}`,
+      blocks: buildLandingTemplate(newPage.templateId),
+      note: `Landing criada por ${currentUser.name} · modelo ${newPage.templateId}`,
     });
     if (result.success && result.data) {
       setSelectedPageId(result.data.id);
       setShowCreate(false);
-      setNewPage({ title: '', slug: '', description: '' });
+      setNewPage({ title: '', slug: '', description: '', templateId: 'institucional' });
     }
   };
 
@@ -589,7 +769,7 @@ export const AdminPagesTab: React.FC = () => {
         </section>
       </div>
 
-      {showCreate && <div className="modal"><div className="modal-card"><h3 className="text-lg font-black">Criar página / landing</h3><p className="text-xs text-stone-500 mt-1">A mesma estrutura serve para campanha e mandato.</p><label className="label mt-4">Título</label><input value={newPage.title} onChange={(e) => setNewPage({ ...newPage, title: e.target.value })} className="field" placeholder="Landing — Educação" /><label className="label mt-3">Slug</label><input value={newPage.slug} onChange={(e) => setNewPage({ ...newPage, slug: e.target.value })} className="field" placeholder="campanha/educacao" /><label className="label mt-3">Descrição</label><textarea value={newPage.description} onChange={(e) => setNewPage({ ...newPage, description: e.target.value })} className="field" rows={3} /><div className="flex justify-end gap-2 mt-5"><button onClick={() => setShowCreate(false)} className="action">Cancelar</button><button onClick={create} className="action action-primary">Criar</button></div></div></div>}
+      {showCreate && <div className="modal"><div className="modal-card max-w-3xl"><h3 className="text-lg font-black">Criar página / landing</h3><p className="text-xs text-stone-500 mt-1">Comece com um dos três modelos padrão e personalize os blocos depois.</p><div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4">{LANDING_TEMPLATES.map((template) => <button key={template.id} type="button" onClick={() => setNewPage({ ...newPage, templateId: template.id })} className={`text-left border rounded-xl p-3 transition-colors ${newPage.templateId === template.id ? 'border-emerald-400 bg-emerald-50 ring-1 ring-emerald-200' : 'border-stone-200 hover:border-emerald-300'}`}><div className="font-black text-sm">{template.label}</div><div className="text-[10px] leading-relaxed text-stone-500 mt-1">{template.description}</div><div className="text-[9px] font-bold text-emerald-700 mt-3">{template.structure}</div></button>)}</div><label className="label mt-5">Título</label><input value={newPage.title} onChange={(e) => setNewPage({ ...newPage, title: e.target.value })} className="field" placeholder="Ex.: Educação no RS" /><label className="label mt-3">Slug</label><input value={newPage.slug} onChange={(e) => setNewPage({ ...newPage, slug: e.target.value })} className="field" placeholder="educacao" /><label className="label mt-3">Descrição</label><textarea value={newPage.description} onChange={(e) => setNewPage({ ...newPage, description: e.target.value })} className="field" rows={2} placeholder="Contexto da landing." /><div className="flex justify-end gap-2 mt-5"><button onClick={() => setShowCreate(false)} className="action">Cancelar</button><button onClick={create} className="action action-primary">Criar com este modelo</button></div></div></div>}
 
       {showBlocks && <div className="modal"><div className="modal-card max-w-2xl"><h3 className="text-lg font-black">Adicionar bloco</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">{BLOCK_TYPES.map((item) => <button key={item.type} onClick={() => addBlock(item.type)} className="text-left border border-stone-200 rounded-xl p-3 hover:border-emerald-300 hover:bg-emerald-50"><div className="font-bold text-sm">{item.label}</div><div className="text-[10px] text-stone-500 mt-1">{item.description}</div></button>)}</div><button onClick={() => setShowBlocks(false)} className="action mt-4">Cancelar</button></div></div>}
 
