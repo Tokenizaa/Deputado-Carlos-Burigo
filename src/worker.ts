@@ -502,7 +502,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
     if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!can(authResult.role as any, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const updated = await updateAdminResult(id, await request.json());
         if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
@@ -578,6 +578,32 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
     return methodNotAllowed();
   },
+  '/api/admin/upload': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (request.method !== 'POST') return methodNotAllowed();
+    try {
+      const form = await request.formData();
+      const file = form.get('file');
+      if (!(file instanceof File)) return Response.json({ error: 'Arquivo é obrigatório' }, { status: 400 });
+      if (file.size > 50 * 1024 * 1024) return Response.json({ error: 'Arquivo excede o limite de 50 MB' }, { status: 400 });
+      const allowed = new Set(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','text/plain','image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime']);
+      if (!allowed.has(file.type)) return Response.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 });
+      const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'bin';
+      const storagePath = `uploads/${crypto.randomUUID()}.${extension}`;
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const { error } = await supabaseAdmin.storage.from('documents').upload(storagePath, bytes, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      const baseUrl = new URL(request.url).origin;
+      const url = new URL(`/storage/v1/object/public/documents/${storagePath}`, baseUrl).toString();
+      return Response.json({ url, storagePath, mimeType: file.type, size: file.size }, { status: 201 });
+    } catch (error) {
+      console.error('[api/admin/upload]', error);
+      return Response.json({ error: error?.message || 'Falha ao enviar arquivo' }, { status: 400 });
+    }
+  },
+
   '/api/videos': async (request) => {
     if (request.method === 'GET') {
       try {
@@ -793,7 +819,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
-    if (!can(authResult.role as any, 'atuação', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       return Response.json(await getAdminDocuments());
     } catch (error) {
@@ -1319,6 +1345,7 @@ export default {
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
         else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = method === 'GET' ? ['ADMIN','EDITOR','VISUALIZADOR'] : ['ADMIN','EDITOR'];
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
+        else if (url.pathname === '/api/admin/upload') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
         else if (url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
 
