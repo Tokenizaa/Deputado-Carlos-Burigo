@@ -34,6 +34,7 @@ export interface PublicAgendaDto {
   image?: string;
   link?: string;
   participants?: string;
+  tags?: string[];
   visibility: 'publico';
 }
 
