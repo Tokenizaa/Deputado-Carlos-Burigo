@@ -234,8 +234,7 @@ export const AgendaCalendar: React.FC<AgendaCalendarProps> = ({
                   {(view === 'week' ? weekDays : [calendarDate]).map((date) => {
                     const eventsForHour = dayEvents(date).filter((event) => Number.parseInt(event.time.replace(/\D/g, '').slice(0, 2) || '-1', 10) === hour);
                     return (
-                      <div key={`${formatDateKey(date)}-${hour}`} role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="contents cursor-pointer">
-                      <div className="h-16 border-r border-b border-stone-200 p-1 space-y-1">
+                      <div key={`${formatDateKey(date)}-${hour}`} role="button" tabIndex={0} onClick={() => onDateClick?.(date)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onDateClick?.(date); }} className="h-16 border-r border-b border-stone-200 p-1 space-y-1 cursor-pointer hover:bg-stone-50">
                         {eventsForHour.map((event) => (
                           <EventCard
                             key={event.id}
