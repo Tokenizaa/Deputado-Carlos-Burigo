@@ -219,6 +219,13 @@ export const AdminPagesTab: React.FC = () => {
     showToast('Mídia removida do bloco. Salve o rascunho para persistir.', 'success');
   };
 
+  const updateBlockMediaField = (blockId: string, field: string, value: string) => {
+    setDraftBlocks((prev) => prev.map((block) => block.id === blockId ? {
+      ...block,
+      content: { ...(block.content || {}), [field]: value, ...(field === 'mediaUrl' ? { imageUrl: value, mediaSource: 'external', mediaId: undefined } : {}) },
+    } : block));
+  };
+
   const getBlockMedia = (block: PageBlock) => {
     const content = block.content || {};
     if (content.mediaType === 'video' || content.videoUrl) {
@@ -419,6 +426,17 @@ export const AdminPagesTab: React.FC = () => {
                               ))}
                             </div>
                             {!media.some((item) => item.mimeType?.startsWith('image/')) && <div className="text-xs text-stone-500 py-4">Nenhuma imagem disponível na biblioteca.</div>}
+                            <div className="mt-3 border-t border-stone-100 pt-3">
+                              <label className="label">URL externa</label>
+                              <div className="flex gap-2">
+                                <input value={block.content?.mediaUrl || block.content?.imageUrl || ''} onChange={(event) => updateBlockMediaField(block.id, 'mediaUrl', event.target.value)} className="field" placeholder="https://..." />
+                                <button type="button" onClick={() => updateBlockMediaField(block.id, 'mediaUrl', '')} className="action">Limpar</button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                              <div><label className="label">Texto alternativo</label><input value={block.content?.altText || ''} onChange={(event) => updateBlockMediaField(block.id, 'altText', event.target.value)} className="field" placeholder="Descrição acessível" /></div>
+                              <div><label className="label">Legenda / crédito</label><input value={block.content?.caption || ''} onChange={(event) => updateBlockMediaField(block.id, 'caption', event.target.value)} className="field" placeholder="Crédito ou legenda" /></div>
+                            </div>
                             {videos.length > 0 && block.type !== 'image' && (
                               <div className="mt-3 pt-3 border-t border-stone-100"><div className="text-[10px] uppercase font-black text-stone-400 mb-2">Vídeos do acervo</div><div className="flex flex-wrap gap-2">
                                 {videos.slice(0, 8).map((item) => <button key={item.id} type="button" onClick={() => applyVideoToBlock(block.id, item)} className="action">{item.title}</button>)}
