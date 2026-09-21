@@ -22,10 +22,15 @@ const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }
   { type: 'contact', label: 'Contato', description: 'Canais de contato' },
 ];
 
+function createDraftId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  return '00000000-0000-4000-8000-' + Math.random().toString(16).slice(2).padEnd(12, '0').slice(0, 12);
+}
+
 function newBlock(type: BlockType, order: number): PageBlock {
   const palette = BLOCK_TYPES.find((item) => item.type === type);
   return {
-    id: `draft-${Date.now()}-${order}`,
+    id: createDraftId(),
     type,
     title: palette?.label || 'Novo bloco',
     subtitle: palette?.description || '',
@@ -102,7 +107,7 @@ export const AdminPagesTab: React.FC = () => {
       const index = prev.findIndex((block) => block.id === id);
       if (index < 0) return prev;
       const source = prev[index];
-      const copy: PageBlock = { ...JSON.parse(JSON.stringify(source)), id: `draft-${Date.now()}-${index + 1}`, title: source.title ? `${source.title} (cópia)` : source.title };
+      const copy: PageBlock = { ...JSON.parse(JSON.stringify(source)), id: createDraftId(), title: source.title ? `${source.title} (cópia)` : source.title };
       const next = [...prev]; next.splice(index + 1, 0, copy);
       return next.map((block, position) => ({ ...block, order: position + 1 }));
     });
@@ -371,6 +376,14 @@ export const AdminPagesTab: React.FC = () => {
                   <div className="md:col-span-3"><label className="label">Status</label><select value={metadata.status} onChange={(e) => setMetadata({ ...metadata, status: e.target.value as any })} className="field"><option value="rascunho">Rascunho</option><option value="publicado">Publicado</option></select></div>
                 </div>
                 <div><label className="label">Descrição / contexto</label><textarea value={metadata.description} onChange={(e) => setMetadata({ ...metadata, description: e.target.value })} className="field" rows={2} placeholder="Ex.: Landing da campanha sobre educação." /></div>
+                <details className="border border-stone-200 rounded-xl bg-stone-50">
+                  <summary className="cursor-pointer list-none px-3 py-2.5 text-[10px] uppercase tracking-wider font-black text-stone-500">Propriedades avançadas da página · SEO</summary>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-3 pb-3">
+                    <div><label className="label">Título SEO</label><input value={metadata.seoTitle} onChange={(e) => setMetadata({ ...metadata, seoTitle: e.target.value })} className="field" placeholder="Título exibido nos buscadores" /></div>
+                    <div><label className="label">Imagem Open Graph</label><div className="flex gap-2"><input value={metadata.ogImageUrl} onChange={(e) => setMetadata({ ...metadata, ogImageUrl: e.target.value })} className="field" placeholder="https://..." /><label className="action shrink-0 cursor-pointer"><span>{uploadingOg ? 'Enviando…' : 'Enviar'}</span><input type="file" accept="image/*" className="hidden" disabled={uploadingOg} onChange={(e) => e.target.files?.[0] && uploadOg(e.target.files[0])} /></label></div></div>
+                    <div className="md:col-span-2"><label className="label">Descrição SEO</label><textarea value={metadata.seoDescription} onChange={(e) => setMetadata({ ...metadata, seoDescription: e.target.value })} className="field" rows={2} placeholder="Descrição usada nos mecanismos de busca e compartilhamentos." /></div>
+                  </div>
+                </details>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => openBlockPicker()} className="action"><Plus className="w-4 h-4" /> Adicionar bloco</button>
                   <button onClick={() => setShowHistory(true)} className="action"><History className="w-4 h-4" /> Versões ({selectedPage.versions?.length || 0})</button>
