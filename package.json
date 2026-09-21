@@ -9,7 +9,14 @@
     "deploy": "npm run build && wrangler deploy -c dist-cf/deputado_carlos_burigo/wrangler.json",
     "preview": "vite preview",
     "clean": "rm -rf dist dist-cf .wrangler",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:api": "vitest run tests/api",
+    "test:e2e": "playwright test",
+    "test:smoke": "npm run lint && npm run test:unit && npm run test:integration && npm run test:api && npx playwright test --project=chromium"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -17,18 +24,23 @@
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
     "react": "^19.0.1",
-    "react-dom": "^19.0.1",
-    "motion": "^12.23.24"
+    "react-dom": "^19.0.1"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.54.10",
+    "@playwright/test": "^1.49.1",
     "@types/node": "^22.14.0",
+    "@vitest/ui": "^2.1.8",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.12",
+    "happy-dom": "^20.14.5",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
+    "vite": "^7.3.6",
+    "vitest": "^2.1.8",
     "wrangler": "^4.132.0"
   }
 }
