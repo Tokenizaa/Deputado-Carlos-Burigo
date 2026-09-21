@@ -20,11 +20,12 @@ interface AdminWorkspaceProps {
   setActiveModule: (module: string) => void;
 }
 
-type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'atuação' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
+type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'gestao-documental' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
 
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
-  atuação: [
-    { id: 'atuacao', label: 'Atuação' },
+  'gestao-documental': [
+    { id: 'documentos', label: 'Documentos' },
+    { id: 'atuacao', label: 'Atuação parlamentar' },
   ],
   conteúdo: [
     { id: 'pages', label: 'Páginas' },
@@ -44,10 +45,10 @@ const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' |
 
 export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, setActiveModule }) => {
   const { currentUser } = useApp();
-  const [subTab, setSubTab] = useState('atuacao');
+  const [subTab, setSubTab] = useState('documentos');
 
   useEffect(() => {
-    if (activeModule === 'atuação') setSubTab('atuacao');
+    if (activeModule === 'gestao-documental') setSubTab('documentos');
     if (activeModule === 'conteúdo') setSubTab('pages');
     if (activeModule === 'administração') setSubTab('users');
     if (activeModule === 'configurações') setSubTab('settings');
@@ -64,6 +65,7 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
 
   const renderSubTab = () => {
     switch (subTab) {
+      case 'documentos': return <AdminAtuacaoTab />;
       case 'atuacao': return <AdminAtuacaoTab />;
       case 'pages': return <AdminPagesTab />;
       case 'news': return <AdminNewsTab />;
