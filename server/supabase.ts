@@ -504,6 +504,7 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
   if ('title' in input) patch.title = String(input.title ?? '').trim();
   if ('documentType' in input) patch.document_type = String(input.documentType ?? '').trim();
   if ('notes' in input) patch.notes = String(input.notes ?? '').trim();
+  if ('originalUrl' in input) patch.original_url = input.originalUrl ? String(input.originalUrl).trim() : null;
 
   const { data, error } = await supabaseAdmin.from('documents')
     .update(patch)
