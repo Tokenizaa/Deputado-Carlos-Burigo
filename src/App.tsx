@@ -33,6 +33,7 @@ import { AdminInviteAcceptView } from './components/auth/AdminInviteAcceptView';
 import { AdminBootstrapView } from './components/auth/AdminBootstrapView';
 import { InternalOnboardingView } from './components/auth/InternalOnboardingView';
 import { InternalOnboardingGate } from './components/auth/InternalOnboardingGate';
+import { InternalProfileView } from './components/auth/InternalProfileView';
 
 const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', 'projetos', 'votacoes', 'documentos', 'resultados', 'noticias', 'agenda', 'municipios', 'videos', 'cidadao', 'minhas-demandas', 'contato', 'campanha', 'privacidade', 'acessibilidade', 'transparencia', 'informativos', 'primeiro-acesso']);
 
@@ -43,6 +44,7 @@ const MainAppContent: React.FC = () => {
   if (pathname === 'convite') return <AdminInviteAcceptView />;
   if (pathname === 'primeiro-acesso') return <AdminBootstrapView />;
   if (pathname === 'onboarding-interno') return <InternalOnboardingView />;
+  if (pathname === 'meu-perfil') return currentUser ? <InternalOnboardingGate><AdminLayout activeTab={adminTab} setActiveTab={setAdminTab}><InternalProfileView /></AdminLayout></InternalOnboardingGate> : <AdminAuthView onAuthenticated={() => { void refreshAllData(); }} />;
   if (pathname === 'minhas-demandas') return <CitizenAccountView />;
 
   const dynamicSlug = pathname && !RESERVED_PATHS.has(pathname) ? pathname : '';
