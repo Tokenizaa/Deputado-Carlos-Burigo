@@ -2,7 +2,7 @@
 
 **Data:** 21/09/2026  
 **Branch:** `main`  
-**Commit de entrada:** `b39a6948a9e3d25d139fde30d6a75a3ad76eece8`
+**Commit de entrada:** `398a6869509c68cea215b1f74b0c00ff2c219235`
 
 ## Objetivo
 
@@ -10,51 +10,78 @@ Executar B2-01 (build/typecheck) e B2-02 (smoke de produção).
 
 ## B2-01 — Build / TypeScript
 
-**Resultado: PENDENTE.**
+**Resultado: PARCIALMENTE VALIDADO.**
 
-O `package.json` confirma os comandos canônicos `npm run lint` e `npm run build`.
-
-A tentativa de obter o repositório para execução local foi bloqueada pela resolução DNS do ambiente:
+A validação local realizada na WSL confirmou:
 
 ```text
-fatal: unable to access 'https://github.com/Tokenizaa/Deputado-Carlos-Burigo.git/':
-Could not resolve host: github.com
+npm run build
+✓ built successfully
 ```
 
-Assim, não foi possível instalar dependências nem executar os comandos.
+O deploy de produção também executou o build novamente e concluiu sem erro.
 
-Não foi declarado PASS por inferência.
+O item ainda não é considerado totalmente encerrado porque o comando canônico de typecheck/lint abaixo ainda não foi executado nesta validação:
+
+```text
+npm run lint
+```
+
+Portanto, não há justificativa para declarar B2-01 totalmente PASS antes desse comando.
 
 ## B2-02 — Smoke de produção
 
-**Resultado: PENDENTE.**
+**Resultado: PASS.**
 
-Endpoint conhecido:
+Worker validado em:
 
 ```text
 https://deputado-carlos-burigo.olfnetto.workers.dev
 ```
 
-A tentativa de acesso externo não retornou resposta HTTP verificável neste ambiente.
+Versão implantada:
 
-O status de CI do commit atual retornou apenas um contexto `Vercel` em failure. Isso não é considerado evidência de falha do Cloudflare, pois o runtime oficial é Cloudflare Workers.
+```text
+2c678424-7822-495e-8557-82fc812ebed3
+```
 
-O `VALIDATION_REPORT.md` existente contém validação histórica de build/deploy/endpoints para estado anterior e não substitui a validação do commit atual.
+Smoke HTTP executado diretamente na WSL, com resposta real do Worker:
+
+| Endpoint | HTTP | Resultado |
+|---|---:|---|
+| `/` | 200 | PASS |
+| `/api/health` | 200 | PASS |
+| `/api/news` | 200 | PASS |
+| `/api/agenda` | 200 | PASS |
+| `/api/pages` | 200 | PASS |
+| `/api/auth/config` | 200 | PASS |
+
+A resposta de `/api/health` confirmou `status: ok`, a aplicação `Plataforma Carlos Búrigo` e runtime `cloudflare`.
+
+A Home também respondeu HTML válido e as APIs públicas essenciais retornaram JSON.
+
+O status `Vercel` em failure no GitHub não é considerado falha da produção, pois o runtime oficial desta aplicação é Cloudflare Workers.
 
 ## Alterações
 
-Nenhuma alteração funcional, de banco ou de produção foi realizada.
+Nenhuma alteração funcional, de banco ou de produção foi realizada nesta validação.
 
-Foi registrado somente o resultado da validação e suas limitações.
+Este documento apenas registra a evidência obtida.
 
 ## Decisão
 
-A Fase 3 permanece **PENDENTE** até haver evidência real de:
+A Fase 3 permanece **PENDENTE SOMENTE PELO B2-01 / TYPECHECK**.
 
-1. `npm run lint` passando;
-2. `npm run build` passando;
-3. Home de produção respondendo;
-4. `/api/health` respondendo;
-5. API pública essencial respondendo.
+O bloqueio restante é único e objetivo:
 
-Somente então avançar para B2-03/B2-04/B2-05.
+```bash
+npm run lint
+```
+
+Se o comando passar, B2-01 poderá ser encerrado e a Fase 3 concluída.
+
+Depois disso, o próximo bloco canônico é:
+
+1. B2-03 — Auth/password protection;
+2. B2-04 — `admin_bootstrap` / RLS;
+3. B2-05 — matriz RBAC.
