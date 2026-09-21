@@ -27,6 +27,7 @@ import {
   getPublicEvidence,
   getAdminDocuments,
   createAdminDocument,
+  getAdminEvidence,
   updateAdminDocument,
   getAdminNews,
   createAdminNews,
@@ -816,6 +817,19 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
+  '/api/admin/evidence': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'GET') return methodNotAllowed();
+    if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    try {
+      return Response.json(await getAdminEvidence());
+    } catch (error) {
+      console.error('[api/admin/evidence]', error);
+      return Response.json({ error: 'Falha ao carregar evidências' }, { status: 500 });
+    }
+  },
+
   '/api/admin/documents': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
