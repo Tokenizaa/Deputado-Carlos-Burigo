@@ -12,6 +12,7 @@ Esta pasta é o núcleo da reconstrução documental.
 - `MAPA-DOCUMENTAL-CANONICO.md` — conjunto mínimo de documentos canônicos.
 - `AUDITORIA-DOCUMENTAL-D0-D3.md` — resultado da auditoria e reconciliação D0–D3.
 - `D6-RECONCILIACAO-ADRS-GOVERNANCA.md` — checkpoint de reconciliação de ADRs e governança.
+- `D7-VALIDACAO-DOCUMENTAL-FINAL.md` — validação e encerramento da reconstrução documental.
 
 ## Regras
 
