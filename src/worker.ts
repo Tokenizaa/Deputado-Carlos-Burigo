@@ -5,6 +5,8 @@ import {
   getPublicNews,
   getPublicResults,
   getPublicSettings,
+  getPlatformSettings,
+  updatePlatformSettings,
   updateAdminSettings,
   getPublicVideos,
   getPublicLegislativeItems,
@@ -425,6 +427,46 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     
     return methodNotAllowed();
   },
+  '/api/platform-settings': async (request) => {
+    try {
+      if (request.method === 'GET') {
+        const settings = await getPlatformSettings();
+        return Response.json(settings);
+      }
+
+      const authResult = await requireAuth(request);
+      if (!can(authResult.role as any, 'configurações', 'manage_settings')) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+
+      if (request.method === 'PUT') {
+        const body = await request.json();
+        if (typeof body?.citizenDemandEnabled !== 'boolean') {
+          return Response.json({ error: 'citizenDemandEnabled deve ser booleano' }, { status: 400 });
+        }
+        const settings = await updatePlatformSettings({
+          citizenDemandEnabled: body.citizenDemandEnabled,
+        });
+        const actor = await getAdminUserById(authResult.userId);
+        await createAdminAuditLog({
+          userId: authResult.userId,
+          userName: actor?.name ?? authResult.userId,
+          userRole: authResult.role,
+          action: 'update',
+          entityType: 'platform_settings',
+          entityId: 'true',
+          details: { citizenDemandEnabled: settings.citizenDemandEnabled },
+        });
+        return Response.json(settings);
+      }
+
+      return Response.json({ error: 'Método não permitido' }, { status: 405 });
+    } catch (error) {
+      console.error('[api/platform-settings]', error);
+      return Response.json({ error: 'Falha ao carregar configurações operacionais' }, { status: 500 });
+    }
+  },
+
   '/api/settings': async (request) => {
     if (request.method === 'GET') {
       try {
