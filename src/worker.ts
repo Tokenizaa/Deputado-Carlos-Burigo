@@ -1139,6 +1139,10 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
 
   '/api/citizen/demand': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
+    const platformSettings = await getPlatformSettings();
+    if (!platformSettings.citizenDemandEnabled) {
+      return Response.json({ error: 'O canal de atendimento está temporariamente indisponível.' }, { status: 503 });
+    }
     const auth = await requireCitizenAuth(request);
     if (auth instanceof Response) return auth;
     try {
