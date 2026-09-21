@@ -199,19 +199,24 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
   }
   const { data, error } = await supabaseAdmin.from('site_settings').update(patch).eq('id', true).select('*').single();
   if (error) throw error;
+  const {
+    site_mode: _siteMode,
+    electoral_number: _electoralNumber,
+    party_number: _partyNumber,
+    party_name: _partyName,
+    campaign_slogan: _campaignSlogan,
+    campaign_cnpj: _campaignCnpj,
+    campaign_coalition: _campaignCoalition,
+    official_election_date: _officialElectionDate,
+    campaign_official_name: _campaignOfficialName,
+    ...publicData
+  } = data;
   return {
-    ...data,
+    ...publicData,
     candidateTitle: data.candidate_title,
     mandateTitle: data.mandate_title,
     institutionalTitle: data.institutional_title,
     candidateName: data.candidate_name,
-    electoralNumber: data.electoral_number,
-    partyNumber: data.party_number,
-    partyName: data.party_name,
-    campaignSlogan: data.campaign_slogan,
-    campaignCnpj: data.campaign_cnpj,
-    campaignCoalition: data.campaign_coalition,
-    officialElectionDate: data.official_election_date,
     gabineteAddressPoa: data.gabinete_address_poa,
     gabineteAddressCaxias: data.gabinete_address_caxias,
     gabinetePhone: data.gabinete_phone,
@@ -222,7 +227,6 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
     bioHighlights: Array.isArray(data.bio_highlights) ? data.bio_highlights : [],
     ctaTitle: data.cta_title,
     ctaSubtitle: data.cta_subtitle,
-    campaignOfficialName: data.campaign_official_name,
     socialInstagram: data.social_instagram,
     socialFacebook: data.social_facebook,
     socialYoutube: data.social_youtube,
