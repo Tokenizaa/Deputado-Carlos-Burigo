@@ -17,6 +17,7 @@ import {
   getAllAdminUsers,
   bootstrapFirstAdmin,
   getAdminAuditLogs,
+  createAdminAuditLog,
   getAdminTasks,
   createAdminTask,
   updateAdminTask,
@@ -854,6 +855,17 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       if (!can(authResult.role as any, 'gestao-documental', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const document = await createAdminDocument(await request.json());
+        if (document) {
+          await createAdminAuditLog({
+            userId: authResult.userId,
+            userName: authResult.user.name,
+            userRole: authResult.role,
+            action: 'CREATE',
+            entityType: 'document',
+            entityId: document.id,
+            details: { title: document.title, category: document.category, visibility: document.visibility, status: document.status },
+          });
+        }
         return Response.json(document, { status: 201 });
       } catch (error) {
         console.error('[api/admin/documents POST]', error);
@@ -873,6 +885,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       const body = await request.json();
       const document = await updateAdminDocument(id, body);
       if (!document) return Response.json({ error: 'Documento não encontrado' }, { status: 404 });
+      await createAdminAuditLog({
+        userId: authResult.userId,
+        userName: authResult.user.name,
+        userRole: authResult.role,
+        action: 'UPDATE',
+        entityType: 'document',
+        entityId: id,
+        details: { changedFields: Object.keys(body), title: document.title, category: document.category, visibility: document.visibility, status: document.status },
+      });
       return Response.json(document);
     } catch (error) {
       console.error('[api/admin/documents/:id]', error);
