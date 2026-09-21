@@ -44,6 +44,7 @@ export interface PublicVideoDto {
 export interface PublicDocumentDto {
   id: string;
   legislativeItemId: string | null;
+  evidenceId: string | null;
   documentType: string;
   title: string;
   originalUrl: string | null;
