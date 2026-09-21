@@ -16,6 +16,7 @@ export interface PublicMediaDto {
   sourcePageUrl: string | null;
   sha256: string | null;
   publishedAt: string | null;
+  publishedAt: string | null;
   downloadedAt: string | null;
   verificationStatus: string;
   rightsStatus: string;
@@ -42,7 +43,7 @@ export interface PublicVideoDto {
 
 export interface PublicDocumentDto {
   id: string;
-  legislativeItemId: string;
+  legislativeItemId: string | null;
   documentType: string;
   title: string;
   originalUrl: string | null;
@@ -59,6 +60,10 @@ export interface PublicDocumentDto {
   createdAt: string;
   updatedAt: string;
   visible: boolean;
+  category: string;
+  status: string;
+  tags: string[];
+  visibility: string;
 }
 
 export interface PublicEvidenceDto {
