@@ -223,3 +223,113 @@ O administrador deve conseguir:
 O módulo **Equipe** será uma camada operacional sobre os dados existentes, conectando usuários, permissões e tarefas sem criar uma nova arquitetura.
 
 **Próxima ação:** implementar as fases 12.1 a 12.5 no componente existente e validar a integração.
+
+
+## 12. Evolução — Cadastro completo e onboarding interno
+
+A Fase 12 passa a incluir uma camada de **perfil operacional completo**, sem transformar o sistema em RH.
+
+### 12.7 — Modelo de perfil interno
+
+O cadastro interno deve separar:
+
+**Identidade**
+- nome completo;
+- nome de exibição;
+- avatar;
+- e-mail de acesso;
+- telefone.
+
+**Informações funcionais**
+- cargo;
+- área/setor;
+- função;
+- responsabilidades;
+- descrição profissional curta;
+- e-mail institucional, quando diferente do login;
+- telefone institucional, quando aplicável;
+- município principal de atuação;
+- data de entrada na equipe.
+
+**Acesso**
+- papel institucional;
+- permissões derivadas de adminPermissions.ts.
+
+A identidade continua em public.profiles, relacionada diretamente a auth.users. Não será criada uma tabela paralela de membros.
+
+### 12.8 — Onboarding do usuário interno
+
+Após o primeiro cadastro/autenticação decorrente de um convite, o usuário interno deverá passar automaticamente por:
+
+1. identificação e confirmação do nome;
+2. foto/avatar;
+3. telefone;
+4. área/setor;
+5. função;
+6. responsabilidades principais;
+7. município de atuação;
+8. conclusão do perfil.
+
+O onboarding deve ser curto, dividido em etapas claras e permitir salvar o perfil sem exigir informações desnecessárias.
+
+Ao concluir, registrar profiles.onboarding_completed_at.
+
+Enquanto o onboarding estiver incompleto, um usuário interno autenticado será direcionado automaticamente para /onboarding-interno antes de acessar /admin.
+
+### 12.9 — Avatar
+
+O avatar será opcional, porém fortemente recomendado.
+
+O arquivo deverá usar a infraestrutura de upload já existente (/api/admin/upload) e armazenamento privado/interno quando apropriado. O perfil armazenará somente a URL do avatar.
+
+Não criar novo bucket ou novo sistema de mídia.
+
+### 12.10 — Papéis institucionais
+
+A descrição dos papéis será refinada para eliminar a sobreposição entre EDITOR e COMUNICACAO:
+
+- **ADMIN — Administrador Geral:** administração do sistema, equipe, configurações e auditoria.
+- **EDITOR — Editor de Conteúdo Institucional:** manutenção e gestão das informações, documentos e conteúdos institucionais autorizados.
+- **COMUNICACAO — Assessoria de Comunicação:** produção e publicação de comunicação pública do gabinete.
+- **ATENDIMENTO — Equipe de Atendimento:** atendimento e acompanhamento das demandas dos cidadãos.
+- **VISUALIZADOR — Consulta:** acesso de leitura aos módulos autorizados.
+
+A distinção é funcional: EDITOR representa manutenção transversal de informação institucional; COMUNICACAO representa atuação especializada em comunicação pública.
+
+As permissões técnicas existentes não serão alteradas automaticamente apenas pela mudança de nomenclatura.
+
+### 12.11 — Usuário externo
+
+O cadastro público deverá permanecer mínimo:
+
+- nome;
+- e-mail;
+- telefone/WhatsApp.
+
+Dados adicionais serão solicitados somente quando necessários para uma finalidade específica de atendimento.
+
+Não reutilizar o onboarding interno para cidadãos.
+
+### 12.12 — Privacidade e minimização
+
+Não coletar no cadastro interno, sem necessidade operacional explícita:
+- CPF;
+- RG;
+- endereço residencial;
+- dados bancários;
+- estado civil;
+- dependentes;
+- dados sensíveis.
+
+A regra é coletar apenas o necessário para identidade, operação do gabinete e controle de acesso.
+
+## 13. Critérios adicionais de aceite
+
+- usuário convidado consegue concluir autenticação e chegar ao onboarding;
+- usuário interno sem onboarding concluído não entra no workspace administrativo;
+- usuário com onboarding concluído entra normalmente;
+- avatar pode ser enviado pela infraestrutura existente;
+- dados do perfil são persistidos no public.profiles;
+- administrador consegue visualizar o perfil operacional;
+- EDITOR e COMUNICACAO ficam claramente diferenciados na interface;
+- nenhuma segunda tabela de usuários/equipe é criada.
