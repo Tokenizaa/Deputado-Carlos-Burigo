@@ -69,7 +69,7 @@ import {
   acceptAdminInvite,
 } from '../server/invites';
 
-import type { User } from '../src/types';
+import type { User, UserRole } from '../src/types';
 import { can } from '../src/config/adminPermissions';
 
 export interface Env {
@@ -434,29 +434,32 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         return Response.json(settings);
       }
 
-      const authResult = await requireAuth(request);
-      if (!can(authResult.role as any, 'configurações', 'manage_settings')) {
-        return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      }
+const authResult = await requireAuth(request);
+       if (authResult instanceof Response) return authResult;
+       // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+       const { userId, role, user } = authResult;
+if (!can(role as UserRole, 'configurações', 'manage_settings')) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
 
-      if (request.method === 'PUT') {
-        const body = await request.json();
-        if (typeof body?.citizenDemandEnabled !== 'boolean') {
-          return Response.json({ error: 'citizenDemandEnabled deve ser booleano' }, { status: 400 });
-        }
-        const settings = await updatePlatformSettings({
-          citizenDemandEnabled: body.citizenDemandEnabled,
-        });
-        const actor = await getAdminUserById(authResult.userId);
-        await createAdminAuditLog({
-          userId: authResult.userId,
-          userName: actor?.name ?? authResult.userId,
-          userRole: authResult.role,
-          action: 'update',
-          entityType: 'platform_settings',
-          entityId: 'true',
-          details: { citizenDemandEnabled: settings.citizenDemandEnabled },
-        });
+       if (request.method === 'PUT') {
+         const body = await request.json();
+         if (typeof body?.citizenDemandEnabled !== 'boolean') {
+           return Response.json({ error: 'citizenDemandEnabled deve ser booleano' }, { status: 400 });
+         }
+         const settings = await updatePlatformSettings({
+           citizenDemandEnabled: body.citizenDemandEnabled,
+         });
+         const actor = await getAdminUserById(userId);
+         await createAdminAuditLog({
+           userId: userId,
+           userName: actor?.name ?? userId,
+           userRole: role,
+           action: 'update',
+           entityType: 'platform_settings',
+           entityId: 'true',
+           details: { citizenDemandEnabled: settings.citizenDemandEnabled },
+         });
         return Response.json(settings);
       }
 
@@ -525,102 +528,110 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         return Response.json({ error: 'Falha ao carregar resultados do acervo' }, { status: 500 });
       }
     }
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const data = await request.json();
-        if (!data?.title || !data?.category || !data?.description) return Response.json({ error: 'title, category e description são obrigatórios' }, { status: 400 });
-        return Response.json(await createAdminResult(data), { status: 201 });
-      } catch (error) {
-        console.error('[api/results POST]', error);
-        return Response.json({ error: error?.message || 'Falha ao criar resultado' }, { status: 400 });
+const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+if (request.method === 'POST') {
+        if (!can(role as UserRole, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const data = await request.json();
+          if (!data?.title || !data?.category || !data?.description) return Response.json({ error: 'title, category e description são obrigatórios' }, { status: 400 });
+          return Response.json(await createAdminResult(data), { status: 201 });
+        } catch (error) {
+          console.error('[api/results POST]', error);
+          return Response.json({ error: error?.message || 'Falha ao criar resultado' }, { status: 400 });
+        }
       }
-    }
     return methodNotAllowed();
   },
-  '/api/results/:id': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    const id = (request as any).params?.id;
-    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
-    if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const updated = await updateAdminResult(id, await request.json());
-        if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
-        return Response.json(updated);
-      } catch (error) {
-        console.error('[api/results/:id PUT]', error);
-        return Response.json({ error: error?.message || 'Falha ao atualizar resultado' }, { status: 400 });
+'/api/results/:id': async (request) => {
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+     const id = (request as any).params?.id;
+     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+if (request.method === 'PUT') {
+        if (!can(role as UserRole, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const updated = await updateAdminResult(id, await request.json());
+          if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+          return Response.json(updated);
+        } catch (error) {
+          console.error('[api/results/:id PUT]', error);
+          return Response.json({ error: error?.message || 'Falha ao atualizar resultado' }, { status: 400 });
+        }
       }
-    }
-    if (request.method === 'DELETE') {
-      if (!can(authResult.role as any, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const deleted = await deleteAdminResult(id);
-        if (!deleted) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
-        return Response.json({ success: true });
-      } catch (error) {
-        console.error('[api/results/:id DELETE]', error);
-        return Response.json({ error: error?.message || 'Falha ao excluir resultado' }, { status: 400 });
+if (request.method === 'DELETE') {
+        if (!can(role as UserRole, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const deleted = await deleteAdminResult(id);
+          if (!deleted) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+          return Response.json({ success: true });
+        } catch (error) {
+          console.error('[api/results/:id DELETE]', error);
+          return Response.json({ error: error?.message || 'Falha ao excluir resultado' }, { status: 400 });
+        }
       }
-    }
-    return methodNotAllowed();
+     return methodNotAllowed();
   },
-  '/api/municipalities': async (request) => {
-    if (request.method === 'GET') {
-      try {
-        return Response.json(await getPublicMunicipalities());
-      } catch (error) {
-        console.error('[api/municipalities GET]', error);
-        return Response.json({ error: 'Falha ao carregar municípios do acervo' }, { status: 500 });
+'/api/municipalities': async (request) => {
+     if (request.method === 'GET') {
+       try {
+         return Response.json(await getPublicMunicipalities());
+       } catch (error) {
+         console.error('[api/municipalities GET]', error);
+         return Response.json({ error: 'Falha ao carregar municípios do acervo' }, { status: 500 });
+       }
+     }
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+if (request.method === 'POST') {
+        if (!can(role as UserRole, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const data = await request.json();
+          if (!data?.name || !data?.region || !Array.isArray(data?.keyDeliveries)) return Response.json({ error: 'name, region e keyDeliveries são obrigatórios' }, { status: 400 });
+          return Response.json(await createAdminMunicipality(data), { status: 201 });
+        } catch (error) {
+          console.error('[api/municipalities POST]', error);
+          return Response.json({ error: error?.message || 'Falha ao criar município' }, { status: 400 });
+        }
       }
-    }
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const data = await request.json();
-        if (!data?.name || !data?.region || !Array.isArray(data?.keyDeliveries)) return Response.json({ error: 'name, region e keyDeliveries são obrigatórios' }, { status: 400 });
-        return Response.json(await createAdminMunicipality(data), { status: 201 });
-      } catch (error) {
-        console.error('[api/municipalities POST]', error);
-        return Response.json({ error: error?.message || 'Falha ao criar município' }, { status: 400 });
-      }
-    }
-    return methodNotAllowed();
+     return methodNotAllowed();
   },
-  '/api/municipalities/:id': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    const id = (request as any).params?.id;
-    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
-    if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const updated = await updateAdminMunicipality(id, await request.json());
-        if (!updated) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
-        return Response.json(updated);
-      } catch (error) {
-        console.error('[api/municipalities/:id PUT]', error);
-        return Response.json({ error: error?.message || 'Falha ao atualizar município' }, { status: 400 });
+'/api/municipalities/:id': async (request) => {
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+     const id = (request as any).params?.id;
+     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+if (request.method === 'PUT') {
+        if (!can(role as UserRole, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const updated = await updateAdminMunicipality(id, await request.json());
+          if (!updated) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+          return Response.json(updated);
+        } catch (error) {
+          console.error('[api/municipalities/:id PUT]', error);
+          return Response.json({ error: error?.message || 'Falha ao atualizar município' }, { status: 400 });
+        }
       }
-    }
-    if (request.method === 'DELETE') {
-      if (!can(authResult.role as any, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      try {
-        const deleted = await deleteAdminMunicipality(id);
-        if (!deleted) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
-        return Response.json({ success: true });
-      } catch (error) {
-        console.error('[api/municipalities/:id DELETE]', error);
-        return Response.json({ error: 'Falha ao excluir município' }, { status: 400 });
+if (request.method === 'DELETE') {
+        if (!can(role as UserRole, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const deleted = await deleteAdminMunicipality(id);
+          if (!deleted) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+          return Response.json({ success: true });
+        } catch (error) {
+          console.error('[api/municipalities/:id DELETE]', error);
+          return Response.json({ error: error?.message || 'Falha ao excluir município' }, { status: 400 });
+        }
       }
-    }
-    return methodNotAllowed();
+     return methodNotAllowed();
   },
   '/api/admin/upload': async (request) => {
     const authResult = await requireAuth(request);

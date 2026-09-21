@@ -50,7 +50,7 @@ export const CitizenPortalView: React.FC = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files?.length) return;
-    setAttachments((prev) => [...prev, ...Array.from(files).map((file) => file.name)]);
+    setAttachments((prev) => [...prev, ...Array.from(files).map((file: File) => file.name)]);
   };
 
   const ensureAccount = async (): Promise<boolean> => {
@@ -87,8 +87,8 @@ export const CitizenPortalView: React.FC = () => {
         phone: formData.citizenPhone,
       }),
     });
-    const accountData = await accountResponse.json();
-    if (!accountResponse.ok) throw new Error(accountData.error || 'Não foi possível criar sua conta.');
+const accountData = await accountResponse.json();
+     if (!accountResponse.ok) throw new Error((accountData as { error?: string }).error || 'Não foi possível criar sua conta.');
 
     const { error: signInError } = await client.auth.signInWithPassword({
       email: formData.citizenEmail.trim(),
@@ -124,10 +124,10 @@ export const CitizenPortalView: React.FC = () => {
         },
         body: JSON.stringify({ ...formData, attachments }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Não foi possível registrar a demanda.');
+const data = await response.json();
+       if (!response.ok) throw new Error((data as { error?: string }).error || 'Não foi possível registrar a demanda.');
 
-      setGeneratedProtocol(data.protocol);
+      setGeneratedProtocol((data as { protocol?: string }).protocol);
       setAccountStep('idle');
       setPassword('');
       setConfirmPassword('');

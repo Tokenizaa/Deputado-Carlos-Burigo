@@ -9,19 +9,20 @@ export const InternalProfileView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [avatar, setAvatar] = useState('');
-  const [form, setForm] = useState({
-    name: '',
-    displayName: '',
-    phone: '',
-    department: '',
-    functionTitle: '',
-    responsibilities: '',
-    bio: '',
-    institutionalEmail: '',
-    institutionalPhone: '',
-    municipality: '',
-    startedAt: '',
-  });
+const [form, setForm] = useState({
+  name: '',
+  displayName: '',
+  phone: '',
+  department: '',
+  functionTitle: '',
+  responsibilities: '',
+  bio: '',
+  institutionalEmail: '',
+  institutionalPhone: '',
+  municipality: '',
+  startedAt: '',
+  cargo: '',
+});
 
   useEffect(() => {
     let active = true;
@@ -29,26 +30,27 @@ export const InternalProfileView: React.FC = () => {
       if (!currentUser) return;
       try {
         const client = await getSupabaseClient();
-        const { data, error } = await client.from('profiles')
-          .select('name,display_name,avatar_url,phone,department,function_title,responsibilities,bio,institutional_email,institutional_phone,municipality,started_at')
-          .eq('id', currentUser.id)
-          .single();
+const { data, error } = await client.from('profiles')
+        .select('name,display_name,avatar_url,phone,department,function_title,cargo,responsibilities,bio,institutional_email,institutional_phone,municipality,started_at')
+        .eq('id', currentUser.id)
+        .single();
         if (error) throw error;
         if (!active) return;
-        setAvatar(data.avatar_url || currentUser.avatar || '');
-        setForm({
-          name: data.name || currentUser.name || '',
-          displayName: data.display_name || currentUser.name || '',
-          phone: data.phone || '',
-          department: data.department || '',
-          functionTitle: data.function_title || data.cargo || '',
-          responsibilities: data.responsibilities || '',
-          bio: data.bio || '',
-          institutionalEmail: data.institutional_email || '',
-          institutionalPhone: data.institutional_phone || '',
-          municipality: data.municipality || '',
-          startedAt: data.started_at || '',
-        });
+setAvatar(data.avatar_url || currentUser.avatar || '');
+      setForm({
+        name: data.name || currentUser.name || '',
+        displayName: data.display_name || currentUser.name || '',
+        phone: data.phone || '',
+        department: data.department || '',
+        functionTitle: data.function_title || '',
+        responsibilities: data.responsibilities || '',
+        bio: data.bio || '',
+        institutionalEmail: data.institutional_email || '',
+        institutionalPhone: data.institutional_phone || '',
+        municipality: data.municipality || '',
+        startedAt: data.started_at || '',
+        cargo: data.cargo || '',
+      });
       } catch (error) {
         if (active) showToast(error instanceof Error ? error.message : 'Não foi possível carregar seu perfil.', 'error');
       } finally {
@@ -71,6 +73,7 @@ export const InternalProfileView: React.FC = () => {
         phone: form.phone.trim() || null,
         department: form.department.trim() || null,
         function_title: form.functionTitle.trim() || null,
+        cargo: form.cargo.trim() || null,
         responsibilities: form.responsibilities.trim() || null,
         bio: form.bio.trim() || null,
         institutional_email: form.institutionalEmail.trim() || null,
@@ -115,6 +118,14 @@ export const InternalProfileView: React.FC = () => {
             </label>
             <label className="text-sm font-bold text-stone-800">Nome de exibição *
               <input required value={form.displayName} onChange={e => setForm({...form,displayName:e.target.value})} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+            </label>
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-bold text-stone-800">Cargo *
+              <input required value={form.cargo} onChange={e => setForm({...form,cargo:e.target.value})} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+            </label>
+            <label className="text-sm font-bold text-stone-800">Telefone institucional
+              <input value={form.institutionalPhone} onChange={e => setForm({...form,institutionalPhone:e.target.value})} type="tel" className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
             </label>
           </div>
         </section>

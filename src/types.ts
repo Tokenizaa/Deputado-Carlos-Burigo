@@ -44,6 +44,14 @@ export interface SiteSettings {
   cta_title: string;
   cta_subtitle: string;
   gabinete_phone_caxias: string;
+  site_mode: string; // 'campaign' | 'mandate' | 'institutional'
+  electoral_number: string;
+  party_number: string;
+  party_name: string;
+  campaign_slogan: string;
+  campaign_cnpj: string;
+  campaign_coalition: string;
+  official_election_date: string;
 }
 
 export type DemandStatus =
@@ -261,6 +269,19 @@ export interface PageVersion {
   savedBy: string;
   status: 'draft' | 'published';
   note?: string;
+}
+
+export interface ProjectItem {
+  id: string;
+  code: string;
+  title: string;
+  summary: string;
+  detailedDescription: string;
+  theme: string;
+  status: string;
+  linkAlrs: string;
+  year: number;
+  impacts: string[];
 }
 
 export type TaskStatus = 'pendente' | 'em_andamento' | 'aguardando' | 'concluida' | 'cancelada';

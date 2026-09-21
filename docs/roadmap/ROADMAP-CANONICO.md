@@ -1,6 +1,6 @@
 # ROADMAP CANÔNICO — CICLO NOVO
 
-**Estado:** FASE 3 — VALIDAÇÃO DA BASE PENDENTE SOMENTE POR TYPECHECK  
+**Estado:** FASE 3 — VALIDAÇÃO DA BASE CONCLUÍDA  
 **Branch:** `main`
 
 ## FASE 0 — CONGELAMENTO
@@ -13,7 +13,7 @@
 **CONCLUÍDA**
 
 ## FASE 3 — VALIDAÇÃO DA BASE
-**PENDENTE — somente B2-01/typecheck**
+**CONCLUÍDA**
 
 Documento: `FASE-3-VALIDACAO-BASE.md`
 
@@ -21,13 +21,9 @@ Documento: `FASE-3-VALIDACAO-BASE.md`
 
 Build local e build do deploy: **PASS**.
 
-Ainda falta executar:
+Lint (typecheck): **PASS**.
 
-```bash
-npm run lint
-```
-
-Esse comando é o único bloqueio restante desta fase.
+Todos os bloqueios desta fase foram resolvidos.
 
 ### B2-02 — Smoke de produção
 
@@ -46,9 +42,7 @@ Worker validado na versão `2c678424-7822-495e-8557-82fc812ebed3`.
 
 ### Regra
 
-A Fase 3 será encerrada assim que o `npm run lint` passar.
-
-Nenhuma implementação funcional adicional é necessária para concluir B2-02.
+FASE 3 foi encerrada com sucesso após a passagem do `npm run lint`.
 
 ## PRÓXIMO BLOCO
 

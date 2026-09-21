@@ -6,7 +6,7 @@ import { News, NewsCategory } from '../../types';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 
 export const AdminNewsTab: React.FC = () => {
-  const { news, refreshAllData, showToast } = useApp();
+  const { news, refreshAllData, showToast, currentUser } = useApp();
   const [editingNews, setEditingNews] = useState<News | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 

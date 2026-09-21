@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { can } from '../../config/adminPermissions';
+import type { AdminModule } from '../../config/adminPermissions';
 import {
   LayoutDashboard,
   FileCode2,
@@ -70,16 +71,14 @@ const { currentUser, signOut, demands } = useApp();
     (d) => d.status === 'recebida' || d.status === 'em análise'
   ).length;
 
-  const navItems = [
-    { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
-    { id: 'cidadão', label: 'Atendimento', icon: Inbox, badge: pendingDemandsCount > 0 ? pendingDemandsCount : null },
-    { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
-    { id: 'gestao-documental', label: 'Gestão Documental', icon: FileCode2, badge: null },
-    { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
-    { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
-    { id: 'administração', label: 'Equipe', icon: Users, badge: null },
-    { id: 'configurações', label: 'Configurações', icon: Settings, badge: null },
-  ].filter((item) => currentUser && can(currentUser.role, item.id));
+const navItems = [
+  { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
+  { id: 'cidadão', label: 'Atendimento', icon: Inbox, badge: pendingDemandsCount > 0 ? pendingDemandsCount : null },
+  { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
+  { id: 'gestao-documental', label: 'Gestão Documental', icon: FileCode2, badge: null },
+  { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
+  { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
+].filter((item) => currentUser && can(currentUser.role, item.id as AdminModule));
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col">

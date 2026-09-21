@@ -24,7 +24,6 @@ type MediaRow = {
   source_page_url: string | null;
   sha256: string | null;
   published_at: string | null;
-  published_at: string | null;
   downloaded_at: string | null;
   verification_status: string;
   rights_status: string;
@@ -72,6 +71,7 @@ type DocumentRow = {
   status: string;
   tags: string[];
   visibility: string;
+  published_at: string | null;
 };
 
 type EvidenceRow = {
@@ -177,6 +177,7 @@ export function mapToPublicDocumentDto(row: DocumentRow): PublicDocumentDto {
     status: row.status,
     tags: row.tags ?? [],
     visibility: row.visibility,
+    publishedAt: row.published_at,
   };
 }
 

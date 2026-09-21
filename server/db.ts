@@ -5,7 +5,6 @@ import {
   Demand,
   News,
   EventItem,
-  ProjectItem,
   ResultItem,
   Municipality,
   VideoItem,
@@ -14,7 +13,8 @@ import {
   PageVersion,
   User,
   AuditLog,
-} from '../src/types.js';
+  ProjectItem,
+} from '../src/types';
 
 interface DatabaseSchema {
   settings: SiteSettings;
@@ -23,10 +23,10 @@ interface DatabaseSchema {
   pageVersions: PageVersion[];
   news: News[];
   events: EventItem[];
-  projects: ProjectItem[];
   results: ResultItem[];
   municipalities: Municipality[];
   videos: VideoItem[];
+  projects: ProjectItem[];
   media: MediaItem[];
   demands: Demand[];
   auditLogs: AuditLog[];
@@ -60,6 +60,17 @@ const INITIAL_SETTINGS: SiteSettings = {
   social_whatsapp: 'https://wa.me/5554999151515',
   seo_default_title: 'Carlos Búrigo | Deputado Estadual e Candidato 15140 MDB Rio Grande do Sul',
   seo_default_description: 'Plataforma oficial de Carlos Búrigo. Conheça a trajetória de quem foi Prefeito de São José dos Ausentes, Secretário da Fazenda de Caxias do Sul, Secretário de Estado e atual Líder do MDB na Assembleia Legislativa do RS.',
+  seo_default_image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+  mandate_slogan: 'Trabalho sério, presença e resultados reais para o Rio Grande.',
+  bio_highlights: [
+    'Ex-prefeito de São José dos Ausentes (2 mandatos)',
+    '9 anos como Secretário da Fazenda de Caxias do Sul',
+    'Secretário de Estado e atual Líder do MDB na ALRS',
+    'Defensor do desenvolvimento sustentável e da redução de burocracia'
+  ],
+  cta_title: 'Quer saber mais?',
+  cta_subtitle: 'Entre em contato com nossa equipe e descubra como estamos transformando o Rio Grande',
+  gabinete_phone_caxias: '(54) 3210-2000',
   privacy_policy_text: 'Em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018), os dados cadastrados pelos cidadãos no canal de atendimento do gabinete são utilizados exclusivamente para a tramitação, resposta e acompanhamento das demandas públicas, sendo resguardado o sigilo pessoal e jamais compartilhados para fins eleitorais abusivos ou comerciais.',
 };
 
@@ -79,13 +90,13 @@ const INITIAL_USERS: User[] = [
     role: 'ADMIN',
     cargo: 'Chefe de Gabinete',
   },
-  {
-    id: 'usr-3',
-    name: 'Rodrigo Fontana',
-    email: 'rodrigo.comunicacao@burigo.com.br',
-    role: 'COMUNICAÇÃO',
-    cargo: 'Coordenador de Comunicação & Imprensa',
-  },
+{
+      id: 'usr-3',
+      name: 'Rodrigo Fontana',
+      email: 'rodrigo.comunicacao@burigo.com.br',
+      role: 'COMUNICACAO',
+      cargo: 'Coordenador de Comunicação & Imprensa',
+    },
   {
     id: 'usr-4',
     name: 'Luciana Zanotto',
@@ -127,50 +138,53 @@ const INITIAL_PROJECTS: ProjectItem[] = [
       'Atração estimada de mais de R$ 5 bilhões em investimentos',
     ],
   },
-  {
-    id: 'proj-2',
-    code: 'PL 184/2024',
-    title: 'Programa Estadual "Juro Zero" para Micro e Pequenas Empresas',
-    summary: 'Institui o subsídio estatal integral de juros em operações de crédito para Microempreendedores Individuais (MEIs) e pequenas empresas atingidas por crises.',
-    detailedDescription: 'Proposta pioneira apresentada por Carlos Búrigo para fortalecer o empreendedorismo e a recuperação econômica. O Estado assume os juros do financiamento junto a instituições financeiras cooperativas e bancos de fomento para que o pequeno empresário invista em capital de giro e maquinário com custo zero de juro.',
-    theme: 'Empreendedorismo & Finanças Públicas',
-    status: 'Em Tramitação',
-    year: 2024,
-    impacts: [
-      'Alívio financeiro para mais de 100 mil microempreendedores',
-      'Preservação direta de postos de trabalho no comércio e serviços',
-      'Foco prioritário em municípios impactados por eventos climáticos',
-    ],
-  },
-  {
-    id: 'proj-3',
-    code: 'FP-LOG-01',
-    title: 'Frente Parlamentar de Logística e Transportes dos Campos de Cima da Serra',
-    summary: 'Articulação suprapartidária para asfaltamento e duplicação da BR-285, integração RS-SC e recuperação de rodovias turísticas e de escoamento.',
-    detailedDescription: 'Criada e presidida por Carlos Búrigo, a frente lidera a cobrança junto ao DNIT e ao Governo do Estado pela conclusão das obras estruturais da Serra Gaúcha, ligação de São José dos Ausentes a Timbé do Sul (SC) e acessos asfálticos que reduzem o custo logístico dos hortifrutigranjeiros e maçã.',
-    theme: 'Infraestrutura & Logística',
-    status: 'Aprovado / Lei Sancionada',
-    year: 2023,
-    impacts: [
-      'Liberação de recursos para o trecho restante da BR-285',
-      'Melhoria contínua de acessos asfálticos em municípios isolados',
-      'Aumento do fluxo de turismo ecológico e de aventura na região dos cânions',
-    ],
-  },
-  {
-    id: 'proj-4',
-    code: 'COM-EDU-02',
-    title: 'Modernização e Manutenção dos Repasses para Escolas Estaduais',
-    summary: 'Iniciativas conduzidas durante a presidência da Comissão de Educação para garantia de merenda com produtos da agricultura familiar e reformas estruturais.',
-    detailedDescription: 'Carlos Búrigo liderou audiências públicas e emendas parlamentares voltadas à recomposição do orçamento da infraestrutura escolar e valorização dos profissionais da educação no Rio Grande do Sul.',
-    theme: 'Educação',
-    status: 'Aprovado / Lei Sancionada',
-    year: 2022,
-    impacts: [
-      'Destinação de emendas diretas a dezenas de escolas da Serra e Campos de Cima da Serra',
-      'Incentivo à aquisição de alimentos da agricultura familiar gaúcha na merenda',
-    ],
-  },
+{
+     id: 'proj-2',
+     code: 'PL 184/2024',
+     title: 'Programa Estadual "Juro Zero" para Micro e Pequenas Empresas',
+     summary: 'Institui o subsídio estatal integral de juros em operações de crédito para Microempreendedores Individuais (MEIs) e pequenas empresas atingidas por crises.',
+     detailedDescription: 'Proposta pioneira apresentada por Carlos Búrigo para fortalecer o empreendedorismo e a recuperação econômica. O Estado assume os juros do financiamento junto a instituições financeiras cooperativas e bancos de fomento para que o pequeno empresário invista em capital de giro e maquinário com custo zero de juro.',
+     theme: 'Empreendedorismo & Finanças Públicas',
+     status: 'Em Tramitação',
+     year: 2024,
+     linkAlrs: 'https://ww4.al.rs.gov.br/legislativo',
+     impacts: [
+       'Alívio financeiro para mais de 100 mil microempreendedores',
+       'Preservação direta de postos de trabalho no comércio e serviços',
+       'Foco prioritário em municípios impactados por eventos climáticos',
+     ],
+   },
+{
+     id: 'proj-3',
+     code: 'FP-LOG-01',
+     title: 'Frente Parlamentar de Logística e Transportes dos Campos de Cima da Serra',
+     summary: 'Articulação suprapartidária para asfaltamento e duplicação da BR-285, integração RS-SC e recuperação de rodovias turísticas e de escoamento.',
+     detailedDescription: 'Criada e presidida por Carlos Búrigo, a frente lidera a cobrança junto ao DNIT e ao Governo do Estado pela conclusão das obras estruturais da Serra Gaúcha, ligação de São José dos Ausentes a Timbé do Sul (SC) e acessos asfálticos que reduzem o custo logístico dos hortifrutigranjeiros e maçã.',
+     theme: 'Infraestrutura & Logística',
+     status: 'Aprovado / Lei Sancionada',
+     year: 2023,
+     linkAlrs: 'https://ww4.al.rs.gov.br/legislativo',
+     impacts: [
+       'Liberação de recursos para o trecho restante da BR-285',
+       'Melhoria contínua de acessos asfálticos em municípios isolados',
+       'Aumento do fluxo de turismo ecológico e de aventura na região dos cânions',
+     ],
+   },
+{
+     id: 'proj-4',
+     code: 'COM-EDU-02',
+     title: 'Modernização e Manutenção dos Repasses para Escolas Estaduais',
+     summary: 'Iniciativas conduzidas durante a presidência da Comissão de Educação para garantia de merenda com produtos da agricultura familiar e reformas estruturais.',
+     detailedDescription: 'Carlos Búrigo liderou audiências públicas e emendas parlamentares voltadas à recomposição do orçamento da infraestrutura escolar e valorização dos profissionais da educação no Rio Grande do Sul.',
+     theme: 'Educação',
+     status: 'Aprovado / Lei Sancionada',
+     year: 2022,
+     linkAlrs: 'https://ww4.al.rs.gov.br/legislativo',
+     impacts: [
+       'Destinação de emendas diretas a dezenas de escolas da Serra e Campos de Cima da Serra',
+       'Incentivo à aquisição de alimentos da agricultura familiar gaúcha na merenda',
+     ],
+   },
 ];
 
 const INITIAL_RESULTS: ResultItem[] = [
@@ -871,22 +885,22 @@ class DatabaseManager {
       console.error('Error reading db.json, generating defaults:', err);
     }
 
-    const defaultData: DatabaseSchema = {
-      settings: INITIAL_SETTINGS,
-      users: INITIAL_USERS,
-      pages: INITIAL_PAGES,
-      pageVersions: INITIAL_VERSIONS,
-      news: INITIAL_NEWS,
-      events: INITIAL_EVENTS,
-      projects: INITIAL_PROJECTS,
-      results: INITIAL_RESULTS,
-      municipalities: INITIAL_MUNICIPALITIES,
-      videos: INITIAL_VIDEOS,
-      media: INITIAL_MEDIA,
-      demands: INITIAL_DEMANDS,
-      auditLogs: INITIAL_AUDIT_LOGS,
-      nextProtocolCounter: 4831,
-    };
+const defaultData: DatabaseSchema = {
+  settings: INITIAL_SETTINGS,
+  users: INITIAL_USERS,
+  pages: INITIAL_PAGES,
+  pageVersions: INITIAL_VERSIONS,
+  news: INITIAL_NEWS,
+  events: INITIAL_EVENTS,
+  results: INITIAL_RESULTS,
+  municipalities: INITIAL_MUNICIPALITIES,
+  videos: INITIAL_VIDEOS,
+  projects: INITIAL_PROJECTS,
+  media: INITIAL_MEDIA,
+  demands: INITIAL_DEMANDS,
+  auditLogs: INITIAL_AUDIT_LOGS,
+  nextProtocolCounter: 4831,
+};
 
     this.saveDataDirect(defaultData);
     return defaultData;

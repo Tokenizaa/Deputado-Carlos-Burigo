@@ -7,6 +7,7 @@ export type AdminModule =
   | 'gestao-documental'
   | 'conteúdo'
   | 'tarefas'
+  | 'atuação'
   | 'administração'
   | 'configurações';
 

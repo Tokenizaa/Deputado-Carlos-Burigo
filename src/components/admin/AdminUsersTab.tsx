@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getSupabaseClient } from '../../lib/supabaseClient';
-import { ROLE_PERMISSIONS } from '../../config/adminPermissions';
+import { ROLE_PERMISSIONS, Permission } from '../../config/adminPermissions';
 import { Role, Task, User } from '../../types';
 
 type Invite = {
@@ -190,7 +190,7 @@ export const AdminUsersTab: React.FC = () => {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data?.error || 'Falha ao atualizar convite.');
-      setInvites((prev) => prev.map((invite) => invite.id === id ? data : invite));
+      setInvites((prev: Invite[]) => prev.map((invite) => invite.id === id ? data : invite));
       if (action === 'approve') await refreshAllData();
       showToast(action === 'approve' ? 'Usuário aprovado.' : 'Convite recusado.', 'success');
     } catch (error: any) {
@@ -438,7 +438,7 @@ export const AdminUsersTab: React.FC = () => {
                     <div key={module} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <span className="text-sm font-semibold text-stone-800">{moduleLabels[module] ?? module}</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {(permissions ?? []).map((permission) => (
+                        {((permissions ?? []) as Permission[]).map((permission: Permission) => (
                           <span key={permission} className="inline-flex items-center gap-1 text-[11px] font-semibold text-stone-600 bg-stone-100 rounded-md px-2 py-1">
                             <Check className="w-3 h-3 text-[#00863f]" />
                             {permissionLabels[permission] ?? permission}

@@ -16,7 +16,6 @@ export interface PublicMediaDto {
   sourcePageUrl: string | null;
   sha256: string | null;
   publishedAt: string | null;
-  publishedAt: string | null;
   downloadedAt: string | null;
   verificationStatus: string;
   rightsStatus: string;
@@ -65,6 +64,7 @@ export interface PublicDocumentDto {
   status: string;
   tags: string[];
   visibility: string;
+  publishedAt: string | null;
 }
 
 export interface PublicEvidenceDto {
