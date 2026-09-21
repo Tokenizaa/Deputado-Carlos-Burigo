@@ -226,6 +226,15 @@ export const AdminPagesTab: React.FC = () => {
     } : block));
   };
 
+  const handleBlockCanvasClick = (event: React.MouseEvent, block: PageBlock) => {
+    const target = event.target as HTMLElement;
+    if (selectedBlockId === block.id && isMediaEditable(block) && target.closest('img')) {
+      setMediaPickerBlockId(block.id);
+      return;
+    }
+    setSelectedBlockId(block.id);
+  };
+
   const getBlockMedia = (block: PageBlock) => {
     const content = block.content || {};
     if (content.mediaType === 'video' || content.videoUrl) {
@@ -365,7 +374,7 @@ export const AdminPagesTab: React.FC = () => {
                         onDragEnd={() => setDraggedBlockId(null)}
                         onDragOver={(event) => event.preventDefault()}
                         onDrop={() => draggedBlockId && moveBlockByDrag(draggedBlockId, block.id)}
-                        onClick={() => setSelectedBlockId(block.id)}
+                        onClick={(event) => handleBlockCanvasClick(event, block)}
                         className={`relative group border-2 border-transparent hover:border-emerald-300 ${selected ? 'border-emerald-500 ring-1 ring-emerald-200' : ''} ${block.visible === false ? 'opacity-50' : ''}`}
                       >
                         <div className="absolute left-2 top-2 z-20 flex items-center gap-1 rounded-md bg-white/95 border border-stone-200 px-2 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
