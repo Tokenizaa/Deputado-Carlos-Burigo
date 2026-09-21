@@ -1,61 +1,39 @@
 # ROADMAP CANÔNICO — CICLO NOVO
 
-**Estado:** FASE 2 CONCLUÍDA / FASE 3 PRÓXIMA  
-**Marco zero:** `FASE-0-CONGELAMENTO-ESTADO.md`  
-**Branch de referência:** `main`
+**Estado:** FASE 3 — VALIDAÇÃO DA BASE PENDENTE  
+**Branch:** `main`
 
 ## FASE 0 — CONGELAMENTO
-**Status:** CONCLUÍDA
+**CONCLUÍDA**
 
 ## FASE 1 — AUDITORIA GERAL
-**Status:** CONCLUÍDA
-
-Documento: `FASE-1-AUDITORIA-GERAL.md`
-
-A auditoria confirmou que a arquitetura atual permanece como base e registrou pendências reais de validação, segurança, fluxos ponta a ponta, acessibilidade e performance.
+**CONCLUÍDA**
 
 ## FASE 2 — BACKLOG REAL
-**Status:** CONCLUÍDA
+**CONCLUÍDA**
 
-Documento: `FASE-2-BACKLOG-REAL.md`
+## FASE 3 — VALIDAÇÃO DA BASE
+**PENDENTE**
 
-A Fase 2 consolidou os achados em 18 itens, com prioridade, dependências e critérios objetivos de aceite.
+Documento: `FASE-3-VALIDACAO-BASE.md`
 
-### Ordem canônica
+### B2-01 — Build/typecheck
+Pendente por indisponibilidade de acesso DNS/GitHub no ambiente de execução.
 
-1. **P0 — Validação básica:** build/typecheck e produção.
-2. **P0 — Segurança/RBAC:** Auth, `admin_bootstrap` e matriz de permissões.
-3. **P1 — Fluxos reais:** APIs, cidadão, CMS, documentos, mídia, equipe e configurações.
-4. **P1 — Qualidade:** acessibilidade e responsividade.
-5. **P2 — Otimização:** policies, índices, observabilidade e pipeline de testes.
+### B2-02 — Smoke de produção
+Pendente porque não foi obtida resposta HTTP verificável do Worker no ambiente.
 
-Nenhum item histórico é reaberto por numeração.
+### Regra
+A Fase 3 não será marcada como concluída sem evidência real dos dois itens.
 
-## FASE 3 EM DIANTE
+Nenhuma implementação funcional deve começar antes do encerramento desses itens.
 
-A próxima fase deve executar o primeiro bloco do backlog, começando pelos itens **B2-01 e B2-02**, sem implementar funcionalidades novas antes de validar a base existente.
+## PRÓXIMO BLOCO
 
-A numeração continua linear:
+Após B2-01 e B2-02:
 
-```
-Fase 0
-Fase 1
-Fase 2
-Fase 3
-Fase 4
-...
-```
+- B2-03 — Auth/password protection;
+- B2-04 — `admin_bootstrap` / RLS;
+- B2-05 — matriz RBAC.
 
-## REGRA DE IMPLEMENTAÇÃO
-
-```
-AUDITORIA
-→ IMPLEMENTAÇÃO
-→ TESTE
-→ VALIDAÇÃO
-→ DOCUMENTAÇÃO
-→ MAIN
-→ CHECKPOINT
-```
-
-Nenhuma fase será considerada concluída apenas porque o código foi escrito.
+A numeração permanece linear.
