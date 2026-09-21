@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AdminAssetInput } from './AdminAssetInput';
 import { useApp } from '../../context/AppContext';
 import { Plus, Edit2, Trash2, Eye, Calendar, MapPin, Check, Save } from 'lucide-react';
 import { News, NewsCategory } from '../../types';
