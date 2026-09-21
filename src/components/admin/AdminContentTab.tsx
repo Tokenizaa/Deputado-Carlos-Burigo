@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const AdminContentTab: React.FC = () => {
-  const { settings, refreshAllData, showToast } = useApp();
+  const { settings, updateSettings, showToast } = useApp();
 
   const [campaignSlogan, setCampaignSlogan] = useState(settings?.campaign_slogan || '');
   const [mandateSlogan, setMandateSlogan] = useState(settings?.mandate_slogan || '');
@@ -44,37 +44,28 @@ export const AdminContentTab: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const res = await fetch('/api/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          campaign_slogan: campaignSlogan,
-          mandate_slogan: mandateSlogan,
-          gabinete_phone: phoneAlrs,
-          gabinete_phone_caxias: phoneCaxias,
-          gabinete_whatsapp: whatsapp,
-          gabinete_email: emailOfficial,
-          campaign_cnpj: electionCnpj,
-          campaign_official_name: campaignName,
-          campaign_coalition: coalition,
-          social_instagram: instagram,
-          social_facebook: facebook,
-          social_youtube: youtube,
-          bio_highlights: bioHighlights,
-          cta_title: ctaTitle,
-          cta_subtitle: ctaSubtitle,
-        }),
+      const success = await updateSettings({
+        campaign_slogan: campaignSlogan,
+        mandate_slogan: mandateSlogan,
+        gabinete_phone: phoneAlrs,
+        gabinete_phone_caxias: phoneCaxias,
+        gabinete_whatsapp: whatsapp,
+        gabinete_email: emailOfficial,
+        campaign_cnpj: electionCnpj,
+        campaign_official_name: campaignName,
+        campaign_coalition: coalition,
+        social_instagram: instagram,
+        social_facebook: facebook,
+        social_youtube: youtube,
+        bio_highlights: bioHighlights,
+        cta_title: ctaTitle,
+        cta_subtitle: ctaSubtitle,
       });
-
-      if (res.ok) {
-        showToast('Conteúdos institucionais e editoriais salvos com sucesso!', 'success');
-        await refreshAllData();
-      } else {
-        const data = await res.json();
-        showToast(data.error || 'Erro ao salvar conteúdos', 'error');
+      if (success) {
+        showToast('Conteúdo institucional salvo com sucesso!', 'success');
       }
-    } catch (err) {
-      showToast('Erro de conexão ao salvar conteúdos.', 'error');
+    } catch {
+      showToast('Erro de conexão ao salvar conteúdo.', 'error');
     } finally {
       setIsSaving(false);
     }
