@@ -483,16 +483,58 @@ export async function getPublicMedia() {
   return data ?? [];
 }
 
+const ADMIN_DOCUMENT_SELECT = 'id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,published_at,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible,category,status,tags,visibility';
+
+function mapAdminDocument(row: any) {
+  const dto = mapToPublicDocumentDto(row);
+  const publicUrl = row.storage_path
+    ? supabaseAdmin.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl
+    : null;
+  return { ...dto, publicUrl };
+}
+
 export async function getAdminDocuments() {
   const { data, error } = await supabaseAdmin.from('documents')
-    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .select(ADMIN_DOCUMENT_SELECT)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((row) => {
-    const dto = mapToPublicDocumentDto(row);
-    const publicUrl = supabaseAdmin.storage.from('documents').getPublicUrl(row.storage_path).data.publicUrl;
-    return { ...dto, publicUrl };
-  });
+  return (data ?? []).map(mapAdminDocument);
+}
+
+export async function createAdminDocument(input: Record<string, unknown>) {
+  const title = String(input.title ?? '').trim();
+  const documentType = String(input.documentType ?? '').trim();
+  const originalUrl = input.originalUrl ? String(input.originalUrl).trim() : '';
+  if (!title) throw new Error('Título é obrigatório');
+  if (!documentType) throw new Error('Tipo do documento é obrigatório');
+  if (!originalUrl) throw new Error('Arquivo ou link do documento é obrigatório');
+
+  const row = {
+    legislative_item_id: input.legislativeItemId || null,
+    document_type: documentType,
+    title,
+    original_url: originalUrl,
+    storage_path: input.storagePath ? String(input.storagePath) : null,
+    mime_type: input.mimeType ? String(input.mimeType) : null,
+    file_size: typeof input.fileSize === 'number' ? input.fileSize : null,
+    source_name: input.sourceName ? String(input.sourceName).trim() : null,
+    published_at: input.publishedAt ? String(input.publishedAt) : null,
+    verification_status: input.verificationStatus ? String(input.verificationStatus) : 'FOUND_UNVERIFIED',
+    rights_status: input.rightsStatus ? String(input.rightsStatus) : 'UNKNOWN',
+    notes: input.notes ? String(input.notes).trim() : null,
+    visible: input.visible !== false,
+    category: input.category ? String(input.category) : 'parlamentar',
+    status: input.status ? String(input.status) : 'publicado',
+    tags: Array.isArray(input.tags) ? input.tags.map(String) : [],
+    visibility: input.visibility ? String(input.visibility) : 'publico',
+  };
+
+  const { data, error } = await supabaseAdmin.from('documents')
+    .insert(row)
+    .select(ADMIN_DOCUMENT_SELECT)
+    .single();
+  if (error) throw error;
+  return mapAdminDocument(data);
 }
 
 export async function updateAdminDocument(id: string, input: Record<string, unknown>) {
@@ -501,21 +543,35 @@ export async function updateAdminDocument(id: string, input: Record<string, unkn
     if (typeof input.visible !== 'boolean') throw new Error('O campo visible deve ser booleano');
     patch.visible = input.visible;
   }
-  if ('title' in input) patch.title = String(input.title ?? '').trim();
+  if ('title' in input) {
+    const value = String(input.title ?? '').trim();
+    if (!value) throw new Error('Título é obrigatório');
+    patch.title = value;
+  }
   if ('documentType' in input) patch.document_type = String(input.documentType ?? '').trim();
-  if ('notes' in input) patch.notes = String(input.notes ?? '').trim();
+  if ('notes' in input) patch.notes = input.notes ? String(input.notes).trim() : null;
   if ('originalUrl' in input) patch.original_url = input.originalUrl ? String(input.originalUrl).trim() : null;
+  if ('storagePath' in input) patch.storage_path = input.storagePath ? String(input.storagePath) : null;
+  if ('mimeType' in input) patch.mime_type = input.mimeType ? String(input.mimeType) : null;
+  if ('fileSize' in input) patch.file_size = typeof input.fileSize === 'number' ? input.fileSize : null;
+  if ('sourceName' in input) patch.source_name = input.sourceName ? String(input.sourceName).trim() : null;
+  if ('publishedAt' in input) patch.published_at = input.publishedAt ? String(input.publishedAt) : null;
+  if ('verificationStatus' in input) patch.verification_status = String(input.verificationStatus || 'FOUND_UNVERIFIED');
+  if ('rightsStatus' in input) patch.rights_status = String(input.rightsStatus || 'UNKNOWN');
+  if ('category' in input) patch.category = String(input.category || 'outros');
+  if ('status' in input) patch.status = String(input.status || 'publicado');
+  if ('tags' in input) patch.tags = Array.isArray(input.tags) ? input.tags.map((tag) => String(tag).trim()).filter(Boolean) : [];
+  if ('visibility' in input) patch.visibility = String(input.visibility || 'publico');
+  if ('legislativeItemId' in input) patch.legislative_item_id = input.legislativeItemId || null;
 
   const { data, error } = await supabaseAdmin.from('documents')
     .update(patch)
     .eq('id', id)
-    .select('id,legislative_item_id,document_type,title,original_url,storage_path,mime_type,file_size,sha256,source_name,downloaded_at,verification_status,rights_status,notes,created_at,updated_at,visible')
+    .select(ADMIN_DOCUMENT_SELECT)
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
-  const dto = mapToPublicDocumentDto(data);
-  const publicUrl = supabaseAdmin.storage.from('documents').getPublicUrl(data.storage_path).data.publicUrl;
-  return { ...dto, publicUrl };
+  return mapAdminDocument(data);
 }
 
 export async function getPublicDocuments() {
