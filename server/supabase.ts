@@ -754,6 +754,7 @@ export async function createAdminAgenda(input: Record<string, unknown>, actorId:
     location: String(input.location ?? ''),
     municipality: String(input.municipality ?? ''),
     visibility: input.visibility === 'interno' ? 'interno' : 'publico',
+    tags: Array.isArray(input.tags) ? input.tags.map((tag) => String(tag).trim()).filter(Boolean).slice(0, 12) : [],
     status: 'publicado',
     created_by: actorId,
   }).select('*').single();
@@ -766,7 +767,7 @@ export async function updateAdminAgenda(id: string, input: Record<string, unknow
   for (const key of ['title','description','location','municipality','visibility']) {
     if (key in input) patch[key] = input[key];
   }
-  if ('date' in input || 'time' in input) patch.starts_at = agendaStartsAt(input);
+  if (Array.isArray(input.tags)) patch.tags = input.tags.map((tag) => String(tag).trim()).filter(Boolean).slice(0, 12);
   const { data, error } = await supabaseAdmin.from('events').update(patch).eq('id', id).select('*').single();
   if (error) throw error;
   return data;
@@ -780,7 +781,7 @@ export async function deleteAdminAgenda(id: string) {
 
 export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
   const { data, error } = await supabasePublic.from('events')
-    .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,visibility,status')
+    .select('id,title,description,starts_at,ends_at,location,municipality,media_id,link,participants,tags,visibility,status')
     .eq('status', 'publicado')
     .eq('visibility', 'publico')
     .order('starts_at', { ascending: true });
