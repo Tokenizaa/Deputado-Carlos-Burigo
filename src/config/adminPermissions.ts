@@ -26,7 +26,7 @@ const ALL: Permission[] = ['view', 'create', 'edit', 'publish', 'delete', 'manag
 export const ROLE_PERMISSIONS: Record<UserRole, Partial<Record<AdminModule, Permission[]>>> = {
   ADMIN: {
     dashboard: ALL, cidadão: ALL, agenda: ALL, 'gestao-documental': ALL, conteúdo: ALL,
-    tarefas: ALL, administração: ALL, configurações: ALL,
+    tarefas: ALL, 'atuação': ALL, administração: ALL, configurações: ALL,
   },
   EDITOR: {
     dashboard: ['view'],
