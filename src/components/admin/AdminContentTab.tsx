@@ -105,7 +105,7 @@ export const AdminContentTab: React.FC = () => {
             Editor de Conteúdo Institucional & Textos Globais
           </h2>
           <p className="text-stone-600 text-xs sm:text-sm">
-            Edite slogans, dados eleitorais oficiais, canais de atendimento, frases de destaque e chamadas públicas.
+            Edite textos institucionais, canais públicos, redes sociais, SEO, compartilhamento e política de privacidade.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export const AdminContentTab: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase text-stone-700 mb-1">
-                Slogan de Mandato/ / Institucional (Assembleia RS)
+                Slogan de Mandato / Institucional (Assembleia RS)
               </label>
               <textarea
                 rows={3}
