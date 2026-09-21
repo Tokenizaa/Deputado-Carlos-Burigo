@@ -143,19 +143,24 @@ export async function getPublicSettings() {
     .select('*').eq('id', true).maybeSingle();
   if (error) throw error;
   if (!data) return null;
+  const {
+    site_mode: _siteMode,
+    electoral_number: _electoralNumber,
+    party_number: _partyNumber,
+    party_name: _partyName,
+    campaign_slogan: _campaignSlogan,
+    campaign_cnpj: _campaignCnpj,
+    campaign_coalition: _campaignCoalition,
+    official_election_date: _officialElectionDate,
+    campaign_official_name: _campaignOfficialName,
+    ...publicData
+  } = data;
   return {
-    ...data,
+    ...publicData,
     candidateTitle: data.candidate_title,
     mandateTitle: data.mandate_title,
     institutionalTitle: data.institutional_title,
     candidateName: data.candidate_name,
-    electoralNumber: data.electoral_number,
-    partyNumber: data.party_number,
-    partyName: data.party_name,
-    campaignSlogan: data.campaign_slogan,
-    campaignCnpj: data.campaign_cnpj,
-    campaignCoalition: data.campaign_coalition,
-    officialElectionDate: data.official_election_date,
     gabineteAddressPoa: data.gabinete_address_poa,
     gabineteAddressCaxias: data.gabinete_address_caxias,
     gabinetePhone: data.gabinete_phone,
@@ -174,8 +179,7 @@ export async function getPublicSettings() {
 
 export async function updateAdminSettings(input: Record<string, unknown>) {
   const allowed = [
-    'site_mode','electoral_number','campaign_slogan','campaign_coalition','campaign_cnpj',
-    'campaign_official_name','mandate_slogan','bio_highlights','cta_title','cta_subtitle',
+    'mandate_slogan','bio_highlights','cta_title','cta_subtitle',
     'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_phone_caxias',
     'gabinete_whatsapp','gabinete_email','social_instagram','social_facebook','social_youtube',
     'seo_default_title','seo_default_description','seo_default_image_url','privacy_policy_text'
@@ -193,7 +197,6 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
       patch[key] = String(input[key] ?? '').trim();
     }
   }
-  if ('site_mode' in input) patch.site_mode = input.site_mode;
   const { data, error } = await supabaseAdmin.from('site_settings').update(patch).eq('id', true).select('*').single();
   if (error) throw error;
   return {
