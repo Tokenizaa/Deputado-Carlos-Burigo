@@ -6,14 +6,12 @@ export const AgendaSection: React.FC = () => {
   const { events } = useApp();
   const [selectedCity, setSelectedCity] = useState('todas');
 
-  // Strict check: only public events for public view
-  const publicEvents = events.filter((e) => e.visibility === 'publico');
-
-  const cities = ['todas', ...Array.from(new Set(publicEvents.map((e) => e.municipality)))];
-
-  const filtered = selectedCity === 'todas'
-    ? publicEvents
-    : publicEvents.filter((e) => e.municipality === selectedCity);
+  const publicEvents = events.filter((event) => event.visibility === 'publico');
+  const cities = ['todas', ...Array.from(new Set(publicEvents.map((event) => event.municipality)))];
+  const filtered =
+    selectedCity === 'todas'
+      ? publicEvents
+      : publicEvents.filter((event) => event.municipality === selectedCity);
 
   return (
     <section className="py-16 sm:py-24 bg-stone-50 border-b border-stone-200">
@@ -31,11 +29,10 @@ export const AgendaSection: React.FC = () => {
             </p>
           </div>
 
-          {/* City filter */}
           <div>
             <select
               value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              onChange={(event) => setSelectedCity(event.target.value)}
               className="text-xs bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 font-medium"
             >
               {cities.map((city) => (
@@ -47,15 +44,15 @@ export const AgendaSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Calendário mensal */}
-        {(() => {
-          const year = calendarDate.getFul        <AgendaCalendar events={filtered} />
+        <AgendaCalendar events={filtered} />
 
-nded-xl border border-dashed border-stone-300">
-              <p className="text-stone-500 font-medium">Nenhum evento público agendado para o filtro selecionado.</p>
-            </div>
-          )}
-        </div>
+        {filtered.length === 0 && (
+          <div className="mt-6 text-center py-12 bg-white rounded-xl border border-dashed border-stone-300">
+            <p className="text-stone-500 font-medium">
+              Nenhum evento público agendado para o filtro selecionado.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
