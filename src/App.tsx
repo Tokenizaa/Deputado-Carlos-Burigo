@@ -38,7 +38,20 @@ const RESERVED_PATHS = new Set(['', 'admin', 'sobre', 'trajetoria', 'atuacao', '
 
 const MainAppContent: React.FC = () => {
   const { currentView, isLoading, setCurrentView, currentUser, authReady, refreshAllData } = useApp();
-  const [adminTab, setAdminTab] = useState('dashboard');
+  const [adminTab, setAdminTab] = useState(() => {
+    if (typeof window === 'undefined') return 'dashboard';
+    const hash = window.location.hash.replace(/^#/, '');
+    return hash || 'dashboard';
+  });
+
+  React.useEffect(() => {
+    const handleAdminHashChange = () => {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash) setAdminTab(hash);
+    };
+    window.addEventListener('hashchange', handleAdminHashChange);
+    return () => window.removeEventListener('hashchange', handleAdminHashChange);
+  }, []);
   const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '') : '';
   if (pathname === 'convite') return <AdminInviteAcceptView />;
   if (pathname === 'primeiro-acesso') return <AdminBootstrapView />;
