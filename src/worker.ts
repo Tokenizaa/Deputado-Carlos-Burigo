@@ -1365,6 +1365,7 @@ try {
           invitedBy: authResult.userId,
           origin,
           sendEmail: body.sendEmail !== false,
+          permissionKeys: Array.isArray(body.permissionKeys) ? body.permissionKeys : [],
         });
         return Response.json(result, { status: 201 });
       } catch (error) {
