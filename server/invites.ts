@@ -221,6 +221,79 @@ export async function approveAdminInvite(id: string, approvedBy: string): Promis
   return data as AdminInvite;
 }
 
+export async function revokeAdminInvite(id: string, revokedBy: string): Promise<AdminInvite> {
+  const { data: invite, error: findError } = await supabaseAdmin
+    .from('admin_invites')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (findError) throw findError;
+  if (!['pendente', 'aceito', 'aprovacao'].includes(invite.status)) {
+    throw new Error('Este convite não pode ser revogado.');
+  }
+
+  const now = new Date().toISOString();
+  const { data, error } = await supabaseAdmin
+    .from('admin_invites')
+    .update({
+      status: 'revogado',
+      approved_by: revokedBy,
+      updated_at: now,
+    })
+    .eq('id', id)
+    .select('id,email,name,cargo,role,status,invited_by,invited_at,expires_at,accepted_at,approved_at,approved_by,auth_user_id')
+    .single();
+  if (error) throw error;
+  return data as AdminInvite;
+}
+
+export async function renewAdminInvite(id: string, origin: string): Promise<{ invite: AdminInvite; link: string }> {
+  const { data: invite, error: findError } = await supabaseAdmin
+    .from('admin_invites')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (findError) throw findError;
+  if (!['pendente', 'aceito', 'aprovacao', 'expirado'].includes(invite.status)) {
+    throw new Error('Este convite não pode ser renovado.');
+  }
+  if (!invite.auth_user_id) throw new Error('O convite não possui usuário Auth associado.');
+
+  const token = randomToken();
+  const tokenHash = await sha256Hex(token);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const redirectTo = new URL('/convite', origin);
+  redirectTo.searchParams.set('token', token);
+
+  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    type: 'invite',
+    email: invite.email,
+    options: {
+      data: { name: invite.name, cargo: invite.cargo, requested_role: invite.role },
+      redirectTo: redirectTo.toString(),
+    },
+  });
+  if (linkError) throw linkError;
+
+  const { data, error } = await supabaseAdmin
+    .from('admin_invites')
+    .update({
+      token_hash: tokenHash,
+      expires_at: expiresAt,
+      status: 'pendente',
+      accepted_at: null,
+      approved_at: null,
+      approved_by: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select('id,email,name,cargo,role,status,invited_by,invited_at,expires_at,accepted_at,approved_at,approved_by,auth_user_id')
+    .single();
+  if (error) throw error;
+
+  return { invite: data as AdminInvite, link: linkData.properties?.action_link ?? redirectTo.toString() };
+}
+
 export async function rejectAdminInvite(id: string, rejectedBy: string): Promise<AdminInvite> {
   const { data, error } = await supabaseAdmin
     .from('admin_invites')
