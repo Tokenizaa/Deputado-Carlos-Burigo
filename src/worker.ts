@@ -66,6 +66,8 @@ import {
   createAdminInvite,
   approveAdminInvite,
   rejectAdminInvite,
+  revokeAdminInvite,
+  renewAdminInvite,
   acceptAdminInvite,
 } from '../server/invites';
 
@@ -1387,6 +1389,10 @@ try {
       const body = await request.json();
       if (body.action === 'approve') return Response.json(await approveAdminInvite(id, authResult.userId));
       if (body.action === 'reject') return Response.json(await rejectAdminInvite(id, authResult.userId));
+      if (body.action === 'revoke') return Response.json(await revokeAdminInvite(id, authResult.userId));
+      if (body.action === 'renew') {
+        return Response.json(await renewAdminInvite(id, new URL(request.url).origin));
+      }
       return Response.json({ error: 'Ação de convite inválida.' }, { status: 400 });
     } catch (error) {
       console.error('[api/admin/invites/:id]', error);
