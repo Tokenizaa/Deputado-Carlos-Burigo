@@ -75,6 +75,7 @@ import {
 
 import type { User, UserRole } from '../src/types';
 import { can } from '../src/config/adminPermissions';
+import type { AdminModule, Permission } from '../src/config/adminPermissions';
 import { getEffectivePermissions, canEffective } from '../server/permissions';
 import { validatePassword } from './lib/passwordValidation';
 
@@ -120,7 +121,7 @@ async function sha256Hex(input: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function requireEffectivePermission(request: Request, module: string, action: string): Promise<{ auth: { userId: string; role: string; user: User } } | Response> {
+async function requireEffectivePermission(request: Request, module: AdminModule, action: Permission): Promise<{ auth: { userId: string; role: string; user: User } } | Response> {
   const authResult = await requireAuth(request);
   if (authResult instanceof Response) return authResult;
   const allowed = await canEffective(authResult.userId, authResult.role, module, action);
