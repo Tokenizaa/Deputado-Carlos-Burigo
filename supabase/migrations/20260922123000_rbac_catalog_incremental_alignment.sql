@@ -4,6 +4,11 @@
 insert into public.permission_definitions
   (permission_key, module, action, label, description)
 values
+  ('tarefas.delete','tarefas' ,'delete','Excluir tarefas','Excluir tarefas.');
+
+insert into public.permission_definitions
+  (permission_key, module, action, label, description)
+values
   ('citizen.assign','cidadão','assign','Distribuir demanda','Atribuir demanda a responsável.'),
   ('citizen.reply','cidadão','reply','Responder demanda','Enviar resposta institucional.')
 on conflict (permission_key) do update set
@@ -14,6 +19,7 @@ on conflict (permission_key) do update set
 
 insert into public.role_permissions (role, permission_key, enabled)
 values
+  ('ADMIN','tarefas.delete',true),
   ('ADMIN','citizen.assign',true),
   ('ADMIN','citizen.reply',true),
   ('ATENDIMENTO','citizen.assign',true),
