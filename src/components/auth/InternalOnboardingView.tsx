@@ -79,6 +79,9 @@ export const InternalOnboardingView: React.FC = () => {
     return true;
   };
 
+  const areaOptions = ['Administrativo', 'Comunicação', 'Atendimento', 'Agenda', 'Gestão documental', 'Conteúdo', 'Tarefas', 'Atuação parlamentar'];
+  const functionOptions = ['Assessor Parlamentar', 'Assessor de Comunicação', 'Assessor de Atendimento', 'Assessor Administrativo', 'Assessor Jurídico', 'Assessor Legislativo', 'Coordenador', 'Assistente'];
+
   const save = async () => {
     if (!currentUser) return;
     setSaving(true);
@@ -199,27 +202,21 @@ export const InternalOnboardingView: React.FC = () => {
             <div className="space-y-5">
               <label className="block text-sm font-bold text-stone-800">
                 Área / setor *
-                <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Ex.: Comunicação, Atendimento, Administrativo" className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+                <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3">
+                  <option value="">Selecione uma área</option>
+                  {areaOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
               </label>
               <label className="block text-sm font-bold text-stone-800">
                 Função *
-                <input value={form.functionTitle} onChange={(e) => setForm({ ...form, functionTitle: e.target.value })} placeholder="Ex.: Assessor Parlamentar" className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+                <select value={form.functionTitle} onChange={(e) => setForm({ ...form, functionTitle: e.target.value })} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3">
+                  <option value="">Selecione uma função</option>
+                  {functionOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
               </label>
               <label className="block text-sm font-bold text-stone-800">
-                Principais responsabilidades *
-                <textarea value={form.responsibilities} onChange={(e) => setForm({ ...form, responsibilities: e.target.value })} rows={4} placeholder="Descreva resumidamente o que você cuida no gabinete." className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-3" />
-              </label>
-              <label className="block text-sm font-bold text-stone-800">
-                Apresentação profissional
-                <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} placeholder="Opcional." className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-3" />
-              </label>
-              <label className="block text-sm font-bold text-stone-800">
-                Município principal de atuação
-                <input value={form.municipality} onChange={(e) => setForm({ ...form, municipality: e.target.value })} placeholder="Ex.: Porto Alegre" className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
-              </label>
-              <label className="block text-sm font-bold text-stone-800">
-                Data de entrada na equipe
-                <input value={form.startedAt} onChange={(e) => setForm({ ...form, startedAt: e.target.value })} type="date" className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 px-3" />
+                Responsabilidades *
+                <textarea value={form.responsibilities} onChange={(e) => setForm({ ...form, responsibilities: e.target.value })} rows={3} placeholder="Descreva resumidamente suas principais responsabilidades." className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-3" />
               </label>
             </div>
           )}
