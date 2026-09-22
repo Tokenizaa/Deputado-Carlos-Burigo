@@ -121,6 +121,11 @@ export const AdminUsersTab: React.FC = () => {
     [invites],
   );
 
+  const expiredOrClosed = useMemo(
+    () => invites.filter((invite) => ['expirado', 'revogado', 'recusado', 'aprovado'].includes(invite.status)),
+    [invites],
+  );
+
   const filteredUsers = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return allUsers.filter((user) => {
@@ -207,7 +212,7 @@ export const AdminUsersTab: React.FC = () => {
     }
   };
 
-  const updateInvite = async (id: string, action: 'approve' | 'reject') => {
+  const updateInvite = async (id: string, action: 'approve' | 'reject' | 'revoke' | 'renew') => {
     try {
       const response = await fetch('/api/admin/invites/' + id, {
         method: 'PATCH',
@@ -218,7 +223,16 @@ export const AdminUsersTab: React.FC = () => {
       if (!response.ok) throw new Error(data?.error || 'Falha ao atualizar convite.');
       setInvites((prev: Invite[]) => prev.map((invite) => invite.id === id ? data : invite));
       if (action === 'approve') await refreshAllData();
-      showToast(action === 'approve' ? 'Usuário aprovado.' : 'Convite recusado.', 'success');
+      if (action === 'renew' && data.link) {
+        await navigator.clipboard.writeText(data.link);
+      }
+      const messages: Record<typeof action, string> = {
+        approve: 'Usuário aprovado.',
+        reject: 'Convite recusado.',
+        revoke: 'Convite revogado.',
+        renew: 'Convite renovado e novo link copiado.',
+      };
+      showToast(messages[action], 'success');
     } catch (error: any) {
       showToast(error?.message || 'Falha ao atualizar convite.', 'error');
     }
@@ -452,7 +466,46 @@ export const AdminUsersTab: React.FC = () => {
                   <button onClick={() => void updateInvite(invite.id, 'reject')} className="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-300 text-stone-700 text-xs font-bold">
                     <UserX className="w-4 h-4" /> Recusar
                   </button>
+                  {invite.status !== 'aprovacao' && (
+                    <button onClick={() => void updateInvite(invite.id, 'renew')} className="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-300 text-stone-700 text-xs font-bold">
+                      <RefreshCw className="w-4 h-4" /> Renovar
+                    </button>
+                  )}
+                  <button onClick={() => void updateInvite(invite.id, 'revoke')} className="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-200 text-red-700 text-xs font-bold">
+                    <X className="w-4 h-4" /> Revogar
+                  </button>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
+        <div className="p-5 border-b border-stone-200">
+          <h3 className="font-bold text-stone-900">Histórico de convites</h3>
+          <p className="text-xs text-stone-500 mt-1">Convites encerrados ou já aprovados.</p>
+        </div>
+        {expiredOrClosed.length === 0 ? (
+          <div className="p-6 text-sm text-stone-500">Nenhum convite encerrado.</div>
+        ) : (
+          <div className="divide-y divide-stone-200">
+            {expiredOrClosed.map((invite) => (
+              <div key={invite.id} className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <div className="font-bold text-stone-900">{invite.name}</div>
+                  <div className="text-xs text-stone-500">{invite.email} · {invite.cargo} · {invite.role}</div>
+                  <div className="text-xs text-stone-500 mt-1">{invite.status}</div>
+                </div>
+                {invite.status === 'expirado' && (
+                  <button
+                    type="button"
+                    onClick={() => void updateInvite(invite.id, 'renew')}
+                    className="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-300 text-stone-700 text-xs font-bold"
+                  >
+                    <RefreshCw className="w-4 h-4" /> Renovar e copiar link
+                  </button>
+                )}
               </div>
             ))}
           </div>
