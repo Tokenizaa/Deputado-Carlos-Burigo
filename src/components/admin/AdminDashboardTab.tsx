@@ -66,23 +66,34 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
       </header>
 
       <section aria-label="Prioridades" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {canDemandsView && <button type="button" onClick={() => setActiveTab('cidadão')} className={metricClass}>
-          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Triagem</span><Inbox className="w-4 h-4 text-rose-600" /></div>
-          <strong className="block text-3xl mt-2">{triage.length}</strong>
-          <span className="text-xs text-stone-500">demandas aguardando análise</span>
-        </button>}
-          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Atendimento</span><Clock3 className="w-4 h-4 text-indigo-600" /></div>
-          <strong className="block text-3xl mt-2">{openDemands.length}</strong>
-          <span className="text-xs text-stone-500">demandas abertas</span>
-        </button>}
-          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Tarefas vencidas</span><AlertCircle className="w-4 h-4 text-rose-600" /></div>
-          <strong className="block text-3xl mt-2">{overdueTasks.length}</strong>
-          <span className="text-xs text-stone-500">precisam de atenção</span>
-        </button>}
-          <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Hoje</span><CalendarDays className="w-4 h-4 text-amber-600" /></div>
-          <strong className="block text-3xl mt-2">{todayTasks.length + todayEvents.length}</strong>
-          <span className="text-xs text-stone-500">tarefas e compromissos</span>
-        </div> : null}
+        {canDemandsView && (
+          <button type="button" onClick={() => setActiveTab('cidadão')} className={metricClass}>
+            <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Triagem</span><Inbox className="w-4 h-4 text-rose-600" /></div>
+            <strong className="block text-3xl mt-2">{triage.length}</strong>
+            <span className="text-xs text-stone-500">demandas aguardando análise</span>
+          </button>
+        )}
+        {canDemandsView && (
+          <button type="button" onClick={() => setActiveTab('cidadão')} className={metricClass}>
+            <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Atendimento</span><Clock3 className="w-4 h-4 text-indigo-600" /></div>
+            <strong className="block text-3xl mt-2">{openDemands.length}</strong>
+            <span className="text-xs text-stone-500">demandas abertas</span>
+          </button>
+        )}
+        {canTasksView && (
+          <button type="button" onClick={() => setActiveTab('tarefas')} className={metricClass}>
+            <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Tarefas vencidas</span><AlertCircle className="w-4 h-4 text-rose-600" /></div>
+            <strong className="block text-3xl mt-2">{overdueTasks.length}</strong>
+            <span className="text-xs text-stone-500">precisam de atenção</span>
+          </button>
+        )}
+        {(canTasksView || canAgendaView) && (
+          <div className={metricClass}>
+            <div className="flex items-center justify-between"><span className="text-xs font-bold text-stone-500">Hoje</span><CalendarDays className="w-4 h-4 text-amber-600" /></div>
+            <strong className="block text-3xl mt-2">{(canTasksView ? todayTasks.length : 0) + (canAgendaView ? todayEvents.length : 0)}</strong>
+            <span className="text-xs text-stone-500">tarefas e compromissos</span>
+          </div>
+        )}
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-5">
