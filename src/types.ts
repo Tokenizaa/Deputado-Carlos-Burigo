@@ -9,6 +9,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   cargo: string;
+  active?: boolean;
   phone?: string;
   department?: string;
   functionTitle?: string;
