@@ -129,7 +129,7 @@ export const AdminDashboardTab: React.FC<{ setActiveTab: (tab: string) => void }
               </div>
             ))}
           </div>
-        </div>
+        </div>}
 
         <aside className="xl:col-span-4 space-y-5">
           {canAgendaView && <section className="bg-white border border-stone-200 rounded-xl p-5">
