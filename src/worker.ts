@@ -199,7 +199,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-const OPEN_GRAPH_IMAGE_URL = '/assets/carlos_burigo_portrait.png';
+const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
