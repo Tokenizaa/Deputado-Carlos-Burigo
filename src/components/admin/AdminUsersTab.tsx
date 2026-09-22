@@ -324,7 +324,7 @@ export const AdminUsersTab: React.FC = () => {
     }
   };
 
-  const selectedSummary = selectedUser ? taskSummary(tasks, selectedUser.id);
+  const selectedSummary = selectedUser ? taskSummary(tasks, selectedUser.id) : null;
   const selectedPermissions = selectedUser ? ROLE_PERMISSIONS[selectedUser.role] ?? {} : {};
 
   return (
