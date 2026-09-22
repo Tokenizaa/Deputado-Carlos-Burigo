@@ -135,3 +135,27 @@ A FASE 4 **não deve ser marcada como concluída ainda**.
 A implementação estrutural está presente e foi auditada; uma lacuna de RBAC foi corrigida. O restante da fase depende principalmente de validação operacional/E2E e da configuração de proteção contra senhas vazadas no Supabase.
 
 **Próxima ação da FASE 4:** executar os testes objetivos de bootstrap, RLS, RBAC, convites e auditoria e reconciliar a matriz de estado.
+
+
+## Incremento RBAC efetivo — 2026-09-22
+
+Concluído neste incremento:
+
+- resolver de permissões efetivas disponível no backend;
+- endpoint administrativo de consulta das permissões efetivas;
+- estado ativo/inativo exposto no modelo de usuário;
+- enforcement por permissão efetiva em endpoints de configurações, conteúdo, agenda, atuação, gestão documental e mídia;
+- guards de papel estático removidos desses endpoints onde o handler já valida a permissão efetiva;
+- convite continua transferindo overrides para o usuário no momento da aprovação.
+
+Commits principais: `184f6a9`, `db4defe`, `04d1628`, `4a44652`.
+
+### Ainda não validado
+
+- compilação/build após os incrementos;
+- matriz automatizada papel × permissão × ação;
+- E2E de acesso real por usuário;
+- Playwright por papel;
+- validação no Supabase conectado.
+
+Portanto, a Fase 4 permanece **EM ANDAMENTO**.
