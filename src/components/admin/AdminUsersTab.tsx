@@ -116,6 +116,7 @@ export const AdminUsersTab: React.FC = () => {
   const [userOverrides, setUserOverrides] = useState<Record<string, boolean>>({});
   const [loadingOverrides, setLoadingOverrides] = useState(false);
   const [savingUser, setSavingUser] = useState(false);
+  const [effectivePermissions, setEffectivePermissions] = useState<Array<{ permission_key: string; module: string; action: string; enabled: boolean }>>([]);
 
   const pending = useMemo(
     () => invites.filter((invite) => ['pendente', 'aprovacao', 'aceito'].includes(invite.status)),
@@ -264,6 +265,25 @@ export const AdminUsersTab: React.FC = () => {
     })();
     return () => { mounted = false; };
   }, [selectedUser?.id]);
+
+  useEffect(() => {
+    if (!selectedUser || currentUser?.role !== 'ADMIN') {
+      setEffectivePermissions([]);
+      return;
+    }
+    let mounted = true;
+    void (async () => {
+      try {
+        const response = await fetch('/api/admin/users/' + selectedUser.id + '/permissions', { headers: await authHeaders() });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data?.error || 'Falha ao carregar permissões efetivas.');
+        if (mounted) setEffectivePermissions(Array.isArray(data?.permissions) ? data.permissions : []);
+      } catch (error: any) {
+        if (mounted) showToast(error?.message || 'Falha ao carregar permissões efetivas.', 'error');
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedUser?.id, currentUser?.role]);
 
   const toggleUserOverride = async (permissionKey: string, enabled: boolean) => {
     if (!selectedUser || selectedUser.role === 'ADMIN') return;
@@ -580,6 +600,7 @@ export const AdminUsersTab: React.FC = () => {
             <div className="p-5 space-y-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs font-bold uppercase bg-stone-100 text-stone-700 px-3 py-1.5 rounded-lg">{selectedUser.role}</span>
+                <span className={"text-xs font-bold px-3 py-1.5 rounded-lg " + (selectedUser.active === false ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700')}>{selectedUser.active === false ? 'Inativo' : 'Ativo'}</span>
                 {currentUser?.role === 'ADMIN' && (
                   <>
                     <select
@@ -616,6 +637,21 @@ export const AdminUsersTab: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {currentUser?.role === 'ADMIN' && (
+                <section className="border border-stone-200 rounded-xl p-4 space-y-3">
+                  <h4 className="text-sm font-bold text-stone-900">Permissões efetivas</h4>
+                  <p className="text-xs text-stone-500">Resultado final do papel e dos ajustes individuais.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {effectivePermissions.map((permission) => (
+                      <div key={permission.permission_key} className={"flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-xs " + (permission.enabled ? 'border-emerald-200 bg-emerald-50/50' : 'border-stone-200 bg-stone-50')}>
+                        <span className="font-medium text-stone-700">{permission.permission_key}</span>
+                        <span className={permission.enabled ? 'text-emerald-700 font-bold' : 'text-stone-400'}>{permission.enabled ? 'Permitido' : 'Negado'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div>
                 <h4 className="text-sm font-bold text-stone-900 mb-3">Acesso por módulo</h4>
