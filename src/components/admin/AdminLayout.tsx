@@ -78,6 +78,7 @@ const navItems = [
   { id: 'gestao-documental', label: 'Gestão Documental', icon: FileCode2, badge: null },
   { id: 'conteúdo', label: 'Conteúdo', icon: Newspaper, badge: null },
   { id: 'tarefas', label: 'Tarefas', icon: ListTodo, badge: null },
+  { id: 'configurações', label: 'Configurações', icon: Settings, badge: null },
 ].filter((item) => currentUser && can(currentUser.role, item.id as AdminModule));
 
   return (
