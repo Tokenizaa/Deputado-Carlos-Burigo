@@ -27,4 +27,9 @@ describe('Open Graph — imagem', () => {
       'https://www.carlosburigo.com.br',
     )).toBe('https://cdn.example.com/og.png');
   });
+  it('usa a imagem institucional estática no caminho canônico do Worker', () => {
+    expect(resolveOpenGraphImageUrl(undefined, 'https://deputado-carlos-burigo.olfnetto.workers.dev'))
+      .toBe('https://deputado-carlos-burigo.olfnetto.workers.dev/assets/carlos_burigo_portrait.png');
+  });
+
 });
