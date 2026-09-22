@@ -30,6 +30,14 @@ type Invite = {
 
 type MemberFilter = 'todos' | Role;
 
+type PermissionDefinition = {
+  permission_key: string;
+  module: string;
+  action: string;
+  label: string;
+  description?: string | null;
+};
+
 const roles: Role[] = ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'];
 
 const roleDescriptions: Record<Role, { title: string; desc: string }> = {
@@ -102,7 +110,11 @@ export const AdminUsersTab: React.FC = () => {
     cargo: '',
     role: 'EDITOR' as Role,
     sendEmail: true,
+    permissionKeys: [] as string[],
   });
+  const [permissionDefinitions, setPermissionDefinitions] = useState<PermissionDefinition[]>([]);
+  const [userOverrides, setUserOverrides] = useState<Record<string, boolean>>({});
+  const [loadingOverrides, setLoadingOverrides] = useState(false);
 
   const pending = useMemo(
     () => invites.filter((invite) => ['pendente', 'aprovacao', 'aceito'].includes(invite.status)),
@@ -152,6 +164,20 @@ export const AdminUsersTab: React.FC = () => {
 
   useEffect(() => {
     void loadInvites();
+    void (async () => {
+      try {
+        const client = await getSupabaseClient();
+        const { data, error } = await client
+          .from('permission_definitions')
+          .select('permission_key,module,action,label,description')
+          .order('module')
+          .order('action');
+        if (error) throw error;
+        setPermissionDefinitions((data ?? []) as PermissionDefinition[]);
+      } catch (error: any) {
+        showToast(error?.message || 'Falha ao carregar catálogo de permissões.', 'error');
+      }
+    })();
   }, []);
 
   const createInvite = async (event: React.FormEvent) => {
@@ -166,7 +192,7 @@ export const AdminUsersTab: React.FC = () => {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data?.error || 'Falha ao criar convite.');
       setInvites((prev) => [data.invite, ...prev]);
-      setForm({ name: '', email: '', cargo: '', role: 'EDITOR', sendEmail: true });
+      setForm({ name: '', email: '', cargo: '', role: 'EDITOR', sendEmail: true, permissionKeys: [] });
       setShowForm(false);
       if (!form.sendEmail && data.link) {
         await navigator.clipboard.writeText(data.link);
@@ -198,7 +224,51 @@ export const AdminUsersTab: React.FC = () => {
     }
   };
 
-  const selectedSummary = selectedUser ? taskSummary(tasks, selectedUser.id) : null;
+  useEffect(() => {
+    let mounted = true;
+    if (!selectedUser) {
+      setUserOverrides({});
+      return;
+    }
+    setLoadingOverrides(true);
+    void (async () => {
+      try {
+        const client = await getSupabaseClient();
+        const { data, error } = await client
+          .from('user_permission_overrides')
+          .select('permission_key,enabled')
+          .eq('user_id', selectedUser.id)
+          .order('permission_key');
+        if (error) throw error;
+        if (mounted) setUserOverrides(Object.fromEntries((data ?? []).map((row) => [row.permission_key, Boolean(row.enabled)])));
+      } catch (error: any) {
+        if (mounted) showToast(error?.message || 'Falha ao carregar overrides.', 'error');
+      } finally {
+        if (mounted) setLoadingOverrides(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedUser?.id]);
+
+  const toggleUserOverride = async (permissionKey: string, enabled: boolean) => {
+    if (!selectedUser || selectedUser.role === 'ADMIN') return;
+    try {
+      const client = await getSupabaseClient();
+      const { error } = await client.from('user_permission_overrides').upsert({
+        user_id: selectedUser.id,
+        permission_key: permissionKey,
+        enabled,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,permission_key' });
+      if (error) throw error;
+      setUserOverrides((prev) => ({ ...prev, [permissionKey]: enabled }));
+      showToast('Permissão individual atualizada.', 'success');
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao atualizar permissão individual.', 'error');
+    }
+  };
+
+  const selectedSummary = selectedUser ? taskSummary(tasks, selectedUser.id);
   const selectedPermissions = selectedUser ? ROLE_PERMISSIONS[selectedUser.role] ?? {} : {};
 
   return (
@@ -247,6 +317,32 @@ export const AdminUsersTab: React.FC = () => {
               {roles.map((role) => <option key={role} value={role}>{role} — {roleDescriptions[role].title}</option>)}
             </select>
           </div>
+          {permissionDefinitions.length > 0 && form.role !== 'ADMIN' && (
+            <div className="border border-stone-200 rounded-xl p-4 space-y-3">
+              <div>
+                <h4 className="text-sm font-bold text-stone-900">Permissões adicionais do convite</h4>
+                <p className="text-xs text-stone-500 mt-1">Essas permissões serão aplicadas além do padrão da função.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                {permissionDefinitions.map((permission) => (
+                  <label key={permission.permission_key} className="flex items-center gap-2 rounded-lg border border-stone-200 p-2 text-xs">
+                    <input
+                      type="checkbox"
+                      checked={form.permissionKeys.includes(permission.permission_key)}
+                      onChange={(event) => setForm((prev) => ({
+                        ...prev,
+                        permissionKeys: event.target.checked
+                          ? [...prev.permissionKeys, permission.permission_key]
+                          : prev.permissionKeys.filter((key) => key !== permission.permission_key),
+                      }))}
+                    />
+                    <span>{permission.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-3 text-sm">
             <label className="inline-flex min-h-11 items-center gap-2"><input type="radio" checked={form.sendEmail} onChange={() => setForm({ ...form, sendEmail: true })} /> Enviar por email</label>
             <label className="inline-flex min-h-11 items-center gap-2"><input type="radio" checked={!form.sendEmail} onChange={() => setForm({ ...form, sendEmail: false })} /> Gerar link para copiar</label>
@@ -448,6 +544,29 @@ export const AdminUsersTab: React.FC = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 mb-3">Overrides individuais</h4>
+                <p className="text-xs text-stone-500 mb-3">Ajustes aplicados somente a este usuário, sem criar uma nova função.</p>
+                {selectedUser.role === 'ADMIN' ? (
+                  <p className="text-xs text-stone-500">ADMIN mantém acesso administrativo completo.</p>
+                ) : loadingOverrides ? (
+                  <p className="text-xs text-stone-500">Carregando permissões…</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto border border-stone-200 rounded-xl p-3">
+                    {permissionDefinitions.map((permission) => (
+                      <label key={permission.permission_key} className="flex items-center gap-2 rounded-lg border border-stone-200 p-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(userOverrides[permission.permission_key])}
+                          onChange={(event) => void toggleUserOverride(permission.permission_key, event.target.checked)}
+                        />
+                        <span>{permission.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">
