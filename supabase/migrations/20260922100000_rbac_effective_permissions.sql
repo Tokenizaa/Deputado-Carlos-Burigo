@@ -111,7 +111,7 @@ select r.role, d.permission_key,
       'tarefas.view','tarefas.create','tarefas.edit'
     )
     when r.role = 'ATENDIMENTO' then d.permission_key in (
-      'dashboard.view','citizen.view','citizen.create','citizen.edit',
+      'dashboard.view','citizen.view','citizen.create','citizen.edit','citizen.assign','citizen.reply',
       'agenda.view','tarefas.view','tarefas.create','tarefas.edit'
     )
     when r.role = 'VISUALIZADOR' then d.permission_key in (
