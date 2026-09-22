@@ -159,3 +159,24 @@ Commits principais: `184f6a9`, `db4defe`, `04d1628`, `4a44652`.
 - validação no Supabase conectado.
 
 Portanto, a Fase 4 permanece **EM ANDAMENTO**.
+
+## Incremento executado — matriz RBAC efetiva e rotas operacionais
+
+Em 2026-09-22 foi concluído mais um incremento da Fase 4:
+
+- catálogo RBAC alinhado com as ações citizen.assign e citizen.reply;
+- alinhamento incremental persistente para ambientes onde a migration original já tenha sido aplicada;
+- permissão efetiva tarefas.delete adicionada ao catálogo;
+- permissão de auditoria alinhada ao módulo de administração;
+- rotas administrativas de tarefas passaram a validar permissão efetiva por ação (view, create, edit, delete);
+- rotas internas de demandas passaram a validar cidadão.view e cidadão.edit pela cadeia efetiva;
+- gestão de usuários, convites e consulta de permissões efetivas passaram a usar administração.manage_users;
+- consulta de auditoria passou a usar a permissão efetiva de auditoria;
+- criado teste unitário da regra de composição: preset da role → overrides individuais;
+- helper de RBAC efetivo recebeu tipagem canônica de módulo/ação.
+
+### Estado
+
+A Fase 4 permanece EM ANDAMENTO.
+
+Ainda não é possível declarar conclusão porque permanecem pendentes a execução real de lint, testes, Playwright, validação contra o Supabase conectado e a auditoria das rotas administrativas restantes que ainda utilizam guards estáticos.
