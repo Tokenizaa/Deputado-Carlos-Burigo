@@ -180,3 +180,41 @@ Em 2026-09-22 foi concluído mais um incremento da Fase 4:
 A Fase 4 permanece EM ANDAMENTO.
 
 Ainda não é possível declarar conclusão porque permanecem pendentes a execução real de lint, testes, Playwright, validação contra o Supabase conectado e a auditoria das rotas administrativas restantes que ainda utilizam guards estáticos.
+
+## Fechamento técnico — 2026-09-22
+
+A bateria local completa foi executada após a remoção da matriz de API obsoleta:
+
+- TypeScript/lint: **PASS**
+- testes unitários: **46/46 PASS**
+- testes de integração: **12/12 PASS**
+- Open Graph: **4/4 PASS**
+- build Cloudflare/Vite: **PASS**
+- working tree local: **limpa**
+
+Também foi corrigido um defeito real encontrado na implementação do RBAC efetivo: o backend estava convertendo módulos para chaves diferentes das chaves persistidas em `permission_definitions`. O mapeamento foi alinhado aos identificadores reais do banco (`content`, `documents`, `tasks`, `activity`, `users`, `settings`).
+
+O projeto Supabase conectado `wktanxbpijurimdjgone` está **ACTIVE_HEALTHY**. A migration `20260922033153 configurable_permissions_rbac` está aplicada e o banco possui:
+
+- 29 definições de permissão;
+- 145 registros de role_permissions;
+- presets para ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO e VISUALIZADOR;
+- RLS habilitado nas tabelas públicas atualmente existentes.
+
+### Pendência externa real
+
+O único alerta de configuração identificado pelo advisor de segurança que exige ação fora do código é:
+
+- **Leaked Password Protection:** desabilitada no Supabase Auth.
+
+O alerta de `admin_bootstrap` com RLS sem policy é intencional: a tabela é privada para o Worker privilegiado e não possui acesso público.
+
+### Estado final da Fase 4
+
+A implementação de código e banco está consolidada. Para declarar a fase operacionalmente encerrada, falta apenas:
+
+1. habilitar **Leaked Password Protection** no projeto Supabase;
+2. executar a bateria local novamente após o último commit de RBAC;
+3. fazer o deploy do Worker e executar um smoke test autenticado das rotas administrativas.
+
+Não há necessidade de recuperar ou corrigir a antiga matriz `tests/api/routes.test.ts`; ela foi removida por representar o modelo de autorização anterior.
