@@ -53,6 +53,7 @@ Escopo canônico:
 5. RBAC
 6. Convites
 7. Auditoria
+8. Permissões configuráveis por role, convite e usuário
 
 ### Estado reconciliado da Fase 4
 
@@ -65,6 +66,12 @@ Escopo canônico:
 - **Auditoria:** implementação existente; fluxo ponta a ponta ainda necessário.
 
 Não classificar uma funcionalidade como ausente apenas porque a validação ainda não foi executada.
+
+### Evolução de RBAC — estado atual
+
+A Fase 4 agora inclui RBAC configurável. As roles continuam como presets e as permissões passam a ser persistidas no Supabase, com possibilidade de ajuste por role, convite e posteriormente por usuário. A especificação e o estado de execução estão em `docs/security/RBAC-CONFIGURAVEL-2026-09-22.md`.
+
+Implementado nesta rodada: catálogo e tabelas de permissões com RLS, defaults das cinco roles, editor de permissões por role em Configurações e suporte backend a overrides de convite.
 
 ## Reconstrução documental — trabalho transversal
 
