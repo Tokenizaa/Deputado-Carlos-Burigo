@@ -23,7 +23,7 @@ export type Permission =
   | 'view_audit'
   | 'manage_settings';
 
-const ALL: Permission[] = ['view', 'create', 'edit', 'publish', 'delete', 'manage_users', 'view_audit', 'manage_settings'];
+const ALL: Permission[] = ['view', 'create', 'edit', 'publish', 'delete', 'assign', 'reply', 'manage_users', 'view_audit', 'manage_settings'];
 
 export const ROLE_PERMISSIONS: Record<UserRole, Partial<Record<AdminModule, Permission[]>>> = {
   ADMIN: {
