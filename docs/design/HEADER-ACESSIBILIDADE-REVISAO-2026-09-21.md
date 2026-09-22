@@ -106,3 +106,10 @@ E em mobile:
 - 768 px.
 
 A refatoração deve ser considerada concluída somente após confirmar que o header não apresenta overflow, sobreposição ou perda de navegação.
+
+
+## Publicações — Informativos
+
+As capas exibidas na seção **Publicações → Informativos** passaram a funcionar como entrada para o documento correspondente. Quando houver PDF público associado, a capa e o botão **Abrir PDF** utilizam o visualizador de documentos existente. A implementação preserva a capa como representação visual, mas não limita mais a publicação à imagem.
+
+**Commit:** `50e51eb`
