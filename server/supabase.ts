@@ -1187,6 +1187,58 @@ if (!profile) continue; // skip if no profile (should not happen)
   }
 }
 
+export async function updateAdminUserRole(userId: string, role: UserRole, actor: User): Promise<User> {
+  if (!userId || !['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'].includes(role)) {
+    throw new Error('Usuário ou papel inválido.');
+  }
+  if (userId === actor.id && role !== 'ADMIN') {
+    throw new Error('O administrador atual não pode remover o próprio acesso administrativo.');
+  }
+  const { data: previous, error: previousError } = await supabaseAdmin
+    .from('user_roles').select('role').eq('user_id', userId).single();
+  if (previousError) throw previousError;
+
+  const { error } = await supabaseAdmin.from('user_roles')
+    .update({ role }).eq('user_id', userId);
+  if (error) throw error;
+
+  const user = await getAdminUserById(userId);
+  if (!user) throw new Error('Usuário não encontrado após alteração do papel.');
+  await createAdminAuditLog({
+    userId: actor.id,
+    userName: actor.name,
+    userRole: actor.role,
+    action: 'alterar_papel',
+    entityType: 'user',
+    entityId: userId,
+    details: { previousRole: previous.role, newRole: role },
+  });
+  return user;
+}
+
+export async function setAdminUserAccess(userId: string, active: boolean, actor: User): Promise<User> {
+  if (!userId) throw new Error('Usuário inválido.');
+  if (userId === actor.id && !active) throw new Error('O administrador atual não pode desativar o próprio acesso.');
+
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    ban_duration: active ? 'none' : '876000h',
+  });
+  if (error) throw error;
+
+  const user = await getAdminUserById(userId);
+  if (!user) throw new Error('Usuário não encontrado após alteração de acesso.');
+  await createAdminAuditLog({
+    userId: actor.id,
+    userName: actor.name,
+    userRole: actor.role,
+    action: active ? 'ativar_acesso' : 'desativar_acesso',
+    entityType: 'user',
+    entityId: userId,
+    details: { active },
+  });
+  return user;
+}
+
 export async function createAdminAuditLog(input: {
   userId: string | null;
   userName: string;
