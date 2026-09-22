@@ -343,8 +343,10 @@ if (request.method !== 'POST') return methodNotAllowed();
   '/api/tasks': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    // Check if user has permission to view tasks (ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO, VISUALIZADOR for GET)
-    if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'].includes(authResult.role)) {
+    if (request.method === 'GET' && !(await canEffective(authResult.userId, authResult.role, 'tarefas', 'view'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    if (request.method === 'POST' && !(await canEffective(authResult.userId, authResult.role, 'tarefas', 'create'))) {
       return Response.json({ error: 'Acesso negado' }, { status: 403 });
     }
     
@@ -359,10 +361,7 @@ if (request.method !== 'POST') return methodNotAllowed();
     }
     
     if (request.method === 'POST') {
-      // Check if user has permission to create tasks (ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO)
-      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'].includes(authResult.role)) {
-        return Response.json({ error: 'Acesso negado' }, { status: 403 });
-      }
+
       try {
         const data = await request.json();
         // Basic validation
@@ -390,8 +389,7 @@ if (request.method !== 'POST') return methodNotAllowed();
     
     // Check permissions based on method
     if (request.method === 'GET') {
-      // View permission: ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO, VISUALIZADOR
-      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR'].includes(authResult.role)) {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'view'))) {
         return Response.json({ error: 'Acesso negado' }, { status: 403 });
       }
       try {
@@ -406,8 +404,7 @@ if (request.method !== 'POST') return methodNotAllowed();
     }
     
     if (request.method === 'PUT') {
-      // Edit permission: ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO
-      if (!['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'].includes(authResult.role)) {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'edit'))) {
         return Response.json({ error: 'Acesso negado' }, { status: 403 });
       }
       try {
@@ -429,8 +426,7 @@ if (request.method !== 'POST') return methodNotAllowed();
     }
     
     if (request.method === 'DELETE') {
-      // Delete permission: ADMIN only
-      if (authResult.role !== 'ADMIN') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'delete'))) {
         return Response.json({ error: 'Acesso negado' }, { status: 403 });
       }
       try {
@@ -1323,7 +1319,7 @@ try {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
-    if (!can(authResult.role as any, 'cidadão', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'cidadão', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const demands = await getAllDemandsAdmin();
       return Response.json(demands);
@@ -1337,7 +1333,7 @@ try {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
-    if (!can(authResult.role as any, 'cidadão', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'cidadão', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const id = (request as any).params?.id;
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
@@ -1362,7 +1358,7 @@ try {
   '/api/admin/users/:id/permissions': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode consultar permissões efetivas.' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para consultar permissões.' }, { status: 403 });
     if (request.method !== 'GET') return methodNotAllowed();
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
@@ -1379,7 +1375,7 @@ try {
   '/api/admin/users/:id': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar usuários.' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar usuários.' }, { status: 403 });
     if (request.method !== 'PATCH') return methodNotAllowed();
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
@@ -1402,7 +1398,7 @@ try {
   '/api/admin/invites': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar convites.' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar convites.' }, { status: 403 });
     if (request.method === 'GET') {
       return respond(() => getAdminInvites(), 'admin/invites', 'Falha ao carregar convites.');
     }
@@ -1472,6 +1468,9 @@ try {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'view_audit'))) {
+      return Response.json({ error: 'Acesso negado para consultar auditoria.' }, { status: 403 });
+    }
     try {
       const logs = await getAdminAuditLogs();
       return Response.json(logs);
@@ -1524,21 +1523,8 @@ export default {
         else if (url.pathname.startsWith('/api/admin/pages')) requiredRoles = method === 'GET'
           ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'COMUNICACAO'];
-        else if (url.pathname === '/api/tasks' || url.pathname.startsWith('/api/tasks/')) requiredRoles = method === 'GET'
-          ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO', 'VISUALIZADOR']
-          : ['ADMIN', 'EDITOR', 'COMUNICACAO', 'ATENDIMENTO'];
-        // /api/demands = contrato INTERNO de gabinete (suíte administrativa).
-        // Listagem/edição exige usuário de gabinete autenticado (RBAC); o
-        // cidadão NÃO lista via esta rota — usa /api/citizen/demands, escopada
-        // por citizen_user_id (worker.ts:1255). GET: ADMIN/EDITOR/ATENDIMENTO/
-        // VISUALIZADOR; writes: ADMIN/EDITOR/ATENDIMENTO. COMUNICACAO não vê
-        // demandas em nenhum método.
-        else if (url.pathname === '/api/demands' || url.pathname.startsWith('/api/demands/')) requiredRoles = method === 'GET'
-          ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
-          : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
-        else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];
-        else if (url.pathname.startsWith('/api/admin/users/')) requiredRoles = ['ADMIN'];
-        else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
+        // RBAC efetivo é aplicado dentro dos handlers para tarefas, demandas,
+        // convites, usuários e auditoria. Não duplicar papel estático aqui.
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = null;
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = null;
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = null;
