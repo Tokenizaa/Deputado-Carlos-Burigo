@@ -202,7 +202,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
 const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
-  const fallback = OPEN_GRAPH_IMAGE_URL;
+  const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
   if (!image?.trim()) return fallback;
   try {
     return new URL(image.trim(), origin).toString();
@@ -213,7 +213,12 @@ function resolveOpenGraphImageUrl(image: string | null | undefined, origin: stri
 
 async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
   try {
-    const settings = await getPublicSettings();
+    let settings: Awaited<ReturnType<typeof getPublicSettings>> = null;
+    try {
+      settings = await getPublicSettings();
+    } catch (error) {
+      console.error('Open Graph settings unavailable; using static defaults', error);
+    }
     const pathname = url.pathname.replace(/\/+$/, '') || '/';
     let title = settings?.seoDefaultTitle || 'Carlos Búrigo | Portal Institucional';
     let description = settings?.seoDefaultDescription || '';
