@@ -199,7 +199,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
+const OPEN_GRAPH_IMAGE_URL = '/assets/carlos_burigo_portrait.png';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
@@ -271,8 +271,11 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       `<meta name="twitter:description" content="${esc(description)}">`,
       `<meta name="twitter:image" content="${esc(image)}">`,
       `<meta name="twitter:image:alt" content="${esc(title)}">`,
-    ].filter(Boolean).join('');
-    const patched = html.replace('</head>', `${tags}</head>`);
+    ].join('');
+    const cleanedHtml = html
+      .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, '')
+      .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '');
+    const patched = cleanedHtml.replace('</head>', `${tags}</head>`);
     const headers = new Headers(response.headers);
     headers.set('Content-Type', 'text/html; charset=UTF-8');
     return new Response(patched, { status: response.status, statusText: response.statusText, headers });
