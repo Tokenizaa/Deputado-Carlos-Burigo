@@ -7,7 +7,7 @@ import { AdminAssetInput } from '../admin/AdminAssetInput';
 const STEPS = [
   { title: 'Identidade', description: 'Confirme como você será identificado no gabinete.' },
   { title: 'Contato', description: 'Informe um telefone para comunicação interna.' },
-  { title: 'Atuação', description: 'Conte em qual área você atua e quais são suas responsabilidades.' },
+  { title: 'Atuação', description: 'Confira os dados definidos no convite do gabinete.' },
   { title: 'Conclusão', description: 'Revise os dados e conclua seu perfil.' },
 ];
 
@@ -75,12 +75,10 @@ export const InternalOnboardingView: React.FC = () => {
   const canAdvance = () => {
     if (step === 0) return form.name.trim().length >= 3 && form.displayName.trim().length >= 2;
     if (step === 1) return form.phone.trim().length >= 8;
-    if (step === 2) return form.department.trim().length >= 2 && form.functionTitle.trim().length >= 2 && form.responsibilities.trim().length >= 5;
+    if (step === 2) return true;
     return true;
   };
 
-  const areaOptions = ['Administrativo', 'Comunicação', 'Atendimento', 'Agenda', 'Gestão documental', 'Conteúdo', 'Tarefas', 'Atuação parlamentar'];
-  const functionOptions = ['Assessor Parlamentar', 'Assessor de Comunicação', 'Assessor de Atendimento', 'Assessor Administrativo', 'Assessor Jurídico', 'Assessor Legislativo', 'Coordenador', 'Assistente'];
 
   const save = async () => {
     if (!currentUser) return;
@@ -97,7 +95,7 @@ export const InternalOnboardingView: React.FC = () => {
           phone: form.phone.trim(),
           department: form.department.trim(),
           function_title: form.functionTitle.trim(),
-          responsibilities: form.responsibilities.trim(),
+          responsibilities: form.responsibilities.trim() || null,
           bio: form.bio.trim() || null,
           institutional_email: form.institutionalEmail.trim() || null,
           institutional_phone: form.institutionalPhone.trim() || null,
@@ -199,25 +197,18 @@ export const InternalOnboardingView: React.FC = () => {
           )}
 
           {step === 2 && (
-            <div className="space-y-5">
-              <label className="block text-sm font-bold text-stone-800">
-                Área / setor *
-                <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3">
-                  <option value="">Selecione uma área</option>
-                  {areaOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-                </select>
-              </label>
-              <label className="block text-sm font-bold text-stone-800">
-                Função *
-                <select value={form.functionTitle} onChange={(e) => setForm({ ...form, functionTitle: e.target.value })} className="mt-2 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3">
-                  <option value="">Selecione uma função</option>
-                  {functionOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-                </select>
-              </label>
-              <label className="block text-sm font-bold text-stone-800">
-                Responsabilidades *
-                <textarea value={form.responsibilities} onChange={(e) => setForm({ ...form, responsibilities: e.target.value })} rows={3} placeholder="Descreva resumidamente suas principais responsabilidades." className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-3" />
-              </label>
+            <div className="space-y-4">
+              <div className="rounded-xl border border-stone-200 bg-stone-50 p-5">
+                <p className="text-xs font-bold uppercase tracking-wide text-stone-500">Área / setor</p>
+                <p className="mt-1 font-bold text-stone-900">{form.department || 'Definido pelo gabinete'}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-stone-50 p-5">
+                <p className="text-xs font-bold uppercase tracking-wide text-stone-500">Função</p>
+                <p className="mt-1 font-bold text-stone-900">{form.functionTitle || 'Definida pelo gabinete'}</p>
+              </div>
+              <p className="text-sm leading-6 text-stone-500">
+                Esses dados vêm do convite do gabinete e não podem ser alterados neste primeiro acesso.
+              </p>
             </div>
           )}
 
