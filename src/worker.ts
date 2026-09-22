@@ -199,7 +199,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.jpg';
+const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = OPEN_GRAPH_IMAGE_URL;
@@ -257,7 +257,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       `<meta property="og:locale" content="pt_BR">`,
       `<meta property="og:image" content="${esc(image)}">`,
       `<meta property="og:image:secure_url" content="${esc(image)}">`,
-      `<meta property="og:image:type" content="image/jpeg">`,
+      `<meta property="og:image:type" content="image/png">`,
       `<meta property="og:image:width" content="1200">`,
       `<meta property="og:image:height" content="630">`,
       `<meta property="og:image:alt" content="${esc(title)}">`,
