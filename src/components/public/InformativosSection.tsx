@@ -1,15 +1,24 @@
 import React, { useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAppUi } from '../../context/AppUiContext';
 
 export const InformativosSection: React.FC = () => {
   const { documents, media, setCurrentView } = useApp();
+  const { openDocumentViewer } = useAppUi();
 
   const capas = useMemo(() => (
     media
       .filter((item) => String(item.category).toLowerCase() === 'documento/capa_informativo' && Boolean(item.url))
       .slice(0, 3)
   ), [media]);
+
+  const informativos = useMemo(() => (
+    documents.filter((document) =>
+      document.title?.toLowerCase().includes('informativo') ||
+      document.storagePath?.toLowerCase().startsWith('informativos/')
+    )
+  ), [documents]);
 
   if (capas.length === 0) return null;
 
@@ -33,17 +42,44 @@ export const InformativosSection: React.FC = () => {
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {capas.map((capa) => (
-            <article key={capa.id} className="overflow-hidden border border-stone-200 bg-white">
-              <div className="aspect-[3/4] overflow-hidden bg-stone-100">
-                <img
-                  src={capa.url}
-                  alt={capa.altText || 'Capa de informativo do gabinete'}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-            </article>
-          ))}
+          {capas.map((capa, index) => {
+            const document = informativos[index];
+            const url = document?.publicUrl || document?.originalUrl;
+
+            return (
+              <article key={capa.id} className="overflow-hidden border border-stone-200 bg-white">
+                <button
+                  type="button"
+                  disabled={!url}
+                  onClick={() => url && openDocumentViewer(url, document?.title || 'Informativo', 'pdf')}
+                  className="block w-full text-left disabled:cursor-default"
+                  aria-label={url ? 'Abrir PDF do informativo' : 'Informativo sem PDF disponível'}
+                >
+                  <div className="aspect-[3/4] overflow-hidden bg-stone-100">
+                    <img
+                      src={capa.url}
+                      alt={capa.altText || 'Capa de informativo do gabinete'}
+                      className="h-full w-full object-contain"
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                    />
+                  </div>
+                </button>
+                <div className="flex min-h-16 items-center justify-between gap-4 border-t border-stone-200 px-5 py-4">
+                  <span className="text-sm font-semibold text-stone-900">Informativo do Gabinete</span>
+                  {url && (
+                    <button
+                      type="button"
+                      onClick={() => openDocumentViewer(url, document?.title || 'Informativo', 'pdf')}
+                      className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-stone-900 hover:text-[#008C45] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008C45]"
+                    >
+                      Abrir PDF
+                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
