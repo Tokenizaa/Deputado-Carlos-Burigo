@@ -1029,6 +1029,7 @@ return {
         role: role as UserRole,
         avatar: profile.avatar_url ?? undefined,
         cargo: profile.cargo ?? '',
+        active: !authUser.user.banned_until || new Date(authUser.user.banned_until).getTime() <= Date.now(),
       };
   } catch (error) {
     console.error('Error fetching admin user by id:', error);
@@ -1177,6 +1178,7 @@ if (!profile) continue; // skip if no profile (should not happen)
          role: role as UserRole,
          avatar: profile.avatar_url ?? undefined,
          cargo: profile.cargo ?? '',
+         active: !authUser.banned_until || new Date(authUser.banned_until).getTime() <= Date.now(),
        });
     }
 
