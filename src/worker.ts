@@ -1350,6 +1350,23 @@ try {
     }
   },
 
+  '/api/admin/users/:id/permissions': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode consultar permissões efetivas.' }, { status: 403 });
+    if (request.method !== 'GET') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+    const user = await getAdminUserById(id);
+    if (!user) return Response.json({ error: 'Usuário não encontrado.' }, { status: 404 });
+    try {
+      return Response.json({ userId: id, role: user.role, permissions: await getEffectivePermissions(id, user.role) });
+    } catch (error) {
+      console.error('[api/admin/users/:id/permissions]', error);
+      return Response.json({ error: error?.message || 'Falha ao carregar permissões efetivas.' }, { status: 500 });
+    }
+  },
+
   '/api/admin/users/:id': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
