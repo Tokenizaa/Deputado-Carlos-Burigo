@@ -199,13 +199,23 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
+function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
+  const fallback = new URL('/assets/carlos_burigo_portrait.png', origin).toString();
+  if (!image?.trim()) return fallback;
+  try {
+    return new URL(image.trim(), origin).toString();
+  } catch {
+    return fallback;
+  }
+}
+
 async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
   try {
     const settings = await getPublicSettings();
     const pathname = url.pathname.replace(/\/+$/, '') || '/';
     let title = settings?.seoDefaultTitle || 'Carlos Búrigo | Portal Institucional';
     let description = settings?.seoDefaultDescription || '';
-    let image = settings?.seoDefaultImageUrl || '';
+    let image = resolveOpenGraphImageUrl(settings?.seoDefaultImageUrl, url.origin);
     let pageUrl = url.toString();
 
     const staticMeta: Record<string, { title: string; description: string }> = {
@@ -232,7 +242,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       if (page) {
         title = page.seoTitle || page.title;
         description = page.seoDescription || page.description || description;
-        image = page.ogImageUrl || image;
+        image = resolveOpenGraphImageUrl(page.ogImageUrl || image, url.origin);
       }
     }
     const html = await response.text();
@@ -243,13 +253,17 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       `<meta property="og:type" content="website">`,
       `<meta property="og:url" content="${esc(pageUrl)}">`,
       `<meta property="og:locale" content="pt_BR">`,
-      image ? `<meta property="og:image" content="${esc(image)}">` : '',
-      image ? `<meta property="og:image:width" content="1200">` : '',
-      image ? `<meta property="og:image:height" content="630">` : '',
+      `<meta property="og:image" content="${esc(image)}">`,
+      `<meta property="og:image:secure_url" content="${esc(image)}">`,
+      `<meta property="og:image:type" content="image/png">`,
+      `<meta property="og:image:width" content="1200">`,
+      `<meta property="og:image:height" content="630">`,
+      `<meta property="og:image:alt" content="${esc(title)}">`,
       `<meta name="twitter:card" content="summary_large_image">`,
       `<meta name="twitter:title" content="${esc(title)}">`,
       `<meta name="twitter:description" content="${esc(description)}">`,
-      image ? `<meta name="twitter:image" content="${esc(image)}">` : '',
+      `<meta name="twitter:image" content="${esc(image)}">`,
+      `<meta name="twitter:image:alt" content="${esc(title)}">`,
     ].filter(Boolean).join('');
     const patched = html.replace('</head>', `${tags}</head>`);
     const headers = new Headers(response.headers);
