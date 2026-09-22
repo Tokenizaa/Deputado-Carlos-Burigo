@@ -153,7 +153,15 @@ export const Navbar: React.FC = () => {
             </div>
           </nav>
 
-          <div className="ml-auto hidden shrink-0 lg:block">
+          <div className="ml-auto hidden shrink-0 items-center gap-2 lg:flex">
+            <a
+              href="/admin"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
+              aria-label="Acessar dashboard"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden xl:inline">Dashboard</span>
+            </a>
             <a
               href="/#contato"
               onClick={(e) => { e.preventDefault(); navigate('contato'); }}
