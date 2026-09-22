@@ -1520,9 +1520,7 @@ export default {
         const method = request.method;
         let requiredRoles: string[] | null = null;
         if (url.pathname === '/api/auth/me' || url.pathname === '/api/auth/config') requiredRoles = [];
-        else if (url.pathname.startsWith('/api/admin/pages')) requiredRoles = method === 'GET'
-          ? ['ADMIN', 'EDITOR', 'COMUNICACAO', 'VISUALIZADOR']
-          : ['ADMIN', 'EDITOR', 'COMUNICACAO'];
+        else if (url.pathname.startsWith('/api/admin/pages')) requiredRoles = null;
         // RBAC efetivo é aplicado dentro dos handlers para tarefas, demandas,
         // convites, usuários e auditoria. Não duplicar papel estático aqui.
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = null;
@@ -1530,7 +1528,7 @@ export default {
         else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = null;
         else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = null;
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = null;
-        else if (url.pathname === '/api/admin/upload') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
+        else if (url.pathname === '/api/admin/upload') requiredRoles = null;
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = null;
         else if (url.pathname === '/api/admin/og-image') requiredRoles = null;
 
