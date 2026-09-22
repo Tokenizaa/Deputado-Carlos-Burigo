@@ -142,3 +142,12 @@ Ainda não foi marcado como concluído o enforcement integral da API, porque os 
 Esta evolução pertence à FASE 4 — SEGURANÇA E ACESSO.
 
 Próximo incremento: substituir progressivamente os guards estáticos por autorização efetiva e criar a matriz de testes `role × permissão × ação`.
+
+## Correção executada — catálogo e convite
+
+- [x] Catálogo frontend alinhado com as ações `citizen.assign` e `citizen.reply`
+- [x] Preset ATENDIMENTO alinhado no banco para essas ações
+- [x] Overrides definidos no convite passam a ser transferidos para `user_permission_overrides` no momento da aprovação
+- [ ] Reenvio/revogação/cancelamento do convite
+- [ ] Gestão completa do ciclo de vida do usuário
+- [ ] Visualização da permissão efetiva por usuário
