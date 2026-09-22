@@ -1,6 +1,14 @@
 import { supabaseAdmin } from './supabase';
 
 export type AdminInviteRole = 'ADMIN' | 'EDITOR' | 'COMUNICACAO' | 'ATENDIMENTO' | 'VISUALIZADOR';
+const ROLE_DEPARTMENT: Record<AdminInviteRole, string> = {
+  ADMIN: 'Administração',
+  EDITOR: 'Conteúdo',
+  COMUNICACAO: 'Comunicação',
+  ATENDIMENTO: 'Atendimento',
+  VISUALIZADOR: 'Visualização',
+};
+
 export type AdminInviteStatus = 'pendente' | 'aceito' | 'aprovacao' | 'aprovado' | 'recusado' | 'revogado' | 'expirado';
 
 export interface AdminInvite {
@@ -157,6 +165,8 @@ export async function approveAdminInvite(id: string, approvedBy: string): Promis
     id: invite.auth_user_id,
     name: invite.name,
     cargo: invite.cargo,
+    department: ROLE_DEPARTMENT[invite.role],
+    function_title: invite.cargo,
     updated_at: now,
   }, { onConflict: 'id' });
   if (profileError) throw profileError;
