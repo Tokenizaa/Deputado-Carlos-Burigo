@@ -121,7 +121,13 @@ const navItems = [
         return (
 <button
              key={item.id}
-             onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+             onClick={() => {
+  setActiveTab(item.id);
+  if (typeof window !== 'undefined') {
+    window.history.replaceState(null, '', `/admin#${item.id}`);
+  }
+  setIsSidebarOpen(false);
+}}
              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
                active
                  ? 'bg-[#00A550] text-white shadow-xs'
