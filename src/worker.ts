@@ -75,6 +75,7 @@ import {
 
 import type { User, UserRole } from '../src/types';
 import { can } from '../src/config/adminPermissions';
+import { getEffectivePermissions } from '../server/permissions';
 import { validatePassword } from './lib/passwordValidation';
 
 export interface Env {
