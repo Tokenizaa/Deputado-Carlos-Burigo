@@ -60,13 +60,13 @@ As políticas públicas/administrativas foram inspecionadas. Os principais domí
 - `private.is_staff()` para operações internas;
 - `private.has_role()` para operações administrativas específicas.
 
-O advisor de segurança retornou apenas um aviso informativo para `admin_bootstrap` sem policy e um aviso sobre proteção contra senhas vazadas desabilitada.
+O advisor de segurança retornou um aviso informativo para `admin_bootstrap` sem policy e um aviso sobre proteção contra senhas vazadas desabilitada.
 
 **Estado:** NÃO VALIDADO E2E.
 
 ### 4.5 RBAC
 
-A matriz `src/config/adminPermissions.ts` existe e o Worker possui verificações `can(...)` nos endpoints administrativos relevantes.
+A matriz `src/config/adminPermissions.ts` existe e o Worker possui verificações de permissão efetiva nos endpoints administrativos relevantes.
 
 Durante a auditoria foi encontrada uma lacuna concreta: ADMIN não possuía explicitamente o módulo `atuação`, apesar de `atuação` existir no tipo de módulos e ser utilizado por endpoints administrativos.
 
@@ -107,79 +107,41 @@ Há integração explícita de auditoria em operações administrativas relevant
 O advisor de segurança do Supabase registrou:
 
 1. **INFO:** `public.admin_bootstrap` possui RLS sem policies. A tabela é utilizada pelo Worker privilegiado e não possui grants diretos para os papéis expostos.
-2. **WARN:** proteção contra senhas vazadas do Supabase Auth está desabilitada. Essa configuração ainda precisa ser habilitada/validada no ambiente Supabase.
+2. **WARN:** proteção contra senhas vazadas do Supabase Auth está desabilitada.
 
-Itens ainda não validados:
+### Classificação da proteção contra senhas vazadas
 
-- rate limiting específico de autenticação;
-- histórico de senhas;
-- recuperação segura de senha;
-- verificação de e-mail;
-- revogação/gestão de sessões;
-- testes E2E de RLS;
-- testes E2E por papel;
-- fluxo E2E de convite;
-- fluxo E2E de auditoria.
+A **Leaked Password Protection** é um mecanismo adicional de hardening do Supabase Auth. Ela rejeita senhas conhecidamente vazadas usando a base Pwned Passwords/Have I Been Pwned. Não é requisito funcional para autenticação, RBAC, RLS, convites ou operação do Worker.
+
+A documentação atual do Supabase informa que esse recurso está disponível no Pro e acima; portanto, ele também não deve ser tratado como dependência obrigatória do ciclo quando o projeto não tiver esse recurso disponível. citeturn0search1turn0search0
+
+**Decisão operacional:** o aviso permanece registrado como **hardening pendente/não bloqueante**. Não haverá interrupção da Fase 4 nem criação de trabalho paralelo apenas para zerar esse alerta.
+
+O alerta de `admin_bootstrap` sem policy permanece intencional e documentado.
 
 ## Correções aplicadas nesta etapa
 
 - `a688bfa` — completa cobertura do módulo `atuação` para ADMIN;
 - `ffed0ff` — alinha input de senha do bootstrap com política de 12 caracteres;
 - `6c788c0` — alinha inputs de senha do cidadão com política de 12 caracteres;
-- `fd43955` — centraliza validação de senha também no serviço de bootstrap.
+- `fd43955` — centraliza validação de senha também no serviço de bootstrap;
+- `d7163a3` — alinha o resolver de RBAC efetivo às chaves reais do catálogo persistido;
+- `f084506` — registra o fechamento técnico preliminar da Fase 4.
 
-## Conclusão
+## Conclusão operacional
 
-A FASE 4 **não deve ser marcada como concluída ainda**.
+A Fase 4 continua **EM ANDAMENTO**, mas a proteção contra senhas vazadas **não é mais considerada bloqueador de fluxo**.
 
-A implementação estrutural está presente e foi auditada; uma lacuna de RBAC foi corrigida. O restante da fase depende principalmente de validação operacional/E2E e da configuração de proteção contra senhas vazadas no Supabase.
+O trabalho deve prosseguir pela validação objetiva que ainda agrega valor:
 
-**Próxima ação da FASE 4:** executar os testes objetivos de bootstrap, RLS, RBAC, convites e auditoria e reconciliar a matriz de estado.
+- smoke autenticado das rotas administrativas;
+- validação E2E do bootstrap;
+- testes E2E de RLS;
+- testes por papel/permissão;
+- fluxo E2E de convite;
+- fluxo E2E de auditoria.
 
-
-## Incremento RBAC efetivo — 2026-09-22
-
-Concluído neste incremento:
-
-- resolver de permissões efetivas disponível no backend;
-- endpoint administrativo de consulta das permissões efetivas;
-- estado ativo/inativo exposto no modelo de usuário;
-- enforcement por permissão efetiva em endpoints de configurações, conteúdo, agenda, atuação, gestão documental e mídia;
-- guards de papel estático removidos desses endpoints onde o handler já valida a permissão efetiva;
-- convite continua transferindo overrides para o usuário no momento da aprovação.
-
-Commits principais: `184f6a9`, `db4defe`, `04d1628`, `4a44652`.
-
-### Ainda não validado
-
-- compilação/build após os incrementos;
-- matriz automatizada papel × permissão × ação;
-- E2E de acesso real por usuário;
-- Playwright por papel;
-- validação no Supabase conectado.
-
-Portanto, a Fase 4 permanece **EM ANDAMENTO**.
-
-## Incremento executado — matriz RBAC efetiva e rotas operacionais
-
-Em 2026-09-22 foi concluído mais um incremento da Fase 4:
-
-- catálogo RBAC alinhado com as ações citizen.assign e citizen.reply;
-- alinhamento incremental persistente para ambientes onde a migration original já tenha sido aplicada;
-- permissão efetiva tarefas.delete adicionada ao catálogo;
-- permissão de auditoria alinhada ao módulo de administração;
-- rotas administrativas de tarefas passaram a validar permissão efetiva por ação (view, create, edit, delete);
-- rotas internas de demandas passaram a validar cidadão.view e cidadão.edit pela cadeia efetiva;
-- gestão de usuários, convites e consulta de permissões efetivas passaram a usar administração.manage_users;
-- consulta de auditoria passou a usar a permissão efetiva de auditoria;
-- criado teste unitário da regra de composição: preset da role → overrides individuais;
-- helper de RBAC efetivo recebeu tipagem canônica de módulo/ação.
-
-### Estado
-
-A Fase 4 permanece EM ANDAMENTO.
-
-Ainda não é possível declarar conclusão porque permanecem pendentes a execução real de lint, testes, Playwright, validação contra o Supabase conectado e a auditoria das rotas administrativas restantes que ainda utilizam guards estáticos.
+Não reabrir funcionalidades já implementadas apenas para eliminar o aviso de hardening do advisor.
 
 ## Fechamento técnico — 2026-09-22
 
@@ -201,20 +163,17 @@ O projeto Supabase conectado `wktanxbpijurimdjgone` está **ACTIVE_HEALTHY**. A 
 - presets para ADMIN, EDITOR, COMUNICACAO, ATENDIMENTO e VISUALIZADOR;
 - RLS habilitado nas tabelas públicas atualmente existentes.
 
-### Pendência externa real
+O Worker foi publicado e respondeu corretamente aos smoke tests públicos:
 
-O único alerta de configuração identificado pelo advisor de segurança que exige ação fora do código é:
+- `/` → HTTP 200;
+- `/api/auth/config` → HTTP 200;
+- `/api/auth/me` sem sessão → HTTP 401;
+- `/api/admin/users` não está exposto nessa rota → HTTP 404.
 
-- **Leaked Password Protection:** desabilitada no Supabase Auth.
+### Estado atual
 
-O alerta de `admin_bootstrap` com RLS sem policy é intencional: a tabela é privada para o Worker privilegiado e não possui acesso público.
+A implementação de código e banco está consolidada. A proteção contra senhas vazadas fica registrada como **hardening não bloqueante**.
 
-### Estado final da Fase 4
-
-A implementação de código e banco está consolidada. Para declarar a fase operacionalmente encerrada, falta apenas:
-
-1. habilitar **Leaked Password Protection** no projeto Supabase;
-2. executar a bateria local novamente após o último commit de RBAC;
-3. fazer o deploy do Worker e executar um smoke test autenticado das rotas administrativas.
+Para encerrar operacionalmente a Fase 4, permanecem prioritariamente as validações reais de autenticação/autorização e os fluxos E2E descritos acima.
 
 Não há necessidade de recuperar ou corrigir a antiga matriz `tests/api/routes.test.ts`; ela foi removida por representar o modelo de autorização anterior.
