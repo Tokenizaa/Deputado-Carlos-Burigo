@@ -172,3 +172,23 @@ O backend de convites agora possui operações explícitas para:
 - retornar novo action link para o fluxo administrativo.
 
 Ainda falta conectar essas operações aos handlers HTTP e à interface administrativa. Não foram marcadas como concluídas até essa integração ser feita.
+
+
+## Integração do ciclo de vida na API e interface
+
+Commits:
+
+- `846060bcc26b2a8974ef10fabb6abd60821dddb0` — API HTTP passou a expor as ações `renew` e `revoke`.
+- `8816ab664a4aa0f41aab6ff15ff28d31212aec9b` — interface da equipe passou a permitir renovação, revogação e consulta do histórico de convites.
+
+O fluxo agora cobre:
+
+1. criação do convite;
+2. aceitação;
+3. aprovação/recusa;
+4. revogação administrativa;
+5. renovação com novo token e novo prazo;
+6. visualização de convites encerrados;
+7. renovação de convite expirado.
+
+A renovação gera novo link e o componente copia o link para a área de transferência. O envio de email de um convite já existente continua separado e não foi tratado como concluído até existir um mecanismo explícito que não crie um segundo usuário Auth.
