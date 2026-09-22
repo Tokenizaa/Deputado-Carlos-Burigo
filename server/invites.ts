@@ -53,6 +53,7 @@ export async function createAdminInvite(input: {
   invitedBy: string;
   origin: string;
   sendEmail: boolean;
+  permissionKeys?: string[];
 }): Promise<{ invite: AdminInvite; link: string }> {
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
@@ -118,6 +119,18 @@ export async function createAdminInvite(input: {
 
   if (input.sendEmail) {
     link = redirectTo.toString();
+  }
+
+  const permissionKeys = [...new Set(input.permissionKeys ?? [])].filter(Boolean);
+  if (permissionKeys.length > 0) {
+    const { error: permissionError } = await supabaseAdmin
+      .from('invite_permission_overrides')
+      .insert(permissionKeys.map((permission_key) => ({
+        invite_id: (invite as AdminInvite).id,
+        permission_key,
+        enabled: true,
+      })));
+    if (permissionError) throw permissionError;
   }
 
   return { invite: invite as AdminInvite, link };
