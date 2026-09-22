@@ -17,6 +17,8 @@ export type Permission =
   | 'edit'
   | 'publish'
   | 'delete'
+  | 'assign'
+  | 'reply'
   | 'manage_users'
   | 'view_audit'
   | 'manage_settings';
@@ -44,7 +46,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Partial<Record<AdminModule, Perm
   },
   ATENDIMENTO: {
     dashboard: ['view'],
-    cidadão: ['view', 'create', 'edit'],
+    cidadão: ['view', 'create', 'edit', 'assign', 'reply'],
     agenda: ['view'],
     tarefas: ['view', 'create', 'edit'],
   },
