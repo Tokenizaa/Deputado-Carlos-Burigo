@@ -476,7 +476,7 @@ const authResult = await requireAuth(request);
        if (authResult instanceof Response) return authResult;
        // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
        const { userId, role, user } = authResult;
-if (!canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings')) {
+if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings'))) {
       return Response.json({ error: 'Acesso negado' }, { status: 403 });
     }
 
@@ -534,7 +534,7 @@ if (!canEffective(authResult.userId, authResult.role, 'configurações', 'manage
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'POST') return methodNotAllowed();
-    if (!canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings') && !canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings')) && !(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       // Defensive: formData() throws TypeError when body is empty or not
       // multipart/form-data (e.g. JSON/axios), leaking the engine message into
@@ -579,7 +579,7 @@ const authResult = await requireAuth(request);
      // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
      const { userId, role, user } = authResult;
 if (request.method === 'POST') {
-        if (!canEffective(authResult.userId, authResult.role, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const data = await request.json();
           if (!data?.title || !data?.category || !data?.description) return Response.json({ error: 'title, category e description são obrigatórios' }, { status: 400 });
@@ -599,7 +599,7 @@ if (request.method === 'POST') {
      const id = (request as any).params?.id;
      if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
 if (request.method === 'PUT') {
-        if (!canEffective(authResult.userId, authResult.role, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const updated = await updateAdminResult(id, await request.json());
           if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
@@ -610,7 +610,7 @@ if (request.method === 'PUT') {
         }
       }
 if (request.method === 'DELETE') {
-        if (!canEffective(authResult.userId, authResult.role, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const deleted = await deleteAdminResult(id);
           if (!deleted) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
@@ -636,7 +636,7 @@ if (request.method === 'DELETE') {
      // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
      const { userId, role, user } = authResult;
 if (request.method === 'POST') {
-        if (!canEffective(authResult.userId, authResult.role, 'atuação', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const data = await request.json();
           if (!data?.name || !data?.region || !Array.isArray(data?.keyDeliveries)) return Response.json({ error: 'name, region e keyDeliveries são obrigatórios' }, { status: 400 });
@@ -656,7 +656,7 @@ if (request.method === 'POST') {
      const id = (request as any).params?.id;
      if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
 if (request.method === 'PUT') {
-        if (!canEffective(authResult.userId, authResult.role, 'atuação', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const updated = await updateAdminMunicipality(id, await request.json());
           if (!updated) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
@@ -667,7 +667,7 @@ if (request.method === 'PUT') {
         }
       }
 if (request.method === 'DELETE') {
-        if (!canEffective(authResult.userId, authResult.role, 'atuação', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
         try {
           const deleted = await deleteAdminMunicipality(id);
           if (!deleted) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
@@ -682,7 +682,7 @@ if (request.method === 'DELETE') {
   '/api/admin/upload': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (!canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create') && !canEffective(authResult.userId, authResult.role, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create')) && !(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     if (request.method !== 'POST') return methodNotAllowed();
     try {
       // Defensive: same empty-body/JSON guard as /api/admin/og-image — keeps
@@ -761,7 +761,7 @@ if (request.method === 'DELETE') {
       }
     }
     if (request.method === 'DELETE') {
-      if (!canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const deleted = await deleteAdminVideo(id);
         if (!deleted) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
@@ -831,7 +831,7 @@ if (request.method === 'DELETE') {
       return respond(async () => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
     }
     if (request.method === 'DELETE') {
-      if (!canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(() => deleteAdminNews(id), 'news DELETE', 'Falha ao excluir notícia');
     }
     return methodNotAllowed();
@@ -842,11 +842,11 @@ if (request.method === 'DELETE') {
     const id = extractPathParams('/api/agenda/:id', new URL(request.url).pathname)?.id;
     if (!id) return Response.json({ error: 'ID do compromisso não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
-      if (!canEffective(authResult.userId, authResult.role, 'agenda', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(async () => updateAdminAgenda(id, await request.json()), 'agenda PUT', 'Falha ao atualizar compromisso');
     }
     if (request.method === 'DELETE') {
-      if (!canEffective(authResult.userId, authResult.role, 'agenda', 'delete')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(() => deleteAdminAgenda(id), 'agenda DELETE', 'Falha ao excluir compromisso');
     }
     return methodNotAllowed();
@@ -956,7 +956,7 @@ if (request.method === 'DELETE') {
       }
     }
     if (request.method === 'POST') {
-      if (!canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const document = await createAdminDocument(await request.json());
         if (document) {
@@ -982,7 +982,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
-    if (!canEffective(authResult.userId, authResult.role, 'gestao-documental', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'ID do documento é obrigatório' }, { status: 400 });
     try {
@@ -1023,7 +1023,7 @@ if (request.method === 'DELETE') {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
-      if (!canEffective(authResult.userId, authResult.role, 'conteúdo', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const pages = await getAdminPages();
         return Response.json(pages);
@@ -1063,7 +1063,7 @@ if (request.method === 'DELETE') {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
-      if (!canEffective(authResult.userId, authResult.role, 'conteúdo', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -1452,7 +1452,7 @@ try {
   '/api/admin/invites/:id': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar convites.' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar convites.' }, { status: 403 });
     if (request.method !== 'PATCH') return methodNotAllowed();
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'ID do convite é obrigatório.' }, { status: 400 });
