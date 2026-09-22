@@ -38,6 +38,11 @@ export const AdminSettingsTab: React.FC = () => {
   const [citizenDemandEnabled, setCitizenDemandEnabled] = useState(true);
   const [loadingControl, setLoadingControl] = useState(true);
   const [savingControl, setSavingControl] = useState(false);
+  const [permissionRole, setPermissionRole] = useState<'ADMIN' | 'EDITOR' | 'COMUNICACAO' | 'ATENDIMENTO' | 'VISUALIZADOR'>('EDITOR');
+  const [permissionDefinitions, setPermissionDefinitions] = useState<Array<{ permission_key: string; module: string; action: string; label: string; description?: string | null }>>([]);
+  const [rolePermissionState, setRolePermissionState] = useState<Record<string, boolean>>({});
+  const [loadingPermissions, setLoadingPermissions] = useState(true);
+  const [savingPermissions, setSavingPermissions] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -78,6 +83,51 @@ export const AdminSettingsTab: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    let mounted = true;
+    const loadPermissions = async () => {
+      try {
+        const client = await getSupabaseClient();
+        const [{ data: definitions, error: definitionsError }, { data: roleRows, error: roleError }] = await Promise.all([
+          client.from('permission_definitions').select('permission_key,module,action,label,description').order('module').order('action'),
+          client.from('role_permissions').select('permission_key,enabled').eq('role', permissionRole),
+        ]);
+        if (definitionsError) throw definitionsError;
+        if (roleError) throw roleError;
+        if (!mounted) return;
+        setPermissionDefinitions(definitions ?? []);
+        setRolePermissionState(Object.fromEntries((roleRows ?? []).map((row) => [row.permission_key, Boolean(row.enabled)])));
+      } catch {
+        if (mounted) setPermissionDefinitions([]);
+      } finally {
+        if (mounted) setLoadingPermissions(false);
+      }
+    };
+    setLoadingPermissions(true);
+    void loadPermissions();
+    return () => { mounted = false; };
+  }, [permissionRole]);
+
+  const saveRolePermissions = async () => {
+    setSavingPermissions(true);
+    try {
+      const client = await getSupabaseClient();
+      const rows = permissionDefinitions.map((definition) => ({
+        role: permissionRole,
+        permission_key: definition.permission_key,
+        enabled: Boolean(rolePermissionState[definition.permission_key]),
+        updated_at: new Date().toISOString(),
+      }));
+      const { error } = await client.from('role_permissions').upsert(rows, { onConflict: 'role,permission_key' });
+      if (error) throw error;
+      window.alert('Permissões da role salvas.');
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Não foi possível salvar as permissões.');
+    } finally {
+      setSavingPermissions(false);
+    }
+  };
+
   const pendingDemands = demands.filter((d) => d.status === 'recebida' || d.status === 'em análise').length;
   const privacyConfigured = Boolean(settings?.privacy_policy_text?.trim());
 
@@ -89,6 +139,64 @@ export const AdminSettingsTab: React.FC = () => {
           Centro de configuração operacional do gabinete. Conteúdo público permanece em Conteúdo; pessoas e permissões permanecem em Equipe.
         </p>
       </div>
+
+      <Section
+        icon={<ShieldCheck className="w-5 h-5 text-stone-700" />}
+        title="Permissões por role"
+        description="O Administrador Geral define o padrão de acesso de cada função. Ajustes individuais e permissões de convite serão aplicados sobre esse padrão."
+      >
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
+          <label className="block">
+            <span className="text-xs font-bold text-stone-600">Role</span>
+            <select
+              value={permissionRole}
+              onChange={(event) => setPermissionRole(event.target.value as typeof permissionRole)}
+              className="mt-1 min-h-11 rounded-lg border border-stone-300 bg-white px-3 text-sm font-semibold"
+            >
+              <option value="EDITOR">Editor</option>
+              <option value="COMUNICACAO">Comunicação</option>
+              <option value="ATENDIMENTO">Atendimento</option>
+              <option value="VISUALIZADOR">Visualizador</option>
+              <option value="ADMIN">Administrador Geral</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={() => void saveRolePermissions()}
+            disabled={loadingPermissions || savingPermissions || permissionRole === 'ADMIN'}
+            className="min-h-11 rounded-lg bg-stone-900 text-white px-4 text-sm font-bold disabled:opacity-50"
+            title={permissionRole === 'ADMIN' ? 'Administrador Geral mantém acesso administrativo completo.' : undefined}
+          >
+            {savingPermissions ? 'Salvando…' : 'Salvar permissões'}
+          </button>
+        </div>
+        {permissionRole === 'ADMIN' && (
+          <p className="text-xs text-stone-500 mb-4">ADMIN permanece como acesso administrativo completo e não deve ser reduzido por overrides comuns.</p>
+        )}
+        <div className="border border-stone-200 rounded-xl divide-y divide-stone-200 overflow-hidden">
+          {loadingPermissions ? (
+            <div className="p-4 text-sm text-stone-500">Carregando permissões…</div>
+          ) : permissionDefinitions.map((definition) => (
+            <label key={definition.permission_key} className="flex items-center justify-between gap-4 p-3 hover:bg-stone-50">
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-stone-800">{definition.label}</span>
+                <span className="block text-xs text-stone-500 mt-0.5">{definition.module} · {definition.action}</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={permissionRole === 'ADMIN' ? true : Boolean(rolePermissionState[definition.permission_key])}
+                disabled={permissionRole === 'ADMIN'}
+                onChange={(event) => setRolePermissionState((prev) => ({ ...prev, [definition.permission_key]: event.target.checked }))}
+                className="h-5 w-5 accent-emerald-600 shrink-0"
+                aria-label={definition.label}
+              />
+            </label>
+          ))}
+        </div>
+        {!loadingPermissions && permissionDefinitions.length === 0 && (
+          <p className="text-sm text-stone-500 mt-3">Nenhuma definição de permissão foi carregada.</p>
+        )}
+      </Section>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <Section
