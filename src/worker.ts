@@ -199,7 +199,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-const OPEN_GRAPH_IMAGE_URL = 'https://www.rbsdirect.com.br/imagesrc/27474857.jpg?format=webp&w=1600&h=1600&a=c';
+const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.jpg';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = OPEN_GRAPH_IMAGE_URL;
@@ -257,7 +257,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       `<meta property="og:locale" content="pt_BR">`,
       `<meta property="og:image" content="${esc(image)}">`,
       `<meta property="og:image:secure_url" content="${esc(image)}">`,
-      `<meta property="og:image:type" content="image/webp">`,
+      `<meta property="og:image:type" content="image/jpeg">`,
       `<meta property="og:image:width" content="1200">`,
       `<meta property="og:image:height" content="630">`,
       `<meta property="og:image:alt" content="${esc(title)}">`,
