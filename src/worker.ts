@@ -1539,14 +1539,14 @@ export default {
         else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];
         else if (url.pathname.startsWith('/api/admin/users/')) requiredRoles = ['ADMIN'];
         else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
-        else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
-        else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
-        else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR'];
-        else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = method === 'GET' ? ['ADMIN','EDITOR','VISUALIZADOR'] : ['ADMIN','EDITOR'];
-        else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
+        else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = null;
+        else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = null;
+        else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = null;
+        else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = null;
+        else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = null;
         else if (url.pathname === '/api/admin/upload') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
-        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = ['ADMIN'];
-        else if (url.pathname === '/api/admin/og-image') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
+        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = null;
+        else if (url.pathname === '/api/admin/og-image') requiredRoles = null;
 
         if (requiredRoles !== null) {
           if (requiredRoles.length === 0) {
