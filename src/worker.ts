@@ -75,7 +75,7 @@ import {
 
 import type { User, UserRole } from '../src/types';
 import { can } from '../src/config/adminPermissions';
-import { getEffectivePermissions } from '../server/permissions';
+import { getEffectivePermissions, canEffective } from '../server/permissions';
 import { validatePassword } from './lib/passwordValidation';
 
 export interface Env {
@@ -118,6 +118,14 @@ function normalizeBrazilPhone(phone: string): string {
 async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function requireEffectivePermission(request: Request, module: string, action: string): Promise<{ auth: { userId: string; role: string; user: User } } | Response> {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const allowed = await canEffective(authResult.userId, authResult.role, module, action);
+  if (!allowed) return Response.json({ error: 'Acesso negado para esta permissão.' }, { status: 403 });
+  return { auth: authResult };
 }
 
 function methodNotAllowed(): Response {
@@ -494,7 +502,7 @@ if (!can(role as UserRole, 'configurações', 'manage_settings')) {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
-    if (!can(authResult.role as any, 'configurações', 'manage_settings')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       return Response.json(await updateAdminSettings(await request.json()));
     } catch (error) {
@@ -704,7 +712,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const data = await request.json();
         if (!data?.title || !data?.url || !data?.platform || !data?.category) return Response.json({ error: 'title, url, platform e category são obrigatórios' }, { status: 400 });
@@ -722,7 +730,7 @@ if (request.method === 'DELETE') {
     const id = (request as any).params?.id;
     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
     if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const updated = await updateAdminVideo(id, await request.json());
         if (!updated) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
@@ -771,7 +779,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(async () => createAdminNews(await request.json(), authResult.userId), 'news POST', 'Falha ao criar notícia');
     }
     return methodNotAllowed();
@@ -788,7 +796,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'agenda', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(async () => createAdminAgenda(await request.json(), authResult.userId), 'agenda POST', 'Falha ao criar compromisso');
     }
     return methodNotAllowed();
@@ -799,7 +807,7 @@ if (request.method === 'DELETE') {
     const id = extractPathParams('/api/news/:id', new URL(request.url).pathname)?.id;
     if (!id) return Response.json({ error: 'ID da notícia não fornecido' }, { status: 400 });
     if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       return respond(async () => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
     }
     if (request.method === 'DELETE') {
@@ -906,7 +914,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
-    if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       return Response.json(await getAdminEvidence());
     } catch (error) {
@@ -919,7 +927,7 @@ if (request.method === 'DELETE') {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
     if (request.method === 'GET') {
-      if (!can(authResult.role as any, 'gestao-documental', 'view')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         return Response.json(await getAdminDocuments());
       } catch (error) {
@@ -1007,7 +1015,7 @@ if (request.method === 'DELETE') {
         );
       }
     } else if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'conteúdo', 'create')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const data = await request.json();
         const page = await createAdminPage(data);
@@ -1062,7 +1070,7 @@ if (request.method === 'DELETE') {
         );
       }
     } else if (request.method === 'PUT') {
-      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -1103,7 +1111,7 @@ if (request.method === 'DELETE') {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'POST') {
-      if (!can(authResult.role as any, 'conteúdo', 'edit')) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id/rollback', url.pathname);
