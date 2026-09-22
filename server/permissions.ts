@@ -63,6 +63,21 @@ export async function canEffective(
   return effective.has(keyFor(module, permission));
 }
 
+export async function getEffectivePermissions(userId: string, role: string): Promise<EffectivePermission[]> {
+  const { data: definitions, error } = await supabaseAdmin
+    .from('permission_definitions')
+    .select('permission_key,module,action');
+  if (error) throw error;
+
+  const effectiveKeys = await getEffectivePermissionKeys(userId, role);
+  return (definitions ?? []).map((row) => ({
+    permission_key: row.permission_key,
+    module: row.module,
+    action: row.action,
+    enabled: effectiveKeys.has(row.permission_key),
+  }));
+}
+
 export async function getUserPermissionOverrides(userId: string) {
   const { data, error } = await supabaseAdmin
     .from('user_permission_overrides')
