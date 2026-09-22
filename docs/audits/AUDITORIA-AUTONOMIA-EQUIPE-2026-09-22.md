@@ -192,3 +192,23 @@ O fluxo agora cobre:
 7. renovação de convite expirado.
 
 A renovação gera novo link e o componente copia o link para a área de transferência. O envio de email de um convite já existente continua separado e não foi tratado como concluído até existir um mecanismo explícito que não crie um segundo usuário Auth.
+
+
+## Gestão de usuários aprovada — primeiro incremento
+
+Commits:
+
+- `47b137ee8adb36c66296148e0373e985fc8b7a53` — operações server-side para alteração de papel e ativação/desativação de acesso, com auditoria.
+- `f29af13a690a52add6e06f281c3e1dedacdd378f` — endpoint administrativo `/api/admin/users/:id`.
+- `bd75047a418dc41948daa5e91126604b4d49fc31` — controles de papel e acesso na tela de detalhe do membro.
+
+Regras implementadas:
+
+- somente ADMIN pode executar as alterações;
+- ADMIN não pode remover o próprio papel administrativo;
+- ADMIN não pode desativar o próprio acesso;
+- alteração de papel é persistida em `user_roles`;
+- desativação/ativação usa o mecanismo de banimento do Supabase Auth;
+- alterações geram registros em `audit_logs`.
+
+A validação E2E e a exibição explícita do estado ativo/inativo ainda permanecem pendentes.
