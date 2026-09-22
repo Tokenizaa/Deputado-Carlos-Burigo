@@ -23,6 +23,18 @@ const keyFor = (module: AdminModule, permission: Permission): string => {
   return `${prefix[module]}.${permission}`;
 };
 
+export function resolveEffectivePermissionKeys(
+  defaults: Array<{ permission_key: string; enabled: boolean }>,
+  overrides: Array<{ permission_key: string; enabled: boolean }>,
+): Set<string> {
+  const effective = new Set(defaults.filter((row) => row.enabled).map((row) => row.permission_key));
+  for (const row of overrides) {
+    if (row.enabled) effective.add(row.permission_key);
+    else effective.delete(row.permission_key);
+  }
+  return effective;
+}
+
 export async function getEffectivePermissionKeys(userId: string, role: string): Promise<Set<string>> {
   if (role === 'ADMIN') {
     const { data, error } = await supabaseAdmin
@@ -40,16 +52,10 @@ export async function getEffectivePermissionKeys(userId: string, role: string): 
   if (defaultsError) throw defaultsError;
   if (overridesError) throw overridesError;
 
-  const effective = new Set(
-    (defaults ?? []).filter((row) => row.enabled).map((row) => row.permission_key),
+  return resolveEffectivePermissionKeys(
+    (defaults ?? []).map((row) => ({ permission_key: row.permission_key, enabled: row.enabled })),
+    (overrides ?? []).map((row) => ({ permission_key: row.permission_key, enabled: row.enabled })),
   );
-
-  for (const row of overrides ?? []) {
-    if (row.enabled) effective.add(row.permission_key);
-    else effective.delete(row.permission_key);
-  }
-
-  return effective;
 }
 
 export async function canEffective(
