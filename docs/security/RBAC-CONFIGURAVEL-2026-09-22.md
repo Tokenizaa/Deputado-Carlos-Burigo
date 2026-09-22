@@ -110,21 +110,35 @@ Não usar `user_metadata` como fonte de autorização.
 ## Estado desta subetapa
 
 - [x] Modelo de permissões definido
-- [x] Tabelas persistentes criadas
-- [x] RLS criado
+- [x] Tabelas persistentes e RLS canonizados no repositório
 - [x] Catálogo inicial de permissões
 - [x] Defaults das cinco roles persistidos
 - [x] Configurações com edição de permissões por role
 - [x] Backend de convite aceita overrides
-- [ ] UI de permissões específicas no convite
-- [ ] UI de overrides por usuário
-- [ ] Resolver permissões efetivas no frontend
-- [ ] Enforcement das permissões efetivas nos endpoints
+- [x] UI de permissões específicas no convite
+- [x] UI de overrides por usuário
+- [x] Resolver de permissões efetivas no backend criado
+- [ ] Resolver efetivo conectado a todos os endpoints
+- [ ] Enforcement das permissões efetivas em toda a API
 - [ ] Testes role × permissão × ação
 - [ ] Validação Playwright por role
+
+## Execução de 22/09/2026
+
+Foi executado o próximo incremento da evolução, sem criar nova fase do roadmap.
+
+Entregas:
+- migration canônica `20260922100000_rbac_effective_permissions.sql`;
+- persistência de `permission_definitions`, `role_permissions`, `user_permission_overrides` e `invite_permission_overrides`;
+- catálogo inicial e presets das cinco roles;
+- `server/permissions.ts` com resolução de permissões efetivas;
+- seleção de permissões adicionais no formulário de convite;
+- edição de overrides individuais na ficha do usuário.
+
+Ainda não foi marcado como concluído o enforcement integral da API, porque os handlers existentes ainda possuem verificações legadas por role em vários pontos. Isso será substituído somente após a matriz de endpoints ser validada.
 
 ## Regra de continuidade
 
 Esta evolução pertence à FASE 4 — SEGURANÇA E ACESSO.
 
-Não criar uma nova fase do roadmap para RBAC configurável.
+Próximo incremento: substituir progressivamente os guards estáticos por autorização efetiva e criar a matriz de testes `role × permissão × ação`.
