@@ -115,6 +115,7 @@ export const AdminUsersTab: React.FC = () => {
   const [permissionDefinitions, setPermissionDefinitions] = useState<PermissionDefinition[]>([]);
   const [userOverrides, setUserOverrides] = useState<Record<string, boolean>>({});
   const [loadingOverrides, setLoadingOverrides] = useState(false);
+  const [savingUser, setSavingUser] = useState(false);
 
   const pending = useMemo(
     () => invites.filter((invite) => ['pendente', 'aprovacao', 'aceito'].includes(invite.status)),
@@ -279,6 +280,27 @@ export const AdminUsersTab: React.FC = () => {
       showToast('Permissão individual atualizada.', 'success');
     } catch (error: any) {
       showToast(error?.message || 'Falha ao atualizar permissão individual.', 'error');
+    }
+  };
+
+  const updateUser = async (action: 'role' | 'access', value: Role | boolean) => {
+    if (!selectedUser) return;
+    setSavingUser(true);
+    try {
+      const response = await fetch('/api/admin/users/' + selectedUser.id, {
+        method: 'PATCH',
+        headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+        body: JSON.stringify(action === 'role' ? { action, role: value } : { action, active: value }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data?.error || 'Falha ao atualizar usuário.');
+      setSelectedUser(data);
+      await refreshAllData();
+      showToast(action === 'role' ? 'Papel atualizado.' : (value ? 'Acesso ativado.' : 'Acesso desativado.'), 'success');
+    } catch (error: any) {
+      showToast(error?.message || 'Falha ao atualizar usuário.', 'error');
+    } finally {
+      setSavingUser(false);
     }
   };
 
@@ -558,6 +580,21 @@ export const AdminUsersTab: React.FC = () => {
             <div className="p-5 space-y-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs font-bold uppercase bg-stone-100 text-stone-700 px-3 py-1.5 rounded-lg">{selectedUser.role}</span>
+                {currentUser?.role === 'ADMIN' && (
+                  <>
+                    <select
+                      value={selectedUser.role}
+                      disabled={savingUser || selectedUser.id === currentUser.id}
+                      onChange={(event) => void updateUser('role', event.target.value as Role)}
+                      className="min-h-10 border border-stone-300 rounded-lg px-2 text-xs font-semibold"
+                      aria-label="Alterar papel"
+                    >
+                      {roles.map((role) => <option key={role} value={role}>{role}</option>)}
+                    </select>
+                    <button type="button" disabled={savingUser || selectedUser.id === currentUser.id} onClick={() => void updateUser('access', true)} className="min-h-10 px-3 rounded-lg border border-emerald-200 text-emerald-700 text-xs font-bold">Ativar</button>
+                    <button type="button" disabled={savingUser || selectedUser.id === currentUser.id} onClick={() => void updateUser('access', false)} className="min-h-10 px-3 rounded-lg border border-red-200 text-red-700 text-xs font-bold">Desativar</button>
+                  </>
+                )}
                 {currentUser?.id === selectedUser.id && <span className="text-xs font-bold text-[#00863f] bg-emerald-50 px-3 py-1.5 rounded-lg">Sessão ativa</span>}
               </div>
 
