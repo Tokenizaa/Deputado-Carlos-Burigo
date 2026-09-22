@@ -157,3 +157,18 @@ As operações administrativas críticas devem gerar eventos:
 Esta auditoria continua pertencendo à evolução da FASE 4 — Segurança e Acesso.
 
 Nenhuma nova fase do roadmap deve ser criada para substituir a FASE 4.
+
+
+## Incremento executado
+
+Commit: `8c581644d3b0982c5205fb40e7eb719525550870`
+
+O backend de convites agora possui operações explícitas para:
+
+- revogar convite ainda pendente/em aprovação;
+- renovar convite pendente, aceito, em aprovação ou expirado;
+- gerar novo token e novo prazo de 7 dias na renovação;
+- invalidar o token anterior ao renovar;
+- retornar novo action link para o fluxo administrativo.
+
+Ainda falta conectar essas operações aos handlers HTTP e à interface administrativa. Não foram marcadas como concluídas até essa integração ser feita.
