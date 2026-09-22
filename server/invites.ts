@@ -190,6 +190,27 @@ export async function approveAdminInvite(id: string, approvedBy: string): Promis
   }, { onConflict: 'user_id' });
   if (roleError) throw roleError;
 
+  const { data: invitePermissions, error: invitePermissionsError } = await supabaseAdmin
+    .from('invite_permission_overrides')
+    .select('permission_key,enabled')
+    .eq('invite_id', id);
+  if (invitePermissionsError) throw invitePermissionsError;
+
+  if (invitePermissions && invitePermissions.length > 0) {
+    const { error: userPermissionsError } = await supabaseAdmin
+      .from('user_permission_overrides')
+      .upsert(
+        invitePermissions.map((permission) => ({
+          user_id: invite.auth_user_id,
+          permission_key: permission.permission_key,
+          enabled: permission.enabled,
+          updated_at: now,
+        })),
+        { onConflict: 'user_id,permission_key' },
+      );
+    if (userPermissionsError) throw userPermissionsError;
+  }
+
   const { data, error: updateError } = await supabaseAdmin
     .from('admin_invites')
     .update({ status: 'aprovado', approved_at: now, approved_by: approvedBy, updated_at: now })
