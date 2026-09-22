@@ -29,31 +29,53 @@ export const AccessibilityBar: React.FC = () => {
     }
   }, [fontScale, highContrast]);
 
+  const increaseFont = () => {
+    setFontScale((current) => current === 'normal' ? 'large' : 'larger');
+  };
+
   return (
     <div className="accessibility-bar" aria-label="Recursos de acessibilidade">
-      <div className="mx-auto flex min-h-10 max-w-7xl items-center justify-between gap-3 overflow-x-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex shrink-0 items-center gap-3">
-          <span className="inline-flex items-center gap-2 font-semibold text-stone-700">
+      <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-stone-700">
             <Accessibility className="h-4 w-4 text-[#006b32]" aria-hidden="true" />
-            <span className="hidden sm:inline">Acessibilidade</span>
+            <span>Acessibilidade</span>
           </span>
+          <span className="hidden h-4 w-px bg-stone-300 sm:block" aria-hidden="true" />
           <a href="#conteudo-principal" className="accessibility-link">Conteúdo</a>
           <a href="#menu-principal" className="accessibility-link">Menu</a>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          <button type="button" className="accessibility-control" onClick={() => setFontScale(fontScale === 'normal' ? 'large' : 'larger')} aria-pressed={fontScale !== 'normal'}>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            className="accessibility-control accessibility-control-compact"
+            onClick={increaseFont}
+            aria-label={fontScale === 'larger' ? 'Fonte ampliada ao máximo' : 'Aumentar tamanho da fonte'}
+            aria-pressed={fontScale !== 'normal'}
+          >
             <Type className="h-4 w-4" aria-hidden="true" />
-            <span>Fonte +</span>
+            <span>A+</span>
           </button>
-          <button type="button" className="accessibility-control" onClick={() => setFontScale('normal')} aria-pressed={fontScale === 'normal'}>
-            Normal
+          <button
+            type="button"
+            className="accessibility-control accessibility-control-compact"
+            onClick={() => setFontScale('normal')}
+            aria-label="Restaurar tamanho normal da fonte"
+            aria-pressed={fontScale === 'normal'}
+          >
+            A
           </button>
-          <button type="button" className="accessibility-control" onClick={() => setHighContrast((value) => !value)} aria-pressed={highContrast}>
+          <button
+            type="button"
+            className="accessibility-control accessibility-control-compact"
+            onClick={() => setHighContrast((value) => !value)}
+            aria-pressed={highContrast}
+          >
             <Contrast className="h-4 w-4" aria-hidden="true" />
-            <span>Contraste</span>
+            <span className="hidden sm:inline">Contraste</span>
           </button>
-          <a href="/acessibilidade" className="accessibility-link">Recursos</a>
+          <a href="/acessibilidade" className="accessibility-link hidden sm:inline-flex">Recursos</a>
         </div>
       </div>
     </div>
