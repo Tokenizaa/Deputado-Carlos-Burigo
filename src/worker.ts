@@ -52,6 +52,8 @@ import {
   createAdminVideo,
   updateAdminVideo,
   deleteAdminVideo,
+  updateAdminUserRole,
+  setAdminUserAccess,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -1348,6 +1350,29 @@ try {
     }
   },
 
+  '/api/admin/users/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (authResult.role !== 'ADMIN') return Response.json({ error: 'Apenas ADMIN pode gerenciar usuários.' }, { status: 403 });
+    if (request.method !== 'PATCH') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (body.action === 'role') {
+        return Response.json(await updateAdminUserRole(id, body.role, authResult.user));
+      }
+      if (body.action === 'access') {
+        if (typeof body.active !== 'boolean') return Response.json({ error: 'active deve ser boolean.' }, { status: 400 });
+        return Response.json(await setAdminUserAccess(id, body.active, authResult.user));
+      }
+      return Response.json({ error: 'Ação de usuário inválida.' }, { status: 400 });
+    } catch (error) {
+      console.error('[api/admin/users/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar usuário.' }, { status: 400 });
+    }
+  },
+
   '/api/admin/invites': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
@@ -1486,6 +1511,7 @@ export default {
           ? ['ADMIN', 'EDITOR', 'ATENDIMENTO', 'VISUALIZADOR']
           : ['ADMIN', 'EDITOR', 'ATENDIMENTO'];
         else if (url.pathname === '/api/admin/invites' || url.pathname.startsWith('/api/admin/invites/')) requiredRoles = ['ADMIN'];
+        else if (url.pathname.startsWith('/api/admin/users/')) requiredRoles = ['ADMIN'];
         else if (url.pathname === '/api/audit-logs') requiredRoles = ['ADMIN'];
         else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO'];
         else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = ['ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO'];
