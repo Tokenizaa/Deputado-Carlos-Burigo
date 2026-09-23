@@ -286,12 +286,19 @@ export function buildOpenGraphTags(input: {
 }
 
 export function applyOpenGraphTags(html: string, tags: string): string {
+  // Remove existing Open Graph and Twitter meta tags
   const cleanedHtml = html
-    .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, '')
-    .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '');
-  return cleanedHtml.includes('</head>')
-    ? cleanedHtml.replace('</head>', `${tags}</head>`)
-    : cleanedHtml;
+    .replace(/<meta[^>]*property=["']og:[^"']+["'][^>]*>/gi, '')
+    .replace(/<meta[^>]*name=["']twitter:[^"']+["'][^>]*>/gi, '');
+
+  // Insert tags before </head> if possible, else before </body>, else at end
+  if (cleanedHtml.includes('</head>')) {
+    return cleanedHtml.replace('</head>', `${tags}</head>`);
+  }
+  if (cleanedHtml.includes('</body>')) {
+    return cleanedHtml.replace('</body>', `${tags}</body>`);
+  }
+  return cleanedHtml + tags;
 }
 
 export async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
