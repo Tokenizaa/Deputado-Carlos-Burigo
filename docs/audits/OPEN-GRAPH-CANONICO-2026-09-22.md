@@ -444,3 +444,57 @@ A validação no domínio público permanece para a Fase 5.
 - `aa6b5c8` — correção das expressões regulares da injeção.
 
 A Fase 2 está encerrada no código. O fechamento completo do ciclo Open Graph continua condicionado às Fases 3, 4 e 5.
+
+
+## 10. FASE 3 — UNIFICAÇÃO DO FRONTEND E CMS
+
+**Status:** CONCLUÍDA em 2026-09-22.
+
+### 10.1 Frontend SEO
+
+`src/components/seo/SEO.tsx` foi alinhado à política definida nas Fases 1 e 2:
+
+- fallback único `/og/carlos-burigo.png`;
+- ausência de configuração global não remove mais `og:image`;
+- imagens relativas são convertidas para URL HTTP/HTTPS absoluta;
+- `og:image:secure_url`, `og:image:type`, `og:image:alt` e Twitter image/alt passaram a seguir a mesma imagem efetiva;
+- `url` recebido pelo componente passou a ser respeitado;
+- canonical e `og:url` usam a URL efetiva;
+- rota raiz foi incluída no mapa client-side;
+- dependências do efeito foram simplificadas para os valores efetivamente utilizados.
+
+### 10.2 CMS / upload de OG
+
+O endpoint existente `/api/admin/og-image` foi mantido, sem criação de novo sistema.
+
+A validação agora confirma:
+
+- multipart/form-data;
+- arquivo real;
+- JPEG ou PNG;
+- limite de 10 MB;
+- assinatura/formato básico compatível com o tipo declarado;
+- dimensões exatamente `1200×630`.
+
+Arquivos que não atendem ao contrato são rejeitados antes do upload ao bucket `og-images`.
+
+### 10.3 Coerência do sistema
+
+A política agora é:
+
+`imagem específica válida → imagem global válida → /og/carlos-burigo.png`
+
+O frontend e o Worker compartilham a mesma regra de fallback. O Worker continua sendo a camada determinante para crawlers, enquanto o SEO client-side mantém a experiência coerente quando o JavaScript é executado.
+
+### 10.4 Limites deliberados
+
+- Os testes de integração da implementação real permanecem para a Fase 4.
+- A inspeção do HTML e da imagem no domínio público permanece para a Fase 5.
+- Não foi criado novo Worker, endpoint paralelo ou sistema adicional de imagens.
+
+### 10.5 Commit da Fase 3
+
+- `eb5a0d5` — alinhamento do SEO client-side;
+- `b9ca837` — validação de dimensões no upload CMS.
+
+A Fase 3 está encerrada no código. O próximo fechamento obrigatório é a Fase 4: testes contra a implementação real.
