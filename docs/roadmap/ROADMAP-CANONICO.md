@@ -115,4 +115,10 @@ Marco: `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`
 
 A Fase 1 consolidou o contrato canônico, a cadeia de fallback, a matriz de rotas, o tratamento de notícias, as falhas conhecidas e a decisão de manter o Worker existente. Nenhuma alteração funcional das fases seguintes foi antecipada.
 
-**Próxima execução:** FASE 2 — IMPLEMENTAÇÃO SERVER-SIDE E FALLBACK.
+**FASE 2 — IMPLEMENTAÇÃO SERVER-SIDE E FALLBACK: CONCLUÍDA**
+
+Execução registrada no documento `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`, com implementação no Worker existente, fallback estático obrigatório, URL absoluta, MIME derivado, tratamento de falhas, rotas institucionais adicionais e resolução de notícias por `?noticia=slug`.
+
+Commits principais: `cf51dd5` e `aa6b5c8`.
+
+**Próxima execução:** FASE 3 — UNIFICAÇÃO DO FRONTEND E CMS.
