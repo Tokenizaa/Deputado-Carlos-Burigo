@@ -38,7 +38,6 @@ export interface SiteSettings {
   social_whatsapp: string;
   seo_default_title: string;
   seo_default_description: string;
-  seo_default_image_url: string;
   privacy_policy_text: string;
   mandate_slogan: string;
   bio_highlights: string[];
@@ -249,7 +248,6 @@ export interface Page {
   description?: string;
   seoTitle?: string;
   seoDescription?: string;
-  ogImageUrl?: string;
   blocks: PageBlock[];
   status: 'rascunho' | 'publicado';
   updatedAt: string;
