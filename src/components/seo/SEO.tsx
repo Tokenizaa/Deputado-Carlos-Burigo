@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { resolveUrl } from '../../lib/url';
 
 const SITE_URL = 'https://www.carlosburigo.com.br';
-const DEFAULT_OG_IMAGE = '/og/carlos-burigo.png';
+const DEFAULT_OG_IMAGE = 'https://deputado-carlos-burigo.olfnetto.workers.dev/og/carlos-burigo.png';
 
 const ROUTE_META: Record<string, { title: string; description: string }> = {
   '/': { title: 'Carlos Búrigo | Portal Institucional', description: 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.' },
@@ -56,7 +56,7 @@ export function SEO(props: { title?: string; description?: string; image?: strin
     };
     const resolvedTitle = title || meta.title;
     const resolvedDescription = description || meta.description;
-    const resolvedImage = resolveUrl(image || settings?.seo_default_image_url, resolveUrl(DEFAULT_OG_IMAGE, SITE_URL + DEFAULT_OG_IMAGE));
+    const resolvedImage = resolveUrl(image || settings?.seo_default_image_url, DEFAULT_OG_IMAGE);
     const canonical = url?.trim() ? resolveUrl(url, SITE_URL + (path === '/' ? '/' : path)) : SITE_URL + (path === '/' ? '/' : path);
 
     document.title = resolvedTitle;
