@@ -199,212 +199,6 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-export function readOpenGraphImageDimensions(bytes: Uint8Array, type: string): { width: number; height: number } | null {
-  if (type === 'image/png') {
-    if (bytes.length < 24 || bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4e || bytes[3] !== 0x47) return null;
-    const width = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(16);
-    const height = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(20);
-    return { width, height };
-  }
-  if (type === 'image/jpeg') {
-    if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) return null;
-    let offset = 2;
-    while (offset + 9 < bytes.length) {
-      if (bytes[offset] !== 0xff) { offset++; continue; }
-      const marker = bytes[offset + 1];
-      offset += 2;
-      if (marker === 0xd8 || marker === 0xd9) continue;
-      if (offset + 2 > bytes.length) return null;
-      const segmentLength = (bytes[offset] << 8) | bytes[offset + 1];
-      if (segmentLength < 2 || offset + segmentLength > bytes.length) return null;
-      const isSof = marker >= 0xc0 && marker <= 0xc3 || marker >= 0xc5 && marker <= 0xc7 || marker >= 0xc9 && marker <= 0xcb || marker >= 0xcd && marker <= 0xcf;
-      if (isSof) {
-        if (segmentLength < 7) return null;
-        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-        return {
-          width: view.getUint16(offset + 5),
-          height: view.getUint16(offset + 3),
-        };
-      }
-      offset += segmentLength;
-    }
-  }
-  return null;
-}
-
-const OPEN_GRAPH_IMAGE_URL = 'https://deputado-carlos-burigo.olfnetto.workers.dev/og/carlos-burigo.png';
-const OPEN_GRAPH_IMAGE_TYPE = 'image/png';
-const OPEN_GRAPH_IMAGE_WIDTH = '1200';
-const OPEN_GRAPH_IMAGE_HEIGHT = '630';
-
-export function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
-  const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
-  if (!image?.trim()) return fallback;
-  try {
-    const resolved = new URL(image.trim(), origin);
-    if (resolved.protocol !== 'http:' && resolved.protocol !== 'https:') return fallback;
-    return resolved.toString();
-  } catch {
-    return fallback;
-  }
-}
-
-export function resolveOpenGraphImageType(imageUrl: string): string {
-  const pathname = new URL(imageUrl).pathname.toLowerCase();
-  if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) return 'image/jpeg';
-  if (pathname.endsWith('.webp')) return 'image/webp';
-  if (pathname.endsWith('.avif')) return 'image/avif';
-  return OPEN_GRAPH_IMAGE_TYPE;
-}
-
-export function buildOpenGraphTags(input: {
-  title: string;
-  description: string;
-  pageUrl: string;
-  image: string;
-  imageType: string;
-}): string {
-  const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return [
-    `<meta property="og:title" content="${esc(input.title)}">`,
-    `<meta property="og:description" content="${esc(input.description)}">`,
-    `<meta property="og:type" content="website">`,
-    `<meta property="og:url" content="${esc(input.pageUrl)}">`,
-    `<meta property="og:locale" content="pt_BR">`,
-    `<meta property="og:image" content="${esc(input.image)}">`,
-    `<meta property="og:image:secure_url" content="${esc(input.image)}">`,
-    `<meta property="og:image:type" content="${esc(input.imageType)}">`,
-    `<meta property="og:image:width" content="${OPEN_GRAPH_IMAGE_WIDTH}">`,
-    `<meta property="og:image:height" content="${OPEN_GRAPH_IMAGE_HEIGHT}">`,
-    `<meta property="og:image:alt" content="${esc(input.title)}">`,
-    `<meta name="twitter:card" content="summary_large_image">`,
-    `<meta name="twitter:title" content="${esc(input.title)}">`,
-    `<meta name="twitter:description" content="${esc(input.description)}">`,
-    `<meta name="twitter:image" content="${esc(input.image)}">`,
-    `<meta name="twitter:image:alt" content="${esc(input.title)}">`,
-  ].join('');
-}
-
-export function applyOpenGraphTags(html: string, tags: string): string {
-  // Remove existing Open Graph and Twitter meta tags
-  const cleanedHtml = html
-    .replace(/<meta[^>]*property=["']og:[^"']+["'][^>]*>/gi, '')
-    .replace(/<meta[^>]*name=["']twitter:[^"']+["'][^>]*>/gi, '');
-
-  // Insert tags before </head> if possible, else before </body>, else at end
-  if (cleanedHtml.includes('</head>')) {
-    return cleanedHtml.replace('</head>', `${tags}</head>`);
-  }
-  if (cleanedHtml.includes('</body>')) {
-    return cleanedHtml.replace('</body>', `${tags}</body>`);
-  }
-  return cleanedHtml + tags;
-}
-
-export async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
-  const html = await response.text();
-  const fallbackImage = new URL(OPEN_GRAPH_IMAGE_URL, url.origin).toString();
-  const fallbackTitle = 'Carlos Búrigo | Portal Institucional';
-  const fallbackDescription = 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.';
-
-  try {
-    let settings: Awaited<ReturnType<typeof getPublicSettings>> = null;
-    try {
-      settings = await getPublicSettings();
-    } catch (error) {
-      console.error('Open Graph settings unavailable; using static defaults', error);
-    }
-    console.log("Open Graph settings:", settings);
-
-    const pathname = url.pathname.replace(/\/+$/, '') || '/';
-    let title = settings?.seoDefaultTitle || fallbackTitle;
-    let description = settings?.seoDefaultDescription || fallbackDescription;
-    let image = resolveOpenGraphImageUrl(settings?.seoDefaultImageUrl, url.origin);
-    console.log("Open Graph image:", image);
-
-    const staticMeta: Record<string, { title: string; description: string }> = {
-      '/': { title, description },
-      '/sobre': { title: 'Sobre Carlos Búrigo | Portal Institucional', description: 'Informações institucionais e perfil público de Carlos Búrigo.' },
-      '/trajetoria': { title: 'Trajetória | Carlos Búrigo', description: 'Trajetória pública e profissional de Carlos Búrigo, organizada em linha do tempo.' },
-      '/atuacao': { title: 'Atuação Parlamentar | Carlos Búrigo', description: 'Consulte proposições, votações, participações e registros da atuação parlamentar.' },
-      '/projetos': { title: 'Proposições | Carlos Búrigo', description: 'Consulte proposições legislativas publicadas no acervo do portal.' },
-      '/votacoes': { title: 'Votações | Carlos Búrigo', description: 'Consulte registros de votações disponíveis no acervo público.' },
-      '/documentos': { title: 'Documentos | Carlos Búrigo', description: 'Acervo público de documentos legislativos e suas fontes.' },
-      '/resultados': { title: 'Resultados e pautas | Carlos Búrigo', description: 'Resultados documentados e vinculados a proposições legislativas publicadas.' },
-      '/noticias': { title: 'Notícias | Carlos Búrigo', description: 'Notícias e informações recentes publicadas no portal institucional.' },
-      '/agenda': { title: 'Agenda | Carlos Búrigo', description: 'Agenda pública e compromissos disponíveis no portal institucional.' },
-      '/municipios': { title: 'Municípios | Carlos Búrigo', description: 'Informações públicas relacionadas aos municípios disponíveis no portal.' },
-      '/videos': { title: 'Vídeos | Carlos Búrigo', description: 'Vídeos publicados no portal institucional.' },
-      '/contato': { title: 'Fale com o Deputado | Carlos Búrigo', description: 'Canal institucional para enviar solicitações, mensagens e demandas ao gabinete.' },
-      '/transparencia': { title: 'Transparência | Carlos Búrigo', description: 'Informações sobre transparência, fontes, critérios de publicação e documentos públicos.' },
-      '/acessibilidade': { title: 'Acessibilidade | Carlos Búrigo', description: 'Recursos e informações de acessibilidade do portal institucional.' },
-      '/privacidade': { title: 'Privacidade | Carlos Búrigo', description: 'Informações sobre privacidade e tratamento de dados no portal.' },
-    };
-
-    if (staticMeta[pathname]) {
-      title = staticMeta[pathname].title;
-      description = staticMeta[pathname].description;
-    }
-
-    if (pathname === '/noticias') {
-      const newsSlug = url.searchParams.get('noticia')?.trim();
-      if (newsSlug) {
-        try {
-          const news = (await getPublicNews()).find((item) => item.slug === newsSlug);
-          if (news) {
-            title = news.seoTitle || news.title;
-            description = news.seoDescription || news.summary || description;
-            image = resolveOpenGraphImageUrl(news.socialImage || news.mainImage || image, url.origin);
-          }
-        } catch (error) {
-          console.error('Open Graph news metadata unavailable; using route defaults', error);
-        }
-      }
-    } else if (!staticMeta[pathname]) {
-      try {
-        const pages = await getPublicPages(pathname.replace(/^\//, ''));
-        const page = pages[0];
-        if (page) {
-          title = page.seoTitle || page.title;
-          description = page.seoDescription || page.description || description;
-          image = resolveOpenGraphImageUrl(page.ogImageUrl || image, url.origin);
-        }
-      } catch (error) {
-        console.error('Open Graph page metadata unavailable; using route defaults', error);
-      }
-    }
-
-    const tags = buildOpenGraphTags({
-      title,
-      description,
-      pageUrl: url.toString(),
-      image,
-      imageType: resolveOpenGraphImageType(image),
-    });
-    const patched = applyOpenGraphTags(html, tags);
-    const headers = new Headers(response.headers);
-    headers.set('Content-Type', 'text/html; charset=UTF-8');
-    return new Response(patched, { status: response.status, statusText: response.statusText, headers });
-  } catch (error) {
-    console.log("Entering Open Graph catch block");
-    console.error('[open-graph]', error);
-    const tags = buildOpenGraphTags({
-      title: fallbackTitle,
-      description: fallbackDescription,
-      pageUrl: url.toString(),
-      image: fallbackImage,
-      imageType: OPEN_GRAPH_IMAGE_TYPE,
-    });
-    const headers = new Headers(response.headers);
-    headers.set('Content-Type', 'text/html; charset=UTF-8');
-    return new Response(applyOpenGraphTags(html, tags), {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
-  }
-}
-
 let runtimeEnv: Env | null = null;
 
 const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
@@ -648,47 +442,6 @@ if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 
     } catch (error) {
       console.error('[api/settings PUT]', error);
       return Response.json({ error: error?.message || 'Falha ao atualizar configurações' }, { status: 400 });
-    }
-  },
-  '/api/admin/og-image': async (request) => {
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) return authResult;
-    if (request.method !== 'POST') return methodNotAllowed();
-    if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings')) && !(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
-    try {
-      // Defensive: formData() throws TypeError when body is empty or not
-      // multipart/form-data (e.g. JSON/axios), leaking the engine message into
-      // the 400. Cheap content-type guard keeps the contract (400) with a
-      // clean, stable error.
-      const contentType = request.headers.get('content-type') ?? '';
-      if (!contentType.includes('multipart/form-data')) {
-        return Response.json({ error: 'Envie o arquivo de imagem como multipart/form-data' }, { status: 400 });
-      }
-      const form = await request.formData();
-      const file = form.get('file');
-      if (!(file instanceof File)) return Response.json({ error: 'Arquivo de imagem é obrigatório' }, { status: 400 });
-      if (!['image/jpeg','image/png'].includes(file.type)) return Response.json({ error: 'Use uma imagem JPEG ou PNG' }, { status: 400 });
-      if (file.size > 10 * 1024 * 1024) return Response.json({ error: 'A imagem deve ter no máximo 10 MB' }, { status: 400 });
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const dimensions = readOpenGraphImageDimensions(bytes, file.type);
-      if (!dimensions) return Response.json({ error: 'Não foi possível validar a imagem JPEG/PNG enviada' }, { status: 400 });
-      if (dimensions.width !== 1200 || dimensions.height !== 630) {
-        return Response.json({ error: 'A imagem Open Graph deve ter exatamente 1200×630 pixels' }, { status: 400 });
-      }
-      const extension = file.type === 'image/png' ? 'png' : 'jpg';
-      const storagePath = `site/${crypto.randomUUID()}.${extension}`;
-      const { error } = await supabaseAdmin.storage.from('og-images').upload(storagePath, file, {
-        contentType: file.type,
-        upsert: false,
-        cacheControl: '3600',
-      });
-      if (error) throw error;
-      const baseUrl = runtimeEnv?.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co';
-      const url = new URL(`/storage/v1/object/public/og-images/${storagePath}`, baseUrl).toString();
-      return Response.json({ url, storagePath });
-    } catch (error) {
-      console.error('[api/admin/og-image]', error);
-      return Response.json({ error: error?.message || 'Falha ao enviar imagem Open Graph' }, { status: 400 });
     }
   },
   '/api/results': async (request) => {
@@ -1680,7 +1433,6 @@ export default {
         else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = null;
         else if (url.pathname === '/api/admin/upload') requiredRoles = null;
         else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = null;
-        else if (url.pathname === '/api/admin/og-image') requiredRoles = null;
 
         if (requiredRoles !== null) {
           if (requiredRoles.length === 0) {
@@ -1701,9 +1453,6 @@ export default {
       response = await env.ASSETS.fetch(request);
       const contentType = response.headers.get('content-type') || '';
       isHtml = contentType.includes('text/html');
-      if (isHtml) {
-        response = await injectOpenGraphMetadata(response, url);
-      }
     }
     
     // Apply security headers to all responses
