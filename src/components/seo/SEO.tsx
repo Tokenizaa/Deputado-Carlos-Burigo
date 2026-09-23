@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { resolveUrl } from '../../lib/url';
 
 const SITE_URL = 'https://www.carlosburigo.com.br';
 const DEFAULT_OG_IMAGE = '/og/carlos-burigo.png';
