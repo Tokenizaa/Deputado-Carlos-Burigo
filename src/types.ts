@@ -263,7 +263,6 @@ export interface PageVersion {
   title: string;
   seoTitle?: string;
   seoDescription?: string;
-  ogImageUrl?: string;
   savedAt: string;
   savedBy: string;
   status: 'draft' | 'published';
