@@ -276,3 +276,98 @@ A conclusão exige três níveis:
 **Código → Testes → Produção**
 
 Somente os três níveis aprovados encerram o plano.
+
+
+## 8. FASE 1 — EXECUÇÃO CONCLUÍDA
+
+**Status:** CONCLUÍDA em 2026-09-22.
+
+### 8.1 Fontes auditadas
+
+Foram confrontadas diretamente no código atual:
+
+- `index.html`;
+- `src/worker.ts`;
+- `src/components/seo/SEO.tsx`;
+- `tests/unit/open-graph-image.test.ts`;
+- modelo/configuração pública de SEO no Supabase;
+- páginas públicas/CMS e seus campos OG;
+- asset `public/og/carlos-burigo.png`;
+- bucket `og-images`;
+- histórico de alterações relacionadas a OG.
+
+### 8.2 Contrato canônico definido
+
+O contrato server-side passa a ser:
+
+| Campo | Regra |
+|---|---|
+| `og:title` | título específico da página/conteúdo; fallback para título institucional |
+| `og:description` | descrição específica; fallback para descrição institucional |
+| `og:type` | `website` no escopo atual |
+| `og:url` | URL canônica da requisição |
+| `og:locale` | `pt_BR` |
+| `og:image` | URL absoluta resolvida pela cadeia canônica |
+| `og:image:secure_url` | acompanhar a imagem quando aplicável |
+| `og:image:type` | corresponder ao tipo real da imagem |
+| `og:image:width` | dimensão real/canônica da imagem |
+| `og:image:height` | dimensão real/canônica da imagem |
+| `og:image:alt` | texto alternativo coerente com o conteúdo |
+| `twitter:card` | `summary_large_image` |
+| `twitter:title` | mesmo título efetivo |
+| `twitter:description` | mesma descrição efetiva |
+| `twitter:image` | mesma imagem efetiva |
+| `twitter:image:alt` | mesmo texto alternativo |
+
+### 8.3 Precedência canônica
+
+A resolução ficou definida como:
+
+**conteúdo específico válido → configuração global válida → asset estático obrigatório**
+
+Asset estático obrigatório:
+
+`/og/carlos-burigo.png`
+
+O asset atual é 1200×630 PNG.
+
+### 8.4 Matriz de rotas
+
+**Rotas institucionais conhecidas pelo Worker:** `/`, `/sobre`, `/trajetoria`, `/atuacao`, `/projetos`, `/votacoes`, `/documentos`, `/resultados`, `/noticias`, `/agenda`, `/municipios`, `/videos`, `/contato`.
+
+**Rotas adicionais conhecidas pelo SEO client-side:** `/transparencia`, `/acessibilidade`, `/privacidade`.
+
+**CMS:** páginas publicadas devem poder fornecer título, descrição e imagem próprios.
+
+**Notícias:** a aplicação usa `/noticias?noticia=slug`; portanto a identificação do conteúdo precisa considerar a query string, e não somente `pathname`.
+
+### 8.5 Falhas e comportamento obrigatório
+
+1. Falha ao consultar configurações públicas não pode eliminar o OG.
+2. Ausência de imagem configurada não pode eliminar o OG.
+3. URL relativa deve ser convertida para absoluta.
+4. URL inválida deve cair no asset estático.
+5. Imagem específica deve prevalecer apenas quando válida.
+6. O tipo declarado não pode permanecer fixo como PNG se a imagem efetiva for JPEG.
+7. Uma exceção na construção do OG não deve devolver uma página HTML sem a garantia mínima de imagem.
+8. O cliente não pode ser a única camada responsável por OG.
+
+### 8.6 Divergências registradas para execução posterior
+
+- `index.html` não é autossuficiente em OG e depende da injeção do Worker.
+- `SEO.tsx` usa regras próprias e remove `og:image` quando não há configuração.
+- `SEO.tsx` recebe `props.url`, mas atualmente constrói a canonical a partir da rota atual.
+- Worker e SEO client-side possuem conjuntos de rotas diferentes.
+- Worker trata notícias principalmente pelo pathname e não pelo slug da query.
+- Worker declara `image/png` independentemente do tipo efetivo da imagem.
+- O teste atual de imagem referencia o caminho legado `/assets/carlos_burigo_portrait.png` e replica a função de produção em vez de testá-la.
+- A configuração global atual não possui imagem cadastrada; o fallback estático é, portanto, a fonte efetiva.
+- O bucket `og-images` está sem objetos no estado auditado.
+
+### 8.7 Decisão arquitetural da Fase 1
+
+**Não criar novo Worker.**
+
+A implementação seguirá no Worker existente, com uma cadeia única de resolução e testes sobre a saída real.
+
+A Fase 1 está encerrada. Nenhuma alteração funcional foi antecipada para a Fase 2.
