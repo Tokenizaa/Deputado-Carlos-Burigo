@@ -121,4 +121,10 @@ Execução registrada no documento `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.m
 
 Commits principais: `cf51dd5` e `aa6b5c8`.
 
-**Próxima execução:** FASE 3 — UNIFICAÇÃO DO FRONTEND E CMS.
+**FASE 3 — UNIFICAÇÃO DO FRONTEND E CMS: CONCLUÍDA**
+
+Execução registrada em `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`. O SEO client-side agora usa o fallback canônico, respeita `url`, mantém imagem mesmo sem configuração global e o CMS valida JPEG/PNG e dimensões exatas de 1200×630 antes do upload.
+
+Commits: `eb5a0d5` e `b9ca837`.
+
+**Próxima execução:** FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA.
