@@ -371,3 +371,76 @@ O asset atual é 1200×630 PNG.
 A implementação seguirá no Worker existente, com uma cadeia única de resolução e testes sobre a saída real.
 
 A Fase 1 está encerrada. Nenhuma alteração funcional foi antecipada para a Fase 2.
+
+
+## 9. FASE 2 — IMPLEMENTAÇÃO SERVER-SIDE E FALLBACK
+
+**Status:** CONCLUÍDA em 2026-09-22.
+
+### 9.1 Implementação executada
+
+O Worker existente foi ajustado sem criação de nova camada ou novo Worker.
+
+Alterações em `src/worker.ts`:
+
+- centralização das constantes do asset canônico:
+  - `/og/carlos-burigo.png`;
+  - `image/png`;
+  - `1200×630`;
+- resolução de imagem aceita somente URLs HTTP/HTTPS;
+- URL relativa é convertida para absoluta usando a origem da requisição;
+- URL ausente ou inválida retorna obrigatoriamente ao asset estático;
+- tipo MIME declarado passou a ser derivado da extensão efetiva da URL para JPEG/PNG/WebP/AVIF, em vez de permanecer sempre como PNG;
+- geração dos campos OG/Twitter foi centralizada em helper único;
+- limpeza dos metadados anteriores permanece antes da injeção;
+- falha de `getPublicSettings()` mantém o fallback institucional;
+- falha de leitura de página CMS não elimina os metadados da rota;
+- falha de leitura de notícia não elimina os metadados da rota;
+- exceção final na construção do OG agora reconstrói o HTML usando o fallback estático, em vez de devolver o HTML original sem garantia de OG;
+- rotas institucionais adicionais `/transparencia`, `/acessibilidade` e `/privacidade` foram incorporadas ao mapa server-side;
+- notícias em `/noticias?noticia=slug` passaram a ser resolvidas pelo slug publicado;
+- título, descrição e imagem social específicos da notícia passam a prevalecer sobre o padrão da rota quando disponíveis.
+
+### 9.2 Cadeia efetiva
+
+`conteúdo específico válido → configuração global válida → /og/carlos-burigo.png`
+
+A cadeia é aplicada no Worker antes da entrega do HTML ao crawler.
+
+### 9.3 Garantia de saída
+
+A injeção passou a trabalhar sobre o texto HTML já carregado em memória. Assim, uma falha posterior de configuração ou consulta de conteúdo não consome o body e não força o retorno do documento original sem OG.
+
+O fallback final garante:
+
+- `og:title`;
+- `og:description`;
+- `og:type`;
+- `og:url`;
+- `og:locale`;
+- `og:image` absoluto;
+- `og:image:secure_url`;
+- `og:image:type`;
+- `og:image:width`;
+- `og:image:height`;
+- `og:image:alt`;
+- `twitter:card`;
+- `twitter:title`;
+- `twitter:description`;
+- `twitter:image`;
+- `twitter:image:alt`.
+
+### 9.4 Limite deliberado desta fase
+
+A validação estrutural de uploads do CMS e o alinhamento do `SEO.tsx` permanecem para a Fase 3.
+
+A substituição do teste legado por testes da implementação real permanece para a Fase 4.
+
+A validação no domínio público permanece para a Fase 5.
+
+### 9.5 Commits da Fase 2
+
+- `cf51dd5` — implementação server-side inicial;
+- `aa6b5c8` — correção das expressões regulares da injeção.
+
+A Fase 2 está encerrada no código. O fechamento completo do ciclo Open Graph continua condicionado às Fases 3, 4 e 5.
