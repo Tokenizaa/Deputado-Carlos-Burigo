@@ -15,7 +15,7 @@ type PageInput = {
 
 const PAGE_COLUMNS = 'id,title,slug,description,seo_title,seo_description,status,updated_by,updated_at,created_at';
 const BLOCK_COLUMNS = 'id,page_id,type,title,subtitle,content,visible,active,position,created_at,updated_at';
-const VERSION_COLUMNS = 'id,page_id,version_number,title,blocks,seo_title,seo_description,og_image_url,saved_by,status,note,created_at';
+const VERSION_COLUMNS = 'id,page_id,version_number,title,blocks,seo_title,seo_description,saved_by,status,note,created_at';
 
 function toBlock(row: any): PageBlock {
   return {
@@ -60,7 +60,6 @@ async function hydratePage(page: any): Promise<Page> {
     description: page.description ?? undefined,
     seoTitle: page.seo_title ?? undefined,
     seoDescription: page.seo_description ?? undefined,
-    ogImageUrl: page.og_image_url ?? undefined,
     blocks: (blocks ?? []).map(toBlock),
     status: page.status,
     updatedAt: page.updated_at,
@@ -214,7 +213,6 @@ export async function rollbackAdminPage(pageId: string, versionId: string): Prom
     title: version.title,
     seo_title: version.seo_title ?? null,
     seo_description: version.seo_description ?? null,
-    og_image_url: version.og_image_url ?? null,
     status: version.status === 'published' ? 'publicado' : 'rascunho',
   }).eq('id', pageId).select(PAGE_COLUMNS).single();
   if (error) throw error;
