@@ -153,7 +153,6 @@ export const Navbar: React.FC = () => {
             </div>
           </nav>
 
-/div>
         </div>
       </div>
     </header>
