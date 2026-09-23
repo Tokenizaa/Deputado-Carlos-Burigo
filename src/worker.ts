@@ -200,18 +200,73 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
 }
 
 const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
+const OPEN_GRAPH_IMAGE_TYPE = 'image/png';
+const OPEN_GRAPH_IMAGE_WIDTH = '1200';
+const OPEN_GRAPH_IMAGE_HEIGHT = '630';
 
 function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
   if (!image?.trim()) return fallback;
   try {
-    return new URL(image.trim(), origin).toString();
+    const resolved = new URL(image.trim(), origin);
+    if (resolved.protocol !== 'http:' && resolved.protocol !== 'https:') return fallback;
+    return resolved.toString();
   } catch {
     return fallback;
   }
 }
 
+function resolveOpenGraphImageType(imageUrl: string): string {
+  const pathname = new URL(imageUrl).pathname.toLowerCase();
+  if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) return 'image/jpeg';
+  if (pathname.endsWith('.webp')) return 'image/webp';
+  if (pathname.endsWith('.avif')) return 'image/avif';
+  return OPEN_GRAPH_IMAGE_TYPE;
+}
+
+function buildOpenGraphTags(input: {
+  title: string;
+  description: string;
+  pageUrl: string;
+  image: string;
+  imageType: string;
+}): string {
+  const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return [
+    `<meta property="og:title" content="${esc(input.title)}">`,
+    `<meta property="og:description" content="${esc(input.description)}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:url" content="${esc(input.pageUrl)}">`,
+    `<meta property="og:locale" content="pt_BR">`,
+    `<meta property="og:image" content="${esc(input.image)}">`,
+    `<meta property="og:image:secure_url" content="${esc(input.image)}">`,
+    `<meta property="og:image:type" content="${esc(input.imageType)}">`,
+    `<meta property="og:image:width" content="${OPEN_GRAPH_IMAGE_WIDTH}">`,
+    `<meta property="og:image:height" content="${OPEN_GRAPH_IMAGE_HEIGHT}">`,
+    `<meta property="og:image:alt" content="${esc(input.title)}">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:title" content="${esc(input.title)}">`,
+    `<meta name="twitter:description" content="${esc(input.description)}">`,
+    `<meta name="twitter:image" content="${esc(input.image)}">`,
+    `<meta name="twitter:image:alt" content="${esc(input.title)}">`,
+  ].join('');
+}
+
+function applyOpenGraphTags(html: string, tags: string): string {
+  const cleanedHtml = html
+    .replace(/<meta\\s+property=["']og:[^"']+["'][^>]*>\\s*/gi, '')
+    .replace(/<meta\\s+name=["']twitter:[^"']+["'][^>]*>\\s*/gi, '');
+  return cleanedHtml.includes('</head>')
+    ? cleanedHtml.replace('</head>', `${tags}</head>`)
+    : cleanedHtml;
+}
+
 async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
+  const html = await response.text();
+  const fallbackImage = new URL(OPEN_GRAPH_IMAGE_URL, url.origin).toString();
+  const fallbackTitle = 'Carlos Búrigo | Portal Institucional';
+  const fallbackDescription = 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.';
+
   try {
     let settings: Awaited<ReturnType<typeof getPublicSettings>> = null;
     try {
@@ -219,11 +274,11 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
     } catch (error) {
       console.error('Open Graph settings unavailable; using static defaults', error);
     }
-    const pathname = url.pathname.replace(/\/+$/, '') || '/';
-    let title = settings?.seoDefaultTitle || 'Carlos Búrigo | Portal Institucional';
-    let description = settings?.seoDefaultDescription || '';
+
+    const pathname = url.pathname.replace(/\\/+$/, '') || '/';
+    let title = settings?.seoDefaultTitle || fallbackTitle;
+    let description = settings?.seoDefaultDescription || fallbackDescription;
     let image = resolveOpenGraphImageUrl(settings?.seoDefaultImageUrl, url.origin);
-    let pageUrl = url.toString();
 
     const staticMeta: Record<string, { title: string; description: string }> = {
       '/': { title, description },
@@ -239,49 +294,71 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       '/municipios': { title: 'Municípios | Carlos Búrigo', description: 'Informações públicas relacionadas aos municípios disponíveis no portal.' },
       '/videos': { title: 'Vídeos | Carlos Búrigo', description: 'Vídeos publicados no portal institucional.' },
       '/contato': { title: 'Fale com o Deputado | Carlos Búrigo', description: 'Canal institucional para enviar solicitações, mensagens e demandas ao gabinete.' },
+      '/transparencia': { title: 'Transparência | Carlos Búrigo', description: 'Informações sobre transparência, fontes, critérios de publicação e documentos públicos.' },
+      '/acessibilidade': { title: 'Acessibilidade | Carlos Búrigo', description: 'Recursos e informações de acessibilidade do portal institucional.' },
+      '/privacidade': { title: 'Privacidade | Carlos Búrigo', description: 'Informações sobre privacidade e tratamento de dados no portal.' },
     };
+
     if (staticMeta[pathname]) {
       title = staticMeta[pathname].title;
       description = staticMeta[pathname].description;
-    } else {
-      const pages = await getPublicPages(pathname.replace(/^\//, ''));
-      const page = pages[0];
-      if (page) {
-        title = page.seoTitle || page.title;
-        description = page.seoDescription || page.description || description;
-        image = resolveOpenGraphImageUrl(page.ogImageUrl || image, url.origin);
+    }
+
+    if (pathname === '/noticias') {
+      const newsSlug = url.searchParams.get('noticia')?.trim();
+      if (newsSlug) {
+        try {
+          const news = (await getPublicNews()).find((item) => item.slug === newsSlug);
+          if (news) {
+            title = news.seoTitle || news.title;
+            description = news.seoDescription || news.summary || description;
+            image = resolveOpenGraphImageUrl(news.socialImage || news.mainImage || image, url.origin);
+          }
+        } catch (error) {
+          console.error('Open Graph news metadata unavailable; using route defaults', error);
+        }
+      }
+    } else if (!staticMeta[pathname]) {
+      try {
+        const pages = await getPublicPages(pathname.replace(/^\\//, ''));
+        const page = pages[0];
+        if (page) {
+          title = page.seoTitle || page.title;
+          description = page.seoDescription || page.description || description;
+          image = resolveOpenGraphImageUrl(page.ogImageUrl || image, url.origin);
+        }
+      } catch (error) {
+        console.error('Open Graph page metadata unavailable; using route defaults', error);
       }
     }
-    const html = await response.text();
-    const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const tags = [
-      `<meta property="og:title" content="${esc(title)}">`,
-      `<meta property="og:description" content="${esc(description)}">`,
-      `<meta property="og:type" content="website">`,
-      `<meta property="og:url" content="${esc(pageUrl)}">`,
-      `<meta property="og:locale" content="pt_BR">`,
-      `<meta property="og:image" content="${esc(image)}">`,
-      `<meta property="og:image:secure_url" content="${esc(image)}">`,
-      `<meta property="og:image:type" content="image/png">`,
-      `<meta property="og:image:width" content="1200">`,
-      `<meta property="og:image:height" content="630">`,
-      `<meta property="og:image:alt" content="${esc(title)}">`,
-      `<meta name="twitter:card" content="summary_large_image">`,
-      `<meta name="twitter:title" content="${esc(title)}">`,
-      `<meta name="twitter:description" content="${esc(description)}">`,
-      `<meta name="twitter:image" content="${esc(image)}">`,
-      `<meta name="twitter:image:alt" content="${esc(title)}">`,
-    ].join('');
-    const cleanedHtml = html
-      .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, '')
-      .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '');
-    const patched = cleanedHtml.replace('</head>', `${tags}</head>`);
+
+    const tags = buildOpenGraphTags({
+      title,
+      description,
+      pageUrl: url.toString(),
+      image,
+      imageType: resolveOpenGraphImageType(image),
+    });
+    const patched = applyOpenGraphTags(html, tags);
     const headers = new Headers(response.headers);
     headers.set('Content-Type', 'text/html; charset=UTF-8');
     return new Response(patched, { status: response.status, statusText: response.statusText, headers });
   } catch (error) {
     console.error('[open-graph]', error);
-    return response;
+    const tags = buildOpenGraphTags({
+      title: fallbackTitle,
+      description: fallbackDescription,
+      pageUrl: url.toString(),
+      image: fallbackImage,
+      imageType: OPEN_GRAPH_IMAGE_TYPE,
+    });
+    const headers = new Headers(response.headers);
+    headers.set('Content-Type', 'text/html; charset=UTF-8');
+    return new Response(applyOpenGraphTags(html, tags), {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   }
 }
 
