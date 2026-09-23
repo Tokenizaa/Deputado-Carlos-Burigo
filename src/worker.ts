@@ -564,7 +564,7 @@ if (request.method === 'DELETE') {
     if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create')) && !(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     if (request.method !== 'POST') return methodNotAllowed();
     try {
-      // Defensive: same empty-body/JSON guard as /api/admin/og-image — keeps
+      // Defensive: keep the 400 contract stable instead of surfacing a TypeError leak.
       // the 400 contract stable instead of surfacing a TypeError leak.
       const contentType = request.headers.get('content-type') ?? '';
       if (!contentType.includes('multipart/form-data')) {
