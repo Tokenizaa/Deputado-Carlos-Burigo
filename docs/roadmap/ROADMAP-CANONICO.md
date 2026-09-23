@@ -127,10 +127,12 @@ Execução registrada em `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`. O SEO 
 
 Commits: `eb5a0d5` e `b9ca837`.
 
-**FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA: EM EXECUÇÃO**
+**FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA: CONCLUÍDA**
 
-Implementação registrada em `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`: o teste legado foi substituído por testes que importam a implementação real do Worker, incluindo fallback, conteúdo específico, notícia, MIME, dimensões, falhas e asset físico. Também foi configurado o workflow `.github/workflows/open-graph-validation.yml` para lint, teste unitário OG e build.
+Implementação e execução registradas em docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md: o teste legado foi substituído por testes que importam a implementação real do Worker, incluindo fallback, conteúdo específico, notícia, MIME, dimensões, falhas e asset físico. O workflow .github/workflows/open-graph-validation.yml também foi configurado.
 
-**Pendência objetiva:** obter evidência de execução bem-sucedida de lint, teste e build. O conector GitHub disponível não retornou workflow run para os commits desta rodada.
+Evidência local de 2026-09-22: lint sem erros; typecheck sem erros; build concluído; suíte unitária com **6 arquivos e 55 testes aprovados**; asset físico confirmado como PNG 1200×630.
 
-**Próximo passo após a evidência:** FASE 5 — VALIDAÇÃO REAL EM PRODUÇÃO E ENCERRAMENTO.
+Observação: o ambiente local reportou 6 vulnerabilidades de dependências e um aviso de chunks acima de 500 kB no build. Nenhum deles causou falha da validação de Open Graph e nenhum foi alterado nesta fase.
+
+**Próximo passo:** FASE 5 — VALIDAÇÃO REAL EM PRODUÇÃO E ENCERRAMENTO.
