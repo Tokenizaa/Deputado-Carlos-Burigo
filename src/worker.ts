@@ -199,7 +199,7 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
-function readOpenGraphImageDimensions(bytes: Uint8Array, type: string): { width: number; height: number } | null {
+export function readOpenGraphImageDimensions(bytes: Uint8Array, type: string): { width: number; height: number } | null {
   if (type === 'image/png') {
     if (bytes.length < 24 || bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4e || bytes[3] !== 0x47) return null;
     const width = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(16);
@@ -237,7 +237,7 @@ const OPEN_GRAPH_IMAGE_TYPE = 'image/png';
 const OPEN_GRAPH_IMAGE_WIDTH = '1200';
 const OPEN_GRAPH_IMAGE_HEIGHT = '630';
 
-function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
+export function resolveOpenGraphImageUrl(image: string | null | undefined, origin: string): string {
   const fallback = new URL(OPEN_GRAPH_IMAGE_URL, origin).toString();
   if (!image?.trim()) return fallback;
   try {
@@ -249,7 +249,7 @@ function resolveOpenGraphImageUrl(image: string | null | undefined, origin: stri
   }
 }
 
-function resolveOpenGraphImageType(imageUrl: string): string {
+export function resolveOpenGraphImageType(imageUrl: string): string {
   const pathname = new URL(imageUrl).pathname.toLowerCase();
   if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) return 'image/jpeg';
   if (pathname.endsWith('.webp')) return 'image/webp';
@@ -257,7 +257,7 @@ function resolveOpenGraphImageType(imageUrl: string): string {
   return OPEN_GRAPH_IMAGE_TYPE;
 }
 
-function buildOpenGraphTags(input: {
+export function buildOpenGraphTags(input: {
   title: string;
   description: string;
   pageUrl: string;
@@ -285,7 +285,7 @@ function buildOpenGraphTags(input: {
   ].join('');
 }
 
-function applyOpenGraphTags(html: string, tags: string): string {
+export function applyOpenGraphTags(html: string, tags: string): string {
   const cleanedHtml = html
     .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, '')
     .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '');
@@ -294,7 +294,7 @@ function applyOpenGraphTags(html: string, tags: string): string {
     : cleanedHtml;
 }
 
-async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
+export async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Response> {
   const html = await response.text();
   const fallbackImage = new URL(OPEN_GRAPH_IMAGE_URL, url.origin).toString();
   const fallbackTitle = 'Carlos Búrigo | Portal Institucional';
