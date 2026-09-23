@@ -60,7 +60,6 @@ interface AppContextType {
       description?: string;
       seoTitle?: string;
       seoDescription?: string;
-      ogImageUrl?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
@@ -72,7 +71,6 @@ interface AppContextType {
     description?: string;
     seoTitle?: string;
     seoDescription?: string;
-    ogImageUrl?: string;
     status?: 'publicado' | 'rascunho';
     blocks?: PageBlock[];
     publish?: boolean;
