@@ -7,14 +7,13 @@ type PageInput = {
   description?: string;
   seoTitle?: string;
   seoDescription?: string;
-  ogImageUrl?: string;
   status?: 'publicado' | 'rascunho';
   blocks?: PageBlock[];
   publish?: boolean;
   note?: string;
 };
 
-const PAGE_COLUMNS = 'id,title,slug,description,seo_title,seo_description,og_image_url,status,updated_by,updated_at,created_at';
+const PAGE_COLUMNS = 'id,title,slug,description,seo_title,seo_description,status,updated_by,updated_at,created_at';
 const BLOCK_COLUMNS = 'id,page_id,type,title,subtitle,content,visible,active,position,created_at,updated_at';
 const VERSION_COLUMNS = 'id,page_id,version_number,title,blocks,seo_title,seo_description,og_image_url,saved_by,status,note,created_at';
 
@@ -40,7 +39,6 @@ function toVersion(row: any): PageVersion {
     blocks: Array.isArray(row.blocks) ? row.blocks : [],
     seoTitle: row.seo_title ?? undefined,
     seoDescription: row.seo_description ?? undefined,
-    ogImageUrl: row.og_image_url ?? undefined,
     savedAt: row.created_at,
     savedBy: row.saved_by ?? '',
     status: (row.status === 'published' ? 'published' : 'draft'),
@@ -151,7 +149,6 @@ async function saveVersion(page: Page, note?: string) {
     blocks: page.blocks,
     seo_title: page.seoTitle ?? null,
     seo_description: page.seoDescription ?? null,
-    og_image_url: page.ogImageUrl ?? null,
     saved_by: null,
     status: page.status === 'publicado' ? 'published' : 'draft',
     note: note ?? null,
@@ -170,7 +167,6 @@ export async function createAdminPage(input: PageInput): Promise<Page> {
     description: input.description?.trim() || null,
     seo_title: input.seoTitle?.trim() || null,
     seo_description: input.seoDescription?.trim() || null,
-    og_image_url: input.ogImageUrl?.trim() || null,
     status: input.publish ? 'publicado' : (input.status ?? 'rascunho'),
   }).select(PAGE_COLUMNS).single();
   if (error) throw error;
@@ -196,7 +192,6 @@ export async function updateAdminPage(id: string, input: PageInput): Promise<Pag
     description: input.description !== undefined ? input.description.trim() : current.description ?? null,
     seo_title: input.seoTitle !== undefined ? input.seoTitle.trim() || null : current.seoTitle ?? null,
     seo_description: input.seoDescription !== undefined ? input.seoDescription.trim() || null : current.seoDescription ?? null,
-    og_image_url: input.ogImageUrl !== undefined ? input.ogImageUrl.trim() || null : current.ogImageUrl ?? null,
     status,
   }).eq('id', id).select(PAGE_COLUMNS).single();
   if (error) throw error;
