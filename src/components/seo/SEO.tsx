@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 
 const SITE_URL = 'https://www.carlosburigo.com.br';
+const DEFAULT_OG_IMAGE = '/og/carlos-burigo.png';
 
 const ROUTE_META: Record<string, { title: string; description: string }> = {
+  '/': { title: 'Carlos Búrigo | Portal Institucional', description: 'Portal institucional de Carlos Búrigo com informações públicas, atuação parlamentar, notícias, agenda e documentos.' },
   '/sobre': { title: 'Sobre Carlos Búrigo | Portal Institucional', description: 'Informações institucionais e perfil público de Carlos Búrigo.' },
   '/trajetoria': { title: 'Trajetória | Carlos Búrigo', description: 'Trajetória pública e profissional de Carlos Búrigo, organizada em linha do tempo.' },
   '/atuacao': { title: 'Atuação Parlamentar | Carlos Búrigo', description: 'Consulte proposições, votações, participações e registros da atuação parlamentar.' },
@@ -53,8 +55,8 @@ export function SEO(props: { title?: string; description?: string; image?: strin
     };
     const resolvedTitle = title || meta.title;
     const resolvedDescription = description || meta.description;
-    const resolvedImage = image || settings?.seo_default_image_url || '';
-    const canonical = `${SITE_URL}${path === '/' ? '/' : path}`;
+    const resolvedImage = resolveUrl(image || settings?.seo_default_image_url, resolveUrl(DEFAULT_OG_IMAGE, SITE_URL + DEFAULT_OG_IMAGE));
+    const canonical = url?.trim() ? resolveUrl(url, SITE_URL + (path === '/' ? '/' : path)) : SITE_URL + (path === '/' ? '/' : path);
 
     document.title = resolvedTitle;
     ensureMeta('name', 'description', resolvedDescription);
@@ -63,15 +65,17 @@ export function SEO(props: { title?: string; description?: string; image?: strin
     ensureMeta('property', 'og:type', 'website');
     ensureMeta('property', 'og:url', canonical);
     ensureMeta('property', 'og:locale', 'pt_BR');
-    if (resolvedImage) ensureMeta('property', 'og:image', resolvedImage);
-    else document.head.querySelector('meta[property="og:image"]')?.remove();
+    ensureMeta('property', 'og:image', resolvedImage);
+    ensureMeta('property', 'og:image:secure_url', resolvedImage);
+    ensureMeta('property', 'og:image:type', resolvedImage.toLowerCase().match(/\.(jpe?g)(?:[?#]|$)/) ? 'image/jpeg' : 'image/png');
     ensureMeta('property', 'og:image:width', '1200');
     ensureMeta('property', 'og:image:height', '630');
+    ensureMeta('property', 'og:image:alt', resolvedTitle);
     ensureMeta('name', 'twitter:card', 'summary_large_image');
     ensureMeta('name', 'twitter:title', resolvedTitle);
     ensureMeta('name', 'twitter:description', resolvedDescription);
-    if (resolvedImage) ensureMeta('name', 'twitter:image', resolvedImage);
-    else document.head.querySelector('meta[name="twitter:image"]')?.remove();
+    ensureMeta('name', 'twitter:image', resolvedImage);
+    ensureMeta('name', 'twitter:image:alt', resolvedTitle);
     ensureLink('canonical', canonical);
 
     const existing = document.head.querySelector<HTMLScriptElement>('script[data-structured-data="portal"]');
@@ -90,7 +94,7 @@ export function SEO(props: { title?: string; description?: string; image?: strin
     } else if (existing) {
       existing.remove();
     }
-  }, [currentView, settings, props.title, props.description, props.image, props.url]);
+  }, [currentView, settings, title, description, image, url]);
 
   return null;
 }
