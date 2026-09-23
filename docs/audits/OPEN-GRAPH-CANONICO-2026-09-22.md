@@ -498,3 +498,75 @@ O frontend e o Worker compartilham a mesma regra de fallback. O Worker continua 
 - `b9ca837` — validação de dimensões no upload CMS.
 
 A Fase 3 está encerrada no código. O próximo fechamento obrigatório é a Fase 4: testes contra a implementação real.
+
+
+## 11. FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA
+
+**Status:** EM EXECUÇÃO — implementação dos testes concluída; execução local/CI dos testes ainda sem evidência disponível em GitHub em 2026-09-22.
+
+### 11.1 Teste legado substituído
+
+O arquivo `tests/unit/open-graph-image.test.ts` deixou de replicar a função de produção e passou a importar diretamente os helpers do `src/worker.ts`.
+
+Cobertura adicionada:
+
+- fallback canônico `/og/carlos-burigo.png`;
+- conversão de URL relativa para absoluta;
+- preservação de URL absoluta HTTP/HTTPS;
+- rejeição de protocolo inválido;
+- resolução de MIME para PNG/JPEG/WebP/AVIF;
+- geração dos campos OG/Twitter;
+- dimensões declaradas 1200×630;
+- remoção de metadados antigos e reinjeção no `<head>`;
+- HTML final produzido pela função server-side do Worker;
+- fallback quando `seo_default_image_url` é nulo;
+- imagem específica de página publicada;
+- notícia individual por `?noticia=slug`;
+- falha de configuração pública sem perda do OG;
+- falha de consulta específica sem perda do OG;
+- leitura do arquivo físico `public/og/carlos-burigo.png`, incluindo assinatura PNG e dimensões reais 1200×630.
+
+### 11.2 Produção tornou-se diretamente testável
+
+Os helpers canônicos do Worker passaram a ser exportados exclusivamente para permitir testes contra a implementação real:
+
+- `resolveOpenGraphImageUrl`;
+- `resolveOpenGraphImageType`;
+- `readOpenGraphImageDimensions`;
+- `buildOpenGraphTags`;
+- `applyOpenGraphTags`;
+- `injectOpenGraphMetadata`.
+
+Nenhuma segunda implementação de resolução de imagem foi mantida no teste.
+
+### 11.3 Validação automatizada
+
+Foi adicionado o workflow mínimo `.github/workflows/open-graph-validation.yml`, acionado em `main` e em pull requests, executando:
+
+1. `npm install`;
+2. `npm run lint`;
+3. teste unitário do Open Graph;
+4. `npm run build`.
+
+O GitHub connector não expôs uma execução de workflow para os commits desta rodada; o endpoint disponível para consulta de workflow por commit retorna somente execuções disparadas por pull request, e não há execução PR associada. Portanto, **não é correto declarar que os testes passaram** apenas com base no commit.
+
+Os commits receberam status Vercel `success`, o que registra validação/deploy pela integração Vercel, mas isso não substitui a evidência específica do conjunto de testes da Fase 4.
+
+### 11.4 Estado da fase
+
+**Concluído no código:**
+
+- testes reais substituíram o teste falso-positivo;
+- cobertura dos cenários críticos foi adicionada;
+- asset físico passou a ser verificado;
+- execução automatizada foi configurada.
+
+**Pendente para fechar a Fase 4:**
+
+- evidência executada de `npm run lint`;
+- evidência executada de `npm run test:unit -- tests/unit/open-graph-image.test.ts`;
+- evidência executada de `npm run build`;
+- confirmação de sucesso do conjunto automatizado.
+
+A Fase 4 permanece aberta até existir evidência de execução. A Fase 5 não deve ser iniciada como encerramento do OG antes desse checkpoint.
+
