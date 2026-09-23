@@ -5,7 +5,6 @@ import { Page, PageBlock, BlockType } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { BlockEditorForm } from './BlockEditorForm';
 import { renderBlock } from '../public/DynamicPageView';
-import { getSupabaseClient } from '../../lib/supabaseClient';
 
 const BLOCK_TYPES: Array<{ type: BlockType; label: string; description: string }> = [
   { type: 'hero', label: 'Hero', description: 'Destaque principal com texto e mídia' },
@@ -237,8 +236,7 @@ export const AdminPagesTab: React.FC = () => {
   const [inlineOriginal, setInlineOriginal] = useState<PageBlock | null>(null);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [mediaPickerBlockId, setMediaPickerBlockId] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', ogImageUrl: '', status: 'rascunho' as 'rascunho' | 'publicado' });
-  const [uploadingOg, setUploadingOg] = useState(false);
+  const [metadata, setMetadata] = useState({ title: '', slug: '', description: '', seoTitle: '', seoDescription: '', status: 'rascunho' as 'rascunho' | 'publicado' });
   const [newPage, setNewPage] = useState({ title: '', slug: '', description: '', templateId: 'institucional' as LandingTemplateId });
 
   const selectedPage = useMemo(() => adminPages.find((page) => page.id === selectedPageId) || adminPages[0], [adminPages, selectedPageId]);
@@ -257,7 +255,6 @@ export const AdminPagesTab: React.FC = () => {
       description: selectedPage.description || '',
       seoTitle: selectedPage.seoTitle || '',
       seoDescription: selectedPage.seoDescription || '',
-      ogImageUrl: selectedPage.ogImageUrl || '',
       status: selectedPage.status,
     });
   }, [selectedPage?.id, selectedPage?.updatedAt]);
@@ -267,7 +264,7 @@ export const AdminPagesTab: React.FC = () => {
     if (!page) return;
     setSelectedPageId(id);
     setDraftBlocks([...page.blocks].sort((a, b) => a.order - b.order));
-    setMetadata({ title: page.title, slug: page.slug, description: page.description || '', seoTitle: page.seoTitle || '', seoDescription: page.seoDescription || '', ogImageUrl: page.ogImageUrl || '', status: page.status });
+    setMetadata({ title: page.title, slug: page.slug, description: page.description || '', seoTitle: page.seoTitle || '', seoDescription: page.seoDescription || '', status: page.status });
   };
 
   const moveBlock = (index: number, direction: -1 | 1) => {
@@ -458,23 +455,6 @@ export const AdminPagesTab: React.FC = () => {
     return { kind: 'image' as const, url: content.imageUrl || content.mediaUrl || item?.url || '', label: item?.title || item?.name || 'Imagem' };
   };
 
-  const uploadOg = async (file: File) => {
-    setUploadingOg(true);
-    try {
-      const client = await getSupabaseClient();
-      const { data } = await client.auth.getSession();
-      if (!data.session?.access_token) throw new Error('Sessão não autenticada');
-      const form = new FormData();
-      form.append('file', file);
-      const res = await fetch('/api/admin/og-image', { method: 'POST', headers: { Authorization: `Bearer ${data.session.access_token}` }, body: form });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || 'Falha ao enviar imagem');
-      setMetadata((current) => ({ ...current, ogImageUrl: json.url }));
-      showToast('Imagem Open Graph enviada. Salve a página para vincular a imagem.', 'success');
-    } catch (error: any) {
-      showToast(error?.message || 'Falha ao enviar imagem Open Graph', 'error');
-    } finally { setUploadingOg(false); }
-  };
 
   const save = async (publish: boolean) => {
     if (!selectedPage) return;
@@ -485,7 +465,6 @@ export const AdminPagesTab: React.FC = () => {
       description: metadata.description,
       seoTitle: metadata.seoTitle,
       seoDescription: metadata.seoDescription,
-      ogImageUrl: metadata.ogImageUrl,
       status: publish ? 'publicado' : 'rascunho',
       publish,
       blocks: draftBlocks,
@@ -561,7 +540,6 @@ export const AdminPagesTab: React.FC = () => {
                   <summary className="cursor-pointer list-none px-3 py-2.5 text-[10px] uppercase tracking-wider font-black text-stone-500">Propriedades avançadas da página · SEO</summary>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-3 pb-3">
                     <div><label className="label">Título SEO</label><input value={metadata.seoTitle} onChange={(e) => setMetadata({ ...metadata, seoTitle: e.target.value })} className="field" placeholder="Título exibido nos buscadores" /></div>
-                    <div><label className="label">Imagem Open Graph</label><div className="flex gap-2"><input value={metadata.ogImageUrl} onChange={(e) => setMetadata({ ...metadata, ogImageUrl: e.target.value })} className="field" placeholder="https://..." /><label className="action shrink-0 cursor-pointer"><span>{uploadingOg ? 'Enviando…' : 'Enviar'}</span><input type="file" accept="image/*" className="hidden" disabled={uploadingOg} onChange={(e) => e.target.files?.[0] && uploadOg(e.target.files[0])} /></label></div></div>
                     <div className="md:col-span-2"><label className="label">Descrição SEO</label><textarea value={metadata.seoDescription} onChange={(e) => setMetadata({ ...metadata, seoDescription: e.target.value })} className="field" rows={2} placeholder="Descrição usada nos mecanismos de busca e compartilhamentos." /></div>
                   </div>
                 </details>
