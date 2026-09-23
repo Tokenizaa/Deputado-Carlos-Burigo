@@ -199,6 +199,39 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
+function readOpenGraphImageDimensions(bytes: Uint8Array, type: string): { width: number; height: number } | null {
+  if (type === 'image/png') {
+    if (bytes.length < 24 || bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4e || bytes[3] !== 0x47) return null;
+    const width = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(16);
+    const height = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(20);
+    return { width, height };
+  }
+  if (type === 'image/jpeg') {
+    if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) return null;
+    let offset = 2;
+    while (offset + 9 < bytes.length) {
+      if (bytes[offset] !== 0xff) { offset++; continue; }
+      const marker = bytes[offset + 1];
+      offset += 2;
+      if (marker === 0xd8 || marker === 0xd9) continue;
+      if (offset + 2 > bytes.length) return null;
+      const segmentLength = (bytes[offset] << 8) | bytes[offset + 1];
+      if (segmentLength < 2 || offset + segmentLength > bytes.length) return null;
+      const isSof = marker >= 0xc0 && marker <= 0xc3 || marker >= 0xc5 && marker <= 0xc7 || marker >= 0xc9 && marker <= 0xcb || marker >= 0xcd && marker <= 0xcf;
+      if (isSof) {
+        if (segmentLength < 7) return null;
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        return {
+          width: view.getUint16(offset + 5),
+          height: view.getUint16(offset + 3),
+        };
+      }
+      offset += segmentLength;
+    }
+  }
+  return null;
+}
+
 const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
 const OPEN_GRAPH_IMAGE_TYPE = 'image/png';
 const OPEN_GRAPH_IMAGE_WIDTH = '1200';
@@ -626,6 +659,12 @@ if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 
       if (!(file instanceof File)) return Response.json({ error: 'Arquivo de imagem é obrigatório' }, { status: 400 });
       if (!['image/jpeg','image/png'].includes(file.type)) return Response.json({ error: 'Use uma imagem JPEG ou PNG' }, { status: 400 });
       if (file.size > 10 * 1024 * 1024) return Response.json({ error: 'A imagem deve ter no máximo 10 MB' }, { status: 400 });
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const dimensions = readOpenGraphImageDimensions(bytes, file.type);
+      if (!dimensions) return Response.json({ error: 'Não foi possível validar a imagem JPEG/PNG enviada' }, { status: 400 });
+      if (dimensions.width !== 1200 || dimensions.height !== 630) {
+        return Response.json({ error: 'A imagem Open Graph deve ter exatamente 1200×630 pixels' }, { status: 400 });
+      }
       const extension = file.type === 'image/png' ? 'png' : 'jpg';
       const storagePath = `site/${crypto.randomUUID()}.${extension}`;
       const { error } = await supabaseAdmin.storage.from('og-images').upload(storagePath, file, {
