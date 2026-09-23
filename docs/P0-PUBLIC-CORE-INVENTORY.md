@@ -242,13 +242,11 @@ Portanto a migração para Supabase está parcial e deliberadamente em andamento
 
 ## 9. SEO e indexação
 
-`index.html` contém title e description institucionais, Open Graph básico, locale e Twitter card.
+`index.html` contém title e description institucionais.
 
 Ainda não foram encontrados no HTML global:
 
 - canonical;
-- `og:url`;
-- `og:image`;
 - metadata específica por rota;
 - JSON-LD.
 
