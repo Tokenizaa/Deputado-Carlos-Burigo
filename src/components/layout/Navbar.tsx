@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, PhoneCall, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { Search, ChevronDown, LayoutDashboard } from 'lucide-react';
 
 const MORE_ITEMS = [
   ['projetos', 'Proposições'],
@@ -153,38 +153,7 @@ export const Navbar: React.FC = () => {
             </div>
           </nav>
 
-          <div className="ml-auto hidden shrink-0 items-center gap-2 lg:flex">
-            <a
-              href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
-              aria-label="Acessar dashboard"
-            >
-              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden xl:inline">Dashboard</span>
-            </a>
-            <a
-              href="/#contato"
-              onClick={(e) => { e.preventDefault(); navigate('contato'); }}
-              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-4 text-sm font-semibold text-white hover:bg-[#006b32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f]"
-            >
-              <PhoneCall className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden xl:inline">Fale com o Deputado</span>
-              <span className="xl:hidden">Fale conosco</span>
-            </a>
-          </div>
-
-          <div className="hidden items-center md:flex lg:hidden">
-            <a href="/#contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
-              <PhoneCall className="h-4 w-4" aria-hidden="true" />
-              Fale com o Deputado
-            </a>
-          </div>
-
-          <div className="flex items-center gap-2 md:hidden lg:hidden">
-            <a href="/contato" onClick={(e) => { e.preventDefault(); navigate('contato'); }} className="inline-flex min-h-11 items-center rounded-md bg-[#00863f] px-3 text-sm font-semibold text-white">
-              Fale com o Deputado
-            </a>
-          </div>
+/div>
         </div>
       </div>
     </header>
