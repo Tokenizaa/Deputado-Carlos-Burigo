@@ -105,3 +105,14 @@ A sequência operacional é somente:
 `FASE 0 → FASE 1 → FASE 2 → FASE 3 → FASE 4 → FASE 5 → ...`
 
 Backlogs e identificadores históricos permanecem como histórico e não definem a próxima fase.
+
+
+## Open Graph — plano específico
+
+**FASE 1 — ESPECIFICAÇÃO E CANONIZAÇÃO: CONCLUÍDA**
+
+Marco: `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`
+
+A Fase 1 consolidou o contrato canônico, a cadeia de fallback, a matriz de rotas, o tratamento de notícias, as falhas conhecidas e a decisão de manter o Worker existente. Nenhuma alteração funcional das fases seguintes foi antecipada.
+
+**Próxima execução:** FASE 2 — IMPLEMENTAÇÃO SERVER-SIDE E FALLBACK.
