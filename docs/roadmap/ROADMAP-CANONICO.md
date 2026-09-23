@@ -127,4 +127,10 @@ Execução registrada em `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`. O SEO 
 
 Commits: `eb5a0d5` e `b9ca837`.
 
-**Próxima execução:** FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA.
+**FASE 4 — TESTES E VALIDAÇÃO AUTOMATIZADA: EM EXECUÇÃO**
+
+Implementação registrada em `docs/audits/OPEN-GRAPH-CANONICO-2026-09-22.md`: o teste legado foi substituído por testes que importam a implementação real do Worker, incluindo fallback, conteúdo específico, notícia, MIME, dimensões, falhas e asset físico. Também foi configurado o workflow `.github/workflows/open-graph-validation.yml` para lint, teste unitário OG e build.
+
+**Pendência objetiva:** obter evidência de execução bem-sucedida de lint, teste e build. O conector GitHub disponível não retornou workflow run para os commits desta rodada.
+
+**Próximo passo após a evidência:** FASE 5 — VALIDAÇÃO REAL EM PRODUÇÃO E ENCERRAMENTO.
