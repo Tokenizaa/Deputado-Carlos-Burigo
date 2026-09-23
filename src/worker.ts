@@ -232,7 +232,7 @@ export function readOpenGraphImageDimensions(bytes: Uint8Array, type: string): {
   return null;
 }
 
-const OPEN_GRAPH_IMAGE_URL = '/og/carlos-burigo.png';
+const OPEN_GRAPH_IMAGE_URL = 'https://deputado-carlos-burigo.olfnetto.workers.dev/og/carlos-burigo.png';
 const OPEN_GRAPH_IMAGE_TYPE = 'image/png';
 const OPEN_GRAPH_IMAGE_WIDTH = '1200';
 const OPEN_GRAPH_IMAGE_HEIGHT = '630';
