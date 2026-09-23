@@ -254,8 +254,8 @@ function buildOpenGraphTags(input: {
 
 function applyOpenGraphTags(html: string, tags: string): string {
   const cleanedHtml = html
-    .replace(/<meta\\s+property=["']og:[^"']+["'][^>]*>\\s*/gi, '')
-    .replace(/<meta\\s+name=["']twitter:[^"']+["'][^>]*>\\s*/gi, '');
+    .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, '')
+    .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '');
   return cleanedHtml.includes('</head>')
     ? cleanedHtml.replace('</head>', `${tags}</head>`)
     : cleanedHtml;
@@ -275,7 +275,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       console.error('Open Graph settings unavailable; using static defaults', error);
     }
 
-    const pathname = url.pathname.replace(/\\/+$/, '') || '/';
+    const pathname = url.pathname.replace(/\/+$/, '') || '/';
     let title = settings?.seoDefaultTitle || fallbackTitle;
     let description = settings?.seoDefaultDescription || fallbackDescription;
     let image = resolveOpenGraphImageUrl(settings?.seoDefaultImageUrl, url.origin);
@@ -320,7 +320,7 @@ async function injectOpenGraphMetadata(response: Response, url: URL): Promise<Re
       }
     } else if (!staticMeta[pathname]) {
       try {
-        const pages = await getPublicPages(pathname.replace(/^\\//, ''));
+        const pages = await getPublicPages(pathname.replace(/^\//, ''));
         const page = pages[0];
         if (page) {
           title = page.seoTitle || page.title;
