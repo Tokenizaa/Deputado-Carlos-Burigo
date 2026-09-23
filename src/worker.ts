@@ -307,11 +307,13 @@ export async function injectOpenGraphMetadata(response: Response, url: URL): Pro
     } catch (error) {
       console.error('Open Graph settings unavailable; using static defaults', error);
     }
+    console.log("Open Graph settings:", settings);
 
     const pathname = url.pathname.replace(/\/+$/, '') || '/';
     let title = settings?.seoDefaultTitle || fallbackTitle;
     let description = settings?.seoDefaultDescription || fallbackDescription;
     let image = resolveOpenGraphImageUrl(settings?.seoDefaultImageUrl, url.origin);
+    console.log("Open Graph image:", image);
 
     const staticMeta: Record<string, { title: string; description: string }> = {
       '/': { title, description },
@@ -377,6 +379,7 @@ export async function injectOpenGraphMetadata(response: Response, url: URL): Pro
     headers.set('Content-Type', 'text/html; charset=UTF-8');
     return new Response(patched, { status: response.status, statusText: response.statusText, headers });
   } catch (error) {
+    console.log("Entering Open Graph catch block");
     console.error('[open-graph]', error);
     const tags = buildOpenGraphTags({
       title: fallbackTitle,
