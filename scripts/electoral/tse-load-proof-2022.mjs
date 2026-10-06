@@ -359,7 +359,8 @@ async function main() {
   const sourceSection = await dataset("Votação por seção eleitoral - 2022 - RS", "votacao_secao_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_RS.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runSection = await runFor(sourceSection, hashes["votacao_secao_2022_RS.zip"], { proof_case: true, layer: "nominal_section" }, sectionRows.length);
-  if (!DRY_RUN && !runSection.__skip) {\n    const facts = sectionRows.map(r => ({
+  if (!DRY_RUN && !runSection.__skip) {
+    const facts = sectionRows.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
       zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`), candidate_id: candidate.id,
       source_dataset_id: sourceSection.id, import_run_id: runSection.id, votes: r.votes
@@ -371,7 +372,8 @@ async function main() {
   const sourceMun = await dataset("Votação nominal por município e zona - 2022", "votacao_candidato_munzona_2022", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2022.zip", { format: "CSV inside ZIP", uf: "ALL", turn: "1/2", role: "candidate aggregate" });
   const runMun = await runFor(sourceMun, hashes["votacao_candidato_munzona_2022.zip"], { proof_case: true, layer: "candidate_municipality_zone" }, munRows.length);
-  if (!DRY_RUN && !runSection.__skip) {\n    const facts = munRows.map(r => ({
+  if (!DRY_RUN && !runMun.__skip) {
+    const facts = munRows.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
       zone_id: zoneMap.get(String(r.zone)), section_id: null, candidate_id: candidate.id,
       source_dataset_id: sourceMun.id, import_run_id: runMun.id, candidate_votes: r.votes, nominal_votes: r.votes
@@ -384,7 +386,8 @@ async function main() {
   const sourceDetailMun = await dataset("Detalhe da apuração por município e zona - 2022 - RS", "detalhe_votacao_munzona_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2022.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runDetailMun = await runFor(sourceDetailMun, hashes["detalhe_votacao_munzona_2022.zip"], { proof_case: true, layer: "apuration_municipality_zone" }, munTotals.length);
-  if (!DRY_RUN && !runSection.__skip) {\n    const facts = munTotals.map(r => ({
+  if (!DRY_RUN && !runDetailMun.__skip) {
+    const facts = munTotals.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
       zone_id: zoneMap.get(String(r.zone)), source_dataset_id: sourceDetailMun.id, import_run_id: runDetailMun.id,
       electorate: r.electorate, comparecimento: r.comparecimento, abstentions: r.abstentions, valid_votes: r.valid_votes,
@@ -397,7 +400,8 @@ async function main() {
   const sourceDetailSection = await dataset("Detalhe da apuração por seção - 2022 - RS", "detalhe_votacao_secao_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_secao/detalhe_votacao_secao_2022.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runDetailSection = await runFor(sourceDetailSection, hashes["detalhe_votacao_secao_2022.zip"], { proof_case: true, layer: "apuration_section" }, sectionTotals.length);
-  if (!DRY_RUN && !runSection.__skip) {\n    const facts = sectionTotals.map(r => ({
+  if (!DRY_RUN && !runDetailSection.__skip) {
+    const facts = sectionTotals.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
       zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`),
       source_dataset_id: sourceDetailSection.id, import_run_id: runDetailSection.id,
@@ -422,7 +426,8 @@ async function main() {
     "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/rs/rs-c0007-e006259-u.json",
     { format: "JSON", file_generation: ea20.idg, election: ELECTION_2026, office_code: "0007", scope: "UF" });
   const run2026 = await runFor(source2026, hashes["rs-c0007-e006259-u.json"], { proof_case: true, layer: "candidate_and_state_total", idg: ea20.idg }, 1);
-  if (!DRY_RUN && !runSection.__skip) {\n    const facts = [{
+  if (!DRY_RUN && !run2026.__skip) {
+    const facts = [{
       round_id: round2026.id, office_id: office.id, uf: UF, candidate_id: candidate2026Record.id,
       source_dataset_id: source2026.id, import_run_id: run2026.id, candidate_votes: votes2026,
       electorate: num(rootElectors.te), comparecimento: num(rootElectors.c), abstentions: num(rootElectors.a),
