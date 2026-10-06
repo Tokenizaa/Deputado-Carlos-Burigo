@@ -1,6 +1,6 @@
 # IE-02 — MODELO DE DADOS DA INTELIGÊNCIA ELEITORAL
 
-**Estado:** MODELO CANÔNICO DEFINIDO — aguardando aplicação no Supabase
+**Estado:** MODELO CANÔNICO DEFINIDO E APLICADO NO SUPABASE
 **Data:** 2026-10-06
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`
 
@@ -343,6 +343,6 @@ O TSE publica o conjunto de Resultados com votação nominal por município/zona
 
 **Modelo lógico definido.**
 
-A aplicação física no banco deverá ocorrer por uma migração Supabase versionada no repositório, depois de validar a conexão administrativa com o projeto Supabase identificado pelo runtime.
+A aplicação física foi concluída na migração `20261006201443_create_electoral_intelligence_model`, já registrada no repositório e verificada no projeto Supabase `wktanxbpijurimdjgone`.
 
 Nenhuma interface foi criada.
