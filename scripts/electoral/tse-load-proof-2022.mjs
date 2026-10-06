@@ -156,7 +156,7 @@ async function main() {
   const detailSectionZip = resolve(ROOT, "detalhe_votacao_secao_2022.zip");
   const ea20Path = resolve(ROOT, "rs-c0007-e006259-u.json");
 
-  if (!DRY_RUN) await download2026(ea20Path);
+  try { await stat(ea20Path); } catch { await download2026(ea20Path); }
   const required = [candidatesZip, munzonaZip, sectionZip, detailMunZip, detailSectionZip, ea20Path];
   for (const path of required) {
     try { await stat(path); } catch { throw new Error(`Arquivo ausente: ${path}`); }
