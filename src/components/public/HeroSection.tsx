@@ -10,7 +10,7 @@ interface HeroSectionProps {
 export const HeroSection: React.FC<HeroSectionProps> = ({ customTitle, customSubtitle, customContent }) => {
   const { settings } = useApp();
   const name = settings?.candidate_name || 'Carlos Búrigo';
-  const image = customContent?.imageUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaqCHAYVGyoPcDnyst_90S8DrikCzDnY7s-cnOwTF8Bc0cmqOX2EvzPA0&s=10';
+  const image = customContent?.imageUrl || '/assets/deputado-carlos-burigo.png';
   const role = settings?.institutional_title || 'Deputado Estadual';
 
   return (
@@ -26,7 +26,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ customTitle, customSub
             width={900}
             height={1125}
             referrerPolicy="no-referrer"
-            onError={(event) => { (event.target as HTMLImageElement).src = '/assets/carlos_burigo_portrait.png'; }}
+            onError={(event) => { (event.target as HTMLImageElement).src = '/assets/deputado-carlos-burigo.png'; }}
           />
         </div>
 
