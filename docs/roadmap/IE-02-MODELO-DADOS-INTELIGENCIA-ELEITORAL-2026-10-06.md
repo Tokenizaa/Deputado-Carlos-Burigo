@@ -337,7 +337,7 @@ Como as tabelas são novas no schema `public`, a implementação deverá conside
 
 ## 10. Fonte oficial
 
-O TSE publica o conjunto de Resultados com votação nominal por município/zona, detalhe da apuração por município/zona, detalhe por seção e votação por seção. O conjunto de 2024 confirma a granularidade necessária para o modelo planejado. citeturn0search0turn0search4
+O TSE publica o conjunto de Resultados com votação nominal por município/zona, detalhe da apuração por município/zona, detalhe por seção e votação por seção. O conjunto de 2024 confirma a granularidade necessária para o modelo planejado. (Portal de Dados Abertos do TSE — conjunto Resultados 2024).
 
 ## 11. Estado da IE-02
 
