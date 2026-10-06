@@ -130,7 +130,7 @@ A Inteligência Eleitoral será privada e deverá reutilizar autenticação, aut
 
 - **IE-01 — Fundação: CONCLUÍDA.** Auditoria do Dashboard, ponto de inserção, autenticação, RBAC existente e fontes eleitorais registrados em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
 - **IE-02 — Modelo de dados: CONCLUÍDA.** Modelo lógico registrado em `docs/roadmap/IE-02-MODELO-DADOS-INTELIGENCIA-ELEITORAL-2026-10-06.md` e migração física aplicada no Supabase em `20261006201443_create_electoral_intelligence_model`.
-- **IE-03 — Ingestão:** EM EXECUÇÃO. Subfase IE-03.1 — descoberta e aquisição das fontes oficiais do TSE iniciada; API/CKAN como caminho primário e crawler do portal como fallback.
+- **IE-03 — Ingestão:** EM EXECUÇÃO. Subfase IE-03.1 — descoberta e aquisição das fontes oficiais do TSE iniciada; API/CKAN como caminho primário e crawler do portal como fallback. Documento: `docs/roadmap/IE-03-INGESTAO-TSE-2026-10-06.md`.
 - **IE-04 — Inteligência:** planejada.
 - **IE-05 — Interface:** planejada.
 - **IE-06 — Investigação:** planejada.
