@@ -257,17 +257,19 @@ TSE
 ## Subfases
 
 ### IE-03.1 — Descoberta das fontes
-**EM EXECUÇÃO**
+**CONCLUÍDA**
 
 Mapear, para 2022 e 2026, quais fontes oficiais fornecem cada categoria necessária à Inteligência Eleitoral.
 
 ### IE-03.2 — Aquisição
-**EM EXECUÇÃO**
+**CONCLUÍDA PARA A PRIMEIRA RODADA DE 2022**
 
 Adquirir as fontes necessárias de forma reproduzível e registrar hash/metadados.
 
 ### IE-03.3 — Leitura e contrato dos dados
-**PRÓXIMA**
+**EM EXECUÇÃO**
+
+Contrato registrado em `docs/roadmap/IE-03-CONTRATO-DADOS-2022-2026.md`. Validador registrado em `scripts/electoral/tse-validate-proof-2022-2026.mjs`.
 
 Para cada fonte, identificar cabeçalhos, códigos, chaves, cardinalidade, turno, cargo e campo semântico de votos.
 
