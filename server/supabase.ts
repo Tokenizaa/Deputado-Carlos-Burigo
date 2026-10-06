@@ -173,7 +173,6 @@ export async function getPublicSettings() {
     socialWhatsapp: data.social_whatsapp,
     seoDefaultTitle: data.seo_default_title,
     seoDefaultDescription: data.seo_default_description,
-    seoDefaultImageUrl: data.seo_default_image_url,
     privacyPolicyText: data.privacy_policy_text,
   };
 }
@@ -211,7 +210,7 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
     'mandate_slogan','bio_highlights','cta_title','cta_subtitle',
     'gabinete_address_poa','gabinete_address_caxias','gabinete_phone','gabinete_phone_caxias',
     'gabinete_whatsapp','gabinete_email','social_instagram','social_facebook','social_youtube',
-    'seo_default_title','seo_default_description','seo_default_image_url','privacy_policy_text'
+    'seo_default_title','seo_default_description','privacy_policy_text'
   ];
   const patch: Record<string, unknown> = {};
   for (const key of allowed) {
@@ -950,7 +949,7 @@ export async function getPublicAgenda(): Promise<PublicAgendaDto[]> {
 
 export async function getPublicPages(slug?: string): Promise<PublicPageDto[]> {
   let query = supabasePublic.from('pages')
-    .select('id,title,slug,description,seo_title,seo_description,og_image_url,status,updated_by,updated_at')
+    .select('id,title,slug,description,seo_title,seo_description,status,updated_by,updated_at')
     .eq('status', 'publicado')
     .order('slug', { ascending: true });
   if (slug) query = query.eq('slug', slug);
