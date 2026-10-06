@@ -8,7 +8,7 @@
 
 Definir como as fontes oficiais do TSE serão transformadas no modelo físico das 14 tabelas criadas na IE-02, sem criar tabelas paralelas, sem acoplar a ingestão a Carlos Búrigo e sem perder a rastreabilidade da fonte.
 
-O TSE permanece como fonte de verdade. O Portal de Dados Abertos de 2022 disponibiliza votação nominal/partido por município/zona, votação por seção e detalhes de apuração; a divulgação de 2026 usa arquivos JSON, incluindo EA20, EA16 e EA18. citeturn0search0turn0search2
+O TSE permanece como fonte de verdade. O Portal de Dados Abertos de 2022 disponibiliza votação nominal/partido por município/zona, votação por seção e detalhes de apuração; a divulgação de 2026 usa arquivos JSON, incluindo EA20, EA16 e EA18. Fontes: Portal de Dados Abertos do TSE — Resultados 2022; TSE — Informações técnicas sobre a divulgação de resultados 2026.
 
 ## 2. Regra fundamental
 
@@ -101,7 +101,7 @@ Destino principal:
 
 A ingestão deve identificar pelo cabeçalho os campos oficiais de candidatura, número, nome, cargo e partido.
 
-A estrutura exata dos campos deve ser registrada pelo parser antes da primeira carga definitiva. O Portal informa que o conjunto contém candidatos de todas as UFs e possui documento de descrição das variáveis. citeturn1search1
+A estrutura exata dos campos deve ser registrada pelo parser antes da primeira carga definitiva. O conjunto contém candidatos de todas as UFs e possui documentação de descrição das variáveis.
 
 ### 5.2 Votação nominal município/zona 2022
 
@@ -179,7 +179,7 @@ Mapear somente campos cuja semântica seja comprovada, incluindo quando disponí
 
 ## 6. Mapeamento 2026
 
-O TSE informa que os resultados de 2026 são distribuídos em JSON e que o EA20 é o arquivo de resultado unificado; EA14/EA15 podem ajudar a identificar atualizações. citeturn0search2
+O TSE informa que os resultados de 2026 são distribuídos em JSON e que o EA20 é o arquivo de resultado unificado; EA14/EA15 podem ajudar a identificar atualizações.
 
 ### EA20
 
