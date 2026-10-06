@@ -261,7 +261,6 @@ export async function updateAdminSettings(input: Record<string, unknown>) {
     socialWhatsapp: data.social_whatsapp,
     seoDefaultTitle: data.seo_default_title,
     seoDefaultDescription: data.seo_default_description,
-    seoDefaultImageUrl: data.seo_default_image_url,
     privacyPolicyText: data.privacy_policy_text,
   };
 }
