@@ -4,7 +4,7 @@ import { basename, resolve } from "node:path";
 
 const BASE = "https://dadosabertos.tse.jus.br";
 const DATASETS = process.argv.slice(2);
-const DEFAULT_DATASETS = ["resultados-2022", "resultados-2024", "candidatos-2026"];
+const DEFAULT_DATASETS = ["candidatos-2022", "resultados-2022", "resultados-2022-boletim-de-urna"];
 
 function normalizeResources(pkg) {
   return (pkg?.result?.resources ?? [])
