@@ -297,10 +297,12 @@ async function main() {
   const round2022 = (await db("electoral_rounds", { election_id: election2022.id, round_number: TURN, official_date: "2022-10-02" }, "election_id,round_number")).data[0];
   const office = (await db("electoral_offices", { tse_office_code: OFFICE_CODE, name: "Deputado Estadual", level: "ESTADUAL" }, "tse_office_code")).data[0];
   await db("electoral_ufs", { uf: UF, name: "Rio Grande do Sul", region: "Sul" }, "uf");
-  const party = (await db("electoral_parties", {
-    tse_party_code: candidateRow.party_number || null, party_number: candidateRow.party_number || null,
+  const partyCode = candidateRow.party_number || null;
+  const existingParty = partyCode ? await one("electoral_parties", { tse_party_code: partyCode }) : null;
+  const party = existingParty ?? (await db("electoral_parties", {
+    tse_party_code: partyCode, party_number: partyCode,
     acronym: candidateRow.acronym || null, name: candidateRow.party_name || "MDB", party_type: "PARTIDO"
-  }, "tse_party_code")).data[0];
+  }, null)).data[0];
   const candidate = (await db("electoral_candidates", {
     election_id: election2022.id, office_id: office.id, tse_candidate_id: candidateRow.tse_candidate_id,
     candidate_number: CANDIDATE_NUMBER, ballot_name: candidateRow.ballot_name, full_name: candidateRow.full_name,
