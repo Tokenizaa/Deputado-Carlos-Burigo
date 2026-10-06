@@ -90,6 +90,54 @@ Antes de avançar para novas funcionalidades da Fase 4, a documentação foi rec
 
 Esse trabalho não substitui as fases do produto. Ele corrige a autoridade documental antes da continuidade da execução.
 
+## INTELIGÊNCIA ELEITORAL — NOVO BLOCO CANÔNICO
+
+A Inteligência Eleitoral foi formalizada como **módulo interno do Dashboard de Gabinete existente**. Não será criada aplicação, dashboard, autenticação ou área administrativa paralela.
+
+Documento canônico:
+- `docs/roadmap/INTELIGENCIA-ELEITORAL-CANONICA-2026-10-06.md`
+
+### Arquitetura funcional
+
+O módulo será organizado em três camadas:
+
+1. **Dados** — eleições, candidatos, municípios, zonas, seções, resultados, eleitorado, comparecimento, abstenção e votos válidos/brancos/nulos.
+2. **Inteligência** — métricas, evolução histórica, comparativos, rankings, concentração territorial, variações e anomalias.
+3. **Investigação** — bate-papo privado baseado em consultas estruturadas aos dados, com respostas acompanhadas de evidências.
+
+### Navegação prevista
+
+`Dashboard de Gabinete → Inteligência Eleitoral`
+
+Subáreas previstas:
+- Panorama
+- Evolução eleitoral
+- Municípios
+- Zonas eleitorais
+- Seções
+- Candidatos
+- Comparativos
+- Mapa eleitoral
+- Investigação
+
+A estrutura final deve respeitar o shell, roteamento, RBAC e padrões já existentes no Dashboard.
+
+### Segurança
+
+A Inteligência Eleitoral será privada e deverá reutilizar autenticação, autorização, RBAC, RLS e infraestrutura existentes. Não haverá API pública, rota pública ou indexação pública para esse módulo.
+
+### Sequência de execução
+
+- **IE-01 — Fundação:** auditoria do Dashboard existente, ponto de inserção, RBAC, fontes eleitorais e decisões arquiteturais.
+- **IE-02 — Modelo de dados:** estrutura canônica no Supabase.
+- **IE-03 — Ingestão:** dados eleitorais históricos e 2026, com validação e rastreabilidade.
+- **IE-04 — Inteligência:** métricas e comparativos.
+- **IE-05 — Interface:** páginas dentro do Dashboard existente.
+- **IE-06 — Investigação:** evolução do bate-papo para investigação baseada em dados.
+- **IE-07 — Validação:** segurança, consistência, evidências e fluxo ponta a ponta.
+
+**Regra:** nenhuma interface de inteligência será criada antes da definição e validação da camada de dados necessária.
+
 ## Próxima sequência
 
 A reconstrução documental está encerrada.
