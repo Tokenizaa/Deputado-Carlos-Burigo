@@ -415,7 +415,7 @@ async function main() {
     tse_election_code: ELECTION_2026, year: YEAR_2026, name: "Eleições Gerais 2026", election_type: "GERAL", scope: "ESTADUAL", status: "EM_APURACAO"
   }, "tse_election_code")).data[0];
   const round2026 = (await db("electoral_rounds", { election_id: election2026.id, round_number: 1 }, "election_id,round_number")).data[0];
-  const candidate2026 = (await db("electoral_candidates", {
+  const candidate2026Record = (await db("electoral_candidates", {
     election_id: election2026.id, office_id: office.id, tse_candidate_id: String(candidate2026.sqcand),
     candidate_number: CANDIDATE_NUMBER, ballot_name: candidate2026.nm, full_name: candidate2026.nm,
     party_id: party.id, candidate_status: candidate2026.st
@@ -427,7 +427,7 @@ async function main() {
   const run2026 = await runFor(source2026, hashes["rs-c0007-e006259-u.json"], { proof_case: true, layer: "candidate_and_state_total", idg: ea20.idg }, 1);
   if (!DRY_RUN) {
     const facts = [{
-      round_id: round2026.id, office_id: office.id, uf: UF, candidate_id: candidate2026.id,
+      round_id: round2026.id, office_id: office.id, uf: UF, candidate_id: candidate2026Record.id,
       source_dataset_id: source2026.id, import_run_id: run2026.id, candidate_votes: votes2026,
       electorate: num(rootElectors.te), comparecimento: num(rootElectors.c), abstentions: num(rootElectors.a),
       valid_votes: num(rootVotes.vv), blank_votes: num(rootVotes.vb), null_votes: num(rootVotes.vn),
