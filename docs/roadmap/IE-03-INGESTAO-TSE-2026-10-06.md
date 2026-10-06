@@ -271,6 +271,8 @@ Adquirir as fontes necessárias de forma reproduzível e registrar hash/metadado
 
 Contrato registrado em `docs/roadmap/IE-03-CONTRATO-DADOS-2022-2026.md`. Validador registrado em `scripts/electoral/tse-validate-proof-2022-2026.mjs`.
 
+**Bloqueio identificado na primeira execução do validador (2026-10-06):** o arquivo oficial `VOTACAO_SECAO_2022_RS` possui contrato próprio de seção, no qual a identificação do votável usa `NR_VOTAVEL` e a quantidade usa `QT_VOTOS`; ele não possui `NR_CANDIDATO` nem `QT_VOTOS_NOMINAIS`. Portanto, a falha atual está no validador, não constitui evidência de inconsistência dos dados do TSE. A correção deverá tratar `VOTACAO_SECAO` como schema distinto e comparar a votação de `NR_VOTAVEL=15140`/`QT_VOTOS` com a camada município/zona, sem fabricar um campo de votos nominais válidos inexistente nessa fonte.
+
 Para cada fonte, identificar cabeçalhos, códigos, chaves, cardinalidade, turno, cargo e campo semântico de votos.
 
 ### IE-03.4 — Validação cruzada
