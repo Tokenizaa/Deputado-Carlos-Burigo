@@ -128,7 +128,7 @@ A Inteligência Eleitoral será privada e deverá reutilizar autenticação, aut
 
 
 ### IE-03 — Reconciliação local × GitHub antes da validação
-**PRÉ-CONDIÇÃO OPERACIONAL — EM EXECUÇÃO**
+**PRÉ-CONDIÇÃO OPERACIONAL — CONCLUÍDA PARA A PROVA 2022/2026**
 
 Antes de qualquer nova validação, aquisição adicional ou carga no Supabase, o estado local usado pelo agente e o estado publicado em `origin/main` devem ser reconciliados. Nenhum `reset`, `clean`, `checkout` ou descarte de trabalho local será executado sem inspeção prévia. O objetivo é preservar trabalho local do agente, identificar commits locais ainda não publicados e só então alinhar o working tree à `main` canônica.
 
@@ -144,7 +144,7 @@ Procedimento obrigatório:
 
 - **IE-01 — Fundação: CONCLUÍDA.** Auditoria do Dashboard, ponto de inserção, autenticação, RBAC existente e fontes eleitorais registrados em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
 - **IE-02 — Modelo de dados: CONCLUÍDA.** Modelo lógico registrado em `docs/roadmap/IE-02-MODELO-DADOS-INTELIGENCIA-ELEITORAL-2026-10-06.md` e migração física aplicada no Supabase em `20261006201443_create_electoral_intelligence_model`.
-- **IE-03 — Ingestão:** EM EXECUÇÃO. A descoberta das fontes e o contrato estrutural de dados de 2022/2026 já foram definidos; a execução segue na validação byte-a-byte dos arquivos 2022 e na implementação da ingestão. A investigação cobre 2022 e 2026 e deve identificar, validar e capturar as dimensões eleitorais, candidatura/partido, resultados nominais, resultados partidários, território eleitoral, apuração/comparecimento e fontes de seção/BU necessárias ao módulo. Carlos Búrigo 15140 é caso de prova, não filtro da ingestão. Para 2026, a divulgação oficial do TSE inclui EA20 (resultado unificado), EA16 (seções), EA18 (auxiliar de seção) e demais arquivos técnicos; para 2022, o Portal de Dados Abertos disponibiliza votação nominal município/zona, votação por seção, votação partidária e detalhes de apuração. Nenhum valor histórico de referência será tratado como confirmado sem validação estrutural em fonte oficial. Documento: `docs/roadmap/IE-03-INGESTAO-TSE-2026-10-06.md`.
+- **IE-03 — Ingestão:** EM EXECUÇÃO. IE-03.1 (descoberta) CONCLUÍDA; IE-03.2 (aquisição da primeira rodada 2022) CONCLUÍDA; IE-03.3 (leitura/contrato) CONCLUÍDA com prova estrutural executada. A prova oficial confirmou **33.611 votos em 2022** para Carlos Búrigo 15140 em RS/1º turno/Deputado Estadual tanto na camada município/zona quanto na camada seção, com `totals_match=true`; confirmou também **21.038 votos em 2026** no EA20 oficial do TSE. O schema distinto de `VOTACAO_SECAO` foi corrigido no validador. Próxima etapa: **IE-03.5 — normalização**, precedida pela formalização do contrato de mapeamento TSE → 14 tabelas do IE-02. Carlos Búrigo continua sendo caso de prova, não filtro da ingestão. Para 2026, a divulgação oficial do TSE inclui EA20, EA16, EA18 e demais arquivos técnicos; para 2022, o Portal de Dados Abertos disponibiliza votação nominal município/zona, votação por seção, votação partidária e detalhes de apuração. Documento: `docs/roadmap/IE-03-INGESTAO-TSE-2026-10-06.md`.
 - **IE-04 — Inteligência:** planejada.
 - **IE-05 — Interface:** planejada.
 - **IE-06 — Investigação:** planejada.
