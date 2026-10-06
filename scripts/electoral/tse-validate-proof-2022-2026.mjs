@@ -46,6 +46,11 @@ function numeric(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
+function getField(indexes, row, key) {
+  const field = indexes[key];
+  return field && field.zero_based >= 0 ? clean(row[field.zero_based]) : "";
+}
+
 async function listZipCsv(zip) {
   return new Promise((resolvePromise, reject) => {
     const p = spawn("unzip", ["-Z1", zip]);
@@ -104,7 +109,7 @@ async function streamZipCsv(zip, entry, onHeader, onRow) {
   });
 }
 
-async function inspectZip(label, zip, preferredPattern) {
+async function inspectZip(label, zip, preferredPattern, schema = "candidate") {
   const entries = await listZipCsv(zip);
   const entry = entries.find((x) => preferredPattern.test(x)) ?? entries.find((x) => /\.csv$/i.test(x));
   if (!entry) throw new Error(`${label}: nenhum CSV/TXT encontrado no ZIP`);
@@ -114,6 +119,7 @@ async function inspectZip(label, zip, preferredPattern) {
     source: label,
     zip,
     entry,
+    schema,
     rows_seen: 0,
     matched_rows: 0,
     votes_total: 0,
@@ -127,45 +133,78 @@ async function inspectZip(label, zip, preferredPattern) {
 
   await streamZipCsv(zip, entry, (h) => {
     headers = h;
-    const fields = {
+
+    const common = {
       year: findIndex(h, ["ANO_ELEICAO"]),
       turn: findIndex(h, ["NR_TURNO"]),
       uf: findIndex(h, ["SG_UF"]),
       cargo_code: findIndex(h, ["CD_CARGO"]),
       cargo_name: findIndex(h, ["DS_CARGO"]),
-      candidate_number: findIndex(h, ["NR_CANDIDATO"]),
-      candidate_name: findIndex(h, ["NM_CANDIDATO"]),
-      votes: findIndex(h, ["QT_VOTOS_NOMINAIS"]),
-      votes_valid: findIndex(h, ["QT_VOTOS_NOMINAIS_VALIDOS"]),
       municipality_code: findIndex(h, ["CD_MUNICIPIO"]),
       municipality_name: findIndex(h, ["NM_MUNICIPIO"]),
       zone: findIndex(h, ["NR_ZONA"]),
       section: findIndex(h, ["NR_SECAO"]),
     };
+
+    const fields = schema === "section"
+      ? {
+          ...common,
+          votavel_number: findIndex(h, ["NR_VOTAVEL"]),
+          votavel_name: findIndex(h, ["NM_VOTAVEL"]),
+          votes: findIndex(h, ["QT_VOTOS"]),
+        }
+      : {
+          ...common,
+          candidate_number: findIndex(h, ["NR_CANDIDATO"]),
+          candidate_name: findIndex(h, ["NM_CANDIDATO"]),
+          votes: findIndex(h, ["QT_VOTOS_NOMINAIS"]),
+          votes_valid: findIndex(h, ["QT_VOTOS_NOMINAIS_VALIDOS"]),
+        };
+
     result.field_indexes = Object.fromEntries(
-      Object.entries(fields).map(([k, v]) => [k, v >= 0 ? { zero_based: v, one_based: v + 1, header: h[v] } : null]),
+      Object.entries(fields).map(([k, v]) => [
+        k,
+        v >= 0 ? { zero_based: v, one_based: v + 1, header: h[v] } : null,
+      ]),
     );
-    if (fields.candidate_number < 0 || fields.votes < 0) {
+
+    if (schema === "section") {
+      if (fields.votavel_number < 0 || fields.votes < 0) {
+        throw new Error(`${label}: não encontrei NR_VOTAVEL e QT_VOTOS pelo cabeçalho`);
+      }
+    } else if (fields.candidate_number < 0 || fields.votes < 0) {
       throw new Error(`${label}: não encontrei NR_CANDIDATO e QT_VOTOS_NOMINAIS pelo cabeçalho`);
     }
   }, (row) => {
     result.rows_seen++;
     const i = result.field_indexes;
-    const value = (key) => i[key] ? clean(row[i[key].zero_based]) : "";
 
-    if (value("year") && value("year") !== YEAR) return;
-    if (value("turn") && value("turn") !== TURN) return;
-    if (value("uf") && value("uf") !== UF) return;
-    if (value("cargo_code") && value("cargo_code") !== "7") return;
-    if (value("cargo_name") && !value("cargo_name").toLowerCase().includes("deputado estadual")) return;
-    if (value("candidate_number") !== CANDIDATE) return;
+    if (getField(i, row, "year") && getField(i, row, "year") !== YEAR) return;
+    if (getField(i, row, "turn") && getField(i, row, "turn") !== TURN) return;
+    if (getField(i, row, "uf") && getField(i, row, "uf") !== UF) return;
+    if (getField(i, row, "cargo_code") && getField(i, row, "cargo_code") !== "7") return;
+    if (
+      getField(i, row, "cargo_name") &&
+      !getField(i, row, "cargo_name").toLowerCase().includes("deputado estadual")
+    ) return;
+
+    const candidateField = schema === "section" ? "votavel_number" : "candidate_number";
+    if (getField(i, row, candidateField) !== CANDIDATE) return;
 
     result.matched_rows++;
-    result.votes_total += numeric(value("votes"));
-    if (i.votes_valid) result.votes_valid += numeric(value("votes_valid"));
-    if (value("municipality_code")) result.municipalities.add(value("municipality_code"));
-    if (value("zone")) result.zones.add(value("zone"));
-    if (value("section")) result.sections.add(value("section"));
+    result.votes_total += numeric(getField(i, row, "votes"));
+
+    if (i.votes_valid) {
+      result.votes_valid += numeric(getField(i, row, "votes_valid"));
+    }
+
+    const municipality = getField(i, row, "municipality_code");
+    const zone = getField(i, row, "zone");
+    const section = getField(i, row, "section");
+
+    if (municipality) result.municipalities.add(municipality);
+    if (zone) result.zones.add(zone);
+    if (section) result.sections.add(section);
     if (result.sample_matches.length < 5) result.sample_matches.push(row);
   });
 
@@ -214,7 +253,7 @@ async function main() {
 
   const [nominal, section, current2026] = await Promise.all([
     inspectZip("2022-votacao-nominal-munzona", nominalZip, /votacao_candidato_munzona_2022_RS\.csv$/i),
-    inspectZip("2022-votacao-secao-RS", sectionZip, /votacao_secao_2022_RS\.csv$/i),
+    inspectZip("2022-votacao-secao-RS", sectionZip, /votacao_secao_2022_RS\.csv$/i, "section"),
     validate2026(),
   ]);
 
@@ -226,7 +265,7 @@ async function main() {
         nominal_munzona: nominal,
         section_rs: section,
         totals_match: nominal.votes_total === section.votes_total,
-        valid_totals_match: nominal.votes_valid === section.votes_valid,
+        valid_totals_match: null,
       },
       "2026": current2026,
     },
