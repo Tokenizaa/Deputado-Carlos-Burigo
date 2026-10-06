@@ -1,6 +1,6 @@
 # INTELIGÊNCIA ELEITORAL — PLANO CANÔNICO
 
-**Estado:** FUNDAÇÃO FORMALIZADA — EXECUÇÃO IE-01 INICIADA  
+**Estado:** IE-01 — FUNDAÇÃO CONCLUÍDA  
 **Módulo:** Dashboard de Gabinete existente  
 **Data:** 2026-10-06
 
@@ -264,10 +264,14 @@ Essas perguntas são o primeiro conjunto de casos de uso; não constituem hipót
 11. Toda informação eleitoral importada deve manter sua fonte.
 12. A implementação deve seguir o padrão técnico já existente no projeto.
 
-## 9. Próximo passo operacional
+## 9. Resultado da IE-01
 
-O próximo trabalho é **IE-01 — Fundação**.
+A auditoria da arquitetura existente está concluída. O módulo será inserido no `AdminLayout`/`AdminWorkspace` existente, usando a rota `/admin#<modulo>` e o mecanismo de autenticação/RBAC já adotado.
 
-A execução começa pelo repositório real: localizar o Dashboard de Gabinete existente, seu shell, rotas, navegação, RBAC, integração Supabase e padrões de dados.
+A fonte primária de dados definida é o Portal de Dados Abertos do TSE. A documentação detalhada da fundação está em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
 
-Somente depois dessa auditoria será definida a implementação concreta da Inteligência Eleitoral dentro da estrutura existente.
+## 10. Próximo passo operacional
+
+**IE-02 — Modelo de Dados.**
+
+A próxima implementação deverá definir e validar o esquema canônico no Supabase, incluindo eleições, candidatos, municípios, zonas, seções, resultados e metadados de origem, antes da criação das telas.
