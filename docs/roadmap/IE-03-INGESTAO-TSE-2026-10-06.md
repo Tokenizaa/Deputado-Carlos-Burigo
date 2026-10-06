@@ -1,6 +1,6 @@
 # IE-03 — INGESTÃO DOS DADOS OFICIAIS DO TSE
 
-**Estado:** EM EXECUÇÃO — IE-03.1 descoberta e aquisição iniciadas  
+**Estado:** EM EXECUÇÃO — IE-03.1 descoberta + IE-03.2 aquisição em lote  
 **Data:** 2026-10-06  
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`
 
@@ -22,14 +22,21 @@ Portal: https://dadosabertos.tse.jus.br/group/resultados
 
 O Portal de Dados Abertos do TSE atualmente publica conjuntos de Resultados de 2022, 2024 e 2026. Os conjuntos de 2022 e 2024 disponibilizam votação nominal por município/zona e dados por seção eleitoral.
 
-Fontes prioritárias da primeira carga:
+### Primeira rodada de aquisição — sete recursos 2022
 
-- Resultados 2022 — votação nominal por município e zona;
-- Resultados 2022 — votação por seção eleitoral;
-- Resultados 2024 — votação nominal por município e zona;
-- Resultados 2024 — votação por seção eleitoral;
-- Candidatos 2022/2024, para completar dimensões de candidato/partido;
-- Resultados 2026 e Candidatos 2026, para acompanhamento incremental conforme os dados forem publicados/consolidados.
+A sequência foi ajustada para uma única rodada de aquisição. Os sete recursos serão descobertos pelo catálogo oficial do TSE, baixados, identificados e analisados em conjunto antes da normalização.
+
+1. Candidatos 2022 — recurso `Candidatos`;
+2. Resultados 2022 — `Votação nominal por município e zona`;
+3. Resultados 2022 — `RS - Votação por seção eleitoral - 2022`;
+4. Resultados 2022 — `Detalhe da apuração por município e zona`;
+5. Resultados 2022 — `Detalhe da apuração por seção eleitoral`;
+6. Resultados 2022 — `Votação em partido por município e zona`;
+7. Resultados 2022 — Boletim de Urna, recurso do RS.
+
+Os recursos brutos não serão versionados no GitHub. O repositório armazenará somente scripts, configuração, documentação e metadados/hash da aquisição.
+
+A expansão 2024/2026 permanece posterior a esta primeira rodada, sem duplicar a etapa de descoberta/aquisição.
 
 ## Prova de referência
 
@@ -87,10 +94,12 @@ TSE Portal
 ### IE-03.1 — Descoberta das fontes
 **EM EXECUÇÃO**
 
-Implementar descoberta dos datasets e recursos oficiais, com API/CKAN primária e crawler HTML de fallback.
+Descobrir os sete recursos da primeira rodada diretamente no catálogo oficial do TSE, com API/CKAN primária e crawler HTML de fallback.
 
 ### IE-03.2 — Aquisição
-Baixar recursos oficiais, calcular SHA-256 e registrar metadados sem ainda carregar fatos incompletos.
+**PRÓXIMA EXECUÇÃO IMEDIATA**
+
+Baixar os sete recursos em uma única rodada, calcular SHA-256 e registrar metadados. A análise estrutural ocorrerá sobre o conjunto adquirido, sem carga de fatos antes da definição do parser.
 
 ### IE-03.3 — Parser/normalização
 Mapear cabeçalhos e códigos TSE para as 14 tabelas canônicas.
