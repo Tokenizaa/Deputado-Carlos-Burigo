@@ -263,7 +263,8 @@ async function main() {
       });
     });
 
-  const ea20 = JSON.parse((await import("node:fs/promises")).readFile ? await (await import("node:fs/promises")).readFile(ea20Path, "utf8") : "{}");
+  const { readFile } = await import("node:fs/promises");
+  const ea20 = JSON.parse(await readFile(ea20Path, "utf8"));
   const cargo2026 = findCargo(ea20, "0007") || findCargo(ea20, 7);
   const candidate2026 = findCandidate(cargo2026 || ea20, CANDIDATE_NUMBER);
   const rootVotes = ea20.v || cargo2026?.v || {};
@@ -405,7 +406,7 @@ async function main() {
       zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`),
       source_dataset_id: sourceDetailSection.id, import_run_id: runDetailSection.id,
       electorate: r.electorate, comparecimento: r.comparecimento, abstentions: r.abstentions,
-      valid_votes: r.nominal_votes, blank_votes: r.blank_votes, null_votes: r.null_votes, total_votes: r.total_votes
+      valid_votes: r.valid_votes, blank_votes: r.blank_votes, null_votes: r.null_votes, total_votes: r.total_votes
     }));
     for (let i = 0; i < facts.length; i += 500) await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
     await finish(runDetailSection, facts.length, { proof_case: true, layer: "apuration_section" });
