@@ -156,6 +156,18 @@ Fonte para:
 
 Votos partidários/legenda não serão armazenados como votos nominais de candidato.
 
+
+### 5.6 Fato agregado por candidato
+
+Quando a fonte fornece voto de candidato em granularidade município/zona ou UF, o fato não deve ser forçado em `electoral_results_nominal`. A tabela `electoral_results_totals` passa a aceitar:
+
+- `candidate_id` para identificar a candidatura;
+- `candidate_votes` para armazenar exclusivamente o voto agregado daquela candidatura.
+
+Os campos de apuração (`electorate`, `comparecimento`, `abstentions`, `valid_votes`, `blank_votes`, `null_votes`, `total_votes`) continuam representando o total eleitoral da granularidade, independentemente de haver `candidate_id`.
+
+Isso permite representar corretamente tanto `VOTACAO_CANDIDATO_MUNZONA` 2022 quanto o EA20/UF 2026 sem criar tabela paralela ou fabricar uma seção.
+
 ### 5.5 Detalhe de apuração
 
 Fontes:
