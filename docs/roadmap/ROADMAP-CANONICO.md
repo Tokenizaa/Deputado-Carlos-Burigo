@@ -126,15 +126,15 @@ A estrutura final deve respeitar o shell, roteamento, RBAC e padrões já existe
 
 A Inteligência Eleitoral será privada e deverá reutilizar autenticação, autorização, RBAC, RLS e infraestrutura existentes. Não haverá API pública, rota pública ou indexação pública para esse módulo.
 
-### Sequência de execução
+### Estado operacional da Inteligência Eleitoral
 
-- **IE-01 — Fundação:** auditoria do Dashboard existente, ponto de inserção, RBAC, fontes eleitorais e decisões arquiteturais.
-- **IE-02 — Modelo de dados:** estrutura canônica no Supabase.
-- **IE-03 — Ingestão:** dados eleitorais históricos e 2026, com validação e rastreabilidade.
-- **IE-04 — Inteligência:** métricas e comparativos.
-- **IE-05 — Interface:** páginas dentro do Dashboard existente.
-- **IE-06 — Investigação:** evolução do bate-papo para investigação baseada em dados.
-- **IE-07 — Validação:** segurança, consistência, evidências e fluxo ponta a ponta.
+- **IE-01 — Fundação: CONCLUÍDA.** Auditoria do Dashboard, ponto de inserção, autenticação, RBAC existente e fontes eleitorais registrados em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
+- **IE-02 — Modelo de dados: PRÓXIMA ETAPA.**
+- **IE-03 — Ingestão:** planejada.
+- **IE-04 — Inteligência:** planejada.
+- **IE-05 — Interface:** planejada.
+- **IE-06 — Investigação:** planejada.
+- **IE-07 — Validação:** planejada.
 
 **Regra:** nenhuma interface de inteligência será criada antes da definição e validação da camada de dados necessária.
 
