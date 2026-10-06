@@ -128,16 +128,6 @@ const MainAppContent: React.FC = () => {
       </main>
       <Footer />
       {currentView !== 'contato' && currentView !== 'cidadao' && (
-      {currentView !== 'admin' && (
-        <a
-          href="/admin"
-          onClick={(event) => { event.preventDefault(); setCurrentView('admin') }}
-          className="fixed left-4 z-40 min-h-12 min-w-12 rounded-full bg-[#00863f] px-4 text-sm font-bold text-white shadow-lg border-2 border-white flex items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00863f] bottom-[calc(4.75rem+env(safe-area-inset-bottom))]"
-          aria-label="Acesso ao Dashboard"
-        >
-          Acesso ao Dashboard
-        </a>
-      )}
         <a
           href="/contato"
           onClick={(event) => { event.preventDefault(); setCurrentView('contato') }}
