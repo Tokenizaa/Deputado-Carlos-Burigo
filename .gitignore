@@ -15,3 +15,8 @@ dist-cf/
 # Playwright output
 playwright-report/
 test-results/
+
+# Electoral raw acquisition artifacts
+artifacts/electoral/raw/
+artifacts/electoral/tse-source-catalog.json
+artifacts/electoral/tse-acquisition-2022.json
