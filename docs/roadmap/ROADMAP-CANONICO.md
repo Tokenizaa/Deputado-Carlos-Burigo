@@ -126,6 +126,20 @@ A estrutura final deve respeitar o shell, roteamento, RBAC e padrões já existe
 
 A Inteligência Eleitoral será privada e deverá reutilizar autenticação, autorização, RBAC, RLS e infraestrutura existentes. Não haverá API pública, rota pública ou indexação pública para esse módulo.
 
+
+### IE-03 — Reconciliação local × GitHub antes da validação
+**PRÉ-CONDIÇÃO OPERACIONAL — EM EXECUÇÃO**
+
+Antes de qualquer nova validação, aquisição adicional ou carga no Supabase, o estado local usado pelo agente e o estado publicado em `origin/main` devem ser reconciliados. Nenhum `reset`, `clean`, `checkout` ou descarte de trabalho local será executado sem inspeção prévia. O objetivo é preservar trabalho local do agente, identificar commits locais ainda não publicados e só então alinhar o working tree à `main` canônica.
+
+Procedimento obrigatório:
+1. inspecionar `git status --short --branch`;
+2. inspecionar `git log --oneline --decorate -n 20`;
+3. inspecionar `git fetch origin` e comparar `HEAD` com `origin/main`;
+4. identificar separadamente commits locais, alterações não commitadas e arquivos brutos de aquisição;
+5. preservar e integrar somente o que for pertinente ao IE-03;
+6. confirmar working tree reconciliado antes de executar o validador.
+
 ### Estado operacional da Inteligência Eleitoral
 
 - **IE-01 — Fundação: CONCLUÍDA.** Auditoria do Dashboard, ponto de inserção, autenticação, RBAC existente e fontes eleitorais registrados em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
