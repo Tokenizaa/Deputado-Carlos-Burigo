@@ -129,7 +129,7 @@ A Inteligência Eleitoral será privada e deverá reutilizar autenticação, aut
 ### Estado operacional da Inteligência Eleitoral
 
 - **IE-01 — Fundação: CONCLUÍDA.** Auditoria do Dashboard, ponto de inserção, autenticação, RBAC existente e fontes eleitorais registrados em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
-- **IE-02 — Modelo de dados: MODELO CANÔNICO DEFINIDO.** O modelo lógico foi registrado em `docs/roadmap/IE-02-MODELO-DADOS-INTELIGENCIA-ELEITORAL-2026-10-06.md`; a aplicação física no Supabase permanece pendente de acesso administrativo ao projeto identificado pelo runtime.
+- **IE-02 — Modelo de dados: CONCLUÍDA.** Modelo lógico registrado em `docs/roadmap/IE-02-MODELO-DADOS-INTELIGENCIA-ELEITORAL-2026-10-06.md` e migração física aplicada no Supabase em `20261006201443_create_electoral_intelligence_model`.
 - **IE-03 — Ingestão:** planejada.
 - **IE-04 — Inteligência:** planejada.
 - **IE-05 — Interface:** planejada.
