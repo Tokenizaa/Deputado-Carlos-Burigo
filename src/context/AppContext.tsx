@@ -322,7 +322,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       description?: string;
       seoTitle?: string;
       seoDescription?: string;
-      ogImageUrl?: string;
       status?: 'publicado' | 'rascunho';
       publish?: boolean;
       note?: string;
