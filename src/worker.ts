@@ -1,25 +1,59 @@
 import {
   getPublicAgenda,
-  getPublicDemandByProtocol,
   getPublicMedia,
   getPublicMunicipalities,
   getPublicNews,
-  getPublicProjects,
   getPublicResults,
   getPublicSettings,
+  getPlatformSettings,
+  updatePlatformSettings,
+  updateAdminSettings,
   getPublicVideos,
-  getPublicLegislativeVotes,
+  getPublicLegislativeItems,
   getPublicPages,
   supabaseAdmin,
   supabasePublic,
   configureSupabaseAdmin,
   getAdminUserById,
+  getAuthenticatedAdminUser,
   getAllAdminUsers,
+  bootstrapFirstAdmin,
   getAdminAuditLogs,
+  createAdminAuditLog,
+  getAdminTasks,
+  createAdminTask,
+  updateAdminTask,
+  deleteAdminTask,
   getAllDemandsAdmin,
   updateDemandAdmin,
   getPublicDocuments,
   getPublicEvidence,
+  getAdminDocuments,
+  createAdminDocument,
+  getAdminEvidence,
+  updateAdminDocument,
+  getAdminNews,
+  createAdminNews,
+  updateAdminNews,
+  deleteAdminNews,
+  getAdminAgenda,
+  createAdminAgenda,
+  updateAdminAgenda,
+  deleteAdminAgenda,
+  getAdminResults,
+  createAdminResult,
+  updateAdminResult,
+  deleteAdminResult,
+  getAdminMunicipalities,
+  createAdminMunicipality,
+  updateAdminMunicipality,
+  deleteAdminMunicipality,
+  getAdminVideos,
+  createAdminVideo,
+  updateAdminVideo,
+  deleteAdminVideo,
+  updateAdminUserRole,
+  setAdminUserAccess,
 } from '../server/supabase';
 import { mapToPublicMediaDto, mapToPublicVideoDto } from '../server/mappers/publicArchive';
 import {
@@ -29,6 +63,20 @@ import {
   updateAdminPage,
   rollbackAdminPage,
 } from '../server/pagesAdmin';
+import {
+  getAdminInvites,
+  createAdminInvite,
+  approveAdminInvite,
+  rejectAdminInvite,
+  revokeAdminInvite,
+  renewAdminInvite,
+  acceptAdminInvite,
+} from '../server/invites';
+
+import type { User, UserRole } from '../src/types';
+import type { AdminModule, Permission } from '../src/config/adminPermissions';
+import { getEffectivePermissions, canEffective } from '../server/permissions';
+import { validatePassword } from './lib/passwordValidation';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -48,27 +96,50 @@ async function respond(fn: JsonHandler, label: string, errorMessage: string): Pr
   }
 }
 
+async function requireCitizenAuth(request: Request): Promise<{ userId: string; email: string; name?: string } | Response> {
+  const authorization = request.headers.get('authorization') ?? '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  if (!match) return Response.json({ error: 'Não autenticado' }, { status: 401 });
+  const { data, error } = await supabaseAdmin.auth.getUser(match[1]);
+  if (error || !data.user) return Response.json({ error: 'Sessão inválida' }, { status: 401 });
+  return {
+    userId: data.user.id,
+    email: data.user.email ?? '',
+    name: typeof data.user.user_metadata?.name === 'string' ? data.user.user_metadata.name : undefined,
+  };
+}
+
+function normalizeBrazilPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('55')) return `+${digits}`;
+  return `+55${digits}`;
+}
+
 async function sha256Hex(input: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Helper to extract user ID from request headers
-function getUserId(request: Request): string | null {
-  const userId = request.headers.get('x-user-id');
-  return userId ?? null;
+async function requireEffectivePermission(request: Request, module: AdminModule, action: Permission): Promise<{ auth: { userId: string; role: string; user: User } } | Response> {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const allowed = await canEffective(authResult.userId, authResult.role, module, action);
+  if (!allowed) return Response.json({ error: 'Acesso negado para esta permissão.' }, { status: 403 });
+  return { auth: authResult };
 }
 
-// Helper to require authentication for admin endpoints
-async function requireAuth(request: Request): Promise<{ userId: string } | Response> {
-  const userId = getUserId(request);
-  if (!userId) {
-    return Response.json(
-      { error: 'Unauthorized: Missing x-user-id header' },
-      { status: 401 }
-    );
-  }
-  return { userId };
+function methodNotAllowed(): Response {
+  return Response.json({ error: 'Método não permitido' }, { status: 405 });
+}
+
+// Helper to extract user ID from request headers
+async function requireAuth(request: Request): Promise<{ userId: string; role: string; user: User } | Response> {
+  const authorization = request.headers.get('authorization') ?? '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  if (!match) return Response.json({ error: 'Não autenticado' }, { status: 401 });
+  const user = await getAuthenticatedAdminUser(match[1]);
+  if (!user) return Response.json({ error: 'Sessão inválida ou usuário sem perfil de gabinete' }, { status: 401 });
+  return { userId: user.id, role: user.role, user };
 }
 
 // Helper to add security headers
@@ -128,7 +199,76 @@ function extractPathParams(pattern: string, pathname: string): Record<string, st
   return params;
 }
 
+let runtimeEnv: Env | null = null;
+
 const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
+  '/api/auth/bootstrap-status': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'ADMIN')
+        .limit(1);
+      if (error) throw error;
+      return Response.json({ available: (data ?? []).length === 0 });
+    } catch (error) {
+      console.error('[api/auth/bootstrap-status]', error);
+      return Response.json({ error: 'Não foi possível verificar o primeiro acesso.' }, { status: 500 });
+    }
+  },
+  '/api/auth/bootstrap-admin': async (request) => {
+if (request.method !== 'POST') return methodNotAllowed();
+     try {
+       const body = await request.json();
+       const name = typeof body?.name === 'string' ? body.name : '';
+       const cargo = typeof body?.cargo === 'string' ? body.cargo : '';
+       const email = typeof body?.email === 'string' ? body.email : '';
+       const password = typeof body?.password === 'string' ? body.password : '';
+       const passwordConfirmation = typeof body?.passwordConfirmation === 'string' ? body.passwordConfirmation : '';
+       if (password !== passwordConfirmation) return Response.json({ error: 'As senhas não coincidem.' }, { status: 400 });
+       
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) return Response.json({ error: passwordValidation.error }, { status: 400 });
+       
+       const user = await bootstrapFirstAdmin({ name, cargo, email, password });
+      return Response.json({ user }, { status: 201 });
+    } catch (error) {
+      console.error('[api/auth/bootstrap-admin]', error);
+      return Response.json({ error: error?.message || 'Não foi possível criar o administrador principal.' }, { status: 400 });
+    }
+  },
+  '/api/auth/config': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    return Response.json({
+      url: runtimeEnv?.SUPABASE_URL ?? 'https://wktanxbpijurimdjgone.supabase.co',
+      publishableKey: runtimeEnv?.SUPABASE_PUBLISHABLE_KEY ?? '',
+    });
+  },
+  '/api/auth/me': async (request) => {
+    if (request.method !== 'GET') return methodNotAllowed();
+    try {
+      const auth = await requireAuth(request);
+      if (auth instanceof Response) return auth;
+      
+      // Get the admin user details
+      const adminUser = await getAdminUserById(auth.userId);
+      if (!adminUser) {
+        return Response.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      }
+      
+      // Get all admin users for the frontend (if needed)
+      const allUsers = await getAllAdminUsers();
+      
+      return Response.json({
+        user: adminUser,
+        allUsers: allUsers || []
+      });
+    } catch (error) {
+      console.error('[api/auth/me]', error);
+      return Response.json({ error: 'Falha ao obter informações do usuário' }, { status: 500 });
+    }
+  },
   '/api/health': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     return Response.json({
@@ -138,77 +278,379 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       timestamp: new Date().toISOString(),
     });
   },
-  '/api/settings': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const settings = await getPublicSettings();
-      if (!settings) {
-        return Response.json(
-          { error: 'Configurações públicas não encontradas no acervo' },
-          { status: 404 }
-        );
+  '/api/tasks': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'GET' && !(await canEffective(authResult.userId, authResult.role, 'tarefas', 'view'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    if (request.method === 'POST' && !(await canEffective(authResult.userId, authResult.role, 'tarefas', 'create'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    
+    if (request.method === 'GET') {
+      try {
+        const tasks = await getAdminTasks();
+        return Response.json(tasks);
+      } catch (error) {
+        console.error('[api/tasks GET]', error);
+        return Response.json({ error: 'Falha ao carregar tarefas' }, { status: 500 });
       }
-      return Response.json(settings);
+    }
+    
+    if (request.method === 'POST') {
+
+      try {
+        const data = await request.json();
+        // Basic validation
+        if (!data?.title) {
+          return Response.json({ error: 'Título é obrigatório' }, { status: 400 });
+        }
+        const task = await createAdminTask({
+          ...data,
+          userId: authResult.userId
+        });
+        return Response.json(task, { status: 201 });
+      } catch (error) {
+        console.error('[api/tasks POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar tarefa' }, { status: 400 });
+      }
+    }
+    
+    return methodNotAllowed();
+  },
+  '/api/tasks/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID da tarefa é obrigatório' }, { status: 400 });
+    
+    // Check permissions based on method
+    if (request.method === 'GET') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'view'))) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const tasks = await getAdminTasks();
+        const task = tasks.find(t => t.id === id);
+        if (!task) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json(task);
+      } catch (error) {
+        console.error('[api/tasks/:id GET]', error);
+        return Response.json({ error: 'Falha ao carregar tarefa' }, { status: 500 });
+      }
+    }
+    
+    if (request.method === 'PUT') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'edit'))) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const data = await request.json();
+        // Basic validation
+        if (!data?.title) {
+          return Response.json({ error: 'Título é obrigatório' }, { status: 400 });
+        }
+        const updated = await updateAdminTask(id, {
+          ...data,
+          userId: authResult.userId
+        });
+        if (!updated) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/tasks/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar tarefa' }, { status: 400 });
+      }
+    }
+    
+    if (request.method === 'DELETE') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'tarefas', 'delete'))) {
+        return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      try {
+        const deleted = await deleteAdminTask(id);
+        if (!deleted) return Response.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/tasks/:id DELETE]', error);
+        return Response.json({ error: 'Falha ao excluir tarefa' }, { status: 500 });
+      }
+    }
+    
+    return methodNotAllowed();
+  },
+  '/api/platform-settings': async (request) => {
+    try {
+      if (request.method === 'GET') {
+        const settings = await getPlatformSettings();
+        return Response.json(settings);
+      }
+
+const authResult = await requireAuth(request);
+       if (authResult instanceof Response) return authResult;
+       // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+       const { userId, role, user } = authResult;
+if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+
+       if (request.method === 'PUT') {
+         const body = await request.json();
+         if (typeof body?.citizenDemandEnabled !== 'boolean') {
+           return Response.json({ error: 'citizenDemandEnabled deve ser booleano' }, { status: 400 });
+         }
+         const settings = await updatePlatformSettings({
+           citizenDemandEnabled: body.citizenDemandEnabled,
+         });
+         const actor = await getAdminUserById(userId);
+         await createAdminAuditLog({
+           userId: userId,
+           userName: actor?.name ?? userId,
+           userRole: role,
+           action: 'update',
+           entityType: 'platform_settings',
+           entityId: 'true',
+           details: { citizenDemandEnabled: settings.citizenDemandEnabled },
+         });
+        return Response.json(settings);
+      }
+
+      return Response.json({ error: 'Método não permitido' }, { status: 405 });
     } catch (error) {
-      console.error('[api/settings]', error);
-      return Response.json(
-        { error: 'Falha ao carregar configurações do acervo' },
-        { status: 500 }
-      );
+      console.error('[api/platform-settings]', error);
+      return Response.json({ error: 'Falha ao carregar configurações operacionais' }, { status: 500 });
     }
   },
-  '/api/projects': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
+
+  '/api/settings': async (request) => {
+    if (request.method === 'GET') {
+      try {
+        const settings = await getPublicSettings();
+        if (!settings) return Response.json({ error: 'Configurações públicas não encontradas no acervo' }, { status: 404 });
+        return Response.json(settings);
+      } catch (error) {
+        console.error('[api/settings GET]', error);
+        return Response.json({ error: 'Falha ao carregar configurações do acervo' }, { status: 500 });
+      }
+    }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'PUT') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'configurações', 'manage_settings'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
-      const projects = await getPublicProjects();
-      return Response.json(projects);
+      return Response.json(await updateAdminSettings(await request.json()));
     } catch (error) {
-      console.error('[api/projects]', error);
-      return Response.json(
-        { error: 'Falha ao carregar projetos do acervo' },
-        { status: 500 }
-      );
+      console.error('[api/settings PUT]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar configurações' }, { status: 400 });
     }
   },
   '/api/results': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicResults());
+      } catch (error) {
+        console.error('[api/results GET]', error);
+        return Response.json({ error: 'Falha ao carregar resultados do acervo' }, { status: 500 });
+      }
+    }
+const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+if (request.method === 'POST') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const data = await request.json();
+          if (!data?.title || !data?.category || !data?.description) return Response.json({ error: 'title, category e description são obrigatórios' }, { status: 400 });
+          return Response.json(await createAdminResult(data), { status: 201 });
+        } catch (error) {
+          console.error('[api/results POST]', error);
+          return Response.json({ error: error?.message || 'Falha ao criar resultado' }, { status: 400 });
+        }
+      }
+    return methodNotAllowed();
+  },
+'/api/results/:id': async (request) => {
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+     const id = (request as any).params?.id;
+     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+if (request.method === 'PUT') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const updated = await updateAdminResult(id, await request.json());
+          if (!updated) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+          return Response.json(updated);
+        } catch (error) {
+          console.error('[api/results/:id PUT]', error);
+          return Response.json({ error: error?.message || 'Falha ao atualizar resultado' }, { status: 400 });
+        }
+      }
+if (request.method === 'DELETE') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const deleted = await deleteAdminResult(id);
+          if (!deleted) return Response.json({ error: 'Resultado não encontrado' }, { status: 404 });
+          return Response.json({ success: true });
+        } catch (error) {
+          console.error('[api/results/:id DELETE]', error);
+          return Response.json({ error: error?.message || 'Falha ao excluir resultado' }, { status: 400 });
+        }
+      }
+     return methodNotAllowed();
+  },
+'/api/municipalities': async (request) => {
+     if (request.method === 'GET') {
+       try {
+         return Response.json(await getPublicMunicipalities());
+       } catch (error) {
+         console.error('[api/municipalities GET]', error);
+         return Response.json({ error: 'Falha ao carregar municípios do acervo' }, { status: 500 });
+       }
+     }
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+if (request.method === 'POST') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const data = await request.json();
+          if (!data?.name || !data?.region || !Array.isArray(data?.keyDeliveries)) return Response.json({ error: 'name, region e keyDeliveries são obrigatórios' }, { status: 400 });
+          return Response.json(await createAdminMunicipality(data), { status: 201 });
+        } catch (error) {
+          console.error('[api/municipalities POST]', error);
+          return Response.json({ error: error?.message || 'Falha ao criar município' }, { status: 400 });
+        }
+      }
+     return methodNotAllowed();
+  },
+'/api/municipalities/:id': async (request) => {
+     const authResult = await requireAuth(request);
+     if (authResult instanceof Response) return authResult;
+     // Type guard: after the instanceof check, authResult is { userId: string; role: string; user: User }
+     const { userId, role, user } = authResult;
+     const id = (request as any).params?.id;
+     if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+if (request.method === 'PUT') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const updated = await updateAdminMunicipality(id, await request.json());
+          if (!updated) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+          return Response.json(updated);
+        } catch (error) {
+          console.error('[api/municipalities/:id PUT]', error);
+          return Response.json({ error: error?.message || 'Falha ao atualizar município' }, { status: 400 });
+        }
+      }
+if (request.method === 'DELETE') {
+        if (!(await canEffective(authResult.userId, authResult.role, 'atuação', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+        try {
+          const deleted = await deleteAdminMunicipality(id);
+          if (!deleted) return Response.json({ error: 'Município não encontrado' }, { status: 404 });
+          return Response.json({ success: true });
+        } catch (error) {
+          console.error('[api/municipalities/:id DELETE]', error);
+          return Response.json({ error: error?.message || 'Falha ao excluir município' }, { status: 400 });
+        }
+      }
+     return methodNotAllowed();
+  },
+  '/api/admin/upload': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create')) && !(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    if (request.method !== 'POST') return methodNotAllowed();
     try {
-      const results = await getPublicResults();
-      return Response.json(results);
+      // Defensive: keep the 400 contract stable instead of surfacing a TypeError leak.
+      // the 400 contract stable instead of surfacing a TypeError leak.
+      const contentType = request.headers.get('content-type') ?? '';
+      if (!contentType.includes('multipart/form-data')) {
+        return Response.json({ error: 'Envie o arquivo como multipart/form-data' }, { status: 400 });
+      }
+      const form = await request.formData();
+      const file = form.get('file');
+      const visibility = String(form.get('visibility') || 'publico');
+      if (!['publico', 'interno', 'restrito'].includes(visibility)) return Response.json({ error: 'Visibilidade inválida' }, { status: 400 });
+      if (!(file instanceof File)) return Response.json({ error: 'Arquivo é obrigatório' }, { status: 400 });
+      if (file.size > 50 * 1024 * 1024) return Response.json({ error: 'Arquivo excede o limite de 50 MB' }, { status: 400 });
+      const allowed = new Set(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','text/plain','image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime']);
+      if (!allowed.has(file.type)) return Response.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 });
+      const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'bin';
+      const storagePath = `uploads/${crypto.randomUUID()}.${extension}`;
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const bucket = visibility === 'publico' ? 'documents' : 'documents-private';
+      const { error } = await supabaseAdmin.storage.from(bucket).upload(storagePath, bytes, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      const baseUrl = new URL(request.url).origin;
+      let url = new URL(`/storage/v1/object/public/documents/${storagePath}`, baseUrl).toString();
+      if (bucket === 'documents-private') {
+        const signed = await supabaseAdmin.storage.from(bucket).createSignedUrl(storagePath, 3600);
+        if (signed.error || !signed.data?.signedUrl) throw signed.error || new Error('Falha ao gerar URL privada');
+        url = signed.data.signedUrl;
+      }
+      return Response.json({ url, storagePath, mimeType: file.type, size: file.size }, { status: 201 });
     } catch (error) {
-      console.error('[api/results]', error);
-      return Response.json(
-        { error: 'Falha ao carregar resultados do acervo' },
-        { status: 500 }
-      );
+      console.error('[api/admin/upload]', error);
+      return Response.json({ error: error?.message || 'Falha ao enviar arquivo' }, { status: 400 });
     }
   },
-  '/api/municipalities': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const municipalities = await getPublicMunicipalities();
-      return Response.json(municipalities);
-    } catch (error) {
-      console.error('[api/municipalities]', error);
-      return Response.json(
-        { error: 'Falha ao carregar municípios do acervo' },
-        { status: 500 }
-      );
-    }
-  },
+
   '/api/videos': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const videos = await getPublicVideos();
-      const mappedVideos = videos.map(mapToPublicVideoDto);
-      return Response.json(mappedVideos);
-    } catch (error) {
-      console.error('[api/videos]', error);
-      return Response.json(
-        { error: 'Falha ao carregar vídeos do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        const videos = await getPublicVideos();
+        return Response.json(videos.map(mapToPublicVideoDto));
+      } catch (error) {
+        console.error('[api/videos GET]', error);
+        return Response.json({ error: 'Falha ao carregar vídeos do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const data = await request.json();
+        if (!data?.title || !data?.url || !data?.platform || !data?.category) return Response.json({ error: 'title, url, platform e category são obrigatórios' }, { status: 400 });
+        return Response.json(await createAdminVideo(data), { status: 201 });
+      } catch (error) {
+        console.error('[api/videos POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar vídeo' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+  '/api/videos/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const updated = await updateAdminVideo(id, await request.json());
+        if (!updated) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
+        return Response.json(updated);
+      } catch (error) {
+        console.error('[api/videos/:id PUT]', error);
+        return Response.json({ error: error?.message || 'Falha ao atualizar vídeo' }, { status: 400 });
+      }
+    }
+    if (request.method === 'DELETE') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const deleted = await deleteAdminVideo(id);
+        if (!deleted) return Response.json({ error: 'Vídeo não encontrado' }, { status: 404 });
+        return Response.json({ success: true });
+      } catch (error) {
+        console.error('[api/videos/:id DELETE]', error);
+        return Response.json({ error: 'Falha ao excluir vídeo' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
   },
   '/api/media': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
@@ -225,30 +667,68 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
   '/api/news': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const news = await getPublicNews();
-      return Response.json(news);
-    } catch (error) {
-      console.error('[api/news]', error);
-      return Response.json(
-        { error: 'Falha ao carregar notícias do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicNews());
+      } catch (error) {
+        console.error('[api/news]', error);
+        return Response.json({ error: 'Falha ao carregar notícias do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(async () => createAdminNews(await request.json(), authResult.userId), 'news POST', 'Falha ao criar notícia');
+    }
+    return methodNotAllowed();
   },
   '/api/agenda': async (request) => {
-    if (request.method !== 'GET') return methodNotAllowed();
-    try {
-      const agenda = await getPublicAgenda();
-      return Response.json(agenda);
-    } catch (error) {
-      console.error('[api/agenda]', error);
-      return Response.json(
-        { error: 'Falha ao carregar agenda do acervo' },
-        { status: 500 }
-      );
+    if (request.method === 'GET') {
+      try {
+        return Response.json(await getPublicAgenda());
+      } catch (error) {
+        console.error('[api/agenda]', error);
+        return Response.json({ error: 'Falha ao carregar agenda do acervo' }, { status: 500 });
+      }
     }
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(async () => createAdminAgenda(await request.json(), authResult.userId), 'agenda POST', 'Falha ao criar compromisso');
+    }
+    return methodNotAllowed();
+  },
+  '/api/news/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = extractPathParams('/api/news/:id', new URL(request.url).pathname)?.id;
+    if (!id) return Response.json({ error: 'ID da notícia não fornecido' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(async () => updateAdminNews(id, await request.json()), 'news PUT', 'Falha ao atualizar notícia');
+    }
+    if (request.method === 'DELETE') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => deleteAdminNews(id), 'news DELETE', 'Falha ao excluir notícia');
+    }
+    return methodNotAllowed();
+  },
+  '/api/agenda/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const id = extractPathParams('/api/agenda/:id', new URL(request.url).pathname)?.id;
+    if (!id) return Response.json({ error: 'ID do compromisso não fornecido' }, { status: 400 });
+    if (request.method === 'PUT') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(async () => updateAdminAgenda(id, await request.json()), 'agenda PUT', 'Falha ao atualizar compromisso');
+    }
+    if (request.method === 'DELETE') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'agenda', 'delete'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      return respond(() => deleteAdminAgenda(id), 'agenda DELETE', 'Falha ao excluir compromisso');
+    }
+    return methodNotAllowed();
   },
   '/api/events': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
@@ -263,15 +743,15 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
-  '/api/votes': async (request) => {
+  '/api/legislative': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     try {
-      const votes = await getPublicLegislativeVotes();
-      return Response.json(votes);
+      const items = await getPublicLegislativeItems();
+      return Response.json(items);
     } catch (error) {
-      console.error('[api/votes]', error);
+      console.error('[api/legislative]', error);
       return Response.json(
-        { error: 'Falha ao carregar votações do acervo' },
+        { error: 'Falha ao carregar atividade legislativa do acervo' },
         { status: 500 }
       );
     }
@@ -329,6 +809,80 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
       );
     }
   },
+  '/api/admin/evidence': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'GET') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    try {
+      return Response.json(await getAdminEvidence());
+    } catch (error) {
+      console.error('[api/admin/evidence]', error);
+      return Response.json({ error: 'Falha ao carregar evidências' }, { status: 500 });
+    }
+  },
+
+  '/api/admin/documents': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method === 'GET') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        return Response.json(await getAdminDocuments());
+      } catch (error) {
+        console.error('[api/admin/documents GET]', error);
+        return Response.json({ error: 'Falha ao carregar documentos' }, { status: 500 });
+      }
+    }
+    if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+      try {
+        const document = await createAdminDocument(await request.json());
+        if (document) {
+          await createAdminAuditLog({
+            userId: authResult.userId,
+            userName: authResult.user.name,
+            userRole: authResult.role,
+            action: 'CREATE',
+            entityType: 'document',
+            entityId: document.id,
+            details: { title: document.title, category: document.category, visibility: document.visibility, status: document.status },
+          });
+        }
+        return Response.json(document, { status: 201 });
+      } catch (error) {
+        console.error('[api/admin/documents POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar documento' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+  '/api/admin/documents/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'PUT') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'gestao-documental', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do documento é obrigatório' }, { status: 400 });
+    try {
+      const body = await request.json();
+      const document = await updateAdminDocument(id, body);
+      if (!document) return Response.json({ error: 'Documento não encontrado' }, { status: 404 });
+      await createAdminAuditLog({
+        userId: authResult.userId,
+        userName: authResult.user.name,
+        userRole: authResult.role,
+        action: 'UPDATE',
+        entityType: 'document',
+        entityId: id,
+        details: { changedFields: Object.keys(body), title: document.title, category: document.category, visibility: document.visibility, status: document.status },
+      });
+      return Response.json(document);
+    } catch (error) {
+      console.error('[api/admin/documents/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar documento' }, { status: 400 });
+    }
+  },
   '/api/evidence': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
     try {
@@ -348,6 +902,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const pages = await getAdminPages();
         return Response.json(pages);
@@ -359,6 +914,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         );
       }
     } else if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'create'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const data = await request.json();
         const page = await createAdminPage(data);
@@ -386,6 +942,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'GET') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -412,6 +969,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
         );
       }
     } else if (request.method === 'PUT') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id', url.pathname);
@@ -452,6 +1010,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     if (authResult instanceof Response) return authResult;
     
     if (request.method === 'POST') {
+      if (!(await canEffective(authResult.userId, authResult.role, 'conteúdo', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
       try {
         const url = new URL(request.url);
         const idMatch = extractPathParams('/api/admin/pages/:id/rollback', url.pathname);
@@ -493,191 +1052,177 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
   
   // Citizen demand endpoints
+  '/api/citizen/account': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+try {
+       const { email, password, name, phone } = await request.json();
+       if (typeof email !== 'string' || typeof password !== 'string' || typeof name !== 'string' || typeof phone !== 'string') {
+         return Response.json({ error: 'Nome, e-mail, telefone e senha são obrigatórios.' }, { status: 400 });
+       }
+       
+       const passwordValidation = validatePassword(password);
+       if (!passwordValidation.valid) return Response.json({ error: passwordValidation.error }, { status: 400 });
+       
+       const normalizedEmail = email.trim().toLowerCase();
+      const normalizedPhone = normalizeBrazilPhone(phone);
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: normalizedEmail,
+        password,
+        email_confirm: true,
+        user_metadata: { name: name.trim(), phone: normalizedPhone },
+      });
+      if (error || !data.user) {
+        console.error('[api/citizen/account]', error);
+        return Response.json({ error: 'Não foi possível criar a conta com esses dados.' }, { status: 400 });
+      }
+      return Response.json({ success: true, user: { id: data.user.id, email: data.user.email } });
+    } catch (error) {
+      console.error('[api/citizen/account]', error);
+      return Response.json({ error: 'Falha ao criar a conta.' }, { status: 500 });
+    }
+  },
+
   '/api/citizen/demand': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
-    
+    const platformSettings = await getPlatformSettings();
+    if (!platformSettings.citizenDemandEnabled) {
+      return Response.json({ error: 'O canal de atendimento está temporariamente indisponível.' }, { status: 503 });
+    }
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
       const data = await request.json();
-      
-      // Extract and validate required fields
       const {
-        citizenName,
-        citizenEmail,
-        citizenPhone,
+        citizenName, citizenEmail, citizenPhone, municipality, neighborhood,
+        category, subject, description, attachments = [], lgpdConsent
+      } = data;
+
+      if (!citizenName || !citizenEmail || !citizenPhone || !municipality || !category || !subject || !description) {
+        return Response.json({ error: 'Campos obrigatórios faltando.' }, { status: 400 });
+      }
+      if (!lgpdConsent) return Response.json({ error: 'Consentimento LGPD é obrigatório.' }, { status: 400 });
+      if (citizenEmail.trim().toLowerCase() !== auth.email.toLowerCase()) {
+        return Response.json({ error: 'O e-mail da demanda deve ser o mesmo da conta.' }, { status: 400 });
+      }
+
+      const normalizedPhone = normalizeBrazilPhone(citizenPhone);
+      let protocol: string | null = null;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const candidateProtocol = `#2026-${Math.floor(100000 + Math.random() * 900000)}`;
+        const { data: existingDemand } = await supabaseAdmin.from('demands').select('id').eq('protocol', candidateProtocol).maybeSingle();
+        if (!existingDemand) { protocol = candidateProtocol; break; }
+      }
+      if (!protocol) return Response.json({ error: 'Não foi possível gerar um protocolo único.' }, { status: 500 });
+
+      const trackingTokenHash = await sha256Hex(`${protocol}:${auth.userId}:${crypto.randomUUID()}`);
+      const now = new Date().toISOString();
+      const { data: demand, error: demandError } = await supabaseAdmin.from('demands').insert({
+        protocol,
+        tracking_token_hash: trackingTokenHash,
+        citizen_user_id: auth.userId,
+        citizen_name: citizenName.trim(),
+        citizen_email: auth.email.toLowerCase(),
+        citizen_phone: normalizedPhone,
         municipality,
-        neighborhood,
+        neighborhood: neighborhood || null,
         category,
         subject,
         description,
-        attachments = [],
-        lgpdConsent
-      } = data;
-      
-      // Validate required fields
-      if (!citizenName || !citizenEmail || !citizenPhone || !municipality || !category || !subject || !description) {
-        return Response.json(
-          { error: 'Campos obrigatórios faltando: citizenName, citizenEmail, citizenPhone, municipality, category, subject, description' },
-          { status: 400 }
-        );
-      }
-      
-      // Validate LGPD consent
-      if (!lgpdConsent) {
-        return Response.json(
-          { error: 'Consentimento LGPD é obrigatório' },
-          { status: 400 }
-        );
-      }
-      
-      // Generate unique protocol in format '#2026-XXXXXX'
-      let protocol = null;
-      const maxAttempts = 5;
-      
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const randomNum = Math.floor(100000 + Math.random() * 900000); // 6-digit number
-        const candidateProtocol = `#2026-${randomNum.toString()}`;
-        
-        // Check if protocol already exists
-        const { data: existingDemand } = await supabasePublic
-          .from('demands')
-          .select('protocol')
-          .eq('protocol', candidateProtocol)
-          .single();
-          
-        if (!existingDemand) {
-          protocol = candidateProtocol;
-          break;
-        }
-      }
-      
-      if (!protocol) {
-        return Response.json(
-          { error: 'Não foi possível gerar um protocolo único após várias tentativas' },
-          { status: 500 }
-        );
-      }
-      
-      const trackingTokenHash = await sha256Hex(protocol + citizenEmail);
-      
-      // Insert demand into demands table
-      const now = new Date().toISOString();
-      const { error: demandError } = await supabaseAdmin
-        .from('demands')
-        .insert({
-          protocol,
-          tracking_token_hash: trackingTokenHash,
-          citizen_name: citizenName,
-          citizen_email: citizenEmail,
-          citizen_phone: citizenPhone,
-          municipality,
-          neighborhood: neighborhood || null,
-          category,
-          subject,
-          description,
-          attachments,
-          priority: 'média',
-          status: 'recebida',
-          created_at: now,
-          updated_at: now
-        });
-        
-      if (demandError) throw demandError;
-      
-      const fullDemand = await getPublicDemandByProtocol(protocol);
-      if (!fullDemand) return Response.json({ error: 'Demanda criada mas não encontrada' }, { status: 500 });
-      
-      // Insert initial history entry
-      const { error: historyError } = await supabaseAdmin
-        .from('demand_history')
-        .insert({
-          demand_id: fullDemand.id,
-          action: 'Criação da demanda',
-          new_status: 'recebida',
-          actor_id: null,
-          actor_name: 'Sistema',
-          actor_role: 'system',
-          note: 'Demanda criada via portal do cidadão',
-          created_at: now
-        });
-      if (historyError) throw historyError;
-      
-      return Response.json({
-        success: true,
-        protocol,
-        demand: fullDemand,
-        message: 'Demanda protocolada com sucesso. Guarde o número de protocolo para acompanhamento.'
+        attachments: Array.isArray(attachments) ? attachments : [],
+        priority: 'média',
+        status: 'recebida',
+        created_at: now,
+        updated_at: now,
+      }).select('id,protocol,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,priority,status,created_at,updated_at').single();
+      if (demandError || !demand) throw demandError ?? new Error('Demanda não criada');
+
+      const { error: historyError } = await supabaseAdmin.from('demand_history').insert({
+        demand_id: demand.id,
+        action: 'Criação da demanda',
+        new_status: 'recebida',
+        actor_id: auth.userId,
+        actor_name: demand.citizen_name,
+        actor_role: 'citizen',
+        note: 'Demanda criada via portal do cidadão',
+        created_at: now,
       });
+      if (historyError) throw historyError;
+
+      return Response.json({ success: true, protocol, demand, message: 'Demanda protocolada com sucesso.' });
     } catch (error) {
       console.error('[api/citizen/demand]', error);
-      return Response.json(
-        { error: 'Falha ao processar demanda' },
-        { status: 500 }
-      );
+      return Response.json({ error: 'Falha ao processar demanda.' }, { status: 500 });
     }
   },
-  
+
   '/api/citizen/lookup': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
-    
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
       const url = new URL(request.url);
-      const protocol = url.searchParams.get('protocol');
-      
-      if (!protocol) {
-        return Response.json(
-          { error: 'Parâmetro protocol é obrigatório' },
-          { status: 400 }
-        );
-      }
-      
-      const demand = await getPublicDemandByProtocol(protocol);
-      
-      if (!demand) {
-        return Response.json(
-          { error: 'Demanda não encontrada' },
-          { status: 404 }
-        );
-      }
-      
-      return Response.json(demand);
+      const id = url.searchParams.get('id');
+      if (!id) return Response.json({ error: 'Parâmetro id é obrigatório.' }, { status: 400 });
+      const { data: demand } = await supabaseAdmin.from('demands')
+        .select('id,protocol,citizen_name,citizen_email,citizen_phone,municipality,neighborhood,category,subject,description,attachments,priority,status,created_at,updated_at')
+        .eq('id', id).eq('citizen_user_id', auth.userId).maybeSingle();
+      if (!demand) return Response.json({ error: 'Demanda não encontrada.' }, { status: 404 });
+      const [{ data: messages }, { data: history }] = await Promise.all([
+        supabaseAdmin.from('demand_messages').select('id,demand_id,sender_type,sender_name,text,attachments,created_at').eq('demand_id', id).order('created_at', { ascending: true }),
+        supabaseAdmin.from('demand_history').select('id,demand_id,action,previous_status,new_status,actor_name,note,created_at').eq('demand_id', id).order('created_at', { ascending: true }),
+      ]);
+      return Response.json({ ...demand, messages: messages ?? [], history: history ?? [] });
     } catch (error) {
       console.error('[api/citizen/lookup]', error);
-      return Response.json(
-        { error: 'Falha ao buscar demanda' },
-        { status: 500 }
-      );
+      return Response.json({ error: 'Falha ao buscar demanda.' }, { status: 500 });
     }
   },
 
-  '/api/auth/me': async (request) => {
+  '/api/citizen/demands': async (request) => {
     if (request.method !== 'GET') return methodNotAllowed();
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
-      const userId = (request.headers.get('x-user-id') as string) || undefined;
-      const user = userId ? await getAdminUserById(userId) : null;
-      const allUsers = await getAllAdminUsers();
-      return Response.json({ user, allUsers });
+      const { data, error } = await supabaseAdmin.from('demands')
+        .select('id,protocol,citizen_name,municipality,category,subject,priority,status,created_at,updated_at')
+        .eq('citizen_user_id', auth.userId).order('created_at', { ascending: false });
+      if (error) throw error;
+      return Response.json(data ?? []);
     } catch (error) {
-      console.error('[api/auth/me] error:', error);
-      return Response.json({ user: null, allUsers: [] }, { status: 500 });
+      console.error('[api/citizen/demands]', error);
+      return Response.json({ error: 'Falha ao carregar suas demandas.' }, { status: 500 });
     }
   },
 
-  '/api/auth/switch-user': async (request) => {
+  '/api/citizen/messages': async (request) => {
     if (request.method !== 'POST') return methodNotAllowed();
+    const auth = await requireCitizenAuth(request);
+    if (auth instanceof Response) return auth;
     try {
-      const { userId } = await request.json();
-      if (!userId) return Response.json({ error: 'userId é obrigatório' }, { status: 400 });
-      const user = await getAdminUserById(userId);
-      if (!user) return Response.json({ error: 'Usuário não encontrado' }, { status: 404 });
-      return Response.json({ success: true, user });
+      const { demandId, text, attachments = [] } = await request.json();
+      if (!demandId || !text?.trim()) return Response.json({ error: 'Mensagem e demanda são obrigatórias.' }, { status: 400 });
+      const { data: demand } = await supabaseAdmin.from('demands').select('id,citizen_name').eq('id', demandId).eq('citizen_user_id', auth.userId).maybeSingle();
+      if (!demand) return Response.json({ error: 'Demanda não encontrada.' }, { status: 404 });
+      const { data, error } = await supabaseAdmin.from('demand_messages').insert({
+        demand_id: demandId,
+        sender_type: 'citizen',
+        sender_name: demand.citizen_name,
+        text: text.trim(),
+        attachments: Array.isArray(attachments) ? attachments : [],
+      }).select('id,demand_id,sender_type,sender_name,text,attachments,created_at').single();
+      if (error) throw error;
+      return Response.json(data);
     } catch (error) {
-      console.error('[api/auth/switch-user] error:', error);
-      return Response.json({ error: 'Falha ao alternar usuário' }, { status: 500 });
+      console.error('[api/citizen/messages]', error);
+      return Response.json({ error: 'Falha ao enviar mensagem.' }, { status: 500 });
     }
   },
 
   '/api/demands': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'GET') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'cidadão', 'view'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const demands = await getAllDemandsAdmin();
       return Response.json(demands);
@@ -688,13 +1233,16 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
   },
 
   '/api/demands/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
     if (request.method !== 'PUT') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'cidadão', 'edit'))) return Response.json({ error: 'Acesso negado' }, { status: 403 });
     try {
       const id = (request as any).params?.id;
       if (!id) return Response.json({ error: 'id é obrigatório' }, { status: 400 });
       const body = await request.json();
       const actor: { id?: string; name?: string; role?: string } = {
-        id: request.headers.get('x-user-id') || undefined,
+        id: authResult.userId,
       };
       // Resolve actor name/role for history entries when possible
       if (actor.id) {
@@ -710,8 +1258,122 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
     }
   },
 
-  '/api/audit-logs': async (request) => {
+  '/api/admin/users/:id/permissions': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para consultar permissões.' }, { status: 403 });
     if (request.method !== 'GET') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+    const user = await getAdminUserById(id);
+    if (!user) return Response.json({ error: 'Usuário não encontrado.' }, { status: 404 });
+    try {
+      return Response.json({ userId: id, role: user.role, permissions: await getEffectivePermissions(id, user.role) });
+    } catch (error) {
+      console.error('[api/admin/users/:id/permissions]', error);
+      return Response.json({ error: error?.message || 'Falha ao carregar permissões efetivas.' }, { status: 500 });
+    }
+  },
+
+  '/api/admin/users/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar usuários.' }, { status: 403 });
+    if (request.method !== 'PATCH') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (body.action === 'role') {
+        return Response.json(await updateAdminUserRole(id, body.role, authResult.user));
+      }
+      if (body.action === 'access') {
+        if (typeof body.active !== 'boolean') return Response.json({ error: 'active deve ser boolean.' }, { status: 400 });
+        return Response.json(await setAdminUserAccess(id, body.active, authResult.user));
+      }
+      return Response.json({ error: 'Ação de usuário inválida.' }, { status: 400 });
+    } catch (error) {
+      console.error('[api/admin/users/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar usuário.' }, { status: 400 });
+    }
+  },
+
+  '/api/admin/invites': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar convites.' }, { status: 403 });
+    if (request.method === 'GET') {
+      return respond(() => getAdminInvites(), 'admin/invites', 'Falha ao carregar convites.');
+    }
+    if (request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const origin = new URL(request.url).origin;
+        const result = await createAdminInvite({
+          email: body.email,
+          name: body.name,
+          cargo: body.cargo,
+          role: body.role,
+          invitedBy: authResult.userId,
+          origin,
+          sendEmail: body.sendEmail !== false,
+          permissionKeys: Array.isArray(body.permissionKeys) ? body.permissionKeys : [],
+        });
+        return Response.json(result, { status: 201 });
+      } catch (error) {
+        console.error('[api/admin/invites POST]', error);
+        return Response.json({ error: error?.message || 'Falha ao criar convite.' }, { status: 400 });
+      }
+    }
+    return methodNotAllowed();
+  },
+
+  '/api/admin/invites/:id': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'manage_users'))) return Response.json({ error: 'Acesso negado para gerenciar convites.' }, { status: 403 });
+    if (request.method !== 'PATCH') return methodNotAllowed();
+    const id = (request as any).params?.id;
+    if (!id) return Response.json({ error: 'ID do convite é obrigatório.' }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (body.action === 'approve') return Response.json(await approveAdminInvite(id, authResult.userId));
+      if (body.action === 'reject') return Response.json(await rejectAdminInvite(id, authResult.userId));
+      if (body.action === 'revoke') return Response.json(await revokeAdminInvite(id, authResult.userId));
+      if (body.action === 'renew') {
+        return Response.json(await renewAdminInvite(id, new URL(request.url).origin));
+      }
+      return Response.json({ error: 'Ação de convite inválida.' }, { status: 400 });
+    } catch (error) {
+      console.error('[api/admin/invites/:id]', error);
+      return Response.json({ error: error?.message || 'Falha ao atualizar convite.' }, { status: 400 });
+    }
+  },
+
+  '/api/invites/:token/accept': async (request) => {
+    if (request.method !== 'POST') return methodNotAllowed();
+    const authorization = request.headers.get('authorization') ?? '';
+    const match = authorization.match(/^Bearer\s+(.+)$/i);
+    if (!match) return Response.json({ error: 'Não autenticado.' }, { status: 401 });
+    const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(match[1]);
+    if (authError || !authData.user?.id || !authData.user.email) return Response.json({ error: 'Sessão de convite inválida.' }, { status: 401 });
+    const token = (request as any).params?.token;
+    if (!token) return Response.json({ error: 'Token do convite é obrigatório.' }, { status: 400 });
+    try {
+      return Response.json(await acceptAdminInvite(token, authData.user.id, authData.user.email));
+    } catch (error) {
+      console.error('[api/invites/:token/accept]', error);
+      return Response.json({ error: error?.message || 'Não foi possível aceitar o convite.' }, { status: 400 });
+    }
+  },
+
+  '/api/audit-logs': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (request.method !== 'GET') return methodNotAllowed();
+    if (!(await canEffective(authResult.userId, authResult.role, 'administração', 'view_audit'))) {
+      return Response.json({ error: 'Acesso negado para consultar auditoria.' }, { status: 403 });
+    }
     try {
       const logs = await getAdminAuditLogs();
       return Response.json(logs);
@@ -724,6 +1386,7 @@ const routeHandlers: Record<string, (request: Request) => Promise<Response>> = {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    runtimeEnv = env;
     // Cloudflare Worker: bindings live on env, not process.env. Upgrade the
     // admin client once the service key arrives so admin/auth routes work.
     if (env.SUPABASE_SERVICE_ROLE_KEY) configureSupabaseAdmin(env.SUPABASE_SERVICE_ROLE_KEY);
@@ -754,17 +1417,40 @@ export default {
       if (!handler) {
         response = Response.json({ error: 'Not Found' }, { status: 404 });
       } else {
-        // Inject params into request for handlers that need them
         const enhancedRequest = request as any;
         enhancedRequest.params = params;
-        
-        response = await handler(enhancedRequest);
+
+        const method = request.method;
+        let requiredRoles: string[] | null = null;
+        if (url.pathname === '/api/auth/me' || url.pathname === '/api/auth/config') requiredRoles = [];
+        else if (url.pathname.startsWith('/api/admin/pages')) requiredRoles = null;
+        // RBAC efetivo é aplicado dentro dos handlers para tarefas, demandas,
+        // convites, usuários e auditoria. Não duplicar papel estático aqui.
+        else if ((url.pathname === '/api/news' || url.pathname.startsWith('/api/news/')) && method !== 'GET') requiredRoles = null;
+        else if ((url.pathname === '/api/agenda' || url.pathname.startsWith('/api/agenda/')) && method !== 'GET') requiredRoles = null;
+        else if ((url.pathname === '/api/results' || url.pathname.startsWith('/api/results/') || url.pathname === '/api/municipalities' || url.pathname.startsWith('/api/municipalities/')) && method !== 'GET') requiredRoles = null;
+        else if (url.pathname === '/api/admin/documents' || url.pathname.startsWith('/api/admin/documents/')) requiredRoles = null;
+        else if ((url.pathname === '/api/videos' || url.pathname.startsWith('/api/videos/')) && method !== 'GET') requiredRoles = null;
+        else if (url.pathname === '/api/admin/upload') requiredRoles = null;
+        else if (url.pathname === '/api/settings' && method !== 'GET') requiredRoles = null;
+
+        if (requiredRoles !== null) {
+          if (requiredRoles.length === 0) {
+            response = await handler(enhancedRequest);
+          } else {
+            const auth = await requireAuth(enhancedRequest);
+            if (auth instanceof Response) response = auth;
+            else if (!requiredRoles.includes(auth.role)) response = Response.json({ error: 'Acesso negado para este papel' }, { status: 403 });
+            else response = await handler(enhancedRequest);
+          }
+        } else {
+          response = await handler(enhancedRequest);
+        }
       }
     } else {
       // Non-API requests: serve static assets. `assets.not_found_handling:
       // single-page-application` handles SPA client routes before reaching here.
       response = await env.ASSETS.fetch(request);
-      // Detect HTML responses (SPA entry point)
       const contentType = response.headers.get('content-type') || '';
       isHtml = contentType.includes('text/html');
     }
