@@ -49,7 +49,6 @@ type PageRow = {
   description?: string | null;
   seo_title?: string | null;
   seo_description?: string | null;
-  og_image_url?: string | null;
   status: 'publicado';
   updated_by?: string | null;
   updated_at: string;
@@ -136,7 +135,6 @@ export function toPublicPageDto(row: PageRow, blocks: PageBlockRow[]): PublicPag
     description: row.description ?? undefined,
     seoTitle: row.seo_title ?? undefined,
     seoDescription: row.seo_description ?? undefined,
-    ogImageUrl: row.og_image_url ?? undefined,
     status: 'publicado',
     updatedAt: row.updated_at,
     updatedBy: row.updated_by ?? undefined,
