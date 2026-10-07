@@ -292,10 +292,10 @@ async function main(){
 
   console.log("[IE-03.7] carregando votação nominal por seção");
   const runS=await startRun(sourceSection,hashes.section,0,{layer:"nominal_section",uf:UF,all_candidates:true});
-  let loadedS=0, sectionVotes=0, pending=Promise.resolve();
+  let loadedS=0, sectionVotes=0;
   if(!runS.__skip){
-    let batch=[];
-    const sr=await readCsv(files.section,/votacao_secao_2018_RS\.csv$/i,h=>({
+    const nominalByKey=new Map();
+    const sr=await readCsv(files.section,/votacao_secao_2018_RS\\.csv$/i,h=>({
       year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
       municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
     }),(row,ix)=>{
@@ -305,29 +305,17 @@ async function main(){
       if(!c?.db)return;
       const municipality=val(row,ix,"municipality"),zone=num(val(row,ix,"zone")),section=num(val(row,ix,"section")),zid=zoneMap.get(String(zone)),sid=sectionMap.get(`${zid}:${section}`),votes=num(val(row,ix,"votes"));
       if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(`Dimensão não resolvida na votação por seção: ${municipality}/${zone}/${section}`);
-      batch.push({round_id:rounds.get(turn).id,office_id:offices.get(office).id,uf:UF,municipality_id:municipalityMap.get(municipality),zone_id:zid,section_id:sid,candidate_id:c.db.id,source_dataset_id:sourceSection.id,import_run_id:runS.id,votes});
-      loadedS++;sectionVotes+=votes;
-      if(batch.length>=500){const copy=batch;batch=[];pending=pending.then(async()=>{
-        const merged=new Map();
-        for(const row of copy){
-          const key=row.round_id+":"+row.office_id+":"+row.section_id+":"+row.candidate_id;
-          const current=merged.get(key);
-          if(current) current.votes+=row.votes; else merged.set(key,row);
-        }
-        await insertBatches("electoral_results_nominal",[...merged.values()],500);
-      });}
+      const key=`${rounds.get(turn).id}:${offices.get(office).id}:${sid}:${c.db.id}`;
+      const current=nominalByKey.get(key);
+      if(current) current.votes+=votes;
+      else nominalByKey.set(key,{round_id:rounds.get(turn).id,office_id:offices.get(office).id,uf:UF,municipality_id:municipalityMap.get(municipality),zone_id:zid,section_id:sid,candidate_id:c.db.id,source_dataset_id:sourceSection.id,import_run_id:runS.id,votes});
+      loadedS++;
+      sectionVotes+=votes;
     });
-    if(batch.length)pending=pending.then(async()=>{
-      const merged=new Map();
-      for(const row of batch){
-        const key=row.round_id+":"+row.office_id+":"+row.section_id+":"+row.candidate_id;
-        const current=merged.get(key);
-        if(current) current.votes+=row.votes; else merged.set(key,row);
-      }
-      await insertBatches("electoral_results_nominal",[...merged.values()],500);
-    }); await pending;
-    await finish(runS,loadedS,{layer:"nominal_section",rows_read:sr.rows,loaded_votes:sectionVotes});
-    console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} fatos, ${sectionVotes.toLocaleString("pt-BR")} votos`);
+    const facts=[...nominalByKey.values()];
+    await insertBatches("electoral_results_nominal",facts,500);
+    await finish(runS,facts.length,{layer:"nominal_section",rows_read:sr.rows,raw_rows:loadedS,loaded_votes:sectionVotes,consolidated_rows:facts.length});
+    console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} linhas brutas, ${facts.length.toLocaleString("pt-BR")} fatos consolidados, ${sectionVotes.toLocaleString("pt-BR")} votos`);
   }
 
   console.log(JSON.stringify({
