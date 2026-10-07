@@ -15,13 +15,18 @@ function run(command, args, options = {}) {
     cwd: options.cwd ?? ROOT,
     encoding: "utf8",
     stdio: options.capture ? ["ignore", "pipe", "inherit"] : "inherit",
-    env: process.env,
+    env: { ...process.env, UNZIP: undefined, UNZIPOPT: undefined },
   });
 }
 
 function requireCommand(command) {
   try {
-    run(command, ["--version"], { capture: true });
+    execFileSync("bash", ["-lc", "command -v " + command], {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "inherit"],
+      env: process.env,
+    });
   } catch {
     throw new Error("Comando obrigatório não encontrado: " + command);
   }
