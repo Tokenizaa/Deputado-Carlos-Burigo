@@ -149,7 +149,7 @@ async function main(){
   console.log(`[IE-03.7] candidaturas encontradas: ${candidateRows.length.toLocaleString("pt-BR")}`);
 
   const elections=new Map(), rounds=new Map(), parties=new Map(), candidateDb=new Map();
-  const offices=new Map([[OFFICE_CODE, (await upsert("electoral_offices",{tse_office_code:OFFICE_CODE,name:OFFICE_NAME,level:OFFICE_LEVEL},"tse_office_code"))[0]]);
+  const offices = new Map([[OFFICE_CODE, (await upsert("electoral_offices", { tse_office_code: OFFICE_CODE, name: OFFICE_NAME, level: OFFICE_LEVEL }, "tse_office_code"))[0]]]);
   for(const [turn,code] of electionCodes){
     const e=(await upsert("electoral_elections",{tse_election_code:code,year:YEAR,name:"Eleições Gerais 2018",election_type:"GERAL",scope:"NACIONAL",status:"FINAL"},"tse_election_code"))[0];
     elections.set(turn,e);
