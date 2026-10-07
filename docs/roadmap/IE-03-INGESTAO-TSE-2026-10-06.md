@@ -297,9 +297,11 @@ Evidência física no banco:
 Todos os cinco `electoral_import_runs` estão `COMPLETED`, com `rows_loaded` igual ao volume físico correspondente e `rows_rejected=0`.
 
 ### IE-03.7 — Cobertura histórica e territorial
-**PRÓXIMA EXECUÇÃO**
+**EM EXECUÇÃO**
 
-Expandir a cadeia comprovada para todas as UFs, eleições e cargos necessários ao escopo definido da Inteligência Eleitoral, sem criar carga específica por candidato.
+Expandir a cadeia comprovada para o **Rio Grande do Sul (RS)** nas eleições de 2018, 2022 e 2026, cobrindo Presidente, Governador, Senador, Deputado Federal e Deputado Estadual, sem criar carga específica por candidato.
+
+**Prova 2018/RS CONCLUÍDA:** arquivos oficiais adquiridos e votação de Carlos Búrigo (15140), 1º turno, Deputado Estadual, reconciliada entre município/zona e seção: **34.322 = 34.322**, abrangendo 497 municípios e 165 zonas.
 
 ### IE-03.8 — Atualização incremental
 **PLANEJADA**
@@ -322,4 +324,4 @@ IE-03 somente será concluída quando:
 
 ## Próximo passo
 
-Com a carga de prova física concluída e validada no Supabase, avançar para **IE-03.7 — cobertura histórica e territorial**, ampliando a mesma cadeia de dados para eleições, UFs e cargos necessários. Nenhuma tela será criada antes de a cobertura mínima da base eleitoral estar definida e validada.
+Com a prova 2018/RS concluída, avançar para **IE-03.7 — cobertura histórica e territorial do RS**, consolidando a carga histórica 2018–2026 para todos os candidatos e cargos definidos. Nenhuma tela será criada antes de a cobertura mínima da base eleitoral estar definida e validada.
