@@ -5,7 +5,8 @@
 - Estado: CANÔNICO / EM EXECUÇÃO
 - Escopo atual: Deputado Estadual — Rio Grande do Sul
 - Eleições: 2018, 2022 e 2026, tratadas separadamente e comparáveis
-- Fonte factual: dados oficiais do TSE processados localmente
+- Fonte factual: dados oficiais do TSE preservados e processados localmente
+- Runtime de produção: Supabase remoto
 - Destino: camada privada de Inteligência Eleitoral dentro do dashboard existente do gabinete
 - Última atualização: 2026-10-07
 
@@ -13,7 +14,7 @@
 
 Transformar os dados eleitorais oficiais em uma camada de inteligência para apoiar análise e decisão do gabinete.
 
-A Inteligência Eleitoral não é um dashboard público de resultados. Ela é uma capacidade interna do dashboard existente do gabinete e combina:
+A Inteligência Eleitoral não é um dashboard público de resultados. É uma capacidade interna do dashboard existente do gabinete e combina:
 
 1. dados factuais;
 2. indicadores calculados;
@@ -21,102 +22,255 @@ A Inteligência Eleitoral não é um dashboard público de resultados. Ela é um
 4. visualizações;
 5. chatbot analítico.
 
-## 2. Arquitetura canônica
+## 2. Arquitetura canônica dos bancos
 
-```
-TSE / dados oficiais
-        ↓
-PostgreSQL LOCAL
-(raw + normalização + auditoria)
-        ↓
-Motor Analítico
-(indicadores + comparações + rankings)
-        ↓
-Projeção analítica enxuta
-        ↓
-Supabase / dashboard privado
-        ↓
-┌───────────────────────┬──────────────────────┐
-│ Dashboard analítico   │ Chatbot analítico    │
-│ gráficos + mapas      │ 100 intents + livre  │
-└───────────────────────┴──────────────────────┘
-```
+A arquitetura separa explicitamente origem/processamento de publicação/runtime.
 
-O Supabase não deve receber dumps brutos do TSE. O armazenamento remoto deve conter apenas a projeção necessária para o produto e respeitar o RBAC/RLS já existente.
+    TSE / dados oficiais
+            |
+            v
+    +-----------------------------+
+    | BANCO LOCAL                 |
+    | fonte de processamento      |
+    |                             |
+    | RAW                         |
+    | - arquivos ZIP/CSV TSE     |
+    | - cópias preservadas        |
+    |                             |
+    | NORMALIZADO                 |
+    | - dados TSE estruturados    |
+    | - candidatos                |
+    | - municípios                |
+    | - resultados nominais       |
+    |                             |
+    | AUDITORIA                   |
+    | - importações               |
+    | - checksums                 |
+    | - validações                |
+    | - baselines                 |
+    +-------------+---------------+
+                  |
+                  | processamento determinístico
+                  v
+    +-----------------------------+
+    | MOTOR ANALÍTICO             |
+    | DATA -> INDICADOR ->        |
+    | INTELIGÊNCIA                |
+    +-------------+---------------+
+                  |
+                  | publicação
+                  v
+    +-----------------------------+
+    | SUPABASE REMOTO             |
+    | banco de PRODUÇÃO           |
+    |                             |
+    | PROJEÇÃO ANALÍTICA          |
+    | - indicadores               |
+    | - rankings                  |
+    | - séries comparativas       |
+    | - métricas territoriais     |
+    | - métricas de concorrência  |
+    | - metadados de atualização  |
+    +-------------+---------------+
+                  |
+                  v
+          Dashboard + Chatbot
 
-## 3. Quatro áreas funcionais
+### Regra fundamental
 
-### 3.1 Visão Geral
+LOCAL = fonte de dados e processamento.
 
-Responder: qual é a situação eleitoral geral do candidato?
+REMOTO = fonte de dados da aplicação em produção.
 
-Inclui KPIs, evolução, concentração, distribuição, rankings, gráficos e síntese.
+A aplicação em produção não pode depender do PostgreSQL local.
 
-### 3.2 Histórico
+O local pode conter todos os dados necessários para reconstrução, auditoria e cálculo. O remoto recebe somente aquilo que a aplicação precisa consultar.
 
-Responder: como o desempenho mudou entre 2018, 2022 e 2026?
+## 3. Banco LOCAL — contrato
 
-Inclui evolução absoluta e percentual, crescimento, retração, estabilidade, mudanças territoriais e séries comparativas.
+O banco local existe para preservar e processar a fonte oficial.
 
-### 3.3 Território
+### 3.1 RAW
 
-Responder: onde o candidato é forte, fraco, está crescendo, perdendo espaço ou apresenta oportunidade?
+Responsável pela preservação dos arquivos oficiais do TSE.
 
-Inclui município, região, ranking, concentração, mapa, evolução e cruzamentos territoriais.
+Inclui:
 
-### 3.4 Candidatos / Concorrência
+- ZIP original;
+- CSV original;
+- nome do arquivo;
+- ano;
+- UF;
+- dataset;
+- URL oficial;
+- data de download;
+- SHA-256;
+- tamanho;
+- metadados da origem.
 
-Responder: contra quem o candidato compete e como essa competição se distribui?
+Os arquivos RAW são imutáveis depois de baixados.
 
-Inclui ranking, comparação, crescimento, presença territorial, sobreposição de territórios e concorrentes relevantes.
+### 3.2 NORMALIZED
 
-## 4. Dashboard analítico
+Responsável pela representação estruturada dos dados TSE para processamento.
 
-Cada uma das quatro áreas deve oferecer análise visual ampla, sem criar um dashboard paralelo.
+Para o escopo atual:
 
-Componentes possíveis por contexto:
+- eleições;
+- municípios;
+- candidatos;
+- resultados nominais;
+- turno;
+- cargo;
+- UF;
+- zona quando disponível.
 
-- KPIs;
-- gráficos de evolução;
-- gráficos comparativos;
+A normalização não altera o significado do dado oficial. Ela apenas transforma o formato de origem em estruturas consultáveis.
+
+### 3.3 AUDIT
+
+Responsável por provar que o processamento está correto.
+
+Inclui:
+
+- execução de importação;
+- arquivo de origem;
+- checksum;
+- quantidade de registros lidos;
+- quantidade carregada;
+- quantidade rejeitada;
+- validações;
+- baselines esperados;
+- divergências;
+- status da execução.
+
+### 3.4 O que NÃO é responsabilidade do local
+
+O local não precisa reproduzir o modelo de produção do gabinete.
+
+Não deve conter:
+
+- dados de sessão de usuários;
+- permissões do dashboard;
+- estado de UI;
+- cópias de dados de negócio do gabinete;
+- APIs de produção;
+- dependência de runtime da aplicação.
+
+## 4. Banco REMOTO / SUPABASE — contrato
+
+O Supabase é o banco operacional da aplicação.
+
+Ele deve ser autônomo para a produção.
+
+### 4.1 O remoto NÃO é
+
+Não é:
+
+- depósito dos ZIPs/CSVs TSE;
+- espelho integral do banco local;
+- warehouse bruto;
+- staging de importação TSE;
+- cópia dos resultados municipais/zona a zona apenas porque eles existem no local.
+
+As tabelas eleitorais remotas antigas orientadas a ingestão bruta — como electoral_results_nominal, electoral_results_totals, electoral_source_datasets e electoral_import_runs — não devem permanecer como arquitetura de runtime quando não forem necessárias à projeção final.
+
+### 4.2 O remoto DEVE conter
+
+Somente dados que sustentem diretamente:
+
+- Visão Geral;
+- Histórico;
+- Território;
+- Candidatos / Concorrência;
+- chatbot analítico;
+- filtros e drill-down necessários;
+- rastreabilidade da versão publicada.
+
+A projeção remota deve conter, conforme a necessidade analítica:
+
+- identificação da eleição/ano;
+- identificação dos candidatos relevantes;
+- métricas consolidadas;
+- métricas por município;
 - rankings;
-- tabelas analíticas;
-- mapas municipais;
-- filtros por eleição/ano;
-- filtros territoriais;
-- comparação entre candidatos;
-- drill-down para município;
-- síntese textual baseada nos indicadores.
+- evolução entre eleições;
+- concentração;
+- participação;
+- crescimento/retração;
+- métricas comparativas de concorrência;
+- metadados da publicação.
 
-Os gráficos devem consumir o mesmo motor analítico utilizado pelo chatbot.
+### 4.3 Regra de autonomia
 
-## 5. Chatbot de Inteligência Eleitoral
+Depois que uma publicação analítica for feita no Supabase:
 
-O chatbot é uma camada transversal às quatro áreas.
+- o dashboard consulta apenas o Supabase;
+- o chatbot consulta apenas o Supabase/camada analítica de produção;
+- nenhuma requisição do usuário executa consulta no banco local;
+- nenhuma tela depende de arquivo local;
+- nenhuma funcionalidade essencial exige que o computador de processamento esteja ligado.
 
-### Regras
+O banco local serve para reconstruir e atualizar a publicação, não para atender usuários.
 
-- Deve responder perguntas livres dentro do domínio eleitoral suportado.
-- Deve possuir inicialmente 100 perguntas guiadas.
-- As 100 perguntas são intents analíticos, não respostas estáticas.
-- Cada intent deve apontar para uma capacidade/função analítica determinística.
-- A IA interpreta a pergunta e parâmetros; os números devem vir de consultas/cálculos verificáveis.
-- A resposta deve identificar período, território e critérios utilizados quando relevantes.
-- Não deve inventar números ausentes da base.
-- Deve distinguir dado factual, indicador calculado e interpretação.
-- Deve permitir perguntas de acompanhamento usando o contexto da conversa.
+## 5. Fluxo oficial de dados
 
-### Catálogo
+    TSE
+     ↓
+    RAW LOCAL
+     ↓
+    NORMALIZED LOCAL
+     ↓
+    AUDIT LOCAL
+     ↓
+    MOTOR ANALÍTICO LOCAL
+     ↓
+    VALIDAÇÃO
+     ↓
+    PROJEÇÃO ANALÍTICA
+     ↓
+    SUPABASE
+     ↓
+    PRODUÇÃO
 
-São 25 intents para cada uma das quatro áreas, totalizando 100.
+O fluxo é unidirecional.
 
-O catálogo executável fica em `src/data/electoral-question-catalog.json`.
+Não existe SUPABASE -> LOCAL e não existe DASHBOARD -> LOCAL.
 
-## 6. Modelo DATA → INDICADOR → INTELIGÊNCIA
+## 6. Separação entre dado bruto e inteligência
+
+### LOCAL
+
+Pergunta respondida:
+
+> O que o TSE publicou e como podemos provar que processamos corretamente?
+
+### REMOTO
+
+Pergunta respondida:
+
+> O que a aplicação precisa saber para analisar o cenário eleitoral?
+
+Essa separação evita dois problemas:
+
+1. transformar o Supabase em um depósito pesado de dados brutos;
+2. fazer a aplicação depender do ambiente de processamento.
+
+## 7. Camada analítica
+
+O motor analítico trabalha sobre o banco local e produz uma publicação determinística.
+
+Modelo:
+
+    DATA
+      ↓
+    INDICADOR
+      ↓
+    INTELIGÊNCIA
 
 ### DATA
 
-Fato oficial, por exemplo:
+Fato oficial:
 
 - votos nominais;
 - candidato;
@@ -127,30 +281,70 @@ Fato oficial, por exemplo:
 
 ### INDICADOR
 
-Cálculo reproduzível, por exemplo:
+Cálculo reproduzível:
 
+- total;
+- participação;
 - crescimento absoluto;
 - crescimento percentual;
-- participação;
 - ranking;
 - concentração;
 - diferença para concorrente.
 
 ### INTELIGÊNCIA
 
-Interpretação orientada à decisão, por exemplo:
+Interpretação:
 
-- município com crescimento relevante;
-- território de força consolidada;
-- território de perda;
-- oportunidade territorial;
-- concorrente dominante em determinado território.
+- força territorial;
+- perda territorial;
+- crescimento relevante;
+- oportunidade;
+- concentração;
+- concorrente dominante.
 
-A camada de IA não substitui o cálculo.
+A IA nunca substitui o cálculo.
 
-## 7. Fonte factual validada
+## 8. Quatro áreas funcionais
 
-Baseline oficial para Deputado Estadual / RS / 1º turno:
+### 8.1 Visão Geral
+
+Responder: qual é a situação eleitoral geral do candidato?
+
+### 8.2 Histórico
+
+Responder: como o desempenho mudou entre 2018, 2022 e 2026?
+
+### 8.3 Território
+
+Responder: onde o candidato é forte, fraco, está crescendo, perdendo espaço ou apresenta oportunidade?
+
+### 8.4 Candidatos / Concorrência
+
+Responder: contra quem o candidato compete e como essa competição se distribui?
+
+## 9. Chatbot
+
+O chatbot usa exatamente a mesma camada analítica do dashboard.
+
+As 100 perguntas são intents, não respostas estáticas.
+
+    Pergunta
+       ↓
+    Intent
+       ↓
+    Parâmetros
+       ↓
+    Função analítica
+       ↓
+    Dados publicados no Supabase
+       ↓
+    Resposta
+
+A IA interpreta linguagem e parâmetros; ela não inventa números.
+
+## 10. Baseline oficial validado
+
+Deputado Estadual — RS — 1º turno:
 
 | Ano | Votos nominais |
 |---|---:|
@@ -160,26 +354,23 @@ Baseline oficial para Deputado Estadual / RS / 1º turno:
 
 Os três anos estão validados no PostgreSQL local.
 
-2026 possui 1.798 votos nominais classificados pelo TSE como “Anulado sub judice”; eles permanecem no baseline de `QT_VOTOS_NOMINAIS`, enquanto a diferença para votos nominais válidos é preservada como informação de auditoria.
+## 11. Ordem obrigatória de implementação
 
-## 8. Primeira implementação
+Antes dos 25 indicadores de Visão Geral:
 
-A execução será incremental:
-
-1. canonizar arquitetura e catálogo de perguntas;
-2. criar contratos do motor analítico;
-3. implementar funções analíticas sobre a base local;
-4. validar cada indicador contra os dados TSE;
-5. gerar a projeção enxuta para Supabase;
-6. conectar o dashboard existente;
-7. conectar o chatbot aos mesmos contratos;
-8. validar segurança, rastreabilidade e respostas.
+1. fechar o contrato do banco local;
+2. fechar o contrato do banco remoto;
+3. remover/aposentar estruturas remotas que representam ingestão bruta e não têm função de produção;
+4. definir a projeção analítica remota;
+5. criar o pipeline LOCAL -> PROJEÇÃO -> SUPABASE;
+6. validar publicação remota;
+7. somente então implementar os indicadores das quatro áreas.
 
 Não será criado dashboard paralelo.
 
-## 9. Critério de qualidade
+## 12. Critério de qualidade
 
-Nenhuma visualização ou resposta do chatbot deve depender de números digitados manualmente.
+Nenhuma visualização ou resposta do chatbot pode depender de números digitados manualmente.
 
 Toda métrica deve possuir:
 
@@ -188,6 +379,7 @@ Toda métrica deve possuir:
 - origem;
 - período;
 - filtros;
-- teste de validação.
+- teste de validação;
+- rastreabilidade da publicação.
 
-Toda resposta estratégica deve poder ser rastreada até os indicadores que a sustentam.
+Toda publicação remota deve poder ser reconstruída a partir dos dados locais oficiais.
