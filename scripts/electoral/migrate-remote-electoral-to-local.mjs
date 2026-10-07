@@ -56,10 +56,38 @@ function ensureCommand(command) {
   }
 }
 
-function loadEnv() {
-  if (typeof process.loadEnvFile === "function" && existsSync(resolve(".env"))) {
-    process.loadEnvFile(resolve(".env"));
+function loadDatabasePasswordFromDotEnv() {
+  if (process.env.SUPABASE_DB_PASSWORD) return;
+
+  const envPath = resolve(".env");
+  if (!existsSync(envPath)) return;
+
+  const line = readFileSync(envPath, "utf8")
+    .split(/\\r?\\n/)
+    .find((entry) => /^\\s*SUPABASE_DB_PASSWORD\\s*=/.test(entry));
+
+  if (!line) return;
+
+  const raw = line.replace(/^\\s*SUPABASE_DB_PASSWORD\\s*=\\s*/, "").trim();
+  const value = raw.replace(/^"(.*)"$/s, "$1").replace(/^'(.*)'$/s, "$1");
+
+  if (value) process.env.SUPABASE_DB_PASSWORD = value;
+}
+
+function prepareRemoteCliWorkdir(workDir) {
+  const sourceConfig = resolve("supabase/config.toml");
+  const targetConfigDir = join(workDir, "supabase");
+
+  if (!existsSync(sourceConfig)) {
+    throw new Error("supabase/config.toml não encontrado para executar o dump remoto.");
   }
+
+  mkdirSync(targetConfigDir, { recursive: true });
+  writeFileSync(
+    join(targetConfigDir, "config.toml"),
+    readFileSync(sourceConfig, "utf8"),
+    "utf8",
+  );
 }
 
 function queryCsv(target, sql) {
@@ -254,7 +282,7 @@ function validateAndReport(reportPath) {
 }
 
 async function main() {
-  loadEnv();
+  loadDatabasePasswordFromDotEnv();
   ensureCommand("supabase");
   ensureCommand("docker");
 
@@ -304,7 +332,12 @@ async function main() {
       "--file", rawDump,
     ];
 
+    if (!dbUrl) {
+      prepareRemoteCliWorkdir(workDir);
+    }
+
     run("supabase", dumpArgs, {
+      cwd: dbUrl ? ROOT : workDir,
       displayArgv: dbUrl
         ? ["db", "dump", "--db-url", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump]
         : ["db", "dump", "--linked", "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
