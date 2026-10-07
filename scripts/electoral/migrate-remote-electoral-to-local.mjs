@@ -39,13 +39,23 @@ function run(command, argv, options = {}) {
   const cwd = options.cwd || ROOT;
   const displayArgv = options.displayArgv || argv;
   console.log(`[IE-MIGRATE] (${cwd}) $ ${command} ${displayArgv.join(" ")}`);
-  return execFileSync(command, argv, {
-    cwd,
-    encoding: "utf8",
-    stdio: options.capture ? ["ignore", "pipe", "inherit"] : "inherit",
-    env: process.env,
-    maxBuffer: 64 * 1024 * 1024,
-  });
+  try {
+    return execFileSync(command, argv, {
+      cwd,
+      encoding: "utf8",
+      stdio: options.capture ? ["ignore", "pipe", "inherit"] : "inherit",
+      env: process.env,
+      maxBuffer: 64 * 1024 * 1024,
+    });
+  } catch (error) {
+    if (options.redact) {
+      const redact = (value) => String(value ?? "").split(options.redact).join("***REDACTED***");
+      if (error.message) error.message = redact(error.message);
+      if (error.stack) error.stack = redact(error.stack);
+      if (error.stderr) error.stderr = redact(error.stderr);
+    }
+    throw error;
+  }
 }
 
 function ensureCommand(command) {
@@ -285,6 +295,8 @@ async function main() {
   loadDatabasePasswordFromDotEnv();
   ensureCommand("supabase");
   ensureCommand("docker");
+  ensureCommand("pg_dump");
+  ensureCommand("psql");
 
   console.log("[IE-MIGRATE] remoto → PostgreSQL local");
   console.log(`[IE-MIGRATE] projeto remoto: ${PROJECT_REF}`);
@@ -320,33 +332,37 @@ async function main() {
       );
     }
 
-    const dumpArgs = [
-      "db", "dump",
-      ...(dbUrl
-        ? ["--db-url", dbUrl]
-        : ["--linked", "--password", dbPassword]),
-      "--data-only",
-      "--schema", "public",
-      "--use-copy",
-      "--file", rawDump,
-    ];
-
-    prepareRemoteCliWorkdir(workDir);
-
     if (!dbUrl) {
-      // O link é feito apenas no diretório temporário desta execução.
-      // A senha é passada explicitamente para não depender do .env do projeto.
-      run("supabase", ["link", "--project-ref", PROJECT_REF, "--password", dbPassword], {
-        cwd: workDir,
-        displayArgv: ["link", "--project-ref", PROJECT_REF, "--password", "***REDACTED***"],
-      });
+      throw new Error("SUPABASE_DB_URL é obrigatória para o dump remoto via Transaction Pooler IPv4.");
     }
 
-    run("supabase", dumpArgs, {
-      cwd: dbUrl ? ROOT : workDir,
-      displayArgv: dbUrl
-        ? ["db", "dump", "--db-url", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump]
-        : ["db", "dump", "--linked", "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
+    const dumpArgs = [
+      dbUrl,
+      "--data-only",
+      "--schema=public",
+      "--format=plain",
+      "--no-owner",
+      "--no-privileges",
+      "--no-comments",
+      ...TARGET_TABLES.map((table) => `--table=public.${table}`),
+      `--file=${rawDump}`,
+    ];
+
+    run("pg_dump", dumpArgs, {
+      cwd: ROOT,
+      displayArgv: [
+        "pg_dump",
+        "***REDACTED***",
+        "--data-only",
+        "--schema=public",
+        "--format=plain",
+        "--no-owner",
+        "--no-privileges",
+        "--no-comments",
+        ...TARGET_TABLES.map((table) => `--table=public.${table}`),
+        `--file=${rawDump}`,
+      ],
+      redact: dbUrl,
     });
 
     console.log(
