@@ -324,7 +324,7 @@ async function main() {
       "db", "dump",
       ...(dbUrl
         ? ["--db-url", dbUrl]
-        : ["--linked", "--project-ref", PROJECT_REF, "--password", dbPassword]),
+        : ["--linked", "--password", dbPassword]),
       "--data-only",
       "--schema", "public",
       "--use-copy",
@@ -332,14 +332,20 @@ async function main() {
     ];
 
     if (!dbUrl) {
+      // db dump --linked exige um projeto vinculado. O link é feito apenas
+      // no diretório temporário desta execução, nunca no repositório.
       prepareRemoteCliWorkdir(workDir);
+      run("supabase", ["link", "--project-ref", PROJECT_REF], {
+        cwd: workDir,
+        displayArgv: ["link", "--project-ref", PROJECT_REF],
+      });
     }
 
     run("supabase", dumpArgs, {
       cwd: dbUrl ? ROOT : workDir,
       displayArgv: dbUrl
         ? ["db", "dump", "--db-url", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump]
-        : ["db", "dump", "--linked", "--project-ref", PROJECT_REF, "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
+        : ["db", "dump", "--linked", "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
     });
 
     console.log(
