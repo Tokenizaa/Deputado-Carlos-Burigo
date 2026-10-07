@@ -270,8 +270,12 @@ A auditoria da arquitetura existente está concluída. O módulo será inserido 
 
 A fonte primária de dados definida é o Portal de Dados Abertos do TSE. A documentação detalhada da fundação está em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
 
-## 10. Próximo passo operacional
+## 10. Estado operacional atualizado
 
-**IE-02 — Modelo de Dados.**
+**IE-02 — Modelo de Dados: CONCLUÍDA.** O modelo canônico foi aplicado no Supabase.
 
-A próxima implementação deverá definir e validar o esquema canônico no Supabase, incluindo eleições, candidatos, municípios, zonas, seções, resultados e metadados de origem, antes da criação das telas.
+**IE-03 — Ingestão: EM EXECUÇÃO.** A carga de prova 2022/RS e 2026 foi concluída e validada fisicamente no Supabase. A próxima execução é a cobertura histórica e territorial.
+
+**IE-03.7 — Cobertura histórica e territorial:** primeira onda definida para 2018, 2022 e 2026, todas as 27 UFs e os cargos de Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital. O documento operacional é `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
+
+Nenhuma tela será criada enquanto a cobertura mínima da base eleitoral não estiver validada.
