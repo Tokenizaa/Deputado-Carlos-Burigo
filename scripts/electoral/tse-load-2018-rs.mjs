@@ -131,7 +131,7 @@ async function main(){
     partyCode:idx(h,["NR_PARTIDO"]),acronym:idx(h,["SG_PARTIDO"]),partyName:idx(h,["NM_PARTIDO"]),
     status:idx(h,["DS_SITUACAO_CANDIDATURA","DS_SITUACAO_CANDIDATO"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")); if(!turn)return;
     const office=val(row,ix,"office"), number=val(row,ix,"number"), id=val(row,ix,"id");
     if(!id||!number)return;
@@ -180,7 +180,7 @@ async function main(){
     nominal:idx(h,["QT_VOTOS_NOMINAIS"]),blank:idx(h,["QT_VOTOS_BRANCOS"]),nulls:idx(h,["QT_VOTOS_NULOS"]),
     legend:idx(h,["QT_VOTOS_LEGENDA"]),location:idx(h,["NM_LOCAL_VOTACAO"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")), municipality=val(row,ix,"municipality"), zone=num(val(row,ix,"zone")), section=num(val(row,ix,"section"));
     if(!turn||!municipality||!zone||!section)return;
     territory.set(municipality,val(row,ix,"municipalityName"));zones.add(zone);
@@ -230,7 +230,7 @@ async function main(){
     municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),candidateId:idx(h,["SQ_CANDIDATO"]),number:idx(h,["NR_CANDIDATO"]),
     votes:idx(h,["QT_VOTOS_NOMINAIS"]),valid:idx(h,["QT_VOTOS_NOMINAIS_VALIDOS"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),candidateId=val(row,ix,"candidateId");
     const c=candidates.get(`${office}:${candidateId}`);
     if(!c||c.turn!==turn||c.office!==OFFICE_CODE)return;
@@ -251,7 +251,7 @@ async function main(){
     comparecimento:idx(h,["QT_COMPARECIMENTO"]),abstentions:idx(h,["QT_ABSTENCOES"]),valid:idx(h,["QT_TOTAL_VOTOS_VALIDOS"]),
     blank:idx(h,["QT_VOTOS_BRANCOS"]),nulls:idx(h,["QT_TOTAL_VOTOS_NULOS"]),total:idx(h,["QT_VOTOS"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     detailMunRows.push({turn:num(val(row,ix,"turn")),office:val(row,ix,"office"),municipality:val(row,ix,"municipality"),zone:num(val(row,ix,"zone")),electorate:num(val(row,ix,"electorate")),comparecimento:num(val(row,ix,"comparecimento")),abstentions:num(val(row,ix,"abstentions")),valid_votes:num(val(row,ix,"valid")),blank_votes:num(val(row,ix,"blank")),null_votes:num(val(row,ix,"nulls")),total_votes:num(val(row,ix,"total"))});
   });
   const runDM=await startRun(sourceDetailMun,hashes.detailMun,dmr.rows,{layer:"apuration_municipality_zone",uf:UF,all_candidates:true});
@@ -270,7 +270,7 @@ async function main(){
       year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
       municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
     }),(row,ix)=>{
-      if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
+      if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
       const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),number=val(row,ix,"votavel");
       const c=candidateByNumber.get(`${office}:${number}:${turn}`);
       if(!c?.db)return;
