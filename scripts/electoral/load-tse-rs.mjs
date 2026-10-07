@@ -16,7 +16,8 @@ function qid(s){return '"'+s.replace(/"/g,'""')+'"'}
 function csv(line){const o=[];let c="",q=false;for(let i=0;i<line.length;i++){const x=line[i],n=line[i+1];if(x==='"'&&q&&n==='"'){c+='"';i++;continue}if(x==='"'){q=!q;continue}if(x===";"&&!q){o.push(c);c="";continue}c+=x}o.push(c);return o}
 function norm(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toUpperCase()}
 
-const header=csv(sh("unzip",["-p",file]).split(/\r?\n/,1)[0]).map(norm);
+const zipEntry=`votacao_candidato_munzona_${year}_RS.csv`;
+const header=csv(sh("bash",["-lc",'unzip -p "$1" "$2" | head -n 1',"bash",file,zipEntry]).split(/\r?\n/,1)[0]).map(norm);
 const required=["SG_UF","CD_MUNICIPIO","NM_MUNICIPIO","NR_ZONA","NR_SECAO","CD_CARGO","DS_CARGO","NR_CANDIDATO","NM_CANDIDATO","QT_VOTOS_NOMINAIS"];
 const missing=required.filter(x=>!header.includes(x));
 if(missing.length)throw new Error("Layout TSE inesperado. Faltando: "+missing.join(", "));
@@ -32,7 +33,7 @@ const turn=idx.NR_TURNO!==undefined?"coalesce(nullif(s."+c("NR_TURNO")+",''),'1'
 const sql=[
 "begin;",
 "create temp table "+stage+" ("+cols.map(x=>qid(x)+" text").join(",")+");",
-"\\copy "+stage+" from program 'unzip -p "+esc(file)+"' with (format csv, delimiter ';', header true, encoding 'LATIN1');",
+"\\copy "+stage+" from program 'unzip -p "+esc(file)+" "+zipEntry+"' with (format csv, delimiter ';', header true, encoding 'LATIN1');",
 "insert into public.electoral_elections(year,election_type,round) values("+year+",'GERAL',1) on conflict(year,election_type,round) do nothing;",
 "insert into public.electoral_municipalities(year,tse_municipality_code,uf,name) select distinct "+year+",nullif("+c("CD_MUNICIPIO")+",'')::int,"+c("SG_UF")+"::char(2),"+c("NM_MUNICIPIO")+" from "+stage+" where "+c("SG_UF")+"='RS' on conflict(year,tse_municipality_code,uf) do update set name=excluded.name;",
 "insert into public.electoral_candidates(year,office_code,office_name,candidate_number,candidate_name,ballot_name,party_number,party_acronym,party_name) select distinct "+year+",nullif("+c("CD_CARGO")+",'')::int,"+c("DS_CARGO")+",nullif("+c("NR_CANDIDATO")+",'')::int,"+c("NM_CANDIDATO")+","+ballot+","+partyNumber+","+partyAcronym+","+partyName+" from "+stage+" where "+c("SG_UF")+"='RS' and upper(unaccent("+c("DS_CARGO")+"))=upper(unaccent('DEPUTADO ESTADUAL')) on conflict(year,office_code,candidate_number) do update set candidate_name=excluded.candidate_name,ballot_name=excluded.ballot_name,party_acronym=excluded.party_acronym,party_name=excluded.party_name;",
