@@ -93,7 +93,9 @@ async function startRun(source,file,rowsRead,metadata) {
     const tables=["electoral_results_nominal","electoral_results_totals"];
     let count=0;
     for(const table of tables){const {count:c,error}=await supabase.from(table).select("id",{count:"exact",head:true}).eq("import_run_id",existing.id);if(error)throw new Error(error.message);count+=Number(c??0);}
-    if(existing.status==="COMPLETED"&&count===Number(existing.rows_loaded??0))return { ...existing,__skip:true };
+    const requestedVersion=metadata?.loader_version;
+    const storedVersion=existing.metadata?.loader_version;
+    if(existing.status==="COMPLETED"&&count===Number(existing.rows_loaded??0)&&(!requestedVersion||storedVersion===requestedVersion))return { ...existing,__skip:true };
     await supabase.from("electoral_results_nominal").delete().eq("import_run_id",existing.id);
     await supabase.from("electoral_results_totals").delete().eq("import_run_id",existing.id);
     await supabase.from("electoral_import_runs").delete().eq("id",existing.id);
@@ -307,7 +309,7 @@ async function main(){
   }
 
   console.log("[IE-03.7] carregando votação nominal por seção");
-  const runS=await startRun(sourceSection,hashes.section,0,{layer:"nominal_section",uf:UF,all_candidates:true});
+  const runS=await startRun(sourceSection,hashes.section,0,{layer:"nominal_section",uf:UF,all_candidates:true,loader_version:"2026-10-07-v2"});
   let loadedS=0, sectionVotes=0;
   if(!runS.__skip){
     const nominalByKey=new Map();
@@ -341,11 +343,11 @@ async function main(){
       sectionVotes+=votes;
     });
     const facts=[...nominalByKey.values()];
-    await insertBatches("electoral_results_nominal",facts,500);
     const unmatchedSample=[...unmatchedVotaveis.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([value,count])=>({value,count}));
     if(matchedSectionRows===0 || matchedSectionRows<sr.rows*0.5) {
       throw new Error(`Cobertura nominal por seção insuficiente: ${matchedSectionRows}/${sr.rows} linhas casadas; não gravando uma carga parcial.`);
     }
+    await insertBatches("electoral_results_nominal",facts,500);
     await finish(runS,facts.length,{layer:"nominal_section",rows_read:sr.rows,raw_rows:loadedS,matched_rows:matchedSectionRows,unmatched_rows:unmatchedSectionRows,unmatched_sample:unmatchedSample,loaded_votes:sectionVotes,consolidated_rows:facts.length});
     console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} linhas casadas, ${facts.length.toLocaleString("pt-BR")} fatos consolidados, ${sectionVotes.toLocaleString("pt-BR")} votos; não casadas: ${unmatchedSectionRows.toLocaleString("pt-BR")}`);
   }
