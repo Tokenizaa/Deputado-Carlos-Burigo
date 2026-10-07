@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { tmpdir } from "node:os";
+import { dirname, resolve, join } from "node:path";
+import { homedir, tmpdir } from "node:os";
 
 const ROOT = resolve(".");
+const LOCAL_ROOT = resolve(process.env.IE_LOCAL_ROOT || join(homedir(), ".supabase-local", "Deputado-Carlos-Burigo-electoral"));
+const LOCAL_MIGRATION = join(LOCAL_ROOT, "supabase", "migrations", "20260000000000_electoral_local_schema.sql");
 const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || "wktanxbpijurimdjgone";
 
 const TARGET_TABLES = [
@@ -34,9 +36,10 @@ const executeCleanup = args.has("--cleanup-remote");
 const replaceLocal = args.has("--replace-local");
 
 function run(command, argv, options = {}) {
-  console.log(`[IE-MIGRATE] $ ${command} ${argv.join(" ")}`);
+  const cwd = options.cwd || ROOT;
+  console.log(`[IE-MIGRATE] (${cwd}) $ ${command} ${argv.join(" ")}`);
   return execFileSync(command, argv, {
-    cwd: ROOT,
+    cwd,
     encoding: "utf8",
     stdio: options.capture ? ["ignore", "pipe", "inherit"] : "inherit",
     env: process.env,
@@ -66,13 +69,65 @@ function queryCsv(target, sql) {
     "-o", "csv",
     sql,
   ];
-  return run("supabase", argv, { capture: true }).trim();
+  return run("supabase", argv, { capture: true, cwd: target === "remote" ? ROOT : LOCAL_ROOT }).trim();
 }
 
 function csvRows(output) {
   const lines = output.split(/\r?\n/).filter(Boolean);
   if (lines.length < 2) throw new Error(`Resposta CSV inesperada: ${output}`);
   return lines.slice(1).map((line) => line.split(",").map((v) => v.replace(/^"|"$/g, "")));
+}
+
+function ensureLocalProject() {
+  mkdirSync(join(LOCAL_ROOT, "supabase", "migrations"), { recursive: true });
+
+  if (!existsSync(join(LOCAL_ROOT, "supabase", "config.toml"))) {
+    run("supabase", ["init"], { cwd: LOCAL_ROOT });
+  }
+
+  const bootstrap = `create extension if not exists pgcrypto;
+create schema if not exists private;
+
+do $ begin
+  if not exists (select 1 from pg_type where typnamespace = 'public'::regnamespace and typname = 'user_role') then
+    create type public.user_role as enum ('ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO','VISUALIZADOR');
+  end if;
+end $;
+
+create table if not exists public.permission_definitions (
+  permission_key text primary key,
+  module text not null,
+  action text not null,
+  label text not null,
+  description text
+);
+
+create or replace function private.is_staff()
+returns boolean language sql stable security definer set search_path = public, private
+as $ select false; $;
+
+create or replace function private.has_role(required_role public.user_role)
+returns boolean language sql stable security definer set search_path = public, private
+as $ select false; $;
+
+grant execute on function private.is_staff() to authenticated;
+grant execute on function private.has_role(public.user_role) to authenticated;
+
+`;
+
+  const electoralFiles = [
+    "supabase/migrations/20261006201443_create_electoral_intelligence_model.sql",
+    "supabase/migrations/20261006222130_ie035_candidate_aggregate_totals.sql",
+    "supabase/migrations/20261006223000_ie035_harden_electoral_policies.sql",
+    "supabase/migrations/20261007013000_fix_electoral_parties_upsert_index.sql",
+  ];
+
+  const migration = bootstrap + "\n" + electoralFiles
+    .map((file) => `-- SOURCE: ${file}\n${readFileSync(resolve(ROOT, file), "utf8")}`)
+    .join("\n\n");
+
+  writeFileSync(LOCAL_MIGRATION, migration, "utf8");
+  console.log(`[IE-MIGRATE] schema eleitoral local preparado: ${LOCAL_MIGRATION}`);
 }
 
 function assertLocalEmpty() {
@@ -93,7 +148,7 @@ function assertLocalEmpty() {
     run("supabase", [
       "db", "query", "--local",
       "truncate table public.electoral_results_nominal, public.electoral_results_totals cascade;",
-    ]);
+    ], { cwd: LOCAL_ROOT });
   }
 }
 
@@ -206,7 +261,8 @@ async function main() {
   console.log(`[IE-MIGRATE] projeto remoto: ${PROJECT_REF}`);
   console.log("[IE-MIGRATE] escopo canônico: RS / Deputado Estadual / 1º turno");
 
-  run("supabase", ["start"]);
+  ensureLocalProject();
+  run("supabase", ["start"], { cwd: LOCAL_ROOT });
   assertLocalEmpty();
 
   const workDir = resolve(tmpdir(), `ie-electoral-migration-${Date.now()}`);
@@ -237,7 +293,7 @@ async function main() {
     console.log(`[IE-MIGRATE] blocos eleitorais preparados: ${blocks}`);
 
     console.log("[IE-MIGRATE] 3/4 — restaurando a camada eleitoral no PostgreSQL local.");
-    run("supabase", ["db", "query", "--local", "--file", electoralDump]);
+    run("supabase", ["db", "query", "--local", "--file", electoralDump], { cwd: LOCAL_ROOT });
 
     const report = validateAndReport(reportPath);
 
