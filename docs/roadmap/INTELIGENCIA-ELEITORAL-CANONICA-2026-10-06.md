@@ -57,7 +57,7 @@ A hierarquia analítica deverá permitir o drill-down:
 
 **Estado → Município → Zona → Seção → Resultado.**
 
-A base deverá suportar tanto a eleição de 2026 quanto eleições históricas necessárias para comparação, especialmente a eleição em que Burigo foi eleito.
+A base deverá suportar 2026 e as eleições históricas necessárias para comparação, inicialmente **2018 e 2022**, sempre no escopo **RS + Deputado Estadual**.
 
 ### Camada 2 — Inteligência
 
@@ -173,8 +173,8 @@ O modelo deverá ser genérico o suficiente para suportar outras eleições e ca
 ### IE-03 — Ingestão e validação
 
 - obter dados de fontes oficiais;
-- importar dados históricos;
-- importar dados de 2026;
+- importar dados históricos de **RS + Deputado Estadual**;
+- importar dados de 2026 para **RS + Deputado Estadual**;
 - preservar a hierarquia territorial;
 - validar totais;
 - registrar origem e versão dos dados;
@@ -276,6 +276,6 @@ A fonte primária de dados definida é o Portal de Dados Abertos do TSE. A docum
 
 **IE-03 — Ingestão: EM EXECUÇÃO.** A carga de prova 2022/RS e 2026 foi concluída e validada fisicamente no Supabase. A próxima execução é a cobertura histórica e territorial.
 
-**IE-03.7 — Cobertura histórica e territorial:** primeira onda definida exclusivamente para o **Rio Grande do Sul (RS)**, em 2018, 2022 e 2026, cobrindo Presidente, Governador, Senador, Deputado Federal e Deputado Estadual, com todos os candidatos e território RS → municípios → zonas → seções. A prova 2018/RS foi fechada com **34.322 votos** de Carlos Búrigo 15140, reconciliados entre município/zona e seção. O documento operacional é `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
+**IE-03.7 — Cobertura histórica e territorial:** primeira onda definida exclusivamente para **Rio Grande do Sul (RS) + Deputado Estadual**, em 2018, 2022 e 2026, com todos os candidatos e território RS → municípios → zonas → seções. A carga 2018/RS já está concluída no Supabase para **853 candidatos**, com **1.449.370 fatos nominais por seção / 5.442.544 votos** e zero rejeições nos quatro import runs. A validação específica de Carlos Búrigo 15140 fecha em **34.322 votos**. O documento operacional é `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
 
 Nenhuma tela será criada enquanto a cobertura mínima da base eleitoral não estiver validada.
