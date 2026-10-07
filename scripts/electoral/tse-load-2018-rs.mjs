@@ -161,7 +161,7 @@ async function main(){
   for(const c of candidateRows){
     if(c.party_number){
       const existing=await one("electoral_parties",{tse_party_code:c.party_number});
-      if(!parties.has(c.party_number)) parties.set(c.party_number,existing??(await upsert("electoral_parties",{tse_party_code:c.party_number,party_number:c.party_number,acronym:c.acronym||null,name:c.party_name||c.acronym||c.party_number,party_type:"PARTIDO"}, "id"))[0]);
+      if(!parties.has(c.party_number)) parties.set(c.party_number,existing??(await upsert("electoral_parties",{tse_party_code:c.party_number,party_number:c.party_number,acronym:c.acronym||null,name:c.party_name||c.acronym||c.party_number,party_type:"PARTIDO"}, "tse_party_code"))[0]);
     }
     const party=parties.get(c.party_number)?.id??null;
     const key=`${c.turn}:${c.office}:${c.tse_candidate_id}`;
@@ -191,16 +191,16 @@ async function main(){
   console.log(`[IE-03.7] território: ${territory.size} municípios, ${zones.size} zonas, ${sections.size} seções`);
 
   const municipalityMap=new Map(),zoneMap=new Map(),sectionMap=new Map();
-  await insertBatches("electoral_municipalities",[...territory].map(([code,name])=>({uf:UF,tse_municipality_code:code,name})),500);
-  await insertBatches("electoral_zones",[...zones].map(zone=>({uf:UF,zone_number:zone})),500);
+  await upsert("electoral_municipalities",[...territory].map(([code,name])=>({uf:UF,tse_municipality_code:code,name})),"uf,tse_municipality_code");
+  await upsert("electoral_zones",[...zones].map(zone=>({uf:UF,zone_number:zone})),"uf,zone_number");
   const munCodes=[...territory.keys()];
   for(let i=0;i<munCodes.length;i+=500){const {data,error}=await supabase.from("electoral_municipalities").select("id,tse_municipality_code").eq("uf",UF).in("tse_municipality_code",munCodes.slice(i,i+500));if(error)throw new Error(error.message);for(const r of data??[])municipalityMap.set(r.tse_municipality_code,r.id);}
   const zoneNums=[...zones];
   for(let i=0;i<zoneNums.length;i+=500){const {data,error}=await supabase.from("electoral_zones").select("id,zone_number").eq("uf",UF).in("zone_number",zoneNums.slice(i,i+500));if(error)throw new Error(error.message);for(const r of data??[])zoneMap.set(String(r.zone_number),r.id);}
   const zm=[...sections.values()].map(r=>({zone_id:zoneMap.get(String(r.zone)),municipality_id:municipalityMap.get(r.municipality)})).filter(r=>r.zone_id&&r.municipality_id);
-  await insertBatches("electoral_zone_municipalities", [...new Map(zm.map(r=>[`${r.zone_id}:${r.municipality_id}`,r])).values()]);
+  await upsert("electoral_zone_municipalities", [...new Map(zm.map(r=>[`${r.zone_id}:${r.municipality_id}`,r])).values()], "zone_id,municipality_id");
   const secRows=[...sections.values()].map(r=>({zone_id:zoneMap.get(String(r.zone)),municipality_id:municipalityMap.get(r.municipality),section_number:r.section,location_name:r.location_name||null})).filter(r=>r.zone_id&&r.municipality_id);
-  await insertBatches("electoral_sections",secRows,500);
+  await upsert("electoral_sections",secRows,"zone_id,section_number");
   for(let i=0;i<zoneNums.length;i+=500){
     const ids=zoneNums.slice(i,i+500).map(n=>zoneMap.get(String(n))).filter(Boolean);
     for(let from=0;;from+=1000){
