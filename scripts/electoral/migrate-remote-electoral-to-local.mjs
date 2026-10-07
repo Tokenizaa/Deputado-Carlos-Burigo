@@ -63,12 +63,12 @@ function loadDatabasePasswordFromDotEnv() {
   if (!existsSync(envPath)) return;
 
   const line = readFileSync(envPath, "utf8")
-    .split(/\\r?\\n/)
-    .find((entry) => /^\\s*SUPABASE_DB_PASSWORD\\s*=/.test(entry));
+    .split(/\r?\n/)
+    .find((entry) => /^\s*SUPABASE_DB_PASSWORD\s*=/.test(entry));
 
   if (!line) return;
 
-  const raw = line.replace(/^\\s*SUPABASE_DB_PASSWORD\\s*=\\s*/, "").trim();
+  const raw = line.replace(/^\s*SUPABASE_DB_PASSWORD\s*=\s*/, "").trim();
   const value = raw.replace(/^"(.*)"$/s, "$1").replace(/^'(.*)'$/s, "$1");
 
   if (value) process.env.SUPABASE_DB_PASSWORD = value;
@@ -244,7 +244,7 @@ TRUNCATE TABLE
   public.electoral_results_nominal,
   public.electoral_results_totals;
 `,
-  "utf8",
+    "utf8",
   );
 }
 
@@ -292,9 +292,6 @@ async function main() {
 
   ensureLocalProject();
 
-  // Esta rotina precisa somente do PostgreSQL local. Studio, Storage, Auth,
-  // Realtime, PostgREST e demais serviços não participam da migração pesada
-  // e podem falhar por falta de recursos sem impedir o banco.
   run("supabase", ["stop"], { cwd: LOCAL_ROOT });
   run("supabase", [
     "start",
@@ -325,7 +322,9 @@ async function main() {
 
     const dumpArgs = [
       "db", "dump",
-      ...(dbUrl ? ["--db-url", dbUrl] : ["--linked", "--password", dbPassword]),
+      ...(dbUrl
+        ? ["--db-url", dbUrl]
+        : ["--linked", "--project-ref", PROJECT_REF, "--password", dbPassword]),
       "--data-only",
       "--schema", "public",
       "--use-copy",
@@ -340,7 +339,7 @@ async function main() {
       cwd: dbUrl ? ROOT : workDir,
       displayArgv: dbUrl
         ? ["db", "dump", "--db-url", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump]
-        : ["db", "dump", "--linked", "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
+        : ["db", "dump", "--linked", "--project-ref", PROJECT_REF, "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
     });
 
     console.log(
