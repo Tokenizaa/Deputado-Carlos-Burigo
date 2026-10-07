@@ -37,7 +37,8 @@ const replaceLocal = args.has("--replace-local");
 
 function run(command, argv, options = {}) {
   const cwd = options.cwd || ROOT;
-  console.log(`[IE-MIGRATE] (${cwd}) $ ${command} ${argv.join(" ")}`);
+  const displayArgv = options.displayArgv || argv;
+  console.log(`[IE-MIGRATE] (${cwd}) $ ${command} ${displayArgv.join(" ")}`);
   return execFileSync(command, argv, {
     cwd,
     encoding: "utf8",
@@ -285,22 +286,29 @@ async function main() {
 
   try {
     console.log("[IE-MIGRATE] 1/4 — dump temporário do remoto.");
+    const dbUrl = process.env.SUPABASE_DB_URL;
     const dbPassword = process.env.SUPABASE_DB_PASSWORD;
-    if (!dbPassword) {
+
+    if (!dbUrl && !dbPassword) {
       throw new Error(
-        "SUPABASE_DB_PASSWORD não definido. O dump remoto precisa usar a senha explícita para evitar o cli_login_postgres em transação somente leitura.",
+        "Defina SUPABASE_DB_URL (recomendado: conexão direta copiada de Connect) ou SUPABASE_DB_PASSWORD. Não informe credenciais no código.",
       );
     }
 
-    run("supabase", [
+    const dumpArgs = [
       "db", "dump",
-      "--linked",
+      ...(dbUrl ? ["--db-url", dbUrl] : ["--linked", "--password", dbPassword]),
       "--data-only",
       "--schema", "public",
       "--use-copy",
-      "--password", dbPassword,
       "--file", rawDump,
-    ]);
+    ];
+
+    run("supabase", dumpArgs, {
+      displayArgv: dbUrl
+        ? ["db", "dump", "--db-url", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump]
+        : ["db", "dump", "--linked", "--password", "***REDACTED***", "--data-only", "--schema", "public", "--use-copy", "--file", rawDump],
+    });
 
     console.log(
       `[IE-MIGRATE] dump bruto temporário: ${(statSync(rawDump).size / 1024 / 1024).toFixed(1)} MB`,
