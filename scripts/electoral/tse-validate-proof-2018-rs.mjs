@@ -51,7 +51,6 @@ async function inspect(label, zip, pattern, section=false) {
       for(const line of lines){ if(!line.trim()) continue;
         if(!headers){ headers=parse(line); ix={year:idx(headers,["ANO_ELEICAO"]),turn:idx(headers,["NR_TURNO"]),uf:idx(headers,["SG_UF"]),office:idx(headers,["CD_CARGO"]),mun:idx(headers,["CD_MUNICIPIO"]),zone:idx(headers,["NR_ZONA"]),section:idx(headers,["NR_SECAO"])}; if(section){ix.votavel=idx(headers,["NR_VOTAVEL"]);ix.votes=idx(headers,["QT_VOTOS"]);}else{ix.candidate=idx(headers,["NR_CANDIDATO"]);ix.votes=idx(headers,["QT_VOTOS_NOMINAIS"]);ix.valid=idx(headers,["QT_VOTOS_NOMINAIS_VALIDOS"]);} continue;}
         r.rows_seen++;
-        if(val(line.split(/(?=(?:[^"]*"[^"]*")*[^"]*$)/),{}, "x")){}
         const row=parse(line);
         if(val(row,ix,"year")!==YEAR||val(row,ix,"turn")!==TURN||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE) continue;
         if(val(row,ix,section?"votavel":"candidate")!==CANDIDATE) continue;
