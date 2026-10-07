@@ -270,12 +270,102 @@ A auditoria da arquitetura existente está concluída. O módulo será inserido 
 
 A fonte primária de dados definida é o Portal de Dados Abertos do TSE. A documentação detalhada da fundação está em `docs/roadmap/IE-01-FUNDACAO-INTELIGENCIA-ELEITORAL-2026-10-06.md`.
 
+
+## 11. Arquitetura de dados — local completo, remoto autônomo
+
+A arquitetura operacional definitiva da Inteligência Eleitoral separa **repositório de dados** de **ambiente de execução da aplicação**.
+
+### PostgreSQL local — fonte completa de ingestão
+
+O ambiente local é o repositório completo dos dados eleitorais e pode conter:
+
+- arquivos brutos oficiais do TSE;
+- staging;
+- dados normalizados;
+- histórico completo;
+- fatos nominais;
+- fatos de totalização;
+- dados auxiliares;
+- cruzamentos;
+- artefatos de auditoria.
+
+O armazenamento local existe para aquisição, processamento, validação, auditoria e reconstrução dos datasets publicados.
+
+### Supabase remoto — fonte exclusiva de runtime
+
+A plataforma em produção **não pode depender do PostgreSQL local**.
+
+Toda funcionalidade da Inteligência Eleitoral deve funcionar integralmente usando somente os dados publicados no Supabase remoto. O banco local pode estar desligado, indisponível ou em processamento sem interromper a operação da plataforma.
+
+Portanto:
+
+> **Local = fonte completa, processamento e auditoria.**
+>
+> **Remoto = fonte exclusiva de dados para a aplicação em produção.**
+
+### Regra de publicação
+
+O remoto não receberá automaticamente toda a base bruta.
+
+Antes da publicação, os dados serão:
+
+1. normalizados;
+2. validados;
+3. consolidados;
+4. filtrados conforme as necessidades reais da Inteligência Eleitoral;
+5. publicados no Supabase remoto;
+6. validados novamente no remoto.
+
+Todo dado necessário para uma funcionalidade de produção deve existir no remoto. Nenhuma consulta de runtime poderá exigir acesso ao banco local.
+
+### Regra de armazenamento
+
+Os arquivos brutos do TSE permanecem no ambiente local mesmo após a publicação. Eles são a matéria-prima para reprocessamento e reconstrução futura.
+
+A remoção de dados eleitorais do Supabase remoto somente poderá ocorrer depois que o equivalente necessário para produção estiver validado no armazenamento local e, quando aplicável, republicado em formato filtrado/consolidado.
+
+## 12. Nova estratégia de reconstrução da base
+
+A carga remoto → local atualmente em execução não é mais a estratégia canônica e deverá ser interrompida.
+
+A reconstrução passa a seguir:
+
+**TSE → arquivos brutos locais → PostgreSQL local → validação → consolidação/filtragem → Supabase remoto.**
+
+O banco eleitoral local será zerado e reconstruído a partir dos arquivos oficiais TSE já adquiridos ou novamente adquiridos, preservando a mesma origem oficial dos dados.
+
+A primeira reconstrução cobre exclusivamente:
+
+- RS;
+- Deputado Estadual;
+- 1º turno;
+- 2018;
+- 2022;
+- 2026.
+
+A carga não será filtrada por Carlos Búrigo. Todos os candidatos necessários ao funcionamento da inteligência permanecem incluídos no dataset local e o remoto receberá somente a projeção analítica necessária à aplicação.
+
+## 13. Regra de independência operacional
+
+É proibido implementar qualquer funcionalidade da Inteligência Eleitoral que, em produção, dependa de:
+
+- PostgreSQL local;
+- Docker local;
+- arquivos locais;
+- scripts de ingestão;
+- diretórios de staging;
+- máquinas de desenvolvimento;
+- processos de ETL em execução.
+
+O ETL local é um processo de **publicação**, não um serviço de runtime.
+
+
 ## 10. Estado operacional atualizado
 
 **IE-02 — Modelo de Dados: CONCLUÍDA.** O modelo canônico foi aplicado no Supabase.
 
-**IE-03 — Ingestão: EM EXECUÇÃO.** A carga de prova 2022/RS e 2026 foi concluída e validada fisicamente no Supabase. A próxima execução é a cobertura histórica e territorial.
+**IE-03 — Ingestão: EM EXECUÇÃO.** A estratégia operacional foi redefinida para ingestão completa no PostgreSQL local e publicação filtrada no Supabase remoto. A reconstrução da base será feita diretamente a partir dos arquivos oficiais do TSE.
 
-**IE-03.7 — Cobertura histórica e territorial:** primeira onda definida exclusivamente para **Rio Grande do Sul (RS) + Deputado Estadual**, em 2018, 2022 e 2026, com todos os candidatos e território RS → municípios → zonas → seções. A carga 2018/RS já está concluída no Supabase para **853 candidatos**, com **1.449.370 fatos nominais por seção / 5.442.544 votos** e zero rejeições nos quatro import runs. A validação específica de Carlos Búrigo 15140 fecha em **34.322 votos**. O documento operacional é `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
+**IE-03.7 — Cobertura histórica e territorial:** EM EXECUÇÃO para RS / Deputado Estadual / 1º turno / 2018, 2022 e 2026. A carga local será reconstruída do zero e validada antes de qualquer publicação remota.
 
 Nenhuma tela será criada enquanto a cobertura mínima da base eleitoral não estiver validada.
