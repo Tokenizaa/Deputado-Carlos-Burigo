@@ -285,12 +285,20 @@ async function main() {
 
   try {
     console.log("[IE-MIGRATE] 1/4 — dump temporário do remoto.");
+    const dbPassword = process.env.SUPABASE_DB_PASSWORD;
+    if (!dbPassword) {
+      throw new Error(
+        "SUPABASE_DB_PASSWORD não definido. O dump remoto precisa usar a senha explícita para evitar o cli_login_postgres em transação somente leitura.",
+      );
+    }
+
     run("supabase", [
       "db", "dump",
       "--linked",
       "--data-only",
       "--schema", "public",
       "--use-copy",
+      "--password", dbPassword,
       "--file", rawDump,
     ]);
 
