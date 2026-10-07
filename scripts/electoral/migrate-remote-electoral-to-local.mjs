@@ -34,7 +34,7 @@ const executeCleanup = args.has("--cleanup-remote");
 const replaceLocal = args.has("--replace-local");
 
 function run(command, argv, options = {}) {
-  console.log(\`[IE-MIGRATE] $ \${command} \${argv.join(" ")}\`);
+  console.log(`[IE-MIGRATE] $ ${command} ${argv.join(" ")}`);
   return execFileSync(command, argv, {
     cwd: ROOT,
     encoding: "utf8",
@@ -48,7 +48,7 @@ function ensureCommand(command) {
   try {
     execFileSync(command, ["--version"], { cwd: ROOT, stdio: "ignore" });
   } catch {
-    throw new Error(\`Comando obrigatório não encontrado: \${command}\`);
+    throw new Error(`Comando obrigatório não encontrado: ${command}`);
   }
 }
 
@@ -71,17 +71,17 @@ function queryCsv(target, sql) {
 
 function csvRows(output) {
   const lines = output.split(/\r?\n/).filter(Boolean);
-  if (lines.length < 2) throw new Error(\`Resposta CSV inesperada: \${output}\`);
+  if (lines.length < 2) throw new Error(`Resposta CSV inesperada: ${output}`);
   return lines.slice(1).map((line) => line.split(",").map((v) => v.replace(/^"|"$/g, "")));
 }
 
 function assertLocalEmpty() {
-  const sql = \`select
+  const sql = `select
     (select count(*) from public.electoral_results_nominal) as nominal_rows,
-    (select count(*) from public.electoral_results_totals) as totals_rows;\`;
+    (select count(*) from public.electoral_results_totals) as totals_rows;`;
   const [nominalRows, totalsRows] = csvRows(queryCsv("local", sql))[0].map(Number);
 
-  console.log(\`[IE-MIGRATE] local antes: nominal=\${nominalRows}, totals=\${totalsRows}\`);
+  console.log(`[IE-MIGRATE] local antes: nominal=${nominalRows}, totals=${totalsRows}`);
 
   if ((nominalRows > 0 || totalsRows > 0) && !replaceLocal) {
     throw new Error(
@@ -144,7 +144,7 @@ function filterDump(source, destination) {
 
   if (keptBlocks !== TARGET_TABLES.length) {
     console.warn(
-      \`[IE-MIGRATE] aviso: \${keptBlocks}/\${TARGET_TABLES.length} tabelas eleitorais apareceram no dump.\`,
+      `[IE-MIGRATE] aviso: ${keptBlocks}/${TARGET_TABLES.length} tabelas eleitorais apareceram no dump.`,
     );
   }
 
@@ -155,21 +155,21 @@ function filterDump(source, destination) {
 function sqlCleanupFile(path) {
   writeFileSync(
     path,
-    \`-- Remove somente os dois armazenamentos eleitorais pesados.
+    `-- Remove somente os dois armazenamentos eleitorais pesados.
 TRUNCATE TABLE
   public.electoral_results_nominal,
   public.electoral_results_totals;
-\`,
+`,
   "utf8",
   );
 }
 
 function validateAndReport(reportPath) {
-  const sql = \`select
+  const sql = `select
     (select count(*) from public.electoral_results_nominal) as nominal_rows,
     coalesce((select sum(nominal_votes) from public.electoral_results_nominal),0) as nominal_votes,
     (select count(*) from public.electoral_results_totals) as totals_rows,
-    coalesce((select sum(candidate_votes) from public.electoral_results_totals),0) as totals_votes;\`;
+    coalesce((select sum(candidate_votes) from public.electoral_results_totals),0) as totals_votes;`;
 
   const remote = csvRows(queryCsv("remote", sql))[0].map(Number);
   const local = csvRows(queryCsv("local", sql))[0].map(Number);
@@ -187,8 +187,8 @@ function validateAndReport(reportPath) {
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, JSON.stringify(report, null, 2) + "\n");
 
-  console.log(\`[IE-MIGRATE] validação: \${report.equal ? "OK" : "DIVERGENTE"}\`);
-  console.log(\`[IE-MIGRATE] relatório: \${reportPath}\`);
+  console.log(`[IE-MIGRATE] validação: ${report.equal ? "OK" : "DIVERGENTE"}`);
+  console.log(`[IE-MIGRATE] relatório: ${reportPath}`);
 
   if (!report.equal) {
     throw new Error("Os totais local/remoto não coincidem. Limpeza remota bloqueada.");
@@ -203,13 +203,13 @@ async function main() {
   ensureCommand("docker");
 
   console.log("[IE-MIGRATE] remoto → PostgreSQL local");
-  console.log(\`[IE-MIGRATE] projeto remoto: \${PROJECT_REF}\`);
+  console.log(`[IE-MIGRATE] projeto remoto: ${PROJECT_REF}`);
   console.log("[IE-MIGRATE] escopo canônico: RS / Deputado Estadual / 1º turno");
 
   run("supabase", ["start"]);
   assertLocalEmpty();
 
-  const workDir = resolve(tmpdir(), \`ie-electoral-migration-\${Date.now()}\`);
+  const workDir = resolve(tmpdir(), `ie-electoral-migration-${Date.now()}`);
   mkdirSync(workDir, { recursive: true });
 
   const rawDump = resolve(workDir, "remote-public-data.sql");
@@ -229,12 +229,12 @@ async function main() {
     ]);
 
     console.log(
-      \`[IE-MIGRATE] dump bruto temporário: \${(statSync(rawDump).size / 1024 / 1024).toFixed(1)} MB\`,
+      `[IE-MIGRATE] dump bruto temporário: ${(statSync(rawDump).size / 1024 / 1024).toFixed(1)} MB`,
     );
 
     console.log("[IE-MIGRATE] 2/4 — filtrando somente as 14 tabelas eleitorais.");
     const blocks = filterDump(rawDump, electoralDump);
-    console.log(\`[IE-MIGRATE] blocos eleitorais preparados: \${blocks}\`);
+    console.log(`[IE-MIGRATE] blocos eleitorais preparados: ${blocks}`);
 
     console.log("[IE-MIGRATE] 3/4 — restaurando a camada eleitoral no PostgreSQL local.");
     run("supabase", ["db", "query", "--local", "--file", electoralDump]);
@@ -256,15 +256,15 @@ async function main() {
     const [remoteNominalRows, remoteTotalsRows] = csvRows(
       queryCsv(
         "remote",
-        \`select
+        `select
           (select count(*) from public.electoral_results_nominal) as nominal_rows,
-          (select count(*) from public.electoral_results_totals) as totals_rows;\`,
+          (select count(*) from public.electoral_results_totals) as totals_rows;`,
       ),
     )[0].map(Number);
 
     if (remoteNominalRows !== 0 || remoteTotalsRows !== 0) {
       throw new Error(
-        \`Limpeza remota incompleta: nominal=\${remoteNominalRows}, totals=\${remoteTotalsRows}\`,
+        `Limpeza remota incompleta: nominal=${remoteNominalRows}, totals=${remoteTotalsRows}`,
       );
     }
 
