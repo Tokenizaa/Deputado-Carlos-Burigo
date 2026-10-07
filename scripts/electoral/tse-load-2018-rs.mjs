@@ -143,8 +143,12 @@ async function main(){
     }
   });
   if(!candidateRows.length)throw new Error("Nenhuma candidatura 2018/RS encontrada.");
+  const candidateById=new Map();
   const candidateByNumber=new Map();
-  for(const c of candidateRows) candidateByNumber.set(`${c.office}:${c.candidate_number}:${c.turn}`,c);
+  for(const c of candidateRows) {
+    candidateById.set(`${c.office}:${c.tse_candidate_id}:${c.turn}`,c);
+    candidateByNumber.set(`${c.office}:${c.candidate_number}:${c.turn}`,c);
+  }
 
   console.log(`[IE-03.7] candidaturas encontradas: ${candidateRows.length.toLocaleString("pt-BR")}`);
 
@@ -232,12 +236,18 @@ async function main(){
   }),(row,ix)=>{
     if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),candidateId=val(row,ix,"candidateId");
-    const c=candidates.get(`${office}:${candidateId}`);
+    const candidateNumber=val(row,ix,"number");
+    const c=candidateById.get(`${office}:${candidateId}:${turn}`) ?? candidateByNumber.get(`${office}:${candidateNumber}:${turn}`);
     if(!c||c.turn!==turn||c.office!==OFFICE_CODE)return;
     munRows.push({turn,office,candidate:c,municipality:val(row,ix,"municipality"),zone:num(val(row,ix,"zone")),votes:num(val(row,ix,"votes")),valid_votes:num(val(row,ix,"valid"))});
   });
   const runM=await startRun(sourceMun,hashes.mun,mr.rows,{layer:"candidate_municipality_zone",uf:UF,all_candidates:true});
   if(!runM.__skip){
+    const unresolvedCandidates=munRows.filter(r=>!r.candidate?.db);
+    if(unresolvedCandidates.length) {
+      const sample=unresolvedCandidates.slice(0,10).map(r=>`${r.candidate?.candidate_number??"?"}/${r.candidate?.tse_candidate_id??"?"}`).join(", ");
+      throw new Error(`Candidatos município/zona sem vínculo: ${unresolvedCandidates.length}. Exemplos: ${sample}`);
+    }
     const facts=munRows.map(r=>({round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zoneMap.get(String(r.zone)),section_id:null,candidate_id:r.candidate.db.id,source_dataset_id:sourceMun.id,import_run_id:runM.id,candidate_votes:r.votes}));
     if(facts.some(f=>!f.municipality_id||!f.zone_id||!f.candidate_id))throw new Error("Fatos município/zona com dimensão não resolvida.");
     await insertBatches("electoral_results_totals",facts,500);await finish(runM,facts.length,{layer:"candidate_municipality_zone"});
