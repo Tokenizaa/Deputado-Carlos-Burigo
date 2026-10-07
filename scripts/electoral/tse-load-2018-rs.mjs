@@ -44,12 +44,12 @@ async function zipEntry(zip, regex) {
   return new Promise((res,rej) => {
     const p=spawn("unzip",["-Z1",zip]); let out="",err="";
     p.stdout.on("data",d=>out+=d); p.stderr.on("data",d=>err+=d);
-    p.on("close",code=>code?rej(new Error(err||\`unzip failed \${code}\`)):res(out.split(/\r?\n/).find(x=>regex.test(x))));
+    p.on("close",code=>code?rej(new Error(err||`unzip failed ${code}`)):res(out.split(/\r?\n/).find(x=>regex.test(x))));
   });
 }
 async function readCsv(zip, regex, onHeader, onRow) {
   const entry=await zipEntry(zip,regex);
-  if(!entry) throw new Error(\`CSV não encontrado em \${zip}\`);
+  if(!entry) throw new Error(`CSV não encontrado em ${zip}`);
   return new Promise((res,rej)=>{
     const p=spawn("unzip",["-p",zip,entry]); let buf="",headers=null,ix=null,rows=0,err="";
     let last=Date.now(), started=Date.now();
@@ -59,13 +59,13 @@ async function readCsv(zip, regex, onHeader, onRow) {
         if(!line.trim()) continue;
         if(!headers){headers=parseCsvLine(line);ix=onHeader(headers);continue;}
         rows++; onRow(parseCsvLine(line),ix);
-        if(Date.now()-last>15000){console.log(\`[IE-03.7] \${zip.split("/").pop()} :: \${rows.toLocaleString("pt-BR")} linhas :: \${Math.round((Date.now()-started)/1000)}s\`);last=Date.now();}
+        if(Date.now()-last>15000){console.log(`[IE-03.7] ${zip.split("/").pop()} :: ${rows.toLocaleString("pt-BR")} linhas :: ${Math.round((Date.now()-started)/1000)}s`);last=Date.now();}
       }
     };
     p.stdout.on("data",consume); p.stderr.on("data",d=>err+=d);
     p.on("close",code=>{
       if(buf.trim()&&headers){rows++;onRow(parseCsvLine(buf),ix);}
-      if(code) rej(new Error(err||\`unzip failed \${code}\`)); else res({entry,rows});
+      if(code) rej(new Error(err||`unzip failed ${code}`)); else res({entry,rows});
     });
   });
 }
@@ -76,14 +76,14 @@ async function fileInfo(path,url){const s=await stat(path);return{name:path.spli
 async function one(table,filters) {
   let q=supabase.from(table).select("*").limit(1);
   for(const [k,v] of Object.entries(filters)) q=q.eq(k,v);
-  const {data,error}=await q;if(error)throw new Error(\`\${table}: \${error.message}\`);return data?.[0]??null;
+  const {data,error}=await q;if(error)throw new Error(`${table}: ${error.message}`);return data?.[0]??null;
 }
 async function upsert(table,payload,conflict) {
   const {data,error}=await supabase.from(table).upsert(payload,{onConflict:conflict}).select();
-  if(error)throw new Error(\`\${table}: \${error.message}\`);return data;
+  if(error)throw new Error(`${table}: ${error.message}`);return data;
 }
 async function insertBatches(table,rows,size=500) {
-  for(let i=0;i<rows.length;i+=size){const {error}=await supabase.from(table).insert(rows.slice(i,i+size));if(error)throw new Error(\`\${table}: \${error.message}\`);}
+  for(let i=0;i<rows.length;i+=size){const {error}=await supabase.from(table).insert(rows.slice(i,i+size));if(error)throw new Error(`${table}: ${error.message}`);}
 }
 async function dataset(code,name,url,hash,metadata) {
   const existing=await one("electoral_source_datasets",{provider:"TSE",dataset_code:code});
@@ -121,7 +121,7 @@ async function main(){
     detailSection:"https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_secao/detalhe_votacao_secao_2018.zip",
     section:"https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2018_RS.zip",
   };
-  for(const p of Object.values(files)){try{await stat(p);}catch{throw new Error(\`Arquivo ausente: \${p}\`);}}
+  for(const p of Object.values(files)){try{await stat(p);}catch{throw new Error(`Arquivo ausente: ${p}`);}}
   const hashes={};
   for(const [k,p] of Object.entries(files))hashes[k]=await fileInfo(p,urls[k]);
 
@@ -140,7 +140,7 @@ async function main(){
     const office=val(row,ix,"office"), number=val(row,ix,"number"), id=val(row,ix,"id");
     if(!id||!number)return;
     electionCodes.set(turn,val(row,ix,"election"));
-    const key=\`\${office}:\${id}\`;
+    const key=`${office}:${id}`;
     if(!candidates.has(key)) {
       const c={turn,office,tse_candidate_id:id,candidate_number:number,ballot_name:val(row,ix,"ballot"),full_name:val(row,ix,"full"),party_number:val(row,ix,"partyCode"),acronym:val(row,ix,"acronym"),party_name:val(row,ix,"partyName"),status:val(row,ix,"status")};
       candidates.set(key,c);candidateRows.push(c);
@@ -148,9 +148,9 @@ async function main(){
   });
   if(!candidateRows.length)throw new Error("Nenhuma candidatura 2018/RS encontrada.");
   const candidateByNumber=new Map();
-  for(const c of candidateRows) candidateByNumber.set(\`\${c.office}:\${c.candidate_number}:\${c.turn}\`,c);
+  for(const c of candidateRows) candidateByNumber.set(`${c.office}:${c.candidate_number}:${c.turn}`,c);
 
-  console.log(\`[IE-03.7] candidaturas encontradas: \${candidateRows.length.toLocaleString("pt-BR")}\`);
+  console.log(`[IE-03.7] candidaturas encontradas: ${candidateRows.length.toLocaleString("pt-BR")}`);
 
   const elections=new Map(), rounds=new Map(), offices=new Map(), parties=new Map(), candidateDb=new Map();
   for(const [turn,code] of electionCodes){
@@ -168,10 +168,10 @@ async function main(){
       if(!parties.has(c.party_number)) parties.set(c.party_number,existing??(await upsert("electoral_parties",{tse_party_code:c.party_number,party_number:c.party_number,acronym:c.acronym||null,name:c.party_name||c.acronym||c.party_number,party_type:"PARTIDO"}, "id"))[0]);
     }
     const party=parties.get(c.party_number)?.id??null;
-    const key=\`\${c.turn}:\${c.office}:\${c.tse_candidate_id}\`;
+    const key=`${c.turn}:${c.office}:${c.tse_candidate_id}`;
     const db=(await upsert("electoral_candidates",{election_id:elections.get(c.turn).id,office_id:offices.get(c.office).id,tse_candidate_id:c.tse_candidate_id,candidate_number:c.candidate_number,ballot_name:c.ballot_name,full_name:c.full_name,party_id:party,candidate_status:c.status},"election_id,office_id,tse_candidate_id"))[0];
     candidateDb.set(key,db);
-    candidateByNumber.get(\`\${c.office}:\${c.candidate_number}:\${c.turn}\`).db=db;
+    candidateByNumber.get(`${c.office}:${c.candidate_number}:${c.turn}`).db=db;
   }
 
   const territory=new Map(), zones=new Set(), sections=new Map();
@@ -188,11 +188,11 @@ async function main(){
     const turn=num(val(row,ix,"turn")), municipality=val(row,ix,"municipality"), zone=num(val(row,ix,"zone")), section=num(val(row,ix,"section"));
     if(!turn||!municipality||!zone||!section)return;
     territory.set(municipality,val(row,ix,"municipalityName"));zones.add(zone);
-    const sk=\`\${zone}:\${section}\`;
+    const sk=`${zone}:${section}`;
     if(!sections.has(sk))sections.set(sk,{zone,section,municipality,location_name:val(row,ix,"location")});
     detailSectionRows.push({turn,office:val(row,ix,"office"),municipality,zone,section,electorate:num(val(row,ix,"electorate")),comparecimento:num(val(row,ix,"comparecimento")),abstentions:num(val(row,ix,"abstentions")),valid_votes:num(val(row,ix,"nominal"))+num(val(row,ix,"blank"))+num(val(row,ix,"nulls"))+num(val(row,ix,"legend")),blank_votes:num(val(row,ix,"blank")),null_votes:num(val(row,ix,"nulls")),total_votes:num(val(row,ix,"nominal"))+num(val(row,ix,"blank"))+num(val(row,ix,"nulls"))+num(val(row,ix,"legend"))});
   });
-  console.log(\`[IE-03.7] território: \${territory.size} municípios, \${zones.size} zonas, \${sections.size} seções\`);
+  console.log(`[IE-03.7] território: ${territory.size} municípios, ${zones.size} zonas, ${sections.size} seções`);
 
   const municipalityMap=new Map(),zoneMap=new Map(),sectionMap=new Map();
   await insertBatches("electoral_municipalities",[...territory].map(([code,name])=>({uf:UF,tse_municipality_code:code,name})),500);
@@ -202,17 +202,17 @@ async function main(){
   const zoneNums=[...zones];
   for(let i=0;i<zoneNums.length;i+=500){const {data,error}=await supabase.from("electoral_zones").select("id,zone_number").eq("uf",UF).in("zone_number",zoneNums.slice(i,i+500));if(error)throw new Error(error.message);for(const r of data??[])zoneMap.set(String(r.zone_number),r.id);}
   const zm=[...sections.values()].map(r=>({zone_id:zoneMap.get(String(r.zone)),municipality_id:municipalityMap.get(r.municipality)})).filter(r=>r.zone_id&&r.municipality_id);
-  await insertBatches("electoral_zone_municipalities", [...new Map(zm.map(r=>[\`\${r.zone_id}:\${r.municipality_id}\`,r])).values()]);
+  await insertBatches("electoral_zone_municipalities", [...new Map(zm.map(r=>[`${r.zone_id}:${r.municipality_id}`,r])).values()]);
   const secRows=[...sections.values()].map(r=>({zone_id:zoneMap.get(String(r.zone)),municipality_id:municipalityMap.get(r.municipality),section_number:r.section,location_name:r.location_name||null})).filter(r=>r.zone_id&&r.municipality_id);
   await insertBatches("electoral_sections",secRows,500);
   for(let i=0;i<zoneNums.length;i+=500){
     const ids=zoneNums.slice(i,i+500).map(n=>zoneMap.get(String(n))).filter(Boolean);
     for(let from=0;;from+=1000){
       const {data,error}=await supabase.from("electoral_sections").select("id,zone_id,section_number").in("zone_id",ids).order("id").range(from,from+999);
-      if(error)throw new Error(error.message);for(const r of data??[])sectionMap.set(\`\${r.zone_id}:\${r.section_number}\`,r.id);if(!data||data.length<1000)break;
+      if(error)throw new Error(error.message);for(const r of data??[])sectionMap.set(`${r.zone_id}:${r.section_number}`,r.id);if(!data||data.length<1000)break;
     }
   }
-  if(sectionMap.size<sections.size)throw new Error(\`Mapa de seções incompleto: \${sectionMap.size}/\${sections.size}\`);
+  if(sectionMap.size<sections.size)throw new Error(`Mapa de seções incompleto: ${sectionMap.size}/${sections.size}`);
 
   const sourceSection=await dataset("votacao_secao_2018_RS","Votação por seção eleitoral - 2018 - RS",urls.section,hashes.section,{uf:UF,year:YEAR,all_candidates:true});
   const sourceMun=await dataset("votacao_candidato_munzona_2018","Votação nominal por município e zona - 2018",urls.mun,hashes.mun,{uf:UF,year:YEAR,all_candidates:true});
@@ -222,7 +222,7 @@ async function main(){
   console.log("[IE-03.7] carregando apuração por seção");
   const runDS=await startRun(sourceDetailSection,hashes.detailSection,dsRead.rows,{layer:"apuration_section",uf:UF,all_offices:true});
   if(!runDS.__skip){
-    const facts=detailSectionRows.map(r=>{const zid=zoneMap.get(String(r.zone));return{round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zid,section_id:sectionMap.get(\`\${zid}:\${r.section}\`),source_dataset_id:sourceDetailSection.id,import_run_id:runDS.id,electorate:r.electorate,comparecimento:r.comparecimento,abstentions:r.abstentions,valid_votes:r.valid_votes,blank_votes:r.blank_votes,null_votes:r.null_votes,total_votes:r.total_votes};});
+    const facts=detailSectionRows.map(r=>{const zid=zoneMap.get(String(r.zone));return{round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zid,section_id:sectionMap.get(`${zid}:${r.section}`),source_dataset_id:sourceDetailSection.id,import_run_id:runDS.id,electorate:r.electorate,comparecimento:r.comparecimento,abstentions:r.abstentions,valid_votes:r.valid_votes,blank_votes:r.blank_votes,null_votes:r.null_votes,total_votes:r.total_votes};});
     if(facts.some(f=>!f.round_id||!f.office_id||!f.municipality_id||!f.zone_id||!f.section_id))throw new Error("Totais de seção com dimensão não resolvida.");
     await insertBatches("electoral_results_totals",facts,500);await finish(runDS,facts.length,{layer:"apuration_section"});
   }
@@ -236,7 +236,7 @@ async function main(){
   }),(row,ix)=>{
     if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
     const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),candidateId=val(row,ix,"candidateId");
-    const c=candidates.get(\`\${office}:\${candidateId}\`);
+    const c=candidates.get(`${office}:${candidateId}`);
     if(!c||c.turn!==turn)return;
     munRows.push({turn,office,candidate:c,municipality:val(row,ix,"municipality"),zone:num(val(row,ix,"zone")),votes:num(val(row,ix,"votes")),valid_votes:num(val(row,ix,"valid"))});
   });
@@ -276,17 +276,17 @@ async function main(){
     }),(row,ix)=>{
       if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
       const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),number=val(row,ix,"votavel");
-      const c=candidateByNumber.get(\`\${office}:\${number}:\${turn}\`);
+      const c=candidateByNumber.get(`${office}:${number}:${turn}`);
       if(!c?.db)return;
-      const municipality=val(row,ix,"municipality"),zone=num(val(row,ix,"zone")),section=num(val(row,ix,"section")),zid=zoneMap.get(String(zone)),sid=sectionMap.get(\`\${zid}:\${section}\`),votes=num(val(row,ix,"votes"));
-      if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(\`Dimensão não resolvida na votação por seção: \${municipality}/\${zone}/\${section}\`);
+      const municipality=val(row,ix,"municipality"),zone=num(val(row,ix,"zone")),section=num(val(row,ix,"section")),zid=zoneMap.get(String(zone)),sid=sectionMap.get(`${zid}:${section}`),votes=num(val(row,ix,"votes"));
+      if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(`Dimensão não resolvida na votação por seção: ${municipality}/${zone}/${section}`);
       batch.push({round_id:rounds.get(turn).id,office_id:offices.get(office).id,uf:UF,municipality_id:municipalityMap.get(municipality),zone_id:zid,section_id:sid,candidate_id:c.db.id,source_dataset_id:sourceSection.id,import_run_id:runS.id,votes});
       loadedS++;sectionVotes+=votes;
       if(batch.length>=500){const copy=batch;batch=[];pending=pending.then(()=>insertBatches("electoral_results_nominal",copy,500));}
     });
     if(batch.length)pending=pending.then(()=>insertBatches("electoral_results_nominal",batch,500)); await pending;
     await finish(runS,loadedS,{layer:"nominal_section",rows_read:sr.rows,loaded_votes:sectionVotes});
-    console.log(\`[IE-03.7] votação por seção: \${loadedS.toLocaleString("pt-BR")} fatos, \${sectionVotes.toLocaleString("pt-BR")} votos\`);
+    console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} fatos, ${sectionVotes.toLocaleString("pt-BR")} votos`);
   }
 
   console.log(JSON.stringify({
