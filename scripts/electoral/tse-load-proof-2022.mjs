@@ -442,6 +442,14 @@ async function main() {
   if (sectionMap.size !== sectionRowsForDb.length) {
     throw new Error("Mapa de seções incompleto: " + sectionMap.size + "/" + sectionRowsForDb.length);
   }
+  const unresolvedSectionKeys = sectionRows.filter(r => {
+    const zoneId = zoneMap.get(String(r.zone));
+    return !zoneId || !sectionMap.get(String(zoneId) + ":" + String(r.section));
+  });
+  if (unresolvedSectionKeys.length) {
+    const sample = unresolvedSectionKeys.slice(0, 10).map(r => [r.municipality, r.zone, r.section].join("/")).join(", ");
+    throw new Error("Seções nominais sem section_id resolvido: " + unresolvedSectionKeys.length + ". Exemplos: " + sample);
+  }
   const missingNominalSections = sectionRows.filter(r => !sectionMap.has([zoneMap.get(String(r.zone)), r.section].join(":")));
   if (missingNominalSections.length) {
     const sample = missingNominalSections.slice(0, 10).map(r => [r.municipality, r.zone, r.section].join("/")).join(", ");
@@ -488,11 +496,19 @@ async function main() {
     "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_RS.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runSection = await runFor(sourceSection, hashes["votacao_secao_2022_RS.zip"], { proof_case: true, layer: "nominal_section" }, sectionRows.length);
   if (!DRY_RUN && !runSection.__skip) {
-    const facts = sectionRows.map(r => ({
-      round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
-      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${zoneMap.get(String(r.zone))}:${r.section}`), candidate_id: candidate.id,
-      source_dataset_id: sourceSection.id, import_run_id: runSection.id, votes: r.votes
-    }));
+    const facts = sectionRows.map(r => {
+      const zoneId = zoneMap.get(String(r.zone));
+      const sectionId = sectionMap.get(String(zoneId) + ":" + String(r.section));
+      return {
+        round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
+        zone_id: zoneId, section_id: sectionId, candidate_id: candidate.id,
+        source_dataset_id: sourceSection.id, import_run_id: runSection.id, votes: r.votes
+      };
+    });
+    const invalidFacts = facts.filter(f => !f.municipality_id || !f.zone_id || !f.section_id);
+    if (invalidFacts.length) {
+      throw new Error("Fatos nominais sem vínculo dimensional: " + invalidFacts.length + ". Primeiro: " + JSON.stringify(invalidFacts[0]));
+    }
     for (let i = 0; i < facts.length; i += 500) {
       const { error } = await supabase.from("electoral_results_nominal").insert(facts.slice(i, i + 500));
       if (error) throw new Error("electoral_results_nominal: " + error.message);
@@ -541,14 +557,24 @@ async function main() {
     "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_secao/detalhe_votacao_secao_2022.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runDetailSection = await runFor(sourceDetailSection, hashes["detalhe_votacao_secao_2022.zip"], { proof_case: true, layer: "apuration_section" }, sectionTotals.length);
   if (!DRY_RUN && !runDetailSection.__skip) {
-    const facts = sectionTotals.map(r => ({
+    const facts = sectionTotals.map(r => {
+      const zoneId = zoneMap.get(String(r.zone));
+      return {
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
-      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${zoneMap.get(String(r.zone))}:${r.section}`),
+      zone_id: zoneId, section_id: sectionMap.get(String(zoneId) + ":" + String(r.section)),
       source_dataset_id: sourceDetailSection.id, import_run_id: runDetailSection.id,
       electorate: r.electorate, comparecimento: r.comparecimento, abstentions: r.abstentions,
       valid_votes: r.valid_votes, blank_votes: r.blank_votes, null_votes: r.null_votes, total_votes: r.total_votes
-    }));
-    for (let i = 0; i < facts.length; i += 500) await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
+      };
+    });
+    const invalidFacts = facts.filter(f => !f.municipality_id || !f.zone_id || !f.section_id);
+    if (invalidFacts.length) {
+      throw new Error("Totais por seção sem vínculo dimensional: " + invalidFacts.length + ". Primeiro: " + JSON.stringify(invalidFacts[0]));
+    }
+    for (let i = 0; i < facts.length; i += 500) {
+      const { error } = await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
+      if (error) throw new Error("electoral_results_totals: " + error.message);
+    }
     await finish(runDetailSection, facts.length, { proof_case: true, layer: "apuration_section" });
   }
 
