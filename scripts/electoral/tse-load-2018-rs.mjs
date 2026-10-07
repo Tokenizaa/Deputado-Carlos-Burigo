@@ -131,7 +131,7 @@ async function main(){
     partyCode:idx(h,["NR_PARTIDO"]),acronym:idx(h,["SG_PARTIDO"]),partyName:idx(h,["NM_PARTIDO"]),
     status:idx(h,["DS_SITUACAO_CANDIDATURA","DS_SITUACAO_CANDIDATO"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
+    if(val(row,ix,"year")!==String(YEAR)||num(val(row,ix,"turn"))!==1||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")); if(!turn)return;
     const office=val(row,ix,"office"), number=val(row,ix,"number"), id=val(row,ix,"id");
     if(!id||!number)return;
