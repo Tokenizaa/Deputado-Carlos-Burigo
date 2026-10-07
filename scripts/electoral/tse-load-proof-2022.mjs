@@ -490,7 +490,7 @@ async function main() {
   if (!DRY_RUN && !runSection.__skip) {
     const facts = sectionRows.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
-      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`), candidate_id: candidate.id,
+      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${zoneMap.get(String(r.zone))}:${r.section}`), candidate_id: candidate.id,
       source_dataset_id: sourceSection.id, import_run_id: runSection.id, votes: r.votes
     }));
     for (let i = 0; i < facts.length; i += 500) {
@@ -543,7 +543,7 @@ async function main() {
   if (!DRY_RUN && !runDetailSection.__skip) {
     const facts = sectionTotals.map(r => ({
       round_id: round2022.id, office_id: office.id, uf: UF, municipality_id: municipalityMap.get(r.municipality),
-      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`),
+      zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${zoneMap.get(String(r.zone))}:${r.section}`),
       source_dataset_id: sourceDetailSection.id, import_run_id: runDetailSection.id,
       electorate: r.electorate, comparecimento: r.comparecimento, abstentions: r.abstentions,
       valid_votes: r.valid_votes, blank_votes: r.blank_votes, null_votes: r.null_votes, total_votes: r.total_votes
