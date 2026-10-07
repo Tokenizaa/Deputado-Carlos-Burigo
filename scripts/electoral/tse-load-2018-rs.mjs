@@ -295,7 +295,7 @@ async function main(){
   let loadedS=0, sectionVotes=0;
   if(!runS.__skip){
     const nominalByKey=new Map();
-    const sr=await readCsv(files.section,/votacao_secao_2018_RS\\.csv$/i,h=>({
+    const sr=await readCsv(files.section,/votacao_secao_2018_RS\.csv$/i,h=>({
       year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
       municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
     }),(row,ix)=>{
