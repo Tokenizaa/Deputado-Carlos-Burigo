@@ -76,6 +76,7 @@ function runPgDump17(dbUrl, workDir) {
     "--no-owner",
     "--no-privileges",
     "--no-comments",
+    "--verbose",
     ...TARGET_TABLES.map((table) => `--table=public.${table}`),
     `--file=${containerOutput}`,
   ];
