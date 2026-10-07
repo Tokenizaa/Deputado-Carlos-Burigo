@@ -1,0 +1,66 @@
+{
+  "provider": "TSE",
+  "purpose": "IE-03.7 cobertura historica e territorial",
+  "cataloged_at": "2026-10-06",
+  "first_wave": {
+    "years": [2018, 2022, 2026],
+    "ufs": ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"],
+    "offices": {
+      "president": "0001",
+      "governor": "0003",
+      "senator": "0005",
+      "federal_deputy": "0006",
+      "state_or_district_deputy": "0007"
+    }
+  },
+  "sources": [
+    {
+      "year": 2018,
+      "dataset": "Resultados - 2018",
+      "dataset_url": "https://dadosabertos.tse.jus.br/dataset/resultados-2018",
+      "layers": [
+        "votacao_candidato_munzona",
+        "votacao_partido_munzona",
+        "detalhe_votacao_munzona",
+        "detalhe_votacao_secao",
+        "votacao_secao_por_uf"
+      ],
+      "status": "cataloged"
+    },
+    {
+      "year": 2018,
+      "dataset": "Candidatos - 2018",
+      "dataset_url": "https://dadosabertos.tse.jus.br/dataset/candidatos-2018",
+      "layers": ["candidaturas"],
+      "status": "cataloged"
+    },
+    {
+      "year": 2022,
+      "dataset": "Resultados - 2022",
+      "dataset_url": "https://dadosabertos.tse.jus.br/dataset/resultados-2022",
+      "layers": [
+        "votacao_candidato_munzona",
+        "votacao_partido_munzona",
+        "detalhe_votacao_munzona",
+        "detalhe_votacao_secao",
+        "votacao_secao_por_uf",
+        "boletim_de_urna"
+      ],
+      "status": "cataloged_and_proven_rs"
+    },
+    {
+      "year": 2026,
+      "dataset": "Resultados oficiais / EA20",
+      "dataset_url": "https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados",
+      "result_base_url": "https://resultados.tse.jus.br/oficial",
+      "layers": [
+        "EA20_resultado_unificado",
+        "EA15_acompanhamento_uf",
+        "EA16_configuracao_secoes",
+        "EA18_auxiliar_secao",
+        "candidaturas_2026"
+      ],
+      "status": "cataloged_and_proven_rs_state_deputy"
+    }
+  ]
+}
