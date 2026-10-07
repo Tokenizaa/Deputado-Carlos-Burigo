@@ -318,18 +318,87 @@ async function main() {
 
   const municipalityMap = new Map();
   const zoneMap = new Map();
-  for (const code of municipalities.keys()) municipalityMap.set(code, (await one("electoral_municipalities", { uf: UF, tse_municipality_code: code })).id);
-  for (const zone of zones) zoneMap.set(zone, (await one("electoral_zones", { uf: UF, zone_number: Number(zone) })).id);
 
-  const sectionMap = new Map();
+  const municipalityRows = [...municipalities].map(([code, name]) => ({
+    uf: UF, tse_municipality_code: code, name
+  }));
+  for (let i = 0; i < municipalityRows.length; i += 500) {
+    await supabase.from("electoral_municipalities").upsert(municipalityRows.slice(i, i + 500), {
+      onConflict: "uf,tse_municipality_code"
+    });
+  }
+
+  const zoneRows = [...zones].map(zone => ({
+    uf: UF, zone_number: Number(zone)
+  }));
+  for (let i = 0; i < zoneRows.length; i += 500) {
+    await supabase.from("electoral_zones").upsert(zoneRows.slice(i, i + 500), {
+      onConflict: "uf,zone_number"
+    });
+  }
+
+  const municipalityCodes = [...municipalities.keys()];
+  const zoneNumbers = [...zones].map(Number);
+  for (let i = 0; i < municipalityCodes.length; i += 500) {
+    const { data, error } = await supabase.from("electoral_municipalities")
+      .select("id,tse_municipality_code")
+      .eq("uf", UF)
+      .in("tse_municipality_code", municipalityCodes.slice(i, i + 500));
+    if (error) throw new Error(`electoral_municipalities: ${error.message}`);
+    for (const row of data ?? []) municipalityMap.set(row.tse_municipality_code, row.id);
+  }
+
+  for (let i = 0; i < zoneNumbers.length; i += 500) {
+    const { data, error } = await supabase.from("electoral_zones")
+      .select("id,zone_number")
+      .eq("uf", UF)
+      .in("zone_number", zoneNumbers.slice(i, i + 500));
+    if (error) throw new Error(`electoral_zones: ${error.message}`);
+    for (const row of data ?? []) zoneMap.set(String(row.zone_number), row.id);
+  }
+
+  const zoneMunicipalityRows = [];
   for (const r of sectionTotals) {
     const municipalityId = municipalityMap.get(r.municipality);
     const zoneId = zoneMap.get(String(r.zone));
-    await db("electoral_zone_municipalities", { zone_id: zoneId, municipality_id: municipalityId }, "zone_id,municipality_id");
-    const section = (await db("electoral_sections", {
-      zone_id: zoneId, municipality_id: municipalityId, section_number: r.section, location_name: r.location_name || null
-    }, "zone_id,section_number")).data[0];
-    sectionMap.set(`${r.zone}:${r.section}`, section.id);
+    if (!municipalityId || !zoneId) throw new Error(`Dimensão ausente para município/zona ${r.municipality}/${r.zone}`);
+    zoneMunicipalityRows.push({ zone_id: zoneId, municipality_id: municipalityId });
+  }
+  const uniqueZoneMunicipalityRows = [...new Map(
+    zoneMunicipalityRows.map(row => [`${row.zone_id}:${row.municipality_id}`, row])
+  ).values()];
+  for (let i = 0; i < uniqueZoneMunicipalityRows.length; i += 500) {
+    const { error } = await supabase.from("electoral_zone_municipalities")
+      .upsert(uniqueZoneMunicipalityRows.slice(i, i + 500), { onConflict: "zone_id,municipality_id" });
+    if (error) throw new Error(`electoral_zone_municipalities: ${error.message}`);
+  }
+
+  const sectionRowsForDb = sectionTotals.map(r => {
+    const municipalityId = municipalityMap.get(r.municipality);
+    const zoneId = zoneMap.get(String(r.zone));
+    return {
+      zone_id: zoneId, municipality_id: municipalityId,
+      section_number: r.section, location_name: r.location_name || null
+    };
+  });
+  for (let i = 0; i < sectionRowsForDb.length; i += 500) {
+    const { error } = await supabase.from("electoral_sections")
+      .upsert(sectionRowsForDb.slice(i, i + 500), { onConflict: "zone_id,section_number" });
+    if (error) throw new Error(`electoral_sections: ${error.message}`);
+  }
+
+  for (let i = 0; i < sectionRowsForDb.length; i += 500) {
+    const rows = sectionRowsForDb.slice(i, i + 500);
+    const zoneIds = [...new Set(rows.map(r => r.zone_id))];
+    const { data, error } = await supabase.from("electoral_sections")
+      .select("id,zone_id,section_number")
+      .in("zone_id", zoneIds);
+    if (error) throw new Error(`electoral_sections: ${error.message}`);
+    for (const row of data ?? []) sectionMap.set(`${row.zone_id}:${row.section_number}`, row.id);
+  }
+
+  if (sectionMap.size !== sectionRowsForDb.length) {
+    throw new Error(`Mapa de seções incompleto: ${sectionMap.size}/${sectionRowsForDb.length}`);
   }
 
   async function dataset(name, code, year, url, metadata) {
