@@ -1,6 +1,6 @@
 # IE-03 — INGESTÃO E BASE ELEITORAL OFICIAL DO TSE
 
-**Estado:** EM EXECUÇÃO — descoberta, aquisição e validação estrutural de 2022 e 2026  
+**Estado:** EM EXECUÇÃO — carga de prova 2022/2026 CONCLUÍDA; cobertura histórica e territorial pendente  
 **Data:** 2026-10-06  
 **Repositório:** `Tokenizaa/Deputado-Carlos-Burigo`
 
@@ -267,27 +267,43 @@ Mapear, para 2022 e 2026, quais fontes oficiais fornecem cada categoria necessá
 Adquirir as fontes necessárias de forma reproduzível e registrar hash/metadados.
 
 ### IE-03.3 — Leitura e contrato dos dados
-**EM EXECUÇÃO**
+**CONCLUÍDA**
 
-Contrato registrado em `docs/roadmap/IE-03-CONTRATO-DADOS-2022-2026.md`. Validador registrado em `scripts/electoral/tse-validate-proof-2022-2026.mjs`.
-
-**Bloqueio identificado na primeira execução do validador (2026-10-06):** o arquivo oficial `VOTACAO_SECAO_2022_RS` possui contrato próprio de seção, no qual a identificação do votável usa `NR_VOTAVEL` e a quantidade usa `QT_VOTOS`; ele não possui `NR_CANDIDATO` nem `QT_VOTOS_NOMINAIS`. Portanto, a falha atual está no validador, não constitui evidência de inconsistência dos dados do TSE. A correção deverá tratar `VOTACAO_SECAO` como schema distinto e comparar a votação de `NR_VOTAVEL=15140`/`QT_VOTOS` com a camada município/zona, sem fabricar um campo de votos nominais válidos inexistente nessa fonte.
-
-Para cada fonte, identificar cabeçalhos, códigos, chaves, cardinalidade, turno, cargo e campo semântico de votos.
+Contrato registrado em `docs/roadmap/IE-03-CONTRATO-DADOS-2022-2026.md`. A leitura dos schemas oficiais foi validada contra o loader. O arquivo `VOTACAO_SECAO_2022_RS` foi tratado com seu contrato próprio: `NR_VOTAVEL` identifica o votável e `QT_VOTOS` representa a quantidade de votos.
 
 ### IE-03.4 — Validação cruzada
-Comparar as camadas nominal, partidária, município/zona, seção e apuração quando disponíveis.
+**CONCLUÍDA PARA O CASO DE PROVA**
+
+A prova 2022 confirmou 33.611 votos de Carlos Búrigo nas camadas oficiais município/zona e seção, com igualdade entre os totais. A prova 2026 confirmou 21.038 votos no EA20 oficial atualmente publicado pelo TSE.
 
 ### IE-03.5 — Normalização
-Mapear as fontes para as 14 tabelas do IE-02 sem perder os códigos e a rastreabilidade do TSE.
+**CONCLUÍDA PARA O CASO DE PROVA**
+
+As fontes foram mapeadas para o modelo IE-02 sem tabela paralela, preservando códigos, dimensões territoriais, fatos e rastreabilidade por dataset/import run.
 
 ### IE-03.6 — Carga de prova
-Carregar primeiro o conjunto mínimo necessário para validar 2022/RS/Búrigo e depois a mesma cadeia para 2026.
+**CONCLUÍDA**
+
+A carga física idempotente foi executada com sucesso no Supabase para as cinco camadas previstas: nominal por seção 2022, agregado candidato município/zona 2022, apuração município/zona 2022, apuração por seção 2022 e prova EA20 2026.
+
+Evidência física no banco:
+- 6.170 fatos nominais por seção, totalizando 33.611 votos;
+- 522 fatos candidato/município-zona, totalizando 33.611 votos;
+- 522 fatos de apuração município/zona;
+- 27.201 fatos de apuração por seção;
+- 1 fato EA20 2026, totalizando 21.038 votos do candidato;
+- 28.246 fatos em `electoral_results_totals`, sendo 54.649 votos de fatos com `candidate_id`.
+
+Todos os cinco `electoral_import_runs` estão `COMPLETED`, com `rows_loaded` igual ao volume físico correspondente e `rows_rejected=0`.
 
 ### IE-03.7 — Cobertura histórica e territorial
-Expandir para todas as UFs, eleições e cargos necessários ao escopo definido da Inteligência Eleitoral, sem criar uma carga específica por candidato.
+**PRÓXIMA EXECUÇÃO**
+
+Expandir a cadeia comprovada para todas as UFs, eleições e cargos necessários ao escopo definido da Inteligência Eleitoral, sem criar carga específica por candidato.
 
 ### IE-03.8 — Atualização incremental
+**PLANEJADA**
+
 Definir mecanismo de detecção de novos/alterados recursos, novas versões e novas totalizações sem duplicação silenciosa.
 
 ## Critério de conclusão da IE-03
@@ -306,4 +322,4 @@ IE-03 somente será concluída quando:
 
 ## Próximo passo
 
-Concluir pessoalmente a descoberta e validação estrutural de **2022 e 2026**, começando pelas fontes oficiais de resultados e seus formatos, antes de criar qualquer tela ou carga definitiva no Supabase.
+Com a carga de prova física concluída e validada no Supabase, avançar para **IE-03.7 — cobertura histórica e territorial**, ampliando a mesma cadeia de dados para eleições, UFs e cargos necessários. Nenhuma tela será criada antes de a cobertura mínima da base eleitoral estar definida e validada.
