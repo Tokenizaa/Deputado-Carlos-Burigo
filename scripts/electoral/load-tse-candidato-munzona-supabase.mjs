@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
-import { existsSync } from "node:fs";
+import { existsSync, basename } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 const argv = process.argv.slice(2);
@@ -11,7 +11,7 @@ const arg = (name) => {
 };
 
 const year = Number(arg("year"));
-const file = arg("file") || `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`;
+const file = arg("file") || `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`;\nconst sourceFileName = basename(file);
 const supabaseUrl = arg("url") || process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const serviceKey =
   arg("service-key") ||
@@ -159,7 +159,7 @@ const oldRuns = await one(
   supabase
     .from("electoral_import_runs")
     .select("id")
-    .eq("source_file_name", file)
+    .in("source_file_name", [file, sourceFileName])
 );
 if (oldRuns.length) {
   const oldIds = oldRuns.map((r) => r.id);
@@ -174,7 +174,7 @@ const { data: importRun, error: importError } = await supabase
   .from("electoral_import_runs")
   .insert({
     dataset_id: sourceDataset.id,
-    source_file_name: file,
+    source_file_name: sourceFileName,
     source_file_url: sourceUrl,
     started_at: new Date().toISOString(),
     status: "RUNNING",
