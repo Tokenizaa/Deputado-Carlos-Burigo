@@ -414,14 +414,20 @@ async function main() {
     if (error) throw new Error(`electoral_sections: ${error.message}`);
   }
 
+  phase("reconstruindo mapa de seções");
   for (let i = 0; i < sectionRowsForDb.length; i += 500) {
     const rows = sectionRowsForDb.slice(i, i + 500);
     const zoneIds = [...new Set(rows.map(r => r.zone_id))];
-    const { data, error } = await supabase.from("electoral_sections")
-      .select("id,zone_id,section_number")
-      .in("zone_id", zoneIds);
-    if (error) throw new Error(`electoral_sections: ${error.message}`);
-    for (const row of data ?? []) sectionMap.set(`${row.zone_id}:${row.section_number}`, row.id);
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase.from("electoral_sections")
+        .select("id,zone_id,section_number")
+        .in("zone_id", zoneIds)
+        .order("id")
+        .range(from, from + 999);
+      if (error) throw new Error(`electoral_sections: ${error.message}`);
+      for (const row of data ?? []) sectionMap.set(`${row.zone_id}:${row.section_number}`, row.id);
+      if (!data || data.length < 1000) break;
+    }
   }
 
   if (sectionMap.size !== sectionRowsForDb.length) {
