@@ -158,7 +158,7 @@ async function main(){
   for(const [turn,code] of electionCodes){
     const e=(await upsert("electoral_elections",{tse_election_code:code,year:YEAR,name:"Eleições Gerais 2022",election_type:"GERAL",scope:"NACIONAL",status:"FINAL"},"tse_election_code"))[0];
     elections.set(turn,e);
-    const official=turn===1?"2022-10-07":"2022-10-28";
+    const official=turn===1?"2022-10-02":"2022-10-30";
     rounds.set(turn,(await upsert("electoral_rounds",{election_id:e.id,round_number:turn,official_date:official},"election_id,round_number"))[0]);
   }
   await upsert("electoral_ufs",{uf:UF,name:"Rio Grande do Sul",region:"Sul"},"uf");
