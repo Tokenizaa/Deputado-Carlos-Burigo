@@ -177,7 +177,7 @@ async function main(){
   const territory=new Map(), zones=new Set(), sections=new Map();
   const detailSectionRows=[];
   console.log("[IE-03.7] lendo apuração por seção para montar território");
-  const dsRead=await readCsv(files.detailSection,/detalhe_votacao_secao_2018\.csv$/i,h=>({
+  const dsRead=await readCsv(files.detailSection,/detalhe_votacao_secao_2018(?:_RS)?\.csv$/i,h=>({
     year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
     municipality:idx(h,["CD_MUNICIPIO"]),municipalityName:idx(h,["NM_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),
     electorate:idx(h,["QT_APTOS"]),comparecimento:idx(h,["QT_COMPARECIMENTO"]),abstentions:idx(h,["QT_ABSTENCOES"]),
@@ -229,7 +229,7 @@ async function main(){
 
   console.log("[IE-03.7] carregando votação nominal município/zona");
   const munRows=[];
-  const mr=await readCsv(files.mun,/votacao_candidato_munzona_2018\.csv$/i,h=>({
+  const mr=await readCsv(files.mun,/votacao_candidato_munzona_2018(?:_RS)?\.csv$/i,h=>({
     year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
     municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),candidateId:idx(h,["SQ_CANDIDATO"]),number:idx(h,["NR_CANDIDATO"]),
     votes:idx(h,["QT_VOTOS_NOMINAIS"]),valid:idx(h,["QT_VOTOS_NOMINAIS_VALIDOS"])
@@ -249,7 +249,7 @@ async function main(){
 
   console.log("[IE-03.7] carregando apuração município/zona");
   const detailMunRows=[];
-  const dmr=await readCsv(files.detailMun,/detalhe_votacao_munzona_2018\.csv$/i,h=>({
+  const dmr=await readCsv(files.detailMun,/detalhe_votacao_munzona_2018(?:_RS)?\.csv$/i,h=>({
     year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
     municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),electorate:idx(h,["QT_APTOS"]),
     comparecimento:idx(h,["QT_COMPARECIMENTO"]),abstentions:idx(h,["QT_ABSTENCOES"]),valid:idx(h,["QT_TOTAL_VOTOS_VALIDOS"]),
