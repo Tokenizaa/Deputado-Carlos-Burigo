@@ -1,0 +1,1 @@
+Issue #21 executed at 2026-10-07T23:40:56Z. Closed remote electoral model and local pipeline, configured pipeline to Supabase.
