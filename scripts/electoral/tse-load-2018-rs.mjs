@@ -307,9 +307,9 @@ async function main(){
       if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(`Dimensão não resolvida na votação por seção: ${municipality}/${zone}/${section}`);
       batch.push({round_id:rounds.get(turn).id,office_id:offices.get(office).id,uf:UF,municipality_id:municipalityMap.get(municipality),zone_id:zid,section_id:sid,candidate_id:c.db.id,source_dataset_id:sourceSection.id,import_run_id:runS.id,votes});
       loadedS++;sectionVotes+=votes;
-      if(batch.length>=500){const copy=batch;batch=[];pending=pending.then(()=>insertBatches("electoral_results_nominal",copy,500));}
+      if(batch.length>=500){const copy=batch;batch=[];pending=pending.then(async()=>{\n        const merged=new Map();\n        for(const row of copy){\n          const key=row.round_id+":"+row.office_id+":"+row.section_id+":"+row.candidate_id;\n          const current=merged.get(key);\n          if(current) current.votes+=row.votes; else merged.set(key,row);\n        }\n        await insertBatches("electoral_results_nominal",[...merged.values()],500);\n      });}
     });
-    if(batch.length)pending=pending.then(()=>insertBatches("electoral_results_nominal",batch,500)); await pending;
+    if(batch.length)pending=pending.then(async()=>{\n      const merged=new Map();\n      for(const row of batch){\n        const key=row.round_id+":"+row.office_id+":"+row.section_id+":"+row.candidate_id;\n        const current=merged.get(key);\n        if(current) current.votes+=row.votes; else merged.set(key,row);\n      }\n      await insertBatches("electoral_results_nominal",[...merged.values()],500);\n    }); await pending;
     await finish(runS,loadedS,{layer:"nominal_section",rows_read:sr.rows,loaded_votes:sectionVotes});
     console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} fatos, ${sectionVotes.toLocaleString("pt-BR")} votos`);
   }
