@@ -331,7 +331,7 @@ async function main() {
     party_id: party.id, candidate_status: candidateRow.status
   }, "election_id,office_id,tse_candidate_id")).data[0];
 
-  const allTerritoryRows = [...sectionTotals, ...munRows];
+  const allTerritoryRows = [...sectionTotals, ...sectionRows, ...munRows];
   const municipalities = new Map();
   for (const r of allTerritoryRows) if (r.municipality) municipalities.set(r.municipality, r.municipality_name);
   const zones = new Set(allTerritoryRows.map(r => String(r.zone)).filter(Boolean));
@@ -400,7 +400,16 @@ async function main() {
     if (error) throw new Error(`electoral_zone_municipalities: ${error.message}`);
   }
 
-  const sectionRowsForDb = sectionTotals.map(r => {
+  const sectionDimensionRows = new Map();
+  for (const r of sectionTotals) {
+    const key = [r.municipality, r.zone, r.section].join(":");
+    sectionDimensionRows.set(key, r);
+  }
+  for (const r of sectionRows) {
+    const key = [r.municipality, r.zone, r.section].join(":");
+    if (!sectionDimensionRows.has(key)) sectionDimensionRows.set(key, r);
+  }
+  const sectionRowsForDb = [...sectionDimensionRows.values()].map(r => {
     const municipalityId = municipalityMap.get(r.municipality);
     const zoneId = zoneMap.get(String(r.zone));
     return {
@@ -431,7 +440,12 @@ async function main() {
   }
 
   if (sectionMap.size !== sectionRowsForDb.length) {
-    throw new Error(`Mapa de seções incompleto: ${sectionMap.size}/${sectionRowsForDb.length}`);
+    throw new Error("Mapa de seções incompleto: " + sectionMap.size + "/" + sectionRowsForDb.length);
+  }
+  const missingNominalSections = sectionRows.filter(r => !sectionMap.has([zoneMap.get(String(r.zone)), r.section].join(":")));
+  if (missingNominalSections.length) {
+    const sample = missingNominalSections.slice(0, 10).map(r => [r.municipality, r.zone, r.section].join("/")).join(", ");
+    throw new Error("Seções nominais sem vínculo: " + missingNominalSections.length + ". Exemplos: " + sample);
   }
 
   async function dataset(name, code, year, url, metadata) {
