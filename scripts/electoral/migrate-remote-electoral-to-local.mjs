@@ -66,6 +66,53 @@ function ensureCommand(command) {
   }
 }
 
+function runPgDump17(dbUrl, workDir) {
+  const containerOutput = "/dump/remote-public-data.sql";
+  const dumpArgs = [
+    dbUrl,
+    "--data-only",
+    "--schema=public",
+    "--format=plain",
+    "--no-owner",
+    "--no-privileges",
+    "--no-comments",
+    ...TARGET_TABLES.map((table) => `--table=public.${table}`),
+    `--file=${containerOutput}`,
+  ];
+
+  run("docker", [
+    "run",
+    "--rm",
+    "--network=host",
+    "-v",
+    `${workDir}:/dump`,
+    "postgres:17-alpine",
+    "pg_dump",
+    ...dumpArgs,
+  ], {
+    cwd: ROOT,
+    displayArgv: [
+      "run",
+      "--rm",
+      "--network=host",
+      "-v",
+      `${workDir}:/dump`,
+      "postgres:17-alpine",
+      "pg_dump",
+      "***REDACTED***",
+      "--data-only",
+      "--schema=public",
+      "--format=plain",
+      "--no-owner",
+      "--no-privileges",
+      "--no-comments",
+      ...TARGET_TABLES.map((table) => `--table=public.${table}`),
+      `--file=${containerOutput}`,
+    ],
+    redact: dbUrl,
+  });
+}
+
 function loadDatabaseCredentialsFromDotEnv() {
   const envPath = resolve(".env");
   if (!existsSync(envPath)) return;
@@ -300,7 +347,6 @@ async function main() {
   loadDatabaseCredentialsFromDotEnv();
   ensureCommand("supabase");
   ensureCommand("docker");
-  ensureCommand("pg_dump");
   ensureCommand("psql");
 
   console.log("[IE-MIGRATE] remoto → PostgreSQL local");
@@ -341,34 +387,7 @@ async function main() {
       throw new Error("SUPABASE_DB_URL é obrigatória para o dump remoto via Transaction Pooler IPv4.");
     }
 
-    const dumpArgs = [
-      dbUrl,
-      "--data-only",
-      "--schema=public",
-      "--format=plain",
-      "--no-owner",
-      "--no-privileges",
-      "--no-comments",
-      ...TARGET_TABLES.map((table) => `--table=public.${table}`),
-      `--file=${rawDump}`,
-    ];
-
-    run("pg_dump", dumpArgs, {
-      cwd: ROOT,
-      displayArgv: [
-        "pg_dump",
-        "***REDACTED***",
-        "--data-only",
-        "--schema=public",
-        "--format=plain",
-        "--no-owner",
-        "--no-privileges",
-        "--no-comments",
-        ...TARGET_TABLES.map((table) => `--table=public.${table}`),
-        `--file=${rawDump}`,
-      ],
-      redact: dbUrl,
-    });
+    runPgDump17(dbUrl, workDir);
 
     console.log(
       `[IE-MIGRATE] dump bruto temporário: ${(statSync(rawDump).size / 1024 / 1024).toFixed(1)} MB`,
