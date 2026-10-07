@@ -1,0 +1,29 @@
+name: IE-03.7 2022 RS acquisition
+
+on:
+  push:
+    paths:
+      - "scripts/electoral/tse-acquire-2022-rs.mjs"
+      - "scripts/electoral/tse-load-2022-rs.mjs"
+      - ".github/workflows/ie-03-7-2022-rs.yml"
+
+jobs:
+  acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validar scripts
+        run: |
+          node --check scripts/electoral/tse-acquire-2022-rs.mjs
+          node --check scripts/electoral/tse-load-2022-rs.mjs
+      - name: Adquirir fontes oficiais TSE 2022 RS
+        run: node scripts/electoral/tse-acquire-2022-rs.mjs
+      - name: Publicar fontes
+        uses: actions/upload-artifact@v4
+        with:
+          name: ie-03-7-2022-rs-sources
+          path: artifacts/electoral/raw/*.zip
