@@ -146,10 +146,10 @@ function resetLocal() {
 }
 
 function findLoader(year) {
-  const dir = resolve("scripts/electoral");
-  return readdirSync(dir).find((file) =>
-    new RegExp("^tse-load.*" + year + ".*\\.mjs$", "i").test(file)
-  );
+  const expected = `tse-load-local-${year}-rs.mjs`;
+  const path = join("scripts/electoral", expected);
+  if (!existsSync(resolve(path))) return null;
+  return expected;
 }
 
 function loadYears() {
