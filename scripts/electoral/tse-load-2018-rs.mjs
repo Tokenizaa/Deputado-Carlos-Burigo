@@ -245,8 +245,27 @@ async function main(){
   if(!runM.__skip){
     const unresolvedCandidates=munRows.filter(r=>!r.candidate?.db);
     if(unresolvedCandidates.length) {
-      const sample=unresolvedCandidates.slice(0,10).map(r=>`${r.candidate?.candidate_number??"?"}/${r.candidate?.tse_candidate_id??"?"}`).join(", ");
-      throw new Error(`Candidatos município/zona sem vínculo: ${unresolvedCandidates.length}. Exemplos: ${sample}`);
+      console.log(`[IE-03.7] candidatos presentes na votação e ausentes no cadastro: ${unresolvedCandidates.length.toLocaleString("pt-BR")}; criando registros mínimos por SQ_CANDIDATO/NR_CANDIDATO`);
+      const created = new Map();
+      for(const r of unresolvedCandidates) {
+        const key=`${r.turn}:${r.office}:${r.candidate.tse_candidate_id}`;
+        if(created.has(key)) continue;
+        const e=elections.get(r.turn), o=offices.get(r.office);
+        if(!e||!o) throw new Error(`Dimensão eleitoral não resolvida para candidato ${key}`);
+        const db=(await upsert("electoral_candidates",{election_id:e.id,office_id:o.id,tse_candidate_id:r.candidate.tse_candidate_id,candidate_number:r.candidate.candidate_number,ballot_name:null,full_name:null,party_id:null,candidate_status:"NAO_LOCALIZADO_NO_CADASTRO_2018"}, "election_id,office_id,tse_candidate_id"))[0];
+        r.candidate.db=db;
+        candidateDb.set(key,db);
+        candidateById.set(`${r.office}:${r.candidate.tse_candidate_id}:${r.turn}`,r.candidate);
+        candidateByNumber.set(`${r.office}:${r.candidate.candidate_number}:${r.turn}`,r.candidate);
+        created.set(key,db);
+      }
+      for(const r of unresolvedCandidates) {
+        if(!r.candidate.db) {
+          const db=created.get(`${r.turn}:${r.office}:${r.candidate.tse_candidate_id}`);
+          if(db) r.candidate.db=db;
+        }
+      }
+      console.log(`[IE-03.7] registros mínimos criados: ${created.size.toLocaleString("pt-BR")}`);
     }
     const facts=munRows.map(r=>({round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zoneMap.get(String(r.zone)),section_id:null,candidate_id:r.candidate.db.id,source_dataset_id:sourceMun.id,import_run_id:runM.id,candidate_votes:r.votes}));
     if(facts.some(f=>!f.municipality_id||!f.zone_id||!f.candidate_id))throw new Error("Fatos município/zona com dimensão não resolvida.");
