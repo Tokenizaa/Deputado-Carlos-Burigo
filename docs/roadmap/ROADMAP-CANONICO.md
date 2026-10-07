@@ -156,7 +156,7 @@ A reconciliação contrato ↔ schema ↔ loader foi concluída sem criar tabela
 
 **Gate:** CONCLUÍDO. A carga física idempotente foi executada após a reconciliação local × GitHub e validada diretamente no Supabase. Os fatos físicos e os cinco `electoral_import_runs` estão consistentes, sem rejeições. **A próxima operação é IE-03.7 — cobertura histórica e territorial.**
 
-**IE-03.7 — Cobertura histórica e territorial: PRÓXIMA EXECUÇÃO.** Expandir a cadeia comprovada para as UFs, eleições e cargos necessários, sem filtro por candidato.
+**IE-03.7 — Cobertura histórica e territorial: ESCOPO DEFINIDO; AQUISIÇÃO É A PRÓXIMA EXECUÇÃO.** A primeira onda canônica cobre 2018, 2022 e 2026, todas as 27 UFs e os cargos de Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital. A segunda onda municipal (2020/2024) fica condicionada à necessidade analítica. Documento: `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
 
 **IE-04 — Inteligência:** planejada.
 - **IE-05 — Interface:** planejada.
