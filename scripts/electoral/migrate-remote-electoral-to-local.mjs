@@ -88,11 +88,11 @@ function ensureLocalProject() {
   const bootstrap = `create extension if not exists pgcrypto;
 create schema if not exists private;
 
-do $ begin
+do $$ begin
   if not exists (select 1 from pg_type where typnamespace = 'public'::regnamespace and typname = 'user_role') then
     create type public.user_role as enum ('ADMIN','EDITOR','COMUNICACAO','ATENDIMENTO','VISUALIZADOR');
   end if;
-end $;
+end $$;
 
 create table if not exists public.permission_definitions (
   permission_key text primary key,
@@ -104,11 +104,11 @@ create table if not exists public.permission_definitions (
 
 create or replace function private.is_staff()
 returns boolean language sql stable security definer set search_path = public, private
-as $ select false; $;
+as $$ select false; $$;
 
 create or replace function private.has_role(required_role public.user_role)
 returns boolean language sql stable security definer set search_path = public, private
-as $ select false; $;
+as $$ select false; $$;
 
 grant execute on function private.is_staff() to authenticated;
 grant execute on function private.has_role(public.user_role) to authenticated;
