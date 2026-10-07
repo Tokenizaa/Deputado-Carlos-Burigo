@@ -442,7 +442,16 @@ async function main() {
   }
   async function runFor(source, file, metadata, rowsRead) {
     const existing = await one("electoral_import_runs", { dataset_id: source.id, file_sha256: file.sha256 });
-    if (existing?.status === "COMPLETED") {\n      const layer = metadata?.layer;\n      const table = layer === "nominal_section" ? "electoral_results_nominal" : "electoral_results_totals";\n      const { count, error: countError } = await supabase.from(table)\n        .select("id", { count: "exact", head: true })\n        .eq("import_run_id", existing.id);\n      if (countError) throw new Error(table + ": " + countError.message);\n      if (Number(count) === Number(existing.rows_loaded)) { existing.__skip = true; return existing; }\n      console.log("[IE-03] import run " + existing.id + " inconsistente: esperado " + existing.rows_loaded + ", encontrado " + (count ?? 0) + "; recarregando");\n    }
+    if (existing?.status === "COMPLETED") {
+      const layer = metadata?.layer;
+      const table = layer === "nominal_section" ? "electoral_results_nominal" : "electoral_results_totals";
+      const { count, error: countError } = await supabase.from(table)
+        .select("id", { count: "exact", head: true })
+        .eq("import_run_id", existing.id);
+      if (countError) throw new Error(table + ": " + countError.message);
+      if (Number(count) === Number(existing.rows_loaded)) { existing.__skip = true; return existing; }
+      console.log("[IE-03] import run " + existing.id + " inconsistente: esperado " + existing.rows_loaded + ", encontrado " + (count ?? 0) + "; recarregando");
+    }
     if (existing?.id) {
       await supabase.from("electoral_results_nominal").delete().eq("import_run_id", existing.id);
       await supabase.from("electoral_results_totals").delete().eq("import_run_id", existing.id);
@@ -470,7 +479,10 @@ async function main() {
       zone_id: zoneMap.get(String(r.zone)), section_id: sectionMap.get(`${r.zone}:${r.section}`), candidate_id: candidate.id,
       source_dataset_id: sourceSection.id, import_run_id: runSection.id, votes: r.votes
     }));
-    for (let i = 0; i < facts.length; i += 500) {\n      const { error } = await supabase.from("electoral_results_nominal").insert(facts.slice(i, i + 500));\n      if (error) throw new Error("electoral_results_nominal: " + error.message);\n    }
+    for (let i = 0; i < facts.length; i += 500) {
+      const { error } = await supabase.from("electoral_results_nominal").insert(facts.slice(i, i + 500));
+      if (error) throw new Error("electoral_results_nominal: " + error.message);
+    }
     await finish(runSection, facts.length, { proof_case: true, expected_votes: 33611, loaded_votes: sectionVotes });
   }
 
@@ -485,7 +497,10 @@ async function main() {
       source_dataset_id: sourceMun.id, import_run_id: runMun.id, candidate_votes: r.votes, nominal_votes: r.votes
     }));
     for (const fact of facts) delete fact.nominal_votes;
-    for (let i = 0; i < facts.length; i += 500) {\n      const { error } = await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));\n      if (error) throw new Error("electoral_results_totals: " + error.message);\n    }
+    for (let i = 0; i < facts.length; i += 500) {
+      const { error } = await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
+      if (error) throw new Error("electoral_results_totals: " + error.message);
+    }
     await finish(runMun, facts.length, { proof_case: true, expected_votes: 33611, loaded_votes: munVotes, valid_votes: munValidVotes });
   }
 
@@ -500,7 +515,10 @@ async function main() {
       electorate: r.electorate, comparecimento: r.comparecimento, abstentions: r.abstentions, valid_votes: r.valid_votes,
       blank_votes: r.blank_votes, null_votes: r.null_votes, total_votes: r.total_votes
     }));
-    for (let i = 0; i < facts.length; i += 500) await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
+    for (let i = 0; i < facts.length; i += 500) {
+      const { error } = await supabase.from("electoral_results_totals").insert(facts.slice(i, i + 500));
+      if (error) throw new Error("electoral_results_totals: " + error.message);
+    }
     await finish(runDetailMun, facts.length, { proof_case: true, layer: "apuration_municipality_zone" });
   }
 
@@ -543,7 +561,8 @@ async function main() {
       valid_votes: num(rootVotes.vv), blank_votes: num(rootVotes.vb), null_votes: num(rootVotes.vn),
       total_votes: num(rootVotes.tv)
     }];
-    const { error } = await supabase.from("electoral_results_totals").insert(facts);\n    if (error) throw new Error("electoral_results_totals: " + error.message);
+    const { error } = await supabase.from("electoral_results_totals").insert(facts);
+    if (error) throw new Error("electoral_results_totals: " + error.message);
     await finish(run2026, 1, { proof_case: true, expected_candidate_votes: 21038, loaded_candidate_votes: votes2026, idg: ea20.idg });
   }
 
