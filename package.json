@@ -22,7 +22,8 @@
     "electoral:download:2026": "node scripts/electoral/download-tse-2026.mjs",
     "electoral:audit:2026": "node scripts/electoral/audit-tse-2026-rs.mjs",
     "electoral:load:supabase": "node scripts/electoral/load-tse-candidato-munzona-supabase.mjs",
-    "electoral:validate:supabase": "node scripts/electoral/validate-tse-candidato-munzona-supabase.mjs"
+    "electoral:validate:supabase": "node scripts/electoral/validate-tse-candidato-munzona-supabase.mjs",
+    "electoral:intelligence": "node scripts/electoral/build-intelligence-local.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
