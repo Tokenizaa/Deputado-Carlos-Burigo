@@ -57,15 +57,24 @@ async function zipEntry(zip, regex) {
 async function readCsv(zip, regex, onHeader, onRow) {
   const entry = await zipEntry(zip, regex);
   if (!entry) throw new Error(`CSV não encontrado: ${zip}`);
+  const startedAt = Date.now();
+  let lastProgressAt = startedAt;
   return new Promise((resolvePromise, reject) => {
     const p = spawn("unzip", ["-p", zip, entry]); let buffer = ""; let headers = null; let ix = null; let rows = 0; let err = "";
+    const progress = () => {
+      const now = Date.now();
+      if (now - lastProgressAt >= 15000) {
+        console.log(`[IE-03] lendo ${zip.split("/").pop()} :: ${rows.toLocaleString("pt-BR")} linhas :: ${Math.round((now - startedAt) / 1000)}s`);
+        lastProgressAt = now;
+      }
+    };
     const consume = chunk => {
       buffer += chunk.toString("latin1");
       const lines = buffer.split(/\r?\n/); buffer = lines.pop() ?? "";
       for (const line of lines) {
         if (!line.trim()) continue;
         if (!headers) { headers = parseCsvLine(line); ix = onHeader(headers); continue; }
-        rows++; onRow(parseCsvLine(line), ix);
+        rows++; onRow(parseCsvLine(line), ix); progress();
       }
     };
     p.stdout.on("data", consume); p.stderr.on("data", d => err += d);
@@ -74,7 +83,11 @@ async function readCsv(zip, regex, onHeader, onRow) {
         if (!headers) { headers = parseCsvLine(buffer); ix = onHeader(headers); }
         else { rows++; onRow(parseCsvLine(buffer), ix); }
       }
-      if (code) reject(new Error(err || `unzip failed ${code}`)); else resolvePromise({ entry, headers, rows });
+      if (code) reject(new Error(err || `unzip failed ${code}`));
+      else {
+        console.log(`[IE-03] concluído ${zip.split("/").pop()} :: ${rows.toLocaleString("pt-BR")} linhas :: ${Math.round((Date.now() - startedAt) / 1000)}s`);
+        resolvePromise({ entry, headers, rows });
+      }
     });
   });
 }
@@ -149,6 +162,9 @@ function findCandidate(node, number) {
 }
 
 async function main() {
+  const startedAt = Date.now();
+  const phase = (message) => console.log(`[IE-03] ${message}`);
+  phase("iniciando carga física de prova");
   const candidatesZip = resolve(ROOT, "consulta_cand_2022.zip");
   const munzonaZip = resolve(ROOT, "votacao_candidato_munzona_2022.zip");
   const sectionZip = resolve(ROOT, "votacao_secao_2022_RS.zip");
@@ -167,6 +183,7 @@ async function main() {
 
   let candidateRow = null;
   let electionCode2022 = "";
+  phase("lendo candidatos 2022");
   await readCsv(candidatesZip, /consulta_cand_2022_RS\.csv$/i,
     h => ({
       year: idx(h, ["ANO_ELEICAO"]), election: idx(h, ["CD_ELEICAO"]), uf: idx(h, ["SG_UF"]), office: idx(h, ["CD_CARGO"]),
@@ -188,6 +205,7 @@ async function main() {
   if (!candidateRow || !electionCode2022) throw new Error("Candidato 15140 ou CD_ELEICAO 2022 não encontrado.");
 
   const munRows = [];
+  phase("lendo votação nominal município/zona 2022");
   await readCsv(munzonaZip, /votacao_candidato_munzona_2022_RS\.csv$/i,
     h => ({
       year: idx(h, ["ANO_ELEICAO"]), turn: idx(h, ["NR_TURNO"]), uf: idx(h, ["SG_UF"]), office: idx(h, ["CD_CARGO"]),
@@ -207,6 +225,7 @@ async function main() {
   const munValidVotes = munRows.reduce((a, r) => a + r.valid_votes, 0);
 
   const sectionRows = [];
+  phase("lendo votação nominal por seção 2022");
   await readCsv(sectionZip, /votacao_secao_2022_RS\.csv$/i,
     h => ({
       year: idx(h, ["ANO_ELEICAO"]), turn: idx(h, ["NR_TURNO"]), uf: idx(h, ["SG_UF"]), office: idx(h, ["CD_CARGO"]),
@@ -223,6 +242,7 @@ async function main() {
   const sectionVotes = sectionRows.reduce((a, r) => a + r.votes, 0);
 
   const munTotals = [];
+  phase("lendo apuração município/zona 2022");
   await readCsv(detailMunZip, /detalhe_votacao_munzona_2022_RS\.csv$/i,
     h => ({
       year: idx(h, ["ANO_ELEICAO"]), turn: idx(h, ["NR_TURNO"]), uf: idx(h, ["SG_UF"]), office: idx(h, ["CD_CARGO"]),
@@ -242,6 +262,7 @@ async function main() {
     });
 
   const sectionTotals = [];
+  phase("lendo apuração por seção 2022");
   await readCsv(detailSectionZip, /detalhe_votacao_secao_2022_RS\.csv$/i,
     h => ({
       year: idx(h, ["ANO_ELEICAO"]), turn: idx(h, ["NR_TURNO"]), uf: idx(h, ["SG_UF"]), office: idx(h, ["CD_CARGO"]),
@@ -291,6 +312,7 @@ async function main() {
   };
   if (DRY_RUN) { console.log(JSON.stringify(dry, null, 2)); return; }
 
+  phase("persistindo dimensões eleitorais");
   const election2022 = (await db("electoral_elections", {
     tse_election_code: electionCode2022, year: YEAR, name: "Eleições Gerais 2022", election_type: "GERAL", scope: "NACIONAL", status: "FINAL"
   }, "tse_election_code")).data[0];
@@ -318,23 +340,28 @@ async function main() {
 
   const municipalityMap = new Map();
   const zoneMap = new Map();
+  const sectionMap = new Map();
 
   const municipalityRows = [...municipalities].map(([code, name]) => ({
     uf: UF, tse_municipality_code: code, name
   }));
   for (let i = 0; i < municipalityRows.length; i += 500) {
-    await supabase.from("electoral_municipalities").upsert(municipalityRows.slice(i, i + 500), {
+    phase(`municípios: lote ${Math.floor(i / 500) + 1}/${Math.ceil(municipalityRows.length / 500)}`);
+    const { error } = await supabase.from("electoral_municipalities").upsert(municipalityRows.slice(i, i + 500), {
       onConflict: "uf,tse_municipality_code"
     });
+    if (error) throw new Error(`electoral_municipalities: ${error.message}`);
   }
 
   const zoneRows = [...zones].map(zone => ({
     uf: UF, zone_number: Number(zone)
   }));
   for (let i = 0; i < zoneRows.length; i += 500) {
-    await supabase.from("electoral_zones").upsert(zoneRows.slice(i, i + 500), {
+    phase(`zonas: lote ${Math.floor(i / 500) + 1}/${Math.ceil(zoneRows.length / 500)}`);
+    const { error } = await supabase.from("electoral_zones").upsert(zoneRows.slice(i, i + 500), {
       onConflict: "uf,zone_number"
     });
+    if (error) throw new Error(`electoral_zones: ${error.message}`);
   }
 
   const municipalityCodes = [...municipalities.keys()];
@@ -427,6 +454,7 @@ async function main() {
     }).eq("id", run.id);
   }
 
+  phase("criando import run e carregando fatos nominais por seção");
   const sourceSection = await dataset("Votação por seção eleitoral - 2022 - RS", "votacao_secao_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_RS.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runSection = await runFor(sourceSection, hashes["votacao_secao_2022_RS.zip"], { proof_case: true, layer: "nominal_section" }, sectionRows.length);
@@ -440,6 +468,7 @@ async function main() {
     await finish(runSection, facts.length, { proof_case: true, expected_votes: 33611, loaded_votes: sectionVotes });
   }
 
+  phase("carregando fatos nominais município/zona");
   const sourceMun = await dataset("Votação nominal por município e zona - 2022", "votacao_candidato_munzona_2022", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2022.zip", { format: "CSV inside ZIP", uf: "ALL", turn: "1/2", role: "candidate aggregate" });
   const runMun = await runFor(sourceMun, hashes["votacao_candidato_munzona_2022.zip"], { proof_case: true, layer: "candidate_municipality_zone" }, munRows.length);
@@ -454,6 +483,7 @@ async function main() {
     await finish(runMun, facts.length, { proof_case: true, expected_votes: 33611, loaded_votes: munVotes, valid_votes: munValidVotes });
   }
 
+  phase("carregando totais município/zona");
   const sourceDetailMun = await dataset("Detalhe da apuração por município e zona - 2022 - RS", "detalhe_votacao_munzona_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2022.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runDetailMun = await runFor(sourceDetailMun, hashes["detalhe_votacao_munzona_2022.zip"], { proof_case: true, layer: "apuration_municipality_zone" }, munTotals.length);
@@ -468,6 +498,7 @@ async function main() {
     await finish(runDetailMun, facts.length, { proof_case: true, layer: "apuration_municipality_zone" });
   }
 
+  phase("carregando totais por seção");
   const sourceDetailSection = await dataset("Detalhe da apuração por seção - 2022 - RS", "detalhe_votacao_secao_2022_RS", 2022,
     "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_secao/detalhe_votacao_secao_2022.zip", { format: "CSV inside ZIP", uf: UF, turn: TURN, office_code: OFFICE_CODE });
   const runDetailSection = await runFor(sourceDetailSection, hashes["detalhe_votacao_secao_2022.zip"], { proof_case: true, layer: "apuration_section" }, sectionTotals.length);
@@ -483,6 +514,7 @@ async function main() {
     await finish(runDetailSection, facts.length, { proof_case: true, layer: "apuration_section" });
   }
 
+  phase("carregando prova 2026");
   const election2026 = (await db("electoral_elections", {
     tse_election_code: ELECTION_2026, year: YEAR_2026, name: "Eleições Gerais 2026", election_type: "GERAL", scope: "ESTADUAL", status: "EM_APURACAO"
   }, "tse_election_code")).data[0];
@@ -509,6 +541,7 @@ async function main() {
     await finish(run2026, 1, { proof_case: true, expected_candidate_votes: 21038, loaded_candidate_votes: votes2026, idg: ea20.idg });
   }
 
+  phase(`carga concluída em ${Math.round((Date.now() - startedAt) / 1000)}s`);
   console.log(JSON.stringify({
     mode: "loaded", writes_to_supabase: true,
     proof_2022: { munzona_votes: munVotes, section_votes: sectionVotes, totals_match: munVotes === sectionVotes && munVotes === 33611 },
