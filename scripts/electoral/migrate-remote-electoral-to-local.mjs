@@ -262,7 +262,17 @@ async function main() {
   console.log("[IE-MIGRATE] escopo canônico: RS / Deputado Estadual / 1º turno");
 
   ensureLocalProject();
-  run("supabase", ["start"], { cwd: LOCAL_ROOT });
+
+  // Esta rotina precisa somente do PostgreSQL local. Studio, Storage, Auth,
+  // Realtime, PostgREST e demais serviços não participam da migração pesada
+  // e podem falhar por falta de recursos sem impedir o banco.
+  run("supabase", ["stop"], { cwd: LOCAL_ROOT });
+  run("supabase", [
+    "start",
+    "--exclude",
+    "gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor",
+  ], { cwd: LOCAL_ROOT });
+
   assertLocalEmpty();
 
   const workDir = resolve(tmpdir(), `ie-electoral-migration-${Date.now()}`);
