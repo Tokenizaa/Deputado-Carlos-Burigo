@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { createClient } from "@supabase/supabase-js";\nimport { basename } from "node:path";
-
+import { createClient } from "@supabase/supabase-js";\n
 const argv = process.argv.slice(2);
 const arg = (name) => {
   const i = argv.indexOf("--" + name);
