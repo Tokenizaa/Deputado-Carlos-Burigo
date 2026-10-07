@@ -66,22 +66,27 @@ function ensureCommand(command) {
   }
 }
 
-function loadDatabasePasswordFromDotEnv() {
-  if (process.env.SUPABASE_DB_PASSWORD) return;
-
+function loadDatabaseCredentialsFromDotEnv() {
   const envPath = resolve(".env");
   if (!existsSync(envPath)) return;
 
-  const line = readFileSync(envPath, "utf8")
+  const entries = readFileSync(envPath, "utf8")
     .split(/\r?\n/)
-    .find((entry) => /^\s*SUPABASE_DB_PASSWORD\s*=/.test(entry));
+    .filter((entry) => /^\s*(SUPABASE_DB_URL|SUPABASE_DB_PASSWORD)\s*=/.test(entry));
 
-  if (!line) return;
+  for (const entry of entries) {
+    const match = entry.match(/^\s*(SUPABASE_DB_URL|SUPABASE_DB_PASSWORD)\s*=\s*(.*)\s*$/);
+    if (!match) continue;
 
-  const raw = line.replace(/^\s*SUPABASE_DB_PASSWORD\s*=\s*/, "").trim();
-  const value = raw.replace(/^"(.*)"$/s, "$1").replace(/^'(.*)'$/s, "$1");
+    const [, key, raw] = match;
+    if (process.env[key]) continue;
 
-  if (value) process.env.SUPABASE_DB_PASSWORD = value;
+    const value = raw
+      .replace(/^\"(.*)\"$/s, "$1")
+      .replace(/^'(.*)'$/s, "$1");
+
+    if (value) process.env[key] = value;
+  }
 }
 
 function prepareRemoteCliWorkdir(workDir) {
@@ -292,7 +297,7 @@ function validateAndReport(reportPath) {
 }
 
 async function main() {
-  loadDatabasePasswordFromDotEnv();
+  loadDatabaseCredentialsFromDotEnv();
   ensureCommand("supabase");
   ensureCommand("docker");
   ensureCommand("pg_dump");
