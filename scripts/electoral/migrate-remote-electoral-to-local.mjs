@@ -331,13 +331,14 @@ async function main() {
       "--file", rawDump,
     ];
 
+    prepareRemoteCliWorkdir(workDir);
+
     if (!dbUrl) {
-      // db dump --linked exige um projeto vinculado. O link é feito apenas
-      // no diretório temporário desta execução, nunca no repositório.
-      prepareRemoteCliWorkdir(workDir);
-      run("supabase", ["link", "--project-ref", PROJECT_REF], {
+      // O link é feito apenas no diretório temporário desta execução.
+      // A senha é passada explicitamente para não depender do .env do projeto.
+      run("supabase", ["link", "--project-ref", PROJECT_REF, "--password", dbPassword], {
         cwd: workDir,
-        displayArgv: ["link", "--project-ref", PROJECT_REF],
+        displayArgv: ["link", "--project-ref", PROJECT_REF, "--password", "***REDACTED***"],
       });
     }
 
