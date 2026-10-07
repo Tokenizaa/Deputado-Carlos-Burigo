@@ -267,7 +267,7 @@ async function main(){
 
   console.log("[IE-03.7] carregando votação nominal por seção");
   const runS=await startRun(sourceSection,hashes.section,0,{layer:"nominal_section",uf:UF,all_candidates:true});
-  let loadedS=0, sectionVotes=0;
+  let loadedS=0, sectionVotes=0, pending=Promise.resolve();
   if(!runS.__skip){
     let batch=[];
     const sr=await readCsv(files.section,/votacao_secao_2018_RS\.csv$/i,h=>({
@@ -282,9 +282,9 @@ async function main(){
       if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(\`Dimensão não resolvida na votação por seção: \${municipality}/\${zone}/\${section}\`);
       batch.push({round_id:rounds.get(turn).id,office_id:offices.get(office).id,uf:UF,municipality_id:municipalityMap.get(municipality),zone_id:zid,section_id:sid,candidate_id:c.db.id,source_dataset_id:sourceSection.id,import_run_id:runS.id,votes});
       loadedS++;sectionVotes+=votes;
-      if(batch.length>=500){const copy=batch;batch=[];insertBatches("electoral_results_nominal",copy,500).catch(e=>{throw e;});}
+      if(batch.length>=500){const copy=batch;batch=[];pending=pending.then(()=>insertBatches("electoral_results_nominal",copy,500));}
     });
-    if(batch.length)await insertBatches("electoral_results_nominal",batch,500);
+    if(batch.length)pending=pending.then(()=>insertBatches("electoral_results_nominal",batch,500)); await pending;
     await finish(runS,loadedS,{layer:"nominal_section",rows_read:sr.rows,loaded_votes:sectionVotes});
     console.log(\`[IE-03.7] votação por seção: \${loadedS.toLocaleString("pt-BR")} fatos, \${sectionVotes.toLocaleString("pt-BR")} votos\`);
   }
