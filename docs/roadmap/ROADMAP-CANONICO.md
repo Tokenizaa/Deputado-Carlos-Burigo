@@ -156,7 +156,7 @@ A reconciliação contrato ↔ schema ↔ loader foi concluída sem criar tabela
 
 **Gate:** CONCLUÍDO. A carga física idempotente foi executada após a reconciliação local × GitHub e validada diretamente no Supabase. Os fatos físicos e os cinco `electoral_import_runs` estão consistentes, sem rejeições. **A próxima operação é IE-03.7 — cobertura histórica e territorial.**
 
-**IE-03.7 — Cobertura histórica e territorial: EM EXECUÇÃO.** O escopo 2018/2022/2026, 27 UFs e cinco cargos está definido; o catálogo oficial TSE foi iniciado e a próxima execução operacional é a aquisição controlada de 2018/RS para validação do layout histórico antes da expansão nacional. A primeira onda canônica cobre 2018, 2022 e 2026, todas as 27 UFs e os cargos de Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital. A segunda onda municipal (2020/2024) fica condicionada à necessidade analítica. Documento: `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
+**IE-03.7 — Cobertura histórica e territorial: EM EXECUÇÃO.** O escopo canônico está restrito ao **Rio Grande do Sul (RS)**. A primeira onda cobre 2018, 2022 e 2026 e os cargos de Presidente, Governador, Senador, Deputado Federal e Deputado Estadual, com território RS → municípios → zonas → seções e todos os candidatos. A prova 2018/RS foi executada e fechada: município/zona e seção totalizaram **34.322 votos** para Carlos Búrigo 15140, abrangendo 497 municípios e 165 zonas. A próxima operação é consolidar 2018/RS no modelo eleitoral e completar 2022/RS e 2026/RS. Documento: `docs/roadmap/IE-03.7-COBERTURA-HISTORICA-TERRITORIAL-2026-10-06.md`.
 
 **IE-04 — Inteligência:** planejada.
 - **IE-05 — Interface:** planejada.
