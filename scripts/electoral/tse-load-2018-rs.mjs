@@ -9,13 +9,9 @@ import { createClient } from "@supabase/supabase-js";
 const ROOT = resolve("artifacts/electoral/raw");
 const YEAR = 2018;
 const UF = "RS";
-const OFFICES = new Map([
-  ["1", ["Presidente", "FEDERAL"]],
-  ["3", ["Governador", "ESTADUAL"]],
-  ["5", ["Senador", "ESTADUAL"]],
-  ["6", ["Deputado Federal", "FEDERAL"]],
-  ["7", ["Deputado Estadual", "ESTADUAL"]],
-]);
+const OFFICE_CODE = "7";
+const OFFICE_NAME = "Deputado Estadual";
+const OFFICE_LEVEL = "ESTADUAL";
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
@@ -106,7 +102,7 @@ async function startRun(source,file,rowsRead,metadata) {
 async function finish(run,loaded,metadata){const {error}=await supabase.from("electoral_import_runs").update({finished_at:new Date().toISOString(),status:"COMPLETED",rows_loaded:loaded,metadata}).eq("id",run.id);if(error)throw new Error(error.message);}
 
 async function main(){
-  console.log("[IE-03.7] consolidando 2018/RS — todos os candidatos e cinco cargos");
+  console.log("[IE-03.7] consolidando 2018/RS — Deputado Estadual, todos os candidatos");
   const files={
     candidates:resolve(ROOT,"consulta_cand_2018.zip"),
     mun:resolve(ROOT,"votacao_candidato_munzona_2018.zip"),
@@ -135,7 +131,7 @@ async function main(){
     partyCode:idx(h,["NR_PARTIDO"]),acronym:idx(h,["SG_PARTIDO"]),partyName:idx(h,["NM_PARTIDO"]),
     status:idx(h,["DS_SITUACAO_CANDIDATURA","DS_SITUACAO_CANDIDATO"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")); if(!turn)return;
     const office=val(row,ix,"office"), number=val(row,ix,"number"), id=val(row,ix,"id");
     if(!id||!number)return;
@@ -152,14 +148,14 @@ async function main(){
 
   console.log(`[IE-03.7] candidaturas encontradas: ${candidateRows.length.toLocaleString("pt-BR")}`);
 
-  const elections=new Map(), rounds=new Map(), offices=new Map(), parties=new Map(), candidateDb=new Map();
+  const elections=new Map(), rounds=new Map(), parties=new Map(), candidateDb=new Map();
+  const offices=new Map([[OFFICE_CODE, (await upsert("electoral_offices",{tse_office_code:OFFICE_CODE,name:OFFICE_NAME,level:OFFICE_LEVEL},"tse_office_code"))[0]]);
   for(const [turn,code] of electionCodes){
     const e=(await upsert("electoral_elections",{tse_election_code:code,year:YEAR,name:"Eleições Gerais 2018",election_type:"GERAL",scope:"NACIONAL",status:"FINAL"},"tse_election_code"))[0];
     elections.set(turn,e);
     const official=turn===1?"2018-10-07":"2018-10-28";
     rounds.set(turn,(await upsert("electoral_rounds",{election_id:e.id,round_number:turn,official_date:official},"election_id,round_number"))[0]);
   }
-  for(const [code,[name,level]] of OFFICES) offices.set(code,(await upsert("electoral_offices",{tse_office_code:code,name,level},"tse_office_code"))[0]);
   await upsert("electoral_ufs",{uf:UF,name:"Rio Grande do Sul",region:"Sul"},"uf");
 
   for(const c of candidateRows){
@@ -184,7 +180,7 @@ async function main(){
     nominal:idx(h,["QT_VOTOS_NOMINAIS"]),blank:idx(h,["QT_VOTOS_BRANCOS"]),nulls:idx(h,["QT_VOTOS_NULOS"]),
     legend:idx(h,["QT_VOTOS_LEGENDA"]),location:idx(h,["NM_LOCAL_VOTACAO"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")), municipality=val(row,ix,"municipality"), zone=num(val(row,ix,"zone")), section=num(val(row,ix,"section"));
     if(!turn||!municipality||!zone||!section)return;
     territory.set(municipality,val(row,ix,"municipalityName"));zones.add(zone);
@@ -216,11 +212,11 @@ async function main(){
 
   const sourceSection=await dataset("votacao_secao_2018_RS","Votação por seção eleitoral - 2018 - RS",urls.section,hashes.section,{uf:UF,year:YEAR,all_candidates:true});
   const sourceMun=await dataset("votacao_candidato_munzona_2018","Votação nominal por município e zona - 2018",urls.mun,hashes.mun,{uf:UF,year:YEAR,all_candidates:true});
-  const sourceDetailMun=await dataset("detalhe_votacao_munzona_2018","Detalhe da apuração por município e zona - 2018",urls.detailMun,hashes.detailMun,{uf:UF,year:YEAR,all_offices:true});
-  const sourceDetailSection=await dataset("detalhe_votacao_secao_2018","Detalhe da apuração por seção - 2018",urls.detailSection,hashes.detailSection,{uf:UF,year:YEAR,all_offices:true});
+  const sourceDetailMun=await dataset("detalhe_votacao_munzona_2018","Detalhe da apuração por município e zona - 2018",urls.detailMun,hashes.detailMun,{uf:UF,year:YEAR,all_candidates:true});
+  const sourceDetailSection=await dataset("detalhe_votacao_secao_2018","Detalhe da apuração por seção - 2018",urls.detailSection,hashes.detailSection,{uf:UF,year:YEAR,all_candidates:true});
 
   console.log("[IE-03.7] carregando apuração por seção");
-  const runDS=await startRun(sourceDetailSection,hashes.detailSection,dsRead.rows,{layer:"apuration_section",uf:UF,all_offices:true});
+  const runDS=await startRun(sourceDetailSection,hashes.detailSection,dsRead.rows,{layer:"apuration_section",uf:UF,all_candidates:true});
   if(!runDS.__skip){
     const facts=detailSectionRows.map(r=>{const zid=zoneMap.get(String(r.zone));return{round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zid,section_id:sectionMap.get(`${zid}:${r.section}`),source_dataset_id:sourceDetailSection.id,import_run_id:runDS.id,electorate:r.electorate,comparecimento:r.comparecimento,abstentions:r.abstentions,valid_votes:r.valid_votes,blank_votes:r.blank_votes,null_votes:r.null_votes,total_votes:r.total_votes};});
     if(facts.some(f=>!f.round_id||!f.office_id||!f.municipality_id||!f.zone_id||!f.section_id))throw new Error("Totais de seção com dimensão não resolvida.");
@@ -234,10 +230,10 @@ async function main(){
     municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),candidateId:idx(h,["SQ_CANDIDATO"]),number:idx(h,["NR_CANDIDATO"]),
     votes:idx(h,["QT_VOTOS_NOMINAIS"]),valid:idx(h,["QT_VOTOS_NOMINAIS_VALIDOS"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
     const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),candidateId=val(row,ix,"candidateId");
     const c=candidates.get(`${office}:${candidateId}`);
-    if(!c||c.turn!==turn)return;
+    if(!c||c.turn!==turn||c.office!==OFFICE_CODE)return;
     munRows.push({turn,office,candidate:c,municipality:val(row,ix,"municipality"),zone:num(val(row,ix,"zone")),votes:num(val(row,ix,"votes")),valid_votes:num(val(row,ix,"valid"))});
   });
   const runM=await startRun(sourceMun,hashes.mun,mr.rows,{layer:"candidate_municipality_zone",uf:UF,all_candidates:true});
@@ -255,10 +251,10 @@ async function main(){
     comparecimento:idx(h,["QT_COMPARECIMENTO"]),abstentions:idx(h,["QT_ABSTENCOES"]),valid:idx(h,["QT_TOTAL_VOTOS_VALIDOS"]),
     blank:idx(h,["QT_VOTOS_BRANCOS"]),nulls:idx(h,["QT_TOTAL_VOTOS_NULOS"]),total:idx(h,["QT_VOTOS"])
   }),(row,ix)=>{
-    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
+    if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
     detailMunRows.push({turn:num(val(row,ix,"turn")),office:val(row,ix,"office"),municipality:val(row,ix,"municipality"),zone:num(val(row,ix,"zone")),electorate:num(val(row,ix,"electorate")),comparecimento:num(val(row,ix,"comparecimento")),abstentions:num(val(row,ix,"abstentions")),valid_votes:num(val(row,ix,"valid")),blank_votes:num(val(row,ix,"blank")),null_votes:num(val(row,ix,"nulls")),total_votes:num(val(row,ix,"total"))});
   });
-  const runDM=await startRun(sourceDetailMun,hashes.detailMun,dmr.rows,{layer:"apuration_municipality_zone",uf:UF,all_offices:true});
+  const runDM=await startRun(sourceDetailMun,hashes.detailMun,dmr.rows,{layer:"apuration_municipality_zone",uf:UF,all_candidates:true});
   if(!runDM.__skip){
     const facts=detailMunRows.map(r=>({round_id:rounds.get(r.turn).id,office_id:offices.get(r.office).id,uf:UF,municipality_id:municipalityMap.get(r.municipality),zone_id:zoneMap.get(String(r.zone)),source_dataset_id:sourceDetailMun.id,import_run_id:runDM.id,electorate:r.electorate,comparecimento:r.comparecimento,abstentions:r.abstentions,valid_votes:r.valid_votes,blank_votes:r.blank_votes,null_votes:r.null_votes,total_votes:r.total_votes}));
     if(facts.some(f=>!f.municipality_id||!f.zone_id||!f.round_id||!f.office_id))throw new Error("Apuração município/zona com dimensão não resolvida.");
@@ -274,7 +270,7 @@ async function main(){
       year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
       municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
     }),(row,ix)=>{
-      if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!OFFICES.has(val(row,ix,"office")))return;
+      if(val(row,ix,"year")!==String(YEAR)||val(row,ix,"uf")!==UF||!val(row,ix,"office")!==OFFICE_CODE)return;
       const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),number=val(row,ix,"votavel");
       const c=candidateByNumber.get(`${office}:${number}:${turn}`);
       if(!c?.db)return;
@@ -291,7 +287,7 @@ async function main(){
 
   console.log(JSON.stringify({
     mode:"loaded",year:YEAR,uf:UF,all_candidates:true,
-    offices:[...OFFICES.keys()],turns:[...rounds.keys()].sort(),
+    office:OFFICE_CODE,office_name:OFFICE_NAME,turns:[...rounds.keys()].sort(),
     candidates:candidateRows.length,municipalities:territory.size,zones:zones.size,sections:sections.size,
     source_files:Object.values(hashes)
   },null,2));
