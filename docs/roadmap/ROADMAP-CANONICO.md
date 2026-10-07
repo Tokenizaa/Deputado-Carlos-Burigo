@@ -127,6 +127,38 @@ A estrutura final deve respeitar o shell, roteamento, RBAC e padrões já existe
 A Inteligência Eleitoral será privada e deverá reutilizar autenticação, autorização, RBAC, RLS e infraestrutura existentes. Não haverá API pública, rota pública ou indexação pública para esse módulo.
 
 
+### IE-03 — Arquitetura de dados local-first / remoto autônomo
+
+A Inteligência Eleitoral adota definitivamente a separação entre ingestão e runtime:
+
+- **PostgreSQL local:** armazenamento completo dos dados brutos, staging, normalização, histórico, processamento e auditoria.
+- **Supabase remoto:** somente a projeção filtrada/consolidada necessária para o funcionamento da Inteligência Eleitoral em produção.
+- **Runtime:** nenhuma funcionalidade da plataforma poderá depender do banco local, arquivos locais, Docker local ou processos de ETL.
+
+A cadeia canônica é:
+
+`TSE → arquivos brutos locais → PostgreSQL local → validação → consolidação/filtragem → Supabase remoto → plataforma`
+
+O remoto deve ser autônomo para o runtime. O local pode estar indisponível sem interromper a Inteligência Eleitoral.
+
+### Reconstrução da base eleitoral — estado atual
+
+A estratégia anterior de dump **remoto → local** foi descontinuada. O banco eleitoral local será zerado e reconstruído diretamente a partir dos arquivos oficiais TSE já adquiridos/reutilizados para 2018 e 2022, com preparação para 2026.
+
+O próximo orquestrador deverá:
+
+1. verificar a versão atual do código com `git pull --ff-only origin main` antes de qualquer execução;
+2. verificar e catalogar os arquivos TSE locais;
+3. validar tamanho, ZIP íntegro, entradas esperadas, ano, UF, turno e cargo;
+4. bloquear a carga se qualquer arquivo obrigatório estiver ausente ou inconsistente;
+5. zerar somente as tabelas eleitorais do PostgreSQL local;
+6. aplicar o modelo eleitoral local;
+7. executar as cargas 2018 e 2022 diretamente dos arquivos TSE;
+8. validar cobertura e reconciliação antes de considerar a carga concluída;
+9. publicar futuramente apenas o conjunto remoto necessário ao runtime.
+
+Nenhum dado remoto será usado como fonte para reconstrução local.
+
 ### IE-03 — Reconciliação local × GitHub antes da validação
 **PRÉ-CONDIÇÃO OPERACIONAL — CONCLUÍDA PARA A PROVA 2022/2026**
 
