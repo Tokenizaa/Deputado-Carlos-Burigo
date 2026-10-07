@@ -146,9 +146,24 @@ async function main(){
   if(!candidateRows.length)throw new Error("Nenhuma candidatura 2022/RS encontrada.");
   const candidateById=new Map();
   const candidateByNumber=new Map();
+  const candidateByName=new Map();
+  const normalizeCandidateNumber = value => {
+    const raw=clean(value);
+    if(!raw)return "";
+    const n=Number(raw);
+    return Number.isFinite(n) ? String(n) : raw.replace(/\\D/g,"");
+  };
+  const normalizeCandidateName = value => clean(value)
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g,"")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g,"");
   for(const c of candidateRows) {
     candidateById.set(`${c.office}:${c.tse_candidate_id}:${c.turn}`,c);
-    candidateByNumber.set(`${c.office}:${c.candidate_number}:${c.turn}`,c);
+    const numberKey=normalizeCandidateNumber(c.candidate_number);
+    if(numberKey)candidateByNumber.set(`${c.office}:${numberKey}:${c.turn}`,c);
+    const nameKey=normalizeCandidateName(c.ballot_name);
+    if(nameKey)candidateByName.set(`${c.office}:${nameKey}:${c.turn}`,c);
   }
 
   console.log(`[IE-03.7] candidaturas encontradas: ${candidateRows.length.toLocaleString("pt-BR")}`);
@@ -296,14 +311,26 @@ async function main(){
   let loadedS=0, sectionVotes=0;
   if(!runS.__skip){
     const nominalByKey=new Map();
+    let matchedSectionRows=0, unmatchedSectionRows=0;
+    const unmatchedVotaveis=new Map();
     const sr=await readCsv(files.section,/votacao_secao_2022_RS\.csv$/i,h=>({
       year:idx(h,["ANO_ELEICAO"]),turn:idx(h,["NR_TURNO"]),uf:idx(h,["SG_UF"]),office:idx(h,["CD_CARGO"]),
-      municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
+      municipality:idx(h,["CD_MUNICIPIO"]),zone:idx(h,["NR_ZONA"]),section:idx(h,["NR_SECAO"]),votavel:idx(h,["NR_VOTAVEL"]),votavelName:idx(h,["NM_VOTAVEL"]),votes:idx(h,["QT_VOTOS"])
     }),(row,ix)=>{
       if(val(row,ix,"year")!==String(YEAR)||num(val(row,ix,"turn"))!==TURN||val(row,ix,"uf")!==UF||val(row,ix,"office")!==OFFICE_CODE)return;
       const turn=num(val(row,ix,"turn")),office=val(row,ix,"office"),number=val(row,ix,"votavel");
-      const c=candidateByNumber.get(`${office}:${number}:${turn}`);
-      if(!c?.db)return;
+      const votavelName=val(row,ix,"votavelName");
+      const numberKey=normalizeCandidateNumber(number);
+      const nameKey=normalizeCandidateName(votavelName);
+      const c=candidateByNumber.get(`${office}:${numberKey}:${turn}`)
+        ?? candidateByName.get(`${office}:${nameKey}:${turn}`);
+      if(!c?.db) {
+        unmatchedSectionRows++;
+        const rawKey=number || votavelName || "#SEM_VOTAVEL";
+        unmatchedVotaveis.set(rawKey,(unmatchedVotaveis.get(rawKey)??0)+1);
+        return;
+      }
+      matchedSectionRows++;
       const municipality=val(row,ix,"municipality"),zone=num(val(row,ix,"zone")),section=num(val(row,ix,"section")),zid=zoneMap.get(String(zone)),sid=sectionMap.get(`${zid}:${section}`),votes=num(val(row,ix,"votes"));
       if(!municipalityMap.get(municipality)||!zid||!sid)throw new Error(`Dimensão não resolvida na votação por seção: ${municipality}/${zone}/${section}`);
       const key=`${rounds.get(turn).id}:${offices.get(office).id}:${sid}:${c.db.id}`;
@@ -315,8 +342,12 @@ async function main(){
     });
     const facts=[...nominalByKey.values()];
     await insertBatches("electoral_results_nominal",facts,500);
-    await finish(runS,facts.length,{layer:"nominal_section",rows_read:sr.rows,raw_rows:loadedS,loaded_votes:sectionVotes,consolidated_rows:facts.length});
-    console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} linhas brutas, ${facts.length.toLocaleString("pt-BR")} fatos consolidados, ${sectionVotes.toLocaleString("pt-BR")} votos`);
+    const unmatchedSample=[...unmatchedVotaveis.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([value,count])=>({value,count}));
+    if(matchedSectionRows===0 || matchedSectionRows<sr.rows*0.5) {
+      throw new Error(`Cobertura nominal por seção insuficiente: ${matchedSectionRows}/${sr.rows} linhas casadas; não gravando uma carga parcial.`);
+    }
+    await finish(runS,facts.length,{layer:"nominal_section",rows_read:sr.rows,raw_rows:loadedS,matched_rows:matchedSectionRows,unmatched_rows:unmatchedSectionRows,unmatched_sample:unmatchedSample,loaded_votes:sectionVotes,consolidated_rows:facts.length});
+    console.log(`[IE-03.7] votação por seção: ${loadedS.toLocaleString("pt-BR")} linhas casadas, ${facts.length.toLocaleString("pt-BR")} fatos consolidados, ${sectionVotes.toLocaleString("pt-BR")} votos; não casadas: ${unmatchedSectionRows.toLocaleString("pt-BR")}`);
   }
 
   console.log(JSON.stringify({
