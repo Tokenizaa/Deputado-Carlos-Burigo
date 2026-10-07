@@ -1,0 +1,1322 @@
+{
+  "version": 1,
+  "scope": {
+    "office": "Deputado Estadual",
+    "uf": "RS",
+    "years": [
+      2018,
+      2022,
+      2026
+    ],
+    "round": 1
+  },
+  "total_questions": 100,
+  "areas": {
+    "overview": 25,
+    "history": 25,
+    "territory": 25,
+    "competition": 25
+  },
+  "questions": [
+    {
+      "id": "overview.total_votes",
+      "area": "overview",
+      "order": 1,
+      "text": "Quantos votos o candidato teve na eleição selecionada?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.state_share",
+      "area": "overview",
+      "order": 2,
+      "text": "Qual foi a participação do candidato no total de votos nominais do cargo?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.municipalities_with_votes",
+      "area": "overview",
+      "order": 3,
+      "text": "Em quantos municípios o candidato recebeu votos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.best_municipality",
+      "area": "overview",
+      "order": 4,
+      "text": "Qual município teve a maior votação do candidato?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.worst_municipality",
+      "area": "overview",
+      "order": 5,
+      "text": "Qual município teve a menor votação entre os municípios onde recebeu votos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.average_votes",
+      "area": "overview",
+      "order": 6,
+      "text": "Qual foi a média de votos por município?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.median_votes",
+      "area": "overview",
+      "order": 7,
+      "text": "Qual foi a mediana de votos por município?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.top10_concentration",
+      "area": "overview",
+      "order": 8,
+      "text": "Quanto dos votos ficou concentrado nos 10 maiores municípios?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.top20_concentration",
+      "area": "overview",
+      "order": 9,
+      "text": "Quanto dos votos ficou concentrado nos 20 maiores municípios?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.municipal_rank",
+      "area": "overview",
+      "order": 10,
+      "text": "Qual foi o ranking do candidato no estado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.municipal_leads",
+      "area": "overview",
+      "order": 11,
+      "text": "Em quantos municípios o candidato foi o mais votado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.above_average",
+      "area": "overview",
+      "order": 12,
+      "text": "Em quais municípios o desempenho ficou acima da média?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.below_average",
+      "area": "overview",
+      "order": 13,
+      "text": "Em quais municípios o desempenho ficou abaixo da média?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.regional_best",
+      "area": "overview",
+      "order": 14,
+      "text": "Qual região apresentou melhor desempenho?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.regional_worst",
+      "area": "overview",
+      "order": 15,
+      "text": "Qual região apresentou pior desempenho?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.vote_distribution",
+      "area": "overview",
+      "order": 16,
+      "text": "Como a votação está distribuída pelo estado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.territorial_concentration",
+      "area": "overview",
+      "order": 17,
+      "text": "A votação está concentrada ou distribuída territorialmente?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.active_municipalities",
+      "area": "overview",
+      "order": 18,
+      "text": "Qual é a cobertura territorial da votação?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.top_contributors",
+      "area": "overview",
+      "order": 19,
+      "text": "Quais municípios mais contribuíram para o resultado estadual?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.low_contributors",
+      "area": "overview",
+      "order": 20,
+      "text": "Quais municípios menos contribuíram para o resultado estadual?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.participation_average",
+      "area": "overview",
+      "order": 21,
+      "text": "Qual é a participação média nos municípios com votação?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.strongest_region",
+      "area": "overview",
+      "order": 22,
+      "text": "Onde está o principal núcleo territorial de força?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.attention_region",
+      "area": "overview",
+      "order": 23,
+      "text": "Qual região merece maior atenção?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.growth_count",
+      "area": "overview",
+      "order": 24,
+      "text": "Quantos municípios apresentam crescimento no período comparado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "overview.decline_count",
+      "area": "overview",
+      "order": 25,
+      "text": "Quantos municípios apresentam queda no período comparado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.total_evolution",
+      "area": "history",
+      "order": 26,
+      "text": "Como a votação evoluiu entre as eleições?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.absolute_change",
+      "area": "history",
+      "order": 27,
+      "text": "Quantos votos foram ganhos ou perdidos entre dois anos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.percent_change",
+      "area": "history",
+      "order": 28,
+      "text": "Qual foi a variação percentual entre dois anos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.municipal_growth",
+      "area": "history",
+      "order": 29,
+      "text": "Quais municípios mais cresceram em votos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.municipal_decline",
+      "area": "history",
+      "order": 30,
+      "text": "Quais municípios mais perderam votos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.consistent_growth",
+      "area": "history",
+      "order": 31,
+      "text": "Quais municípios apresentam crescimento consistente entre os três ciclos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.consistent_decline",
+      "area": "history",
+      "order": 32,
+      "text": "Quais municípios apresentam queda consistente?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.reversal",
+      "area": "history",
+      "order": 33,
+      "text": "Quais municípios inverteram a tendência?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.new_strengths",
+      "area": "history",
+      "order": 34,
+      "text": "Quais territórios se tornaram relevantes no período?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.lost_strengths",
+      "area": "history",
+      "order": 35,
+      "text": "Quais territórios perderam relevância?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.growth_count",
+      "area": "history",
+      "order": 36,
+      "text": "Quantos municípios cresceram entre os anos comparados?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.decline_count",
+      "area": "history",
+      "order": 37,
+      "text": "Quantos municípios caíram?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.stable_count",
+      "area": "history",
+      "order": 38,
+      "text": "Quantos municípios permaneceram relativamente estáveis?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.best_gain",
+      "area": "history",
+      "order": 39,
+      "text": "Qual foi o maior ganho absoluto municipal?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.best_loss",
+      "area": "history",
+      "order": 40,
+      "text": "Qual foi a maior perda absoluta municipal?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.best_percent_gain",
+      "area": "history",
+      "order": 41,
+      "text": "Qual foi o maior crescimento percentual municipal?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.best_percent_loss",
+      "area": "history",
+      "order": 42,
+      "text": "Qual foi a maior queda percentual municipal?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.state_evolution_rank",
+      "area": "history",
+      "order": 43,
+      "text": "Como a evolução do candidato se compara à evolução estadual?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.concentration_change",
+      "area": "history",
+      "order": 44,
+      "text": "A concentração territorial aumentou ou diminuiu?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.coverage_change",
+      "area": "history",
+      "order": 45,
+      "text": "A cobertura municipal aumentou ou diminuiu?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.regional_evolution",
+      "area": "history",
+      "order": 46,
+      "text": "Quais regiões mais cresceram?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.regional_decline",
+      "area": "history",
+      "order": 47,
+      "text": "Quais regiões mais perderam?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.trajectory",
+      "area": "history",
+      "order": 48,
+      "text": "Qual é a trajetória eleitoral geral nos três ciclos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.turning_points",
+      "area": "history",
+      "order": 49,
+      "text": "Quais foram os principais pontos de mudança territorial?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "history.priority_changes",
+      "area": "history",
+      "order": 50,
+      "text": "Quais territórios mudaram de prioridade com a evolução histórica?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.strongholds",
+      "area": "territory",
+      "order": 51,
+      "text": "Quais são os municípios mais fortes do candidato?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.weakholds",
+      "area": "territory",
+      "order": 52,
+      "text": "Quais são os municípios mais fracos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.opportunities",
+      "area": "territory",
+      "order": 53,
+      "text": "Quais municípios apresentam oportunidade territorial?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.growing",
+      "area": "territory",
+      "order": 54,
+      "text": "Onde o candidato está crescendo?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.declining",
+      "area": "territory",
+      "order": 55,
+      "text": "Onde o candidato está perdendo espaço?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.top_rankings",
+      "area": "territory",
+      "order": 56,
+      "text": "Quais municípios têm melhor posição relativa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.low_rankings",
+      "area": "territory",
+      "order": 57,
+      "text": "Quais municípios têm pior posição relativa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.map_strength",
+      "area": "territory",
+      "order": 58,
+      "text": "Como a força territorial está distribuída no mapa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.map_growth",
+      "area": "territory",
+      "order": 59,
+      "text": "Onde estão os maiores crescimentos no mapa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.map_decline",
+      "area": "territory",
+      "order": 60,
+      "text": "Onde estão as maiores quedas no mapa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.region_strength",
+      "area": "territory",
+      "order": 61,
+      "text": "Quais regiões concentram maior força?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.region_opportunity",
+      "area": "territory",
+      "order": 62,
+      "text": "Quais regiões concentram maior oportunidade?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.concentration",
+      "area": "territory",
+      "order": 63,
+      "text": "Quais municípios concentram a maior parcela da votação?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.dispersion",
+      "area": "territory",
+      "order": 64,
+      "text": "A votação está concentrada em poucos territórios ou dispersa?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.coverage",
+      "area": "territory",
+      "order": 65,
+      "text": "Em quantos municípios existe presença eleitoral?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.growth_low_base",
+      "area": "territory",
+      "order": 66,
+      "text": "Onde houve crescimento apesar de uma base pequena?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.high_base_decline",
+      "area": "territory",
+      "order": 67,
+      "text": "Onde existe votação forte, mas perda recente?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.high_growth",
+      "area": "territory",
+      "order": 68,
+      "text": "Onde existe crescimento absoluto relevante?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.high_share",
+      "area": "territory",
+      "order": 69,
+      "text": "Onde a participação relativa do candidato é maior?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.low_share",
+      "area": "territory",
+      "order": 70,
+      "text": "Onde a participação relativa é menor?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.priority",
+      "area": "territory",
+      "order": 71,
+      "text": "Quais municípios deveriam ser priorizados segundo os indicadores definidos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.compare",
+      "area": "territory",
+      "order": 72,
+      "text": "Como dois ou mais municípios se comparam?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "territory.regional_profile",
+      "area": "territory",
+      "order": 73,
+      "text": "Qual é o perfil territorial por região?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.top_candidates",
+      "area": "competition",
+      "order": 74,
+      "text": "Quem foram os candidatos mais votados?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.candidate_rank",
+      "area": "competition",
+      "order": 75,
+      "text": "Qual foi a posição do candidato entre os concorrentes?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.vote_gap",
+      "area": "competition",
+      "order": 76,
+      "text": "Qual a diferença para o candidato imediatamente acima?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.vote_lead",
+      "area": "competition",
+      "order": 77,
+      "text": "Qual a vantagem sobre o candidato imediatamente abaixo?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.growth_leaders",
+      "area": "competition",
+      "order": 78,
+      "text": "Quais concorrentes mais cresceram?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.growth_losers",
+      "area": "competition",
+      "order": 79,
+      "text": "Quais concorrentes mais perderam votos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.local_winners",
+      "area": "competition",
+      "order": 80,
+      "text": "Quem venceu nos municípios onde o candidato não venceu?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.local_challengers",
+      "area": "competition",
+      "order": 81,
+      "text": "Quem são os principais concorrentes nos territórios do candidato?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.overlap",
+      "area": "competition",
+      "order": 82,
+      "text": "Quais concorrentes disputam os mesmos territórios?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.territorial_leaders",
+      "area": "competition",
+      "order": 83,
+      "text": "Quais concorrentes dominam cada região?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.municipal_leaders",
+      "area": "competition",
+      "order": 84,
+      "text": "Quem lidera nos municípios prioritários?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.candidate_compare",
+      "area": "competition",
+      "order": 85,
+      "text": "Como o candidato se compara a outro candidato?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.rank_evolution",
+      "area": "competition",
+      "order": 86,
+      "text": "Como a posição do candidato mudou historicamente?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.vote_share_compare",
+      "area": "competition",
+      "order": 87,
+      "text": "Como a participação relativa se compara à dos concorrentes?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.growth_compare",
+      "area": "competition",
+      "order": 88,
+      "text": "Quem cresceu mais entre dois anos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.loss_compare",
+      "area": "competition",
+      "order": 89,
+      "text": "Quem perdeu mais entre dois anos?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.gain_where_burigo_lost",
+      "area": "competition",
+      "order": 90,
+      "text": "Quem ganhou onde o candidato perdeu?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.loss_where_burigo_gained",
+      "area": "competition",
+      "order": 91,
+      "text": "Onde o candidato cresceu enquanto concorrentes perderam?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.dominant_competitor",
+      "area": "competition",
+      "order": 92,
+      "text": "Qual concorrente é mais relevante no território analisado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.emerging_competitor",
+      "area": "competition",
+      "order": 93,
+      "text": "Qual concorrente apresenta crescimento relevante?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.territorial_overlap",
+      "area": "competition",
+      "order": 94,
+      "text": "Qual é o grau de sobreposição territorial com um concorrente?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.competitive_municipalities",
+      "area": "competition",
+      "order": 95,
+      "text": "Quais municípios apresentam maior competição?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.low_competition",
+      "area": "competition",
+      "order": 96,
+      "text": "Quais municípios apresentam menor pressão competitiva?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.regional_competition",
+      "area": "competition",
+      "order": 97,
+      "text": "Como a competição varia por região?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.strategic_competitors",
+      "area": "competition",
+      "order": 98,
+      "text": "Quais concorrentes merecem acompanhamento prioritário?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.competitive_trend",
+      "area": "competition",
+      "order": 99,
+      "text": "A pressão competitiva aumentou ou diminuiu?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    },
+    {
+      "id": "competition.candidate_context",
+      "area": "competition",
+      "order": 100,
+      "text": "Qual é o contexto competitivo do candidato no período analisado?",
+      "params": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ]
+    }
+  ]
+}
