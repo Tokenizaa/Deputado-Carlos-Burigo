@@ -154,7 +154,7 @@
       "metodo": "municipalMaximum",
       "funcao_analitica": "maxMunicipality",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "municipio",
       "denominador": null,
       "restricoes": [
@@ -193,7 +193,7 @@
       "metodo": "municipalMinimumPositive",
       "funcao_analitica": "minPositiveMunicipality",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "municipio",
       "denominador": null,
       "restricoes": [
