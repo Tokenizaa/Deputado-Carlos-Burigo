@@ -37,10 +37,27 @@ const RUNTIME_IMPLEMENTED = new Set([
   'history.concentration_change',
   'history.coverage_change',
   'history.trajectory',
+  'territory.strongholds',
+  'territory.weakholds',
+  'territory.growing',
+  'territory.declining',
+  'territory.top_rankings',
+  'territory.low_rankings',
+  'territory.region_strength',
+  'territory.concentration',
+  'territory.dispersion',
+  'territory.coverage',
+  'territory.growth_low_base',
+  'territory.high_base_decline',
+  'territory.high_growth',
+  'territory.high_share',
+  'territory.low_share',
+  'territory.compare',
+  'territory.regional_profile',
 ]);
 
 type ElectoralResponse = {
-  status: 'ok' | 'error' | 'pending';
+  status: 'ok' | 'error' | 'pending' | 'insufficient_data';
   question: string;
   intent: string;
   agent: string;
