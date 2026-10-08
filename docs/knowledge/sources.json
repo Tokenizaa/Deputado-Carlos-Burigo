@@ -5,10 +5,17 @@
     {
       "id": "cambridge-electoral-competitiveness",
       "title": "A General Approach to Measuring Electoral Competitiveness for Parties and Governments",
-      "authors": ["Axel Cronert", "Pär Nyman"],
+      "authors": [
+        "Axel Cronert",
+        "Pär Nyman"
+      ],
       "publisher": "Cambridge University Press / Political Analysis",
       "year": 2020,
-      "topics": ["competitiveness", "electoral-analysis", "measurement"],
+      "topics": [
+        "competitiveness",
+        "electoral-analysis",
+        "measurement"
+      ],
       "url": "https://www.cambridge.org/core/journals/political-analysis/article/general-approach-to-measuring-electoral-competitiveness-for-parties-and-governments/F263FAE4A2CB138FD155355F03897D93",
       "status": "reviewed"
     },
@@ -18,7 +25,12 @@
       "author": "Jesse Clark",
       "publisher": "MIT Election Data + Science Lab",
       "year": 2021,
-      "topics": ["election-data", "inference", "limitations", "geography"],
+      "topics": [
+        "election-data",
+        "inference",
+        "limitations",
+        "geography"
+      ],
       "url": "https://electionlab.mit.edu/articles/powerful-tool-election-analysis",
       "status": "reviewed"
     },
@@ -26,7 +38,11 @@
       "id": "ace-electoral-quality",
       "title": "Approaches to Measuring Electoral Quality",
       "publisher": "ACE Electoral Knowledge Network",
-      "topics": ["electoral-methodology", "comparative-analysis", "measurement"],
+      "topics": [
+        "electoral-methodology",
+        "comparative-analysis",
+        "measurement"
+      ],
       "url": "https://aceproject.org/ace-en/focus/measuring-electoral-quality/approaches-to-measuring-electoral-quality",
       "status": "reviewed"
     },
@@ -34,19 +50,59 @@
       "id": "ons-geography",
       "title": "Geography",
       "publisher": "UK Office for National Statistics",
-      "topics": ["statistical-geography", "territorial-comparability", "aggregation"],
+      "topics": [
+        "statistical-geography",
+        "territorial-comparability",
+        "aggregation"
+      ],
       "url": "https://www.ons.gov.uk/methodology/geography",
       "status": "reviewed"
     },
     {
       "id": "laakso-taagepera-effective-number",
       "title": "Effective Number of Parties",
-      "authors": ["Markku Laakso", "Rein Taagepera"],
+      "authors": [
+        "Markku Laakso",
+        "Rein Taagepera"
+      ],
       "year": 1979,
-      "topics": ["fragmentation", "effective-number-of-parties", "concentration"],
+      "topics": [
+        "fragmentation",
+        "effective-number-of-parties",
+        "concentration"
+      ],
       "url": "https://www.oxfordreference.com/display/10.1093/oi/authority.20110803095743432",
       "status": "catalogued",
       "note": "Fonte de referência secundária para a definição e fórmula; a versão original será adicionada ao corpus quando disponível em fonte primária acessível."
+    },
+    {
+      "id": "sage-time-series-political-science",
+      "title": "Time-Series Analysis",
+      "publisher": "International Encyclopedia of Political Science / SAGE",
+      "topics": [
+        "time-series",
+        "longitudinal-analysis",
+        "political-science"
+      ],
+      "url": "https://sk.sagepub.com/ency/edvol/intlpoliticalscience/chpt/timeseries-analysis",
+      "status": "catalogued"
+    },
+    {
+      "id": "aminikhanghahi-cook-change-points",
+      "title": "A Survey of Methods for Time Series Change Point Detection",
+      "authors": [
+        "Samaneh Aminikhanghahi",
+        "Diane J. Cook"
+      ],
+      "publisher": "Knowledge and Information Systems",
+      "year": 2017,
+      "topics": [
+        "change-point-detection",
+        "time-series",
+        "anomaly-analysis"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5464762/",
+      "status": "catalogued"
     }
   ]
 }
