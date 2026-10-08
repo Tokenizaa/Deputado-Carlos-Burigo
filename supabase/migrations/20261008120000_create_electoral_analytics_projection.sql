@@ -81,3 +81,7 @@ create policy electoral_analytics_municipalities_staff_select on public.electora
 drop policy if exists electoral_analytics_cm_staff_select on public.electoral_analytics_candidate_municipal;
 create policy electoral_analytics_cm_staff_select on public.electoral_analytics_candidate_municipal
   for select to authenticated using (private.is_staff());
+grant select on public.electoral_analytics_elections to authenticated;
+grant select on public.electoral_analytics_candidates to authenticated;
+grant select on public.electoral_analytics_municipalities to authenticated;
+grant select on public.electoral_analytics_candidate_municipal to authenticated;
