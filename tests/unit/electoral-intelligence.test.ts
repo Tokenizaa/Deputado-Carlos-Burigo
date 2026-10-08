@@ -16,7 +16,10 @@ vi.mock('../../server/supabase', () => ({
         return chain([
           { year: 2018, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 100000, vote_share: 1.88309968, rank: 10, municipalities_with_votes: 3 },
           { year: 2022, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 200000, vote_share: 3.44773549, rank: 8, municipalities_with_votes: 4 },
-          { year: 2026, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 150000, vote_share: 2.59756885, rank: 9, municipalities_with_votes: 2 },
+          { year: 2026, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 150000, vote_share: 2.59756885, rank: 2, municipalities_with_votes: 2 },
+          { year: 2018, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 90000, vote_share: 1.69, rank: 20, municipalities_with_votes: 3 },
+          { year: 2022, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 250000, vote_share: 4.31, rank: 5, municipalities_with_votes: 4 },
+          { year: 2026, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 220000, vote_share: 3.81, rank: 1, municipalities_with_votes: 3 },
         ]);
       }
 
@@ -31,6 +34,16 @@ vi.mock('../../server/supabase', () => ({
           { year: 2022, municipality_code: 4, candidate_number: 12345, votes: 20000, vote_share: 4, candidate_rank: 3 },
           { year: 2026, municipality_code: 1, candidate_number: 12345, votes: 90000, vote_share: 1, candidate_rank: 1 },
           { year: 2026, municipality_code: 2, candidate_number: 12345, votes: 60000, vote_share: 2, candidate_rank: 2 },
+          { year: 2018, municipality_code: 1, candidate_number: 23456, votes: 40000, vote_share: 1, candidate_rank: 2 },
+          { year: 2018, municipality_code: 2, candidate_number: 23456, votes: 30000, vote_share: 2, candidate_rank: 2 },
+          { year: 2018, municipality_code: 3, candidate_number: 23456, votes: 20000, vote_share: 3, candidate_rank: 1 },
+          { year: 2022, municipality_code: 1, candidate_number: 23456, votes: 90000, vote_share: 1, candidate_rank: 2 },
+          { year: 2022, municipality_code: 2, candidate_number: 23456, votes: 70000, vote_share: 2, candidate_rank: 1 },
+          { year: 2022, municipality_code: 3, candidate_number: 23456, votes: 50000, vote_share: 3, candidate_rank: 1 },
+          { year: 2022, municipality_code: 4, candidate_number: 23456, votes: 40000, vote_share: 4, candidate_rank: 1 },
+          { year: 2026, municipality_code: 1, candidate_number: 23456, votes: 120000, vote_share: 1, candidate_rank: 2 },
+          { year: 2026, municipality_code: 2, candidate_number: 23456, votes: 80000, vote_share: 1, candidate_rank: 1 },
+          { year: 2026, municipality_code: 3, candidate_number: 23456, votes: 20000, vote_share: 3, candidate_rank: 2 },
         ]);
       }
 
@@ -186,6 +199,33 @@ describe('electoral intelligence runtime — overview', () => {
     expect((compare.result as any).municipalities).toHaveLength(2);
 
     for (const id of ['territory.region_strength', 'territory.regional_profile', 'territory.growth_low_base', 'territory.high_base_decline']) {
+      const result = await executeElectoralQuestion(id, { candidate: 12345, year: 2022 });
+      expect(result.status).toBe('insufficient_data');
+      expect(result.result).toBeNull();
+    }
+  });
+
+  it('closes the Competition runtime block and preserves regional insufficiency explicitly', async () => {
+    const implemented = [
+      'competition.top_candidates','competition.candidate_rank','competition.vote_gap','competition.vote_lead',
+      'competition.growth_leaders','competition.growth_losers','competition.local_winners','competition.local_challengers',
+      'competition.overlap','competition.municipal_leaders','competition.candidate_compare','competition.rank_evolution',
+      'competition.vote_share_compare','competition.growth_compare','competition.loss_compare','competition.gain_where_burigo_lost',
+      'competition.loss_where_burigo_gained','competition.dominant_competitor','competition.emerging_competitor',
+      'competition.territorial_overlap','competition.competitive_municipalities','competition.low_competition',
+    ];
+    for (const id of implemented) {
+      const result = await executeElectoralQuestion(id, { candidate: 12345, competitor: 23456, year: 2022, from_year: 2018, to_year: 2026, municipality: [1, 2], limit: 2 });
+      expect(result.status).toBe('ok');
+      expect(result.evidence).toContain('Supabase analytical projection');
+    }
+    const rank = await executeElectoralQuestion('competition.candidate_rank', { candidate: 12345, year: 2026 });
+    expect((rank.result as any).rank).toBe(2);
+    const compare = await executeElectoralQuestion('competition.candidate_compare', { candidate: 12345, competitor: 23456, year: 2022 });
+    expect((compare.result as any).comparison.candidateA).toBe('12345');
+    const overlap = await executeElectoralQuestion('competition.territorial_overlap', { candidate: 12345, competitor: 23456, year: 2026 });
+    expect((overlap.result as any).overlapPct).toBeGreaterThan(0);
+    for (const id of ['competition.territorial_leaders', 'competition.regional_competition']) {
       const result = await executeElectoralQuestion(id, { candidate: 12345, year: 2022 });
       expect(result.status).toBe('insufficient_data');
       expect(result.result).toBeNull();
