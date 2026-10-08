@@ -19,6 +19,7 @@ const keyFor = (module: AdminModule, permission: Permission): string => {
     atuação: 'atuação',
     administração: 'administração',
     configurações: 'configuracoes',
+    'inteligencia-eleitoral': 'inteligencia-eleitoral',
   };
   return `${prefix[module]}.${permission}`;
 };
