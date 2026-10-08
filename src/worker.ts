@@ -291,7 +291,7 @@ if (request.method !== 'POST') return methodNotAllowed();
         .from('electoral_analytics_candidates')
         .select('year,candidate_number,candidate_name,votes,rank')
         .eq('year', year);
-      const { data, error } = /^\\d+$/.test(query)
+      const { data, error } = /^\d+$/.test(query)
         ? await baseQuery.eq('candidate_number', Number(query)).order('candidate_name', { ascending: true }).limit(25)
         : await baseQuery.ilike('candidate_name', `%${query}%`).order('candidate_name', { ascending: true }).limit(25);
       if (error) throw error;
