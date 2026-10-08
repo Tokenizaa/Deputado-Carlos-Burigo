@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { BarChart3, Bot, ChevronRight, Loader2, MessageSquare, Search, ShieldCheck } from 'lucide-react';
+import { BarChart3, Bot, ChevronRight, Download, Loader2, MessageSquare, Mic, Search, ShieldCheck, Volume2 } from 'lucide-react';
+import { buildElectoralCsv, buildElectoralReportHtml, buildElectoralVoiceSummary, canUseSpeechRecognition } from '../../lib/electoral-report';
 
 type Area = 'overview' | 'history' | 'territory' | 'competition';
 type Question = { id: string; area: Area; label: string; prompt: string; needsCompetitor?: boolean };
+type SpeechRecognitionLike = { lang: string; interimResults: boolean; maxAlternatives: number; start: () => void; onstart: (() => void) | null; onerror: (() => void) | null; onend: (() => void) | null; onresult: ((event: { results?: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null };
 type RuntimeResponse = { status: 'ok' | 'pending' | 'insufficient_data' | 'error'; intent?: string; method?: string; function?: string; result?: unknown; evidence?: string[]; limitations?: string[]; error?: string };
 
 const QUESTIONS: Question[] = [
@@ -92,8 +94,70 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [listening, setListening] = useState(false);
 
   const questions = useMemo(() => QUESTIONS.filter(q => q.area === area), [area]);
+
+  const exportCsv = () => {
+    if (!response || response.status !== 'ok') return;
+    const blob = new Blob([buildElectoralCsv(response)], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `inteligencia-eleitoral-${response.intent || 'resultado'}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const printReport = () => {
+    if (!response || response.status !== 'ok') return;
+    const html = buildElectoralReportHtml(response, activeQuestion?.label || 'Relatório eleitoral', activeQuestion?.prompt || 'Análise eleitoral');
+    const reportWindow = window.open('', '_blank', 'noopener,noreferrer,width=1100,height=800');
+    if (!reportWindow) {
+      setMessage('O navegador bloqueou a janela do relatório. Permita pop-ups para gerar o PDF.');
+      return;
+    }
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+    reportWindow.focus();
+    reportWindow.addEventListener('load', () => reportWindow.print(), { once: true });
+  };
+
+  const speakResult = () => {
+    if (!response || response.status !== 'ok' || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(buildElectoralVoiceSummary(response, activeQuestion?.prompt || 'Resultado eleitoral'));
+    utterance.lang = 'pt-BR';
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startVoiceQuestion = () => {
+    if (typeof window === 'undefined') return;
+    const browserWindow = window as Window & { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
+    const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setMessage('Reconhecimento de voz não é suportado neste navegador.');
+      return;
+    }
+    const recognition = new Recognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => { setListening(true); setMessage('Ouvindo…'); };
+    recognition.onerror = () => { setListening(false); setMessage('Não foi possível reconhecer a pergunta por voz.'); };
+    recognition.onend = () => setListening(false);
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript || '';
+      setChatInput(transcript);
+      const question = resolveElectoralQuestion(transcript);
+      if (!question) {
+        setMessage('Não identifiquei a análise. Reformule a pergunta ou escolha uma opção abaixo.');
+        return;
+      }
+      void runQuestion(question);
+    };
+    recognition.start();
+  };
 
   const runQuestion = async (question: Question) => {
     if (!candidate || Number(candidate) <= 0) { setMessage('Informe o número eleitoral do candidato antes de consultar.'); return; }
@@ -129,11 +193,11 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
         <div className="flex items-end text-xs text-stone-500">RS · Deputado Estadual · 1º turno</div>
       </div>
 
-      <form onSubmit={askChat} className="rounded-2xl border border-stone-200 bg-stone-50 p-4"><label className="flex items-center gap-2 text-sm font-bold text-stone-900" htmlFor="electoral-question"><MessageSquare className="h-4 w-4 text-[#00A550]" />Pergunte</label><div className="mt-2 flex gap-2"><input id="electoral-question" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ex.: quais municípios mais cresceram?" className="min-h-11 min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#00A550]" /><button type="submit" className="min-h-11 rounded-lg bg-[#00A550] px-4 text-sm font-bold text-white hover:opacity-90" aria-label="Enviar pergunta"><Search className="h-4 w-4" /></button></div>{message && <p className="mt-2 text-sm text-amber-800" role="status">{message}</p>}</form>
+      <form onSubmit={askChat} className="rounded-2xl border border-stone-200 bg-stone-50 p-4"><label className="flex items-center gap-2 text-sm font-bold text-stone-900" htmlFor="electoral-question"><MessageSquare className="h-4 w-4 text-[#00A550]" />Pergunte</label><div className="mt-2 flex gap-2"><input id="electoral-question" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Ex.: quais municípios mais cresceram?" className="min-h-11 min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#00A550]" /><button type="button" onClick={startVoiceQuestion} disabled={listening || !canUseSpeechRecognition()} className="min-h-11 rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-700 disabled:opacity-40" aria-label="Perguntar por voz" title={canUseSpeechRecognition() ? 'Perguntar por voz' : 'Voz não suportada neste navegador'}><Mic className="h-4 w-4" /></button><button type="submit" className="min-h-11 rounded-lg bg-[#00A550] px-4 text-sm font-bold text-white hover:opacity-90" aria-label="Enviar pergunta"><Search className="h-4 w-4" /></button></div>{message && <p className="mt-2 text-sm text-amber-800" role="status">{message}</p>}</form>
 
       <nav className="flex gap-1 overflow-x-auto border-b border-stone-200" aria-label="Áreas da inteligência eleitoral">{(Object.keys(AREA_LABELS) as Area[]).map(item => <button key={item} type="button" onClick={() => setArea(item)} className={`min-h-12 shrink-0 border-b-2 px-4 text-sm font-bold ${area === item ? 'border-[#00A550] text-[#00A550]' : 'border-transparent text-stone-500 hover:text-stone-900'}`}>{AREA_LABELS[item]}</button>)}</nav>
 
-      <div className="grid gap-5 lg:grid-cols-[320px_1fr]"><div className="space-y-2">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex w-full items-center justify-between rounded-xl border bg-white p-4 text-left transition-colors hover:border-[#00A550] ${activeQuestion?.id === question.id ? 'border-[#00A550] ring-1 ring-[#00A550]' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-[#00A550]" /></button>)}</div><div className="min-h-[320px] rounded-2xl border border-stone-200 bg-white p-5">{loading ? <div className="flex min-h-[280px] items-center justify-center text-sm text-stone-600"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Consultando o runtime eleitoral…</div> : response ? <><div className="mb-5 flex items-start justify-between gap-4 border-b border-stone-100 pb-4"><div><p className="text-xs font-bold uppercase tracking-wider text-[#00A550]">{activeQuestion?.label || 'Análise'}</p><h2 className="mt-1 text-xl font-black text-stone-900">{activeQuestion?.prompt}</h2></div><BarChart3 className="h-5 w-5 text-stone-400" /></div><ResultView response={response} /></> : <div className="flex min-h-[280px] flex-col items-center justify-center text-center"><Bot className="h-8 w-8 text-stone-300" /><h2 className="mt-3 text-lg font-black text-stone-900">Escolha uma análise</h2><p className="mt-1 max-w-md text-sm text-stone-500">O resultado será apresentado aqui sem cálculos no navegador.</p></div>}</div></div>
+      <div className="grid gap-5 lg:grid-cols-[320px_1fr]"><div className="space-y-2">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex w-full items-center justify-between rounded-xl border bg-white p-4 text-left transition-colors hover:border-[#00A550] ${activeQuestion?.id === question.id ? 'border-[#00A550] ring-1 ring-[#00A550]' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-[#00A550]" /></button>)}</div><div className="min-h-[320px] rounded-2xl border border-stone-200 bg-white p-5">{loading ? <div className="flex min-h-[280px] items-center justify-center text-sm text-stone-600"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Consultando o runtime eleitoral…</div> : response ? <><div className="mb-5 flex flex-col gap-3 border-b border-stone-100 pb-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-[#00A550]">{activeQuestion?.label || 'Análise'}</p><h2 className="mt-1 text-xl font-black text-stone-900">{activeQuestion?.prompt}</h2></div><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCsv} disabled={response.status !== 'ok'} className="min-h-10 inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Download className="h-4 w-4" />CSV</button><button type="button" onClick={printReport} disabled={response.status !== 'ok'} className="min-h-10 inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Download className="h-4 w-4" />PDF</button><button type="button" onClick={speakResult} disabled={response.status !== 'ok'} className="min-h-10 inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Volume2 className="h-4 w-4" />Ouvir resumo</button></div></div><ResultView response={response} /></> : <div className="flex min-h-[280px] flex-col items-center justify-center text-center"><Bot className="h-8 w-8 text-stone-300" /><h2 className="mt-3 text-lg font-black text-stone-900">Escolha uma análise</h2><p className="mt-1 max-w-md text-sm text-stone-500">O resultado será apresentado aqui sem cálculos no navegador.</p></div>}</div></div>
     </section>
   );
 };
