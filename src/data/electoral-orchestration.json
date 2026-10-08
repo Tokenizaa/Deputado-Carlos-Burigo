@@ -1,0 +1,3106 @@
+{
+  "version": "1.0.0",
+  "principle": "O orquestrador monta um plano; não calcula.",
+  "stages": [
+    "question",
+    "ontology_resolution",
+    "intent_resolution",
+    "skill_resolution",
+    "method_resolution",
+    "structured_filters",
+    "semantic_retrieval",
+    "evidence_selection",
+    "deterministic_result",
+    "interpretation"
+  ],
+  "plans": [
+    {
+      "question_id": "overview.total_votes",
+      "intent_id": "EA-001",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "totalVotes",
+      "function": "sumVotes",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.state_share",
+      "intent_id": "EA-002",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "voteShare",
+      "function": "shareOfTotal",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.municipalities_with_votes",
+      "intent_id": "EA-003",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "territorialCoverage",
+      "function": "countPositiveMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.best_municipality",
+      "intent_id": "EA-004",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalMaximum",
+      "function": "maxMunicipality",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.worst_municipality",
+      "intent_id": "EA-005",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalMinimumPositive",
+      "function": "minPositiveMunicipality",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.average_votes",
+      "intent_id": "EA-006",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalMean",
+      "function": "averageVotes",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.median_votes",
+      "intent_id": "EA-007",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalMedian",
+      "function": "medianVotes",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.top10_concentration",
+      "intent_id": "EA-008",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "topKMunicipalConcentration",
+      "function": "topKConcentration",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.top20_concentration",
+      "intent_id": "EA-009",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "topKMunicipalConcentration",
+      "function": "topKConcentration",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.municipal_rank",
+      "intent_id": "EA-010",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "candidateRanking",
+      "function": "candidateRank",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.municipal_leads",
+      "intent_id": "EA-011",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalLeadership",
+      "function": "countMunicipalLeads",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.above_average",
+      "intent_id": "EA-012",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "aboveAverage",
+      "function": "municipalitiesAboveAverage",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.below_average",
+      "intent_id": "EA-013",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "belowAverage",
+      "function": "municipalitiesBelowAverage",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.regional_best",
+      "intent_id": "EA-014",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "regionalRanking",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.regional_worst",
+      "intent_id": "EA-015",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "regionalRanking",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.vote_distribution",
+      "intent_id": "EA-016",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "distributionSummary",
+      "function": "distributionSummary",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.territorial_concentration",
+      "intent_id": "EA-017",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "topKMunicipalConcentration",
+      "function": "topKConcentration",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.active_municipalities",
+      "intent_id": "EA-018",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "territorialCoveragePercentage",
+      "function": "coveragePercentage",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.top_contributors",
+      "intent_id": "EA-019",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalRanking",
+      "function": "topContributors",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.low_contributors",
+      "intent_id": "EA-020",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "municipalRanking",
+      "function": "lowContributors",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.participation_average",
+      "intent_id": "EA-021",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "conditionalMean",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.strongest_region",
+      "intent_id": "EA-022",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "regionalStrength",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.attention_region",
+      "intent_id": "EA-023",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "regionalAttention",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.growth_count",
+      "intent_id": "EA-024",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "growthCount",
+      "function": "countGrowingMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "overview.decline_count",
+      "intent_id": "EA-025",
+      "area": "overview",
+      "agent": "electoral-overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ],
+      "method": "declineCount",
+      "function": "countDecliningMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.total_evolution",
+      "intent_id": "EA-026",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "historicalEvolution",
+      "function": "historicalEvolution",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.absolute_change",
+      "intent_id": "EA-027",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "absoluteChange",
+      "function": "absoluteChange",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.percent_change",
+      "intent_id": "EA-028",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "percentChange",
+      "function": "percentChange",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.municipal_growth",
+      "intent_id": "EA-029",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "municipalGrowth",
+      "function": "municipalGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.municipal_decline",
+      "intent_id": "EA-030",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "municipalDecline",
+      "function": "municipalDecline",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.consistent_growth",
+      "intent_id": "EA-031",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "consistentGrowth",
+      "function": "consistentGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.consistent_decline",
+      "intent_id": "EA-032",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "consistentDecline",
+      "function": "consistentDecline",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.reversal",
+      "intent_id": "EA-033",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "trendReversals",
+      "function": "trendReversals",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.new_strengths",
+      "intent_id": "EA-034",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.lost_strengths",
+      "intent_id": "EA-035",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.growth_count",
+      "intent_id": "EA-036",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "countGrowingMunicipalities",
+      "function": "countGrowingMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.decline_count",
+      "intent_id": "EA-037",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "countDecliningMunicipalities",
+      "function": "countDecliningMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.stable_count",
+      "intent_id": "EA-038",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "countStableMunicipalities",
+      "function": "countStableMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.best_gain",
+      "intent_id": "EA-039",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "maxAbsoluteGain",
+      "function": "maxAbsoluteGain",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.best_loss",
+      "intent_id": "EA-040",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "maxAbsoluteLoss",
+      "function": "maxAbsoluteLoss",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.best_percent_gain",
+      "intent_id": "EA-041",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "maxPercentageGain",
+      "function": "maxPercentageGain",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.best_percent_loss",
+      "intent_id": "EA-042",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "maxPercentageLoss",
+      "function": "maxPercentageLoss",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.state_evolution_rank",
+      "intent_id": "EA-043",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "compareCandidateToStateGrowth",
+      "function": "compareCandidateToStateGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.concentration_change",
+      "intent_id": "EA-044",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "concentrationChange",
+      "function": "concentrationChange",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.coverage_change",
+      "intent_id": "EA-045",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "coverageChange",
+      "function": "coverageChange",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.regional_evolution",
+      "intent_id": "EA-046",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.regional_decline",
+      "intent_id": "EA-047",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.trajectory",
+      "intent_id": "EA-048",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "historicalEvolution",
+      "function": "historicalEvolution",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.turning_points",
+      "intent_id": "EA-049",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "history.priority_changes",
+      "intent_id": "EA-050",
+      "area": "history",
+      "agent": "electoral-history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.strongholds",
+      "intent_id": "EA-051",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "territorialStrength",
+      "function": "territorialStrength",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.weakholds",
+      "intent_id": "EA-052",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "territorialWeakness",
+      "function": "territorialWeakness",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.opportunities",
+      "intent_id": "EA-053",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.growing",
+      "intent_id": "EA-054",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "municipalGrowth",
+      "function": "municipalGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.declining",
+      "intent_id": "EA-055",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "municipalDecline",
+      "function": "municipalDecline",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.top_rankings",
+      "intent_id": "EA-056",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "rankByVotes",
+      "function": "rankByVotes",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.low_rankings",
+      "intent_id": "EA-057",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "lowContributors",
+      "function": "lowContributors",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.map_strength",
+      "intent_id": "EA-058",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.map_growth",
+      "intent_id": "EA-059",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.map_decline",
+      "intent_id": "EA-060",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.region_strength",
+      "intent_id": "EA-061",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "regionalStrength",
+      "function": "regionalStrength",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.region_opportunity",
+      "intent_id": "EA-062",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.concentration",
+      "intent_id": "EA-063",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "territoryConcentration",
+      "function": "territoryConcentration",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.dispersion",
+      "intent_id": "EA-064",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "territorialDispersion",
+      "function": "territorialDispersion",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.coverage",
+      "intent_id": "EA-065",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "countPositiveMunicipalities",
+      "function": "countPositiveMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.growth_low_base",
+      "intent_id": "EA-066",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "growthWithLowBase",
+      "function": "growthWithLowBase",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.high_base_decline",
+      "intent_id": "EA-067",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "strongAndDeclining",
+      "function": "strongAndDeclining",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.high_growth",
+      "intent_id": "EA-068",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "highAbsoluteGrowth",
+      "function": "highAbsoluteGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.high_share",
+      "intent_id": "EA-069",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "municipalVoteShare",
+      "function": "municipalVoteShare",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.low_share",
+      "intent_id": "EA-070",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "municipalVoteShare",
+      "function": "municipalVoteShare",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.priority",
+      "intent_id": "EA-071",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.compare",
+      "intent_id": "EA-072",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "compareMunicipalities",
+      "function": "compareMunicipalities",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "territory.regional_profile",
+      "intent_id": "EA-073",
+      "area": "territory",
+      "agent": "electoral-territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ],
+      "method": "regionalStrength",
+      "function": "regionalStrength",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.top_candidates",
+      "intent_id": "EA-074",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateRanking",
+      "function": "rankCandidates",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.candidate_rank",
+      "intent_id": "EA-075",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateRanking",
+      "function": "candidateRank",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.vote_gap",
+      "intent_id": "EA-076",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGap",
+      "function": "candidateGap",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.vote_lead",
+      "intent_id": "EA-077",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGap",
+      "function": "candidateGap",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.growth_leaders",
+      "intent_id": "EA-078",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGrowth",
+      "function": "candidateGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.growth_losers",
+      "intent_id": "EA-079",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGrowth",
+      "function": "candidateGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.local_winners",
+      "intent_id": "EA-080",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "municipalLeadersAgainstCandidate",
+      "function": "municipalLeadersAgainstCandidate",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.local_challengers",
+      "intent_id": "EA-081",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "municipalCompetition",
+      "function": "municipalChallengers",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.overlap",
+      "intent_id": "EA-082",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "territorialOverlap",
+      "function": "territorialOverlap",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.territorial_leaders",
+      "intent_id": "EA-083",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "regionalCompetition",
+      "function": "regionalCompetition",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.municipal_leaders",
+      "intent_id": "EA-084",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "municipalLeadership",
+      "function": "municipalLeaders",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.candidate_compare",
+      "intent_id": "EA-085",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateComparison",
+      "function": "compareCandidates",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.rank_evolution",
+      "intent_id": "EA-086",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "rankEvolution",
+      "function": "candidateRankEvolution",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.vote_share_compare",
+      "intent_id": "EA-087",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateShareRanking",
+      "function": "candidateShareRanking",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.growth_compare",
+      "intent_id": "EA-088",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGrowth",
+      "function": "candidateGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.loss_compare",
+      "intent_id": "EA-089",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGrowth",
+      "function": "candidateGrowth",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.gain_where_burigo_lost",
+      "intent_id": "EA-090",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "comparativeMunicipalOutcome",
+      "function": "comparativeMunicipalOutcome",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.loss_where_burigo_gained",
+      "intent_id": "EA-091",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "comparativeMunicipalOutcome",
+      "function": "comparativeMunicipalOutcome",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.dominant_competitor",
+      "intent_id": "EA-092",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "rankCompetitors",
+      "function": "rankCompetitors",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.emerging_competitor",
+      "intent_id": "EA-093",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "candidateGrowthExcluding",
+      "function": "candidateGrowthExcluding",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.territorial_overlap",
+      "intent_id": "EA-094",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "territorialOverlap",
+      "function": "territorialOverlap",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.competitive_municipalities",
+      "intent_id": "EA-095",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "municipalCompetition",
+      "function": "municipalCompetition",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.low_competition",
+      "intent_id": "EA-096",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "municipalCompetition",
+      "function": "municipalCompetition",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.regional_competition",
+      "intent_id": "EA-097",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "regionalCompetition",
+      "function": "regionalCompetition",
+      "state": "IMPLEMENTADO",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.strategic_competitors",
+      "intent_id": "EA-098",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.competitive_trend",
+      "intent_id": "EA-099",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    },
+    {
+      "question_id": "competition.candidate_context",
+      "intent_id": "EA-100",
+      "area": "competition",
+      "agent": "electoral-competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ],
+      "method": "PENDING",
+      "function": "PENDING",
+      "state": "IMPLEMENTATION_PENDING",
+      "scope": {
+        "office": "Deputado Estadual",
+        "uf": "RS",
+        "round": 1,
+        "years": [
+          2018,
+          2022,
+          2026
+        ]
+      },
+      "evidence": [
+        "TSE",
+        "baselines oficiais validadas"
+      ]
+    }
+  ],
+  "validation": {
+    "before_execution": [
+      "question_id_exists",
+      "intent_exists",
+      "agent_exists",
+      "skill_exists",
+      "method_exists_or_pending",
+      "scope_valid",
+      "denominator_defined_or_null"
+    ],
+    "after_execution": [
+      "result_matches_contract",
+      "evidence_present",
+      "pending_not_executed",
+      "llm_cannot_modify_result"
+    ]
+  },
+  "failure_states": [
+    "UNKNOWN_QUESTION",
+    "AMBIGUOUS_SCOPE",
+    "METHOD_PENDING",
+    "INSUFFICIENT_DATA",
+    "INVALID_DENOMINATOR",
+    "UNSUPPORTED_COMPARISON"
+  ],
+  "output_contract": {
+    "status": "ok|pending|insufficient|error",
+    "question_id": "string",
+    "intent_id": "string",
+    "agent": "string",
+    "skills": "string[]",
+    "method": "string|null",
+    "function": "string|null",
+    "scope": "object",
+    "result": "structured_result|null",
+    "evidence": "array",
+    "limitations": "array"
+  }
+}
