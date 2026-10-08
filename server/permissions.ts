@@ -103,7 +103,8 @@ export async function canEffective(
 ): Promise<boolean> {
   if (role === 'ADMIN') return true;
   const effective = await getEffectivePermissionKeys(userId, role);
-  return effective.has(keyFor(module, permission));
+  const key = keyFor(module, permission);
+  return key ? effective.has(key) : false;
 }
 
 export async function getEffectivePermissions(userId: string, role: string): Promise<EffectivePermission[]> {
