@@ -8,21 +8,57 @@ export type EffectivePermission = {
   enabled: boolean;
 };
 
-const keyFor = (module: AdminModule, permission: Permission): string => {
-  const prefix: Record<AdminModule, string> = {
-    dashboard: 'dashboard',
-    cidadão: 'citizen',
-    agenda: 'agenda',
-    'gestao-documental': 'gestao-documental',
-    conteúdo: 'conteudo',
-    tarefas: 'tarefas',
-    atuação: 'atuação',
-    administração: 'administração',
-    configurações: 'configuracoes',
-    'inteligencia-eleitoral': 'inteligencia-eleitoral',
-  };
-  return `${prefix[module]}.${permission}`;
+const PERMISSION_KEYS: Record<AdminModule, Partial<Record<Permission, string>>> = {
+  dashboard: { view: 'dashboard.view' },
+  'inteligencia-eleitoral': { view: 'inteligencia-eleitoral.view' },
+  cidadão: {
+    view: 'citizen.view',
+    create: 'citizen.create',
+    edit: 'citizen.edit',
+    assign: 'citizen.assign',
+    reply: 'citizen.reply',
+  },
+  agenda: {
+    view: 'agenda.view',
+    create: 'agenda.create',
+    edit: 'agenda.edit',
+    delete: 'agenda.delete',
+  },
+  'gestao-documental': {
+    view: 'documents.view',
+    create: 'documents.create',
+    edit: 'documents.edit',
+    delete: 'documents.delete',
+  },
+  conteúdo: {
+    view: 'content.view',
+    create: 'content.create',
+    edit: 'content.edit',
+    publish: 'content.publish',
+    delete: 'content.delete',
+  },
+  tarefas: {
+    view: 'tasks.view',
+    create: 'tasks.create',
+    edit: 'tasks.edit',
+  },
+  atuação: {
+    view: 'activity.view',
+    create: 'activity.create',
+    edit: 'activity.edit',
+    publish: 'activity.publish',
+  },
+  administração: {
+    manage_users: 'users.manage',
+    view_audit: 'audit.view',
+  },
+  configurações: {
+    manage_settings: 'settings.manage',
+  },
 };
+
+const keyFor = (module: AdminModule, permission: Permission): string | undefined =>
+  PERMISSION_KEYS[module][permission];
 
 export function resolveEffectivePermissionKeys(
   defaults: Array<{ permission_key: string; enabled: boolean }>,
