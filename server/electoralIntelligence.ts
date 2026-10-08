@@ -1,6 +1,6 @@
 import { supabaseAdmin } from './supabase';
 import orchestration from '../src/data/electoral-orchestration.json';
-import { countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities } from '../src/lib/electoral-analytics';
+import { countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
 
 const plans = new Map(orchestration.plans.map((plan) => [plan.question_id, plan]));
 
@@ -54,6 +54,13 @@ const RUNTIME_IMPLEMENTED = new Set([
   'territory.low_share',
   'territory.compare',
   'territory.regional_profile',
+  'competition.top_candidates', 'competition.candidate_rank', 'competition.vote_gap', 'competition.vote_lead',
+  'competition.growth_leaders', 'competition.growth_losers', 'competition.local_winners', 'competition.local_challengers',
+  'competition.overlap', 'competition.territorial_leaders', 'competition.municipal_leaders', 'competition.candidate_compare',
+  'competition.rank_evolution', 'competition.vote_share_compare', 'competition.growth_compare', 'competition.loss_compare',
+  'competition.gain_where_burigo_lost', 'competition.loss_where_burigo_gained', 'competition.dominant_competitor',
+  'competition.emerging_competitor', 'competition.territorial_overlap', 'competition.competitive_municipalities',
+  'competition.low_competition', 'competition.regional_competition',
 ]);
 
 type ElectoralResponse = {
@@ -80,6 +87,7 @@ export interface ElectoralQuestionParams {
   from_year?: number;
   to_year?: number;
   candidate?: number | string;
+  competitor?: number | string;
   municipality?: number | number[];
   limit?: number;
 }
@@ -458,6 +466,98 @@ export async function executeElectoralQuestion(
       evidence: [...plan.evidence, 'Supabase analytical projection'],
       limitations: ['Indicadores territoriais usam exclusivamente a projeção analítica publicada no Supabase. Questões regionais permanecem condicionadas à existência de uma dimensão regional explícita.'],
     };
+  }
+
+  if (questionId.startsWith('competition.')) {
+    const candidateNumber = Number(params.candidate);
+    if (!Number.isInteger(candidateNumber) || candidateNumber <= 0) {
+      throw new Error(`candidate é obrigatório para executar ${questionId}.`);
+    }
+    if (questionId === 'competition.territorial_leaders' || questionId === 'competition.regional_competition') {
+      return {
+        status: 'insufficient_data', question: questionId, intent: plan.intent_id, agent: plan.agent,
+        skills: plan.skills, method: plan.method, function: plan.function,
+        scope: { office: 'Deputado Estadual', uf: 'RS', round: 1, years: [2018, 2022, 2026] }, result: null,
+        evidence: [...plan.evidence, 'Supabase analytical projection'],
+        limitations: ['A projeção analítica atual não possui dimensão regional por município; o runtime não inventa regiões.'],
+      };
+    }
+    const { data: candidateRows, error: candidateError } = await supabaseAdmin
+      .from('electoral_analytics_candidates')
+      .select('year,candidate_number,candidate_name,votes,vote_share,rank,municipalities_with_votes')
+      .order('year', { ascending: true });
+    if (candidateError) throw candidateError;
+    const { data: municipalRows, error: municipalError } = await supabaseAdmin
+      .from('electoral_analytics_candidate_municipal')
+      .select('year,municipality_code,candidate_number,votes,vote_share,candidate_rank')
+      .order('year', { ascending: true });
+    if (municipalError) throw municipalError;
+    const allCandidates = (candidateRows ?? []).map(r => ({ candidateId: String(r.candidate_number), votes: Number(r.votes), candidateName: r.candidate_name, year: Number(r.year), voteShare: Number(r.vote_share), rank: Number(r.rank) }));
+    const allMunicipal = (municipalRows ?? []).map(r => ({ year: Number(r.year) as 2018 | 2022 | 2026, municipality: Number(r.municipality_code), candidateId: String(r.candidate_number), votes_nominal: Number(r.votes) }));
+    const year = [2018, 2022, 2026].includes(Number(params.year)) ? Number(params.year) : 2026;
+    const fromYear = Number(params.from_year) || 2018;
+    const toYear = Number(params.to_year) || 2026;
+    const limit = Number.isInteger(params.limit) && Number(params.limit) > 0 ? Number(params.limit) : 10;
+    const target = String(candidateNumber);
+    const competitor = params.competitor != null ? String(params.competitor) : null;
+    const candidatesAt = (y: number) => allCandidates.filter(r => r.year === y).map(r => ({ candidateId: r.candidateId, votes: r.votes }));
+    const municipalAt = (y: number) => allMunicipal.filter(r => r.year === y);
+    const targetRows = candidatesAt(year);
+    const fromCandidates = candidatesAt(fromYear);
+    const toCandidates = candidatesAt(toYear);
+    const municipalCurrent = municipalAt(year);
+    const municipalFrom = municipalAt(fromYear);
+    const municipalTo = municipalAt(toYear);
+    let result: unknown;
+    switch (questionId) {
+      case 'competition.top_candidates': result = { year, candidates: rankCandidates(targetRows).slice(0, limit) }; break;
+      case 'competition.candidate_rank': result = { year, candidate: candidateNumber, rank: candidateRank(targetRows, target) }; break;
+      case 'competition.vote_gap': case 'competition.vote_lead': {
+        const gap = candidateGap(targetRows, target); result = { year, candidate: candidateNumber, ...(gap ?? { rank: null, votes: null, above: null, below: null, gapAbove: null, leadBelow: null }) }; break;
+      }
+      case 'competition.growth_leaders': result = { fromYear, toYear, candidates: candidateGrowth(fromCandidates, toCandidates, limit) }; break;
+      case 'competition.growth_losers': result = { fromYear, toYear, candidates: candidateGrowth(fromCandidates, toCandidates, toCandidates.length).filter(x => x.absoluteChange < 0).sort((a,b) => a.absoluteChange - b.absoluteChange).slice(0, limit) }; break;
+      case 'competition.local_winners': result = { year, municipalities: municipalLeadersAgainstCandidate(municipalCurrent, target, limit) }; break;
+      case 'competition.local_challengers': result = { year, candidate: candidateNumber, candidates: municipalChallengers(municipalCurrent, target, limit) }; break;
+      case 'competition.overlap': {
+        const competitors = [...new Set(municipalCurrent.map(r => r.candidateId).filter(id => id !== target))];
+        result = { year, candidate: candidateNumber, competitors: competitors.map(id => ({ candidateId: id, overlapPct: territorialOverlap(municipalCurrent, target, id) })).sort((a,b) => (b.overlapPct ?? -1) - (a.overlapPct ?? -1)).slice(0, limit) }; break;
+      }
+      case 'competition.municipal_leaders': {
+        const requested = Array.isArray(params.municipality) ? params.municipality : (params.municipality != null ? [params.municipality] : []);
+        const leaders = municipalLeaders(municipalCurrent).filter(x => requested.length === 0 || requested.includes(x.municipality));
+        result = { year, municipalities: leaders.slice(0, limit) }; break;
+      }
+      case 'competition.candidate_compare': {
+        if (!competitor || competitor === target) throw new Error('competitor é obrigatório e deve ser diferente de candidate para competition.candidate_compare.');
+        result = { year, comparison: compareCandidates(targetRows, target, competitor) }; break;
+      }
+      case 'competition.rank_evolution': {
+        const yearlyRows = ([2018, 2022, 2026] as const).map(y => ({ year: y, rows: candidatesAt(y) }));
+        result = { candidate: candidateNumber, evolution: candidateRankEvolution(yearlyRows, target) }; break;
+      }
+      case 'competition.vote_share_compare': result = { year, candidates: candidateShareRanking(targetRows).slice(0, limit) }; break;
+      case 'competition.growth_compare': result = { fromYear, toYear, candidates: candidateGrowth(fromCandidates, toCandidates, limit) }; break;
+      case 'competition.loss_compare': result = { fromYear, toYear, candidates: candidateGrowth(fromCandidates, toCandidates, toCandidates.length).filter(x => x.absoluteChange < 0).sort((a,b) => a.absoluteChange - b.absoluteChange).slice(0, limit) }; break;
+      case 'competition.gain_where_burigo_lost': {
+        const outcomes = comparativeMunicipalOutcome(municipalFrom, municipalTo, target, limit * 5).filter(x => x.candidateChange < 0).sort((a,b) => (b.competitorChanges[0]?.absoluteChange ?? 0) - (a.competitorChanges[0]?.absoluteChange ?? 0));
+        result = { fromYear, toYear, municipalities: outcomes.slice(0, limit) }; break;
+      }
+      case 'competition.loss_where_burigo_gained': {
+        const outcomes = comparativeMunicipalOutcome(municipalFrom, municipalTo, target, limit * 5).filter(x => x.candidateChange > 0).sort((a,b) => (b.candidateChange - a.candidateChange));
+        result = { fromYear, toYear, municipalities: outcomes.slice(0, limit) }; break;
+      }
+      case 'competition.dominant_competitor': result = { year, candidate: candidateNumber, competitors: rankCompetitors(targetRows, target, limit) }; break;
+      case 'competition.emerging_competitor': result = { fromYear, toYear, competitors: candidateGrowthExcluding(fromCandidates, toCandidates, target, limit) }; break;
+      case 'competition.territorial_overlap': {
+        if (!competitor || competitor === target) throw new Error('competitor é obrigatório e deve ser diferente de candidate para competition.territorial_overlap.');
+        result = { year, candidate: candidateNumber, competitor: Number(competitor), overlapPct: territorialOverlap(municipalCurrent, target, competitor) }; break;
+      }
+      case 'competition.competitive_municipalities': result = { year, municipalities: municipalCompetition(municipalCurrent, limit, false) }; break;
+      case 'competition.low_competition': result = { year, municipalities: municipalCompetition(municipalCurrent, limit, true) }; break;
+      default: throw new Error('Intent de competição está implementado no catálogo, mas ainda não está disponível no runtime.');
+    }
+    return { status: 'ok', question: questionId, intent: plan.intent_id, agent: plan.agent, skills: plan.skills, method: plan.method, function: plan.function, scope: { office: 'Deputado Estadual', uf: 'RS', round: 1, years: [2018, 2022, 2026] }, result, evidence: [...plan.evidence, 'Supabase analytical projection'], limitations: ['Indicadores de competição usam a projeção analítica publicada no Supabase. Comparações entre candidatos exigem competitor quando a pergunta define um concorrente específico.'] };
   }
 
   const { data, error } = await supabaseAdmin
