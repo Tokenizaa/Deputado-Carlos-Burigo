@@ -110,7 +110,7 @@ const MainAppContent: React.FC = () => {
         {currentView === 'home' && <HomeView />}
         {currentView === 'sobre' && <AboutView />}
         {currentView === 'trajetoria' && <TrajectoryView />}
-        {currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="visao-geral" />}
+        {currentView === 'atuacao' && <ActionsAndProjectsSection initialSubTab="projetos" />}
         {currentView === 'projetos' && <ActionsAndProjectsSection initialSubTab="projetos" />}
         {currentView === 'votacoes' && <ActionsAndProjectsSection initialSubTab="votacoes" />}
         {currentView === 'documentos' && <ActionsAndProjectsSection initialSubTab="documentos" />}
