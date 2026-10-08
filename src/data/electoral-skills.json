@@ -1,0 +1,1581 @@
+{
+  "version": "1.0.0",
+  "scope": {
+    "office": "Deputado Estadual",
+    "uf": "RS",
+    "years": [
+      2018,
+      2022,
+      2026
+    ],
+    "round": 1
+  },
+  "principle": "Uma skill representa uma capacidade analítica reutilizável; nenhuma skill é criada por pergunta.",
+  "skills": [
+    {
+      "id": "vote-share",
+      "objective": "Participação relativa segundo denominador explícito",
+      "function_refs": [
+        "shareOfTotal"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "ranking",
+      "objective": "Ordenação de unidades por métrica",
+      "function_refs": [
+        "rankByVotes",
+        "candidateRank",
+        "rankCandidates"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "distribution-summary",
+      "objective": "Resumo de distribuição de votos",
+      "function_refs": [
+        "distributionSummary"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "historical-comparison",
+      "objective": "Comparação entre eleições compatíveis",
+      "function_refs": [
+        "historicalEvolution",
+        "compareMunicipalHistory"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "growth-rate",
+      "objective": "Variação percentual",
+      "function_refs": [
+        "variationPct",
+        "percentChange",
+        "candidateGrowth"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "trend-analysis",
+      "objective": "Análise descritiva de trajetórias e reversões",
+      "function_refs": [
+        "trendReversals",
+        "consistentGrowth",
+        "consistentDecline"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "stability-analysis",
+      "objective": "Estabilidade relativa dentro de tolerância definida",
+      "function_refs": [
+        "countStableMunicipalities"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "volatility-analysis",
+      "objective": "Mudança entre períodos com definição metodológica explícita",
+      "function_refs": [
+        "PENDING"
+      ],
+      "status": "SUPPORTING_PENDING",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "comparability-check",
+      "objective": "Validação de compatibilidade entre observações",
+      "function_refs": [
+        "PENDING"
+      ],
+      "status": "SUPPORTING_PENDING",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "municipal-ranking",
+      "objective": "Ranking municipal",
+      "function_refs": [
+        "rankByVotes",
+        "municipalRank"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "territorial-strength",
+      "objective": "Desempenho territorial relativo",
+      "function_refs": [
+        "territorialStrength"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "territorial-dependence",
+      "objective": "Dependência do resultado em determinados territórios",
+      "function_refs": [
+        "PENDING"
+      ],
+      "status": "SUPPORTING_PENDING",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "territorial-concentration",
+      "objective": "Concentração dos votos por território",
+      "function_refs": [
+        "topKConcentration",
+        "territoryConcentration"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "territorial-distribution",
+      "objective": "Distribuição e cobertura territorial",
+      "function_refs": [
+        "territorialDispersion",
+        "regionalTotals",
+        "regionalStrength"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "competition-margin",
+      "objective": "Margem entre competidores",
+      "function_refs": [
+        "competitionMargin",
+        "candidateGap"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "competition-analysis",
+      "objective": "Análise competitiva por método declarado",
+      "function_refs": [
+        "municipalCompetition",
+        "regionalCompetition",
+        "territorialOverlap"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "concentration-analysis",
+      "objective": "Concentração por Top-K ou método formalizado",
+      "function_refs": [
+        "topKConcentration"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "fragmentation-analysis",
+      "objective": "Fragmentação da distribuição",
+      "function_refs": [
+        "fragmentationIndex"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    },
+    {
+      "id": "effective-number",
+      "objective": "Número efetivo de competidores",
+      "function_refs": [
+        "effectiveNumberOfCandidates"
+      ],
+      "status": "CANONICAL",
+      "output": [
+        "intent",
+        "skill",
+        "method",
+        "parameters",
+        "scope",
+        "inputs",
+        "result",
+        "unit",
+        "denominator",
+        "limitations",
+        "evidence"
+      ]
+    }
+  ],
+  "intent_mapping": [
+    {
+      "pergunta_id": "overview.total_votes",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.state_share",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.municipalities_with_votes",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.best_municipality",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.worst_municipality",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.average_votes",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.median_votes",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.top10_concentration",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.top20_concentration",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.municipal_rank",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.municipal_leads",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.above_average",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.below_average",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.regional_best",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.regional_worst",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.vote_distribution",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.territorial_concentration",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.active_municipalities",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.top_contributors",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.low_contributors",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.participation_average",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.strongest_region",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.attention_region",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.growth_count",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "overview.decline_count",
+      "area": "overview",
+      "skills": [
+        "vote-share",
+        "ranking",
+        "distribution-summary",
+        "historical-comparison"
+      ]
+    },
+    {
+      "pergunta_id": "history.total_evolution",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.absolute_change",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.percent_change",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.municipal_growth",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.municipal_decline",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.consistent_growth",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.consistent_decline",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.reversal",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.new_strengths",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.lost_strengths",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.growth_count",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.decline_count",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.stable_count",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.best_gain",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.best_loss",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.best_percent_gain",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.best_percent_loss",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.state_evolution_rank",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.concentration_change",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.coverage_change",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.regional_evolution",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.regional_decline",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.trajectory",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.turning_points",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "history.priority_changes",
+      "area": "history",
+      "skills": [
+        "historical-comparison",
+        "growth-rate",
+        "trend-analysis",
+        "stability-analysis",
+        "volatility-analysis",
+        "comparability-check"
+      ]
+    },
+    {
+      "pergunta_id": "territory.strongholds",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.weakholds",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.opportunities",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.growing",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.declining",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.top_rankings",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.low_rankings",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.map_strength",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.map_growth",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.map_decline",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.region_strength",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.region_opportunity",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.concentration",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.dispersion",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.coverage",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.growth_low_base",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.high_base_decline",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.high_growth",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.high_share",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.low_share",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.priority",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.compare",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "territory.regional_profile",
+      "area": "territory",
+      "skills": [
+        "municipal-ranking",
+        "territorial-strength",
+        "territorial-dependence",
+        "territorial-concentration",
+        "territorial-distribution",
+        "growth-rate"
+      ]
+    },
+    {
+      "pergunta_id": "competition.top_candidates",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.candidate_rank",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.vote_gap",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.vote_lead",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.growth_leaders",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.growth_losers",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.local_winners",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.local_challengers",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.overlap",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.territorial_leaders",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.municipal_leaders",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.candidate_compare",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.rank_evolution",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.vote_share_compare",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.growth_compare",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.loss_compare",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.gain_where_burigo_lost",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.loss_where_burigo_gained",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.dominant_competitor",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.emerging_competitor",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.territorial_overlap",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.competitive_municipalities",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.low_competition",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.regional_competition",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.strategic_competitors",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.competitive_trend",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    },
+    {
+      "pergunta_id": "competition.candidate_context",
+      "area": "competition",
+      "skills": [
+        "competition-margin",
+        "competition-analysis",
+        "concentration-analysis",
+        "fragmentation-analysis",
+        "effective-number",
+        "ranking"
+      ]
+    }
+  ]
+}
