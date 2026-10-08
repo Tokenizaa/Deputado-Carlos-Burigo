@@ -265,9 +265,9 @@ describe('electoral intelligence runtime — overview', () => {
   });
 
   it('does not calculate implementation-pending questions', async () => {
-    const result = await executeElectoralQuestion('overview.regional_best');
+    const result = await executeElectoralQuestion('territory.region_opportunity');
     expect(result.status).toBe('pending');
-    expect(result.intent).toBe('EA-014');
+    expect(result.intent).toBe('EA-062');
     expect(result.result).toBeNull();
     expect(result.function).toBe('PENDING');
   });
