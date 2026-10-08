@@ -243,3 +243,7 @@ Evidência local de 2026-09-22: lint sem erros; typecheck sem erros; build concl
 Observação: o ambiente local reportou 6 vulnerabilidades de dependências e um aviso de chunks acima de 500 kB no build. Nenhum deles causou falha da validação de Open Graph e nenhum foi alterado nesta fase.
 
 **Próximo passo:** FASE 5 — VALIDAÇÃO REAL EM PRODUÇÃO E ENCERRAMENTO.
+
+## Atualização 2026-10-08 — UX e refatoração da Inteligência Eleitoral
+
+O contrato visual está em `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md`; a decisão arquitetural está em ADR-0004. A auditoria do frontend pode iniciar imediatamente. O trabalho é limitado a cinco fases: (1) auditoria/contrato, (2) fundação/seletor, (3) dashboard analítico, (4) chat/relatórios, (5) validação/entrega. Agrupar tarefas relacionadas; evitar microfases. Toda fase precisa de testes, evidências, commit e integração em main, sem branches concluídas abandonadas. Dashboard funcional e insights ligados aos dados permanecem condicionados aos gates de cobertura eleitoral, incluindo IE-03.7. Não mascarar lacunas com dados simulados.
