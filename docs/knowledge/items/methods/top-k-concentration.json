@@ -1,0 +1,28 @@
+{
+  "id": "top-k-concentration",
+  "type": "method",
+  "title": "Concentração Top-K",
+  "concept": "concentration",
+  "definition": "Parcela do resultado concentrada nas K maiores unidades ordenadas pela métrica.",
+  "method": "topKConcentration",
+  "formula": "sum(top K) / total * 100",
+  "inputs": [
+    "rows",
+    "k"
+  ],
+  "assumptions": [
+    "unidades são ordenáveis pela mesma métrica"
+  ],
+  "limitations": [
+    "ignora a distribuição fora do Top-K"
+  ],
+  "interpretation": "Quanto maior o percentual, maior a concentração do resultado no subconjunto superior.",
+  "related_concepts": [
+    "territorial_dependence",
+    "rank"
+  ],
+  "source_ids": [
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}
