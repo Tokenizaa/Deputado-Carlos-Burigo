@@ -539,12 +539,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalRanking",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -557,7 +557,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-015",
@@ -578,12 +579,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalRanking",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -596,7 +597,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-016",
@@ -815,10 +817,10 @@
         "municipality"
       ],
       "metodo": "conditionalMean",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "averageVotesWherePositive",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
       "saida": "number",
-      "unidade": "percentual",
+      "unidade": "votos_por_municipio",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
@@ -830,7 +832,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO"
     },
     {
       "id": "EA-022",
@@ -851,12 +853,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalStrength",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "regionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -869,7 +871,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-023",
@@ -890,12 +893,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalAttention",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -908,7 +911,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-024",
@@ -1315,7 +1319,7 @@
       "pergunta_id": "history.new_strengths",
       "pergunta": "Quais territórios se tornaram relevantes no período?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "newTerritorialStrength",
       "parametros": [
         "year",
         "from_year",
@@ -1331,7 +1335,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "newTerritorialStrength",
       "funcao_analitica": "PENDING",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
@@ -1347,7 +1351,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-035",
@@ -1356,7 +1361,7 @@
       "pergunta_id": "history.lost_strengths",
       "pergunta": "Quais territórios perderam relevância?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "lostTerritorialStrength",
       "parametros": [
         "year",
         "from_year",
@@ -1372,7 +1377,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "lostTerritorialStrength",
       "funcao_analitica": "PENDING",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
@@ -1388,7 +1393,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-036",
@@ -1797,7 +1803,7 @@
       "pergunta_id": "history.regional_evolution",
       "pergunta": "Quais regiões mais cresceram?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "regionalEvolution",
       "parametros": [
         "year",
         "from_year",
@@ -1813,11 +1819,11 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
-      "funcao_analitica": "PENDING",
+      "metodo": "regionalEvolution",
+      "funcao_analitica": "regionalEvolution",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
-      "unidade": "a definir",
+      "unidade": "regiao",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
@@ -1829,7 +1835,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-047",
@@ -1838,7 +1845,7 @@
       "pergunta_id": "history.regional_decline",
       "pergunta": "Quais regiões mais perderam?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "regionalDecline",
       "parametros": [
         "year",
         "from_year",
@@ -1854,11 +1861,11 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
-      "funcao_analitica": "PENDING",
+      "metodo": "regionalDecline",
+      "funcao_analitica": "regionalEvolution",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
-      "unidade": "a definir",
+      "unidade": "regiao",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
@@ -1870,7 +1877,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-048",
@@ -1919,7 +1927,7 @@
       "pergunta_id": "history.turning_points",
       "pergunta": "Quais foram os principais pontos de mudança territorial?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "territorialTurningPoints",
       "parametros": [
         "year",
         "from_year",
@@ -1935,7 +1943,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "territorialTurningPoints",
       "funcao_analitica": "PENDING",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
@@ -1951,7 +1959,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-050",
@@ -1960,7 +1969,7 @@
       "pergunta_id": "history.priority_changes",
       "pergunta": "Quais territórios mudaram de prioridade com a evolução histórica?",
       "objetivo_analitico": "Responder à pergunta com indicador histórico determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "priorityChange",
       "parametros": [
         "year",
         "from_year",
@@ -1976,7 +1985,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "priorityChange",
       "funcao_analitica": "PENDING",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
@@ -1992,7 +2001,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-051",
@@ -2083,7 +2093,7 @@
       "pergunta_id": "territory.opportunities",
       "pergunta": "Quais municípios apresentam oportunidade territorial?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "opportunityIndex",
       "parametros": [
         "year",
         "from_year",
@@ -2099,7 +2109,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "opportunityIndex",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2115,7 +2125,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-054",
@@ -2288,7 +2299,7 @@
       "pergunta_id": "territory.map_strength",
       "pergunta": "Como a força territorial está distribuída no mapa?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "territorialMap",
       "parametros": [
         "year",
         "from_year",
@@ -2304,7 +2315,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "territorialMap",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2320,7 +2331,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-059",
@@ -2329,7 +2341,7 @@
       "pergunta_id": "territory.map_growth",
       "pergunta": "Onde estão os maiores crescimentos no mapa?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "territorialMap",
       "parametros": [
         "year",
         "from_year",
@@ -2345,7 +2357,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "territorialMap",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2361,7 +2373,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-060",
@@ -2370,7 +2383,7 @@
       "pergunta_id": "territory.map_decline",
       "pergunta": "Onde estão as maiores quedas no mapa?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "territorialMap",
       "parametros": [
         "year",
         "from_year",
@@ -2386,7 +2399,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "territorialMap",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2402,7 +2415,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-061",
@@ -2452,7 +2466,7 @@
       "pergunta_id": "territory.region_opportunity",
       "pergunta": "Quais regiões concentram maior oportunidade?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "regionalOpportunity",
       "parametros": [
         "year",
         "from_year",
@@ -2468,7 +2482,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "regionalOpportunity",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2484,7 +2498,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-063",
@@ -2821,7 +2836,7 @@
       "pergunta_id": "territory.priority",
       "pergunta": "Quais municípios deveriam ser priorizados segundo os indicadores definidos?",
       "objetivo_analitico": "Responder à pergunta territorial com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "priorityIndex",
       "parametros": [
         "year",
         "from_year",
@@ -2837,7 +2852,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "priorityIndex",
       "funcao_analitica": "PENDING",
       "entrada": "dados territoriais",
       "saida": "object",
@@ -2853,7 +2868,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-072",
@@ -3952,7 +3968,7 @@
       "pergunta_id": "competition.strategic_competitors",
       "pergunta": "Quais concorrentes merecem acompanhamento prioritário?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "strategicCompetitorRanking",
       "parametros": [
         "year",
         "from_year",
@@ -3969,7 +3985,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "strategicCompetitorRanking",
       "funcao_analitica": "PENDING",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
@@ -3985,7 +4001,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-099",
@@ -3994,7 +4011,7 @@
       "pergunta_id": "competition.competitive_trend",
       "pergunta": "A pressão competitiva aumentou ou diminuiu?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "competitiveTrend",
       "parametros": [
         "year",
         "from_year",
@@ -4011,7 +4028,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "competitiveTrend",
       "funcao_analitica": "PENDING",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
@@ -4027,7 +4044,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "id": "EA-100",
@@ -4036,7 +4054,7 @@
       "pergunta_id": "competition.candidate_context",
       "pergunta": "Qual é o contexto competitivo do candidato no período analisado?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "PENDING",
+      "intent": "candidateCompetitiveContext",
       "parametros": [
         "year",
         "from_year",
@@ -4053,7 +4071,7 @@
         "municipality",
         "region"
       ],
-      "metodo": "PENDING",
+      "metodo": "candidateCompetitiveContext",
       "funcao_analitica": "PENDING",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
@@ -4069,7 +4087,8 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTATION_PENDING",
+      "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     }
   ]
 }

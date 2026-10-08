@@ -77,6 +77,7 @@ import type { User, UserRole } from '../src/types';
 import type { AdminModule, Permission } from '../src/config/adminPermissions';
 import { getEffectivePermissions, canEffective } from '../server/permissions';
 import { validatePassword } from './lib/passwordValidation';
+import { executeElectoralQuestion } from '../server/electoralIntelligence';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -267,6 +268,29 @@ if (request.method !== 'POST') return methodNotAllowed();
     } catch (error) {
       console.error('[api/auth/me]', error);
       return Response.json({ error: 'Falha ao obter informações do usuário' }, { status: 500 });
+    }
+  },
+  '/api/admin/electoral/intelligence': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'dashboard', 'view'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    if (request.method !== 'POST') return methodNotAllowed();
+
+    try {
+      const body = await request.json();
+      const questionId = typeof body?.questionId === 'string' ? body.questionId.trim() : '';
+      if (!questionId) return Response.json({ error: 'questionId é obrigatório.' }, { status: 400 });
+
+      const params = body?.params && typeof body.params === 'object' && !Array.isArray(body.params) ? body.params : {};
+      const result = await executeElectoralQuestion(questionId, params);
+      return Response.json(result);
+    } catch (error) {
+      console.error('[api/admin/electoral/intelligence]', error);
+      const message = error?.message || 'Falha ao executar inteligência eleitoral.';
+      const status = message.includes('ainda não está disponível') ? 422 : 500;
+      return Response.json({ error: message }, { status });
     }
   },
   '/api/health': async (request) => {

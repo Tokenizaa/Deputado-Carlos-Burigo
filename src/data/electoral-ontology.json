@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "scope": {
     "office": "Deputado Estadual",
     "uf": "RS",
@@ -32,7 +32,9 @@
     "municipality",
     "region",
     "metric",
-    "method"
+    "method",
+    "region_type",
+    "region_code"
   ],
   "metrics": {
     "votes": {
@@ -93,6 +95,26 @@
     "competition": {
       "unit": "method_dependent",
       "type": "category"
+    },
+    "regional_strength": {
+      "unit": "relative_performance",
+      "type": "derived",
+      "method": "regional_vote_share_vs_state_vote_share"
+    },
+    "opportunity_index": {
+      "unit": "index_0_100",
+      "type": "derived",
+      "method": "transparent_composite"
+    },
+    "priority_index": {
+      "unit": "index_0_100",
+      "type": "derived",
+      "method": "transparent_composite"
+    },
+    "competitive_pressure": {
+      "unit": "percent",
+      "type": "derived",
+      "method": "second_place_share_of_leader"
     }
   },
   "competition_methods": [
@@ -115,6 +137,22 @@
     "municipality_is_not_zone",
     "undefined_denominator_is_null",
     "llm_cannot_redefine_canonical_formula",
-    "pending_when_method_is_not_formalized"
-  ]
+    "pending_when_method_is_not_formalized",
+    "region_must_use_canonical_ibge_mapping",
+    "region_mapping_version_must_be_declared",
+    "composite_indices_require_explicit_components_and_weights",
+    "descriptive_indices_do_not_imply_causal_or_prescriptive_conclusions"
+  ],
+  "region_reference": {
+    "canonical_type": "IBGE_RGI",
+    "label": "Região Geográfica Imediata",
+    "geographic_source": "IBGE",
+    "assignment_key": "municipality_ibge_code",
+    "rule": "cada município do RS pertence a uma única RGI na versão geográfica adotada",
+    "temporal_reference": "versão da divisão geográfica explicitamente registrada no dataset",
+    "source_ids": [
+      "IBGE_QGREF",
+      "IBGE_MALHA_MUNICIPAL"
+    ]
+  }
 }

@@ -22,6 +22,88 @@ export const BASELINES: Record<Year, { votes: number; municipalities: number; ro
   2026: { votes: 5774628, municipalities: 497, rows: 94055 },
 };
 
+
+export interface RegionalVoteRow {
+  region: string;
+  votes_nominal: number;
+}
+
+export interface RegionalStrengthRow {
+  region: string;
+  candidateVotes: number;
+  regionVotes: number;
+  candidateSharePct: number | null;
+  stateSharePct: number | null;
+  strengthRatio: number | null;
+}
+
+export interface RegionalChangeRow {
+  region: string;
+  fromVotes: number;
+  toVotes: number;
+  absoluteChange: number;
+  percentageChange: number | null;
+}
+
+export function aggregateRegionalVotes(
+  rows: MunicipalVoteRow[],
+  municipalityToRegion: Map<number, string>,
+): RegionalVoteRow[] {
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    const region = municipalityToRegion.get(row.municipality);
+    if (!region) continue;
+    totals.set(region, (totals.get(region) ?? 0) + row.votes_nominal);
+  }
+  return [...totals.entries()].map(([region, votes_nominal]) => ({ region, votes_nominal }));
+}
+
+export function regionalStrength(
+  candidateRows: MunicipalVoteRow[],
+  stateCandidateVotes: number,
+  regionTotals: RegionalVoteRow[],
+  stateTotalVotes: number,
+  municipalityToRegion: Map<number, string>,
+): RegionalStrengthRow[] {
+  const candidateByRegion = new Map(aggregateRegionalVotes(candidateRows, municipalityToRegion).map(row => [row.region, row.votes_nominal]));
+  const candidateStateShare = shareOfTotal(stateCandidateVotes, stateTotalVotes);
+  return regionTotals.map(region => {
+    const candidateVotes = candidateByRegion.get(region.region) ?? 0;
+    const candidateSharePct = shareOfTotal(candidateVotes, region.votes_nominal);
+    return {
+      region: region.region,
+      candidateVotes,
+      regionVotes: region.votes_nominal,
+      candidateSharePct,
+      stateSharePct: candidateStateShare,
+      strengthRatio: candidateSharePct === null || candidateStateShare === null || candidateStateShare === 0
+        ? null
+        : candidateSharePct / candidateStateShare,
+    };
+  });
+}
+
+export function rankRegionalStrength(rows: RegionalStrengthRow[], descending = true): RegionalStrengthRow[] {
+  return [...rows].filter(row => row.strengthRatio !== null).sort((a, b) => {
+    const delta = Number(b.strengthRatio) - Number(a.strengthRatio);
+    return descending ? delta : -delta || a.region.localeCompare(b.region);
+  });
+}
+
+export function regionalEvolution(fromRows: RegionalVoteRow[], toRows: RegionalVoteRow[]): RegionalChangeRow[] {
+  const from = new Map(fromRows.map(row => [row.region, row.votes_nominal]));
+  return toRows.map(row => {
+    const fromVotes = from.get(row.region) ?? 0;
+    return {
+      region: row.region,
+      fromVotes,
+      toVotes: row.votes_nominal,
+      absoluteChange: variationAbs(fromVotes, row.votes_nominal),
+      percentageChange: variationPct(fromVotes, row.votes_nominal),
+    };
+  });
+}
+
 export function sumVotes(rows: MunicipalVoteRow[]): number {
   return rows.reduce((sum, row) => sum + row.votes_nominal, 0);
 }
@@ -207,11 +289,6 @@ export function regionalTotals(rows: MunicipalVoteRow[]): Record<string, number>
     acc[region] = (acc[region] ?? 0) + row.votes_nominal;
     return acc;
   }, {});
-}
-export function regionalStrength(rows: MunicipalVoteRow[], k: number): Array<{ region: string; votes: number; sharePct: number | null }> {
-  const totals = regionalTotals(rows);
-  const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
-  return Object.entries(totals).map(([region, votes]) => ({ region, votes, sharePct: shareOfTotal(votes, total) })).sort((a,b)=>b.votes-a.votes).slice(0, Math.max(0,k));
 }
 export function priorityScore(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
   return rankByVotes(rows).slice(0, Math.max(0,k));

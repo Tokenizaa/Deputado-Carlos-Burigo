@@ -403,8 +403,8 @@
         "historical-comparison"
       ],
       "method": "regionalRanking",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -418,7 +418,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "overview.regional_worst",
@@ -432,8 +433,8 @@
         "historical-comparison"
       ],
       "method": "regionalRanking",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -447,7 +448,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "overview.vote_distribution",
@@ -606,8 +608,8 @@
         "historical-comparison"
       ],
       "method": "conditionalMean",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "averageVotesWherePositive",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -635,8 +637,8 @@
         "historical-comparison"
       ],
       "method": "regionalStrength",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "regionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -650,7 +652,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "overview.attention_region",
@@ -664,8 +667,8 @@
         "historical-comparison"
       ],
       "method": "regionalAttention",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -679,7 +682,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "overview.growth_count",
@@ -1000,7 +1004,7 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
+      "method": "newTerritorialStrength",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1016,7 +1020,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "history.lost_strengths",
@@ -1031,7 +1036,7 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
+      "method": "lostTerritorialStrength",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1047,7 +1052,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "history.growth_count",
@@ -1372,9 +1378,9 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "method": "regionalEvolution",
+      "function": "regionalEvolution",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1388,7 +1394,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "history.regional_decline",
@@ -1403,9 +1410,9 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "method": "regionalDecline",
+      "function": "regionalEvolution",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1419,7 +1426,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "history.trajectory",
@@ -1465,7 +1473,7 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
+      "method": "territorialTurningPoints",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1481,7 +1489,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "history.priority_changes",
@@ -1496,7 +1505,7 @@
         "volatility-analysis",
         "comparability-check"
       ],
-      "method": "PENDING",
+      "method": "priorityChange",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1512,7 +1521,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.strongholds",
@@ -1589,7 +1599,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "opportunityIndex",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1605,7 +1615,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.growing",
@@ -1744,7 +1755,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "territorialMap",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1760,7 +1771,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.map_growth",
@@ -1775,7 +1787,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "territorialMap",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1791,7 +1803,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.map_decline",
@@ -1806,7 +1819,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "territorialMap",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1822,7 +1835,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.region_strength",
@@ -1868,7 +1882,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "regionalOpportunity",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -1884,7 +1898,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.concentration",
@@ -2147,7 +2162,7 @@
         "territorial-distribution",
         "growth-rate"
       ],
-      "method": "PENDING",
+      "method": "priorityIndex",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -2163,7 +2178,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "territory.compare",
@@ -2984,7 +3000,7 @@
         "effective-number",
         "ranking"
       ],
-      "method": "PENDING",
+      "method": "strategicCompetitorRanking",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -3000,7 +3016,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "competition.competitive_trend",
@@ -3015,7 +3032,7 @@
         "effective-number",
         "ranking"
       ],
-      "method": "PENDING",
+      "method": "competitiveTrend",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -3031,7 +3048,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
       "question_id": "competition.candidate_context",
@@ -3046,7 +3064,7 @@
         "effective-number",
         "ranking"
       ],
-      "method": "PENDING",
+      "method": "candidateCompetitiveContext",
       "function": "PENDING",
       "state": "IMPLEMENTATION_PENDING",
       "scope": {
@@ -3062,7 +3080,8 @@
       "evidence": [
         "TSE",
         "baselines oficiais validadas"
-      ]
+      ],
+      "methodology_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     }
   ],
   "validation": {
