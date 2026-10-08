@@ -275,3 +275,70 @@ A próxima camada metodológica deve acrescentar:
 10. vocabulário eleitoral canônico.
 
 Cada novo método deverá registrar definição, fórmula, entradas, saída, pressupostos, limitações, interpretação e fontes.
+
+
+## 15. Fragmentação e número efetivo de partidos
+
+Embora o projeto atual esteja centrado em candidatos a Deputado Estadual, a análise de competição pode exigir uma medida agregada da distribuição de votos entre partidos ou candidatos. A unidade deve ser explicitada antes do cálculo.
+
+### Fractionalização de Rae
+
+Uma forma clássica de medir fragmentação eleitoral é:
+
+`F = 1 - Σ p_i²`
+
+onde `p_i` é a participação eleitoral da unidade `i`.
+
+Interpretação:
+- valor próximo de 0: distribuição concentrada em uma unidade;
+- valor maior: distribuição mais fragmentada.
+
+A literatura clássica diferencia explicitamente a aplicação sobre votos da aplicação sobre cadeiras. Para o nosso sistema, essas duas versões nunca devem ser misturadas.
+
+### HHI
+
+O índice de Herfindahl-Hirschman é:
+
+`HHI = Σ p_i²`
+
+É uma medida de concentração. Na mesma distribuição:
+
+`F = 1 - HHI`
+
+Portanto, HHI e fractionalização são complementares, mas não devem receber o mesmo nome semânticamente.
+
+### Effective Number of Parties — Laakso-Taagepera
+
+O número efetivo de partidos é:
+
+`ENP = 1 / Σ p_i²`
+
+Pode ser aplicado a:
+- participação nos votos: ENEP;
+- participação nas cadeiras: ENPP.
+
+O valor representa o número de unidades de tamanho igual que produziria aproximadamente a mesma concentração observada.
+
+### Regra para o motor
+
+O resultado precisa registrar:
+- `basis`: votes ou seats;
+- `unit`: parties ou candidates;
+- `p_i`: participação usada;
+- período;
+- território;
+- universo eleitoral;
+- fórmula;
+- valor.
+
+### Limitações
+
+O ENP não é simplesmente a contagem de partidos/candidatos existentes. Ele pondera a distribuição de tamanho. Duas eleições podem ter o mesmo número nominal de partidos e ENP diferente.
+
+Da mesma forma, HHI, fractionalização e ENP não são três "pontuações de força". São transformações diferentes da distribuição.
+
+### Fonte metodológica
+
+A literatura clássica sobre sistemas partidários trata concentração, fractionalização e entropia como famílias de medidas para descrever propriedades agregadas do sistema. A formulação de Laakso-Taagepera relaciona o número efetivo à soma dos quadrados das participações.
+
+Fonte catalogada: Laakso & Taagepera (1979), com referência secundária Oxford Reference no catálogo de fontes.
