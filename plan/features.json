@@ -1,0 +1,22 @@
+{
+  "id": "FASE-2-INTENT-ELEITORAL",
+  "title": "FASE 2 - intents analíticos + motor reutilizável",
+  "phase": "G1",
+  "passes": false,
+  "priority": 1,
+  "depends_on": [],
+  "acceptance": [
+    "1. As 100 perguntas mapeadas para intents analíticos.",
+    "2. Intents com parâmetros e regras determinísticas.",
+    "3. Funções reutilizáveis identificadas/implementadas.",
+    "4. Funções operando sobre dados eleitorais já validados.",
+    "5. Testes das funções principais.",
+    "6. 2018/2022/2026 preservando baselines oficiais (números acima).",
+    "7. Zero dados fake/mock.",
+    "8. Maker concluir implementação.",
+    "9. Checker independente verificar.",
+    "10. Evidência persistida no repositório.",
+    "11. Commit no origin/main.",
+    "12. Estado final auditável pelo GitHub."
+  ]
+}
