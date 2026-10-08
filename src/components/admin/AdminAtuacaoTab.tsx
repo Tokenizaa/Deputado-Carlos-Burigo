@@ -28,7 +28,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [category, setCategory] = useState('parlamentar');
   const [status, setStatus] = useState('publicado');
   const [tags, setTags] = useState('');
-  const [visibility, setVisibility] = useState('publico');
+  const [visibility, setVisibility] = useState<'publico' | 'interno' | 'restrito'>('publico');
   const [sourceName, setSourceName] = useState('');
   const [publishedAt, setPublishedAt] = useState('');
   const [notes, setNotes] = useState('');
@@ -124,7 +124,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   };
 
   const openCreate = () => {
-    setEditing({ id: '', legislativeItemId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
+    setEditing({ id: '', legislativeItemId: null, evidenceId: null, documentType: '', title: '', originalUrl: null, publicUrl: null, storagePath: '', mimeType: '', fileSize: 0, sha256: null, sourceName: null, publishedAt: null, downloadedAt: null, verificationStatus: 'FOUND_UNVERIFIED', rightsStatus: 'UNKNOWN', notes: null, createdAt: '', updatedAt: '', visible: true, category: 'parlamentar', status: 'publicado', tags: [], visibility: 'publico' });
     setTitle(''); setDocumentType(''); setOriginalUrl(''); setStoragePath(''); setMimeType(''); setFileSize(null); setCategory('parlamentar'); setStatus('publicado'); setTags(''); setVisibility('publico'); setSourceName(''); setPublishedAt(''); setNotes(''); setLegislativeItemId(''); setEvidenceId(''); setVisible(true);
   };
 
