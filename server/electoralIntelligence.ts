@@ -17,6 +17,25 @@ const RUNTIME_IMPLEMENTED = new Set([
   'overview.municipal_leads',
   'overview.above_average',
   'overview.below_average',
+  'history.total_evolution',
+  'history.absolute_change',
+  'history.percent_change',
+  'history.municipal_growth',
+  'history.municipal_decline',
+  'history.consistent_growth',
+  'history.consistent_decline',
+  'history.reversal',
+  'history.growth_count',
+  'history.decline_count',
+  'history.stable_count',
+  'history.best_gain',
+  'history.best_loss',
+  'history.best_percent_gain',
+  'history.best_percent_loss',
+  'history.state_evolution_rank',
+  'history.concentration_change',
+  'history.coverage_change',
+  'history.trajectory',
 ]);
 
 type ElectoralResponse = {
@@ -234,6 +253,68 @@ export async function executeElectoralQuestion(
       evidence: [...plan.evidence, 'Supabase analytical projection'],
       limitations: ['Indicadores municipais usam somente municípios com votação positiva do candidato; média e mediana são calculadas sobre esse conjunto.'],
     };
+  }
+
+  if (questionId.startsWith('history.')) {
+    const candidateNumber = Number(params.candidate);
+    if (!Number.isInteger(candidateNumber) || candidateNumber <= 0) {
+      throw new Error(`candidate é obrigatório para executar ${questionId}.`);
+    }
+    const { data: candidateRows, error: candidateError } = await supabaseAdmin
+      .from('electoral_analytics_candidates')
+      .select('year,candidate_number,votes,vote_share,rank')
+      .eq('candidate_number', candidateNumber)
+      .order('year', { ascending: true });
+    if (candidateError) throw candidateError;
+    const { data: municipalRows, error: municipalError } = await supabaseAdmin
+      .from('electoral_analytics_candidate_municipal')
+      .select('year,municipality_code,candidate_number,votes,vote_share,candidate_rank')
+      .eq('candidate_number', candidateNumber)
+      .order('year', { ascending: true });
+    if (municipalError) throw municipalError;
+    const { data: electionRows, error: electionError } = await supabaseAdmin
+      .from('electoral_analytics_elections')
+      .select('year,total_nominal_votes')
+      .order('year', { ascending: true });
+    if (electionError) throw electionError;
+    const candidates = candidateRows ?? [];
+    const municipal = municipalRows ?? [];
+    const elections = electionRows ?? [];
+    const years = [...new Set(candidates.map(r => Number(r.year)))].sort((a,b)=>a-b);
+    const fromYear = Number(params.from_year) || years[0];
+    const toYear = Number(params.to_year) || years[years.length - 1];
+    const from = candidates.find(r=>Number(r.year)===fromYear);
+    const to = candidates.find(r=>Number(r.year)===toYear);
+    const rowsFor = (year:number) => municipal.filter(r=>Number(r.year)===year).map(r=>({ municipality:Number(r.municipality_code), votes_nominal:Number(r.votes) }));
+    const a = rowsFor(fromYear), b = rowsFor(toYear), mid = rowsFor(years[1] ?? toYear);
+    const limit = Number.isInteger(params.limit) && Number(params.limit)>0 ? Number(params.limit) : 10;
+    const changes = () => b.map(r=>{const f=a.find(x=>x.municipality===r.municipality)?.votes_nominal??0; return {municipality:r.municipality,fromVotes:f,toVotes:r.votes_nominal,absoluteChange:r.votes_nominal-f,percentageChange:f===0?null:((r.votes_nominal-f)/f)*100};});
+    const ch = changes();
+    const resultByQuestion = (() => {
+      switch(questionId) {
+        case 'history.total_evolution':
+        case 'history.trajectory': return { candidate:candidateNumber, byYear:candidates.map(r=>({year:Number(r.year),votes:Number(r.votes),voteSharePct:Number(r.vote_share),rank:Number(r.rank)})) };
+        case 'history.absolute_change': return {candidate:candidateNumber,fromYear,toYear,change:(to&&from)?Number(to.votes)-Number(from.votes):null};
+        case 'history.percent_change': return {candidate:candidateNumber,fromYear,toYear,changePct:(to&&from&&Number(from.votes)!==0)?((Number(to.votes)-Number(from.votes))/Number(from.votes))*100:null};
+        case 'history.municipal_growth': return {candidate:candidateNumber,fromYear,toYear,municipalities:ch.filter(x=>x.absoluteChange>0).sort((x,y)=>y.absoluteChange-x.absoluteChange).slice(0,limit)};
+        case 'history.municipal_decline': return {candidate:candidateNumber,fromYear,toYear,municipalities:ch.filter(x=>x.absoluteChange<0).sort((x,y)=>x.absoluteChange-y.absoluteChange).slice(0,limit)};
+        case 'history.consistent_growth': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&v[1]>v[0]&&v[2]>v[1];}).slice(0,limit)};
+        case 'history.consistent_decline': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&v[1]<v[0]&&v[2]<v[1];}).slice(0,limit)};
+        case 'history.reversal': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&((v[1]>v[0]&&v[2]<v[1])||(v[1]<v[0]&&v[2]>v[1]));}).slice(0,limit)};
+        case 'history.growth_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.absoluteChange>0).length};
+        case 'history.decline_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.absoluteChange<0).length};
+        case 'history.stable_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.percentageChange!==null&&Math.abs(x.percentageChange)<=5).length};
+        case 'history.best_gain': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.absoluteChange>0).sort((x,y)=>y.absoluteChange-x.absoluteChange)[0]??null};
+        case 'history.best_loss': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.absoluteChange<0).sort((x,y)=>x.absoluteChange-y.absoluteChange)[0]??null};
+        case 'history.best_percent_gain': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.percentageChange!==null&&x.percentageChange>0).sort((x,y)=>(y.percentageChange??0)-(x.percentageChange??0))[0]??null};
+        case 'history.best_percent_loss': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.percentageChange!==null&&x.percentageChange<0).sort((x,y)=>(x.percentageChange??0)-(y.percentageChange??0))[0]??null};
+        case 'history.state_evolution_rank': { const eFrom=elections.find(r=>Number(r.year)===fromYear),eTo=elections.find(r=>Number(r.year)===toYear); return {candidate:candidateNumber,fromYear,toYear,comparison:{candidateChangePct:from&&to&&Number(from.votes)!==0?((Number(to.votes)-Number(from.votes))/Number(from.votes))*100:null,stateChangePct:eFrom&&eTo&&Number(eFrom.total_nominal_votes)!==0?((Number(eTo.total_nominal_votes)-Number(eFrom.total_nominal_votes))/Number(eFrom.total_nominal_votes))*100:null}}; }
+        case 'history.concentration_change': return {candidate:candidateNumber,fromYear,toYear,changePct: (()=>{const calc=(r:any[])=>{const s=[...r].sort((x,y)=>y.votes_nominal-x.votes_nominal);const total=s.reduce((z,x)=>z+x.votes_nominal,0);return total? s.slice(0,10).reduce((z,x)=>z+x.votes_nominal,0)/total*100:null};const x=calc(a),y=calc(b);return x===null||y===null?null:y-x;})()};
+        case 'history.coverage_change': return {candidate:candidateNumber,fromYear,toYear,changePct:((new Set(b.filter(x=>x.votes_nominal>0).map(x=>x.municipality)).size-new Set(a.filter(x=>x.votes_nominal>0).map(x=>x.municipality)).size)/497)*100};
+        default: throw new Error('Intent eleitoral está implementado no catálogo, mas ainda não está disponível no runtime.');
+      }
+    })();
+    return {status:'ok',question:questionId,intent:plan.intent_id,agent:plan.agent,skills:plan.skills,method:plan.method,function:plan.function,scope:{office:'Deputado Estadual',uf:'RS',round:1,years},result:resultByQuestion,evidence:[...plan.evidence,'Supabase analytical projection'],limitations:['Comparações históricas usam os anos oficiais selecionados e mantêm o escopo Deputado Estadual / RS / turno 1.']};
   }
 
   const { data, error } = await supabaseAdmin
