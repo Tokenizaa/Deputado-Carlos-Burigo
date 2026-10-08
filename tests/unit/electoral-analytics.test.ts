@@ -6,7 +6,7 @@ import {
   topKConcentration, variationPct, absoluteChange, percentChange, compareMunicipalHistory,
   municipalGrowth, municipalDecline, consistentGrowth, consistentDecline, trendReversals,
   countStableMunicipalities, maxPercentageGain, maxPercentageLoss, concentrationChange, coverageChange,
-  compareCandidateToStateGrowth, historicalEvolution
+  compareCandidateToStateGrowth, historicalEvolution, rankCandidates, candidateGap, candidateGrowth, compareCandidates, candidateShareRanking, candidateRankEvolution, municipalLeaders, municipalChallengers, territorialOverlap, effectiveNumberOfCandidates, fragmentationIndex, competitionMargin, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome
 } from "../../src/lib/electoral-analytics";
 
 const rows = [
@@ -93,5 +93,47 @@ describe("electoral analytics — overview", () => {
     expect(regionalTotals([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}])).toEqual({N:40,S:20});
     expect(regionalStrength([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}],1)[0].region).toBe("N");
     expect(priorityScore(rows,2).length).toBe(2);
+  });
+});
+
+
+describe("electoral analytics — competition", () => {
+  const candidates = [
+    { candidateId: "A", votes: 60 },
+    { candidateId: "B", votes: 30 },
+    { candidateId: "C", votes: 10 },
+  ];
+  const municipal = [
+    { year: 2026 as const, municipality: 1, candidateId: "A", votes_nominal: 60, region: "N" },
+    { year: 2026 as const, municipality: 1, candidateId: "B", votes_nominal: 30, region: "N" },
+    { year: 2026 as const, municipality: 1, candidateId: "C", votes_nominal: 10, region: "N" },
+    { year: 2026 as const, municipality: 2, candidateId: "A", votes_nominal: 20, region: "S" },
+    { year: 2026 as const, municipality: 2, candidateId: "B", votes_nominal: 30, region: "S" },
+    { year: 2026 as const, municipality: 2, candidateId: "C", votes_nominal: 10, region: "S" },
+  ];
+  it("ranks candidates and computes adjacent gaps", () => {
+    expect(rankCandidates(candidates).map(r => r.candidateId)).toEqual(["A","B","C"]);
+    expect(candidateGap(candidates,"B")?.gapAbove).toBe(30);
+    expect(candidateGap(candidates,"B")?.leadBelow).toBe(20);
+  });
+  it("computes growth, comparisons and shares", () => {
+    expect(candidateGrowth(candidates,[{candidateId:"A",votes:70},{candidateId:"B",votes:20},{candidateId:"C",votes:15}],3)[0].candidateId).toBe("A");
+    expect(compareCandidates(candidates,"A","B")?.absoluteGap).toBe(30);
+    expect(candidateShareRanking(candidates)[0].sharePct).toBeCloseTo(60);
+    expect(candidateRankEvolution([{year:2018,rows:candidates},{year:2022,rows:[{candidateId:"B",votes:70},{candidateId:"A",votes:20},{candidateId:"C",votes:10}]}],"A").map(x=>x.rank)).toEqual([1,2]);
+  });
+  it("measures territorial competition without hidden sentinels", () => {
+    expect(municipalLeaders(municipal).map(x=>x.leader)).toEqual(["A","B"]);
+    expect(municipalChallengers(municipal,"A",2)[0].candidateId).toBe("B");
+    expect(territorialOverlap(municipal,"A","B")).toBe(100);
+    expect(effectiveNumberOfCandidates(candidates)).toBeGreaterThan(1);
+    expect(fragmentationIndex(candidates)).toBeGreaterThan(0);
+    expect(competitionMargin(candidates).marginVotes).toBe(30);
+    expect(municipalCompetition(municipal,2)[0].municipality).toBe(2);
+    expect(regionalCompetition(municipal,2)).toHaveLength(2);
+  });
+  it("keeps comparative territorial outcomes deterministic", () => {
+    const later = municipal.map(r => ({...r, votes_nominal: r.candidateId === "A" ? r.votes_nominal - 10 : r.votes_nominal + (r.candidateId === "B" ? 10 : 0)}));
+    expect(comparativeMunicipalOutcome(municipal,later,"A",2).length).toBe(2);
   });
 });
