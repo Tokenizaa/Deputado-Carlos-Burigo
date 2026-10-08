@@ -38,6 +38,10 @@ O banco local continua sendo a origem de processamento e auditoria.
 
 ## Estado
 
-O contrato da interface está fechado, mas a integração runtime permanece dependente da publicação da projeção analítica no Supabase e da conexão efetiva entre orquestrador, motor determinístico, RAG e provedor LLM.
+**CONTRATO + RUNTIME PARCIAL**
 
-Não criar uma interface que simule dados enquanto essa projeção não existir.
+A projeção analítica de produção já está publicada no Supabase e a Rodada 1 do runtime determinístico foi concluída para os 13 intents do bloco Overview (EA-001 a EA-013).
+
+A integração completa do chatbot ainda depende das rodadas seguintes do runtime, da integração efetiva do pipeline de interpretação/RAG e da conexão do provedor LLM.
+
+Não criar uma interface que simule dados. O chatbot só deve consumir resultados efetivamente produzidos pelo runtime determinístico.
