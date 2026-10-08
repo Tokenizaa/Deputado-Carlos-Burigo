@@ -815,7 +815,7 @@
         "municipality"
       ],
       "metodo": "conditionalMean",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "averageVotesWherePositive",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
       "saida": "number",
       "unidade": "percentual",
@@ -830,7 +830,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING"
+      "estado": "IMPLEMENTADO"
     },
     {
       "id": "EA-022",
