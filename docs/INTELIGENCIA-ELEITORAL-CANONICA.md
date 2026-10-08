@@ -540,3 +540,7 @@ Antes da construção da UI, devem ser fechados os contratos técnicos de:
 6. Speech-to-Text / Text-to-Speech desacoplados.
 
 A implementação deve então construir as duas superfícies sobre o mesmo motor, sem duplicar cálculo ou metodologia.
+
+## 22. Contrato de UX visual e interação — 2026-10-08
+
+Consultar `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md` e ADR-0004. O dashboard é a superfície principal de análise; o chat é flutuante, independente e compartilha contexto explicitamente. A seleção de candidato/eleição atualiza o cenário; filtros, gráficos, mapas e tabelas devem permitir exploração e drill-down. Insights e relatórios apresentam evidências, método e limitações em linguagem clara. Reutilizar a arquitetura e o dashboard de gabinete existentes. Não usar dados fictícios nem declarar implementado o que não foi validado. A auditoria preparatória pode começar imediatamente; as visualizações ligadas a dados respeitam os gates de cobertura do roadmap.

@@ -369,3 +369,7 @@ O ETL local é um processo de **publicação**, não um serviço de runtime.
 **IE-03.7 — Cobertura histórica e territorial:** EM EXECUÇÃO para RS / Deputado Estadual / 1º turno / 2018, 2022 e 2026. A carga local será reconstruída do zero e validada antes de qualquer publicação remota.
 
 Nenhuma tela será criada enquanto a cobertura mínima da base eleitoral não estiver validada.
+
+## Aditivo de experiência visual — 2026-10-08
+
+Seguir `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md` e ADR-0004. Dashboard analítico principal e chat flutuante independente compartilham contexto e resultados estruturados. A seleção de candidato/eleição atualiza o cenário; gráficos, mapas, tabelas e filtros permitem drill-down. A auditoria pode começar já; as visualizações reais devem respeitar os gates de cobertura existentes. Refatoração agrupada em até cinco fases, com testes, evidências, commits e merge em main.
