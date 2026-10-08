@@ -606,8 +606,8 @@
         "historical-comparison"
       ],
       "method": "conditionalMean",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "averageVotesWherePositive",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
