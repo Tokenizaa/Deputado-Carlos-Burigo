@@ -1336,7 +1336,7 @@
         "region"
       ],
       "metodo": "newTerritorialStrength",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -1351,7 +1351,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -1378,7 +1378,7 @@
         "region"
       ],
       "metodo": "lostTerritorialStrength",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -1393,7 +1393,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -1944,7 +1944,7 @@
         "region"
       ],
       "metodo": "territorialTurningPoints",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -1959,7 +1959,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -1986,7 +1986,7 @@
         "region"
       ],
       "metodo": "priorityChange",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -2001,7 +2001,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2110,7 +2110,7 @@
         "region"
       ],
       "metodo": "opportunityIndex",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2125,7 +2125,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2316,7 +2316,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2331,7 +2331,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2358,7 +2358,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2373,7 +2373,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2400,7 +2400,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2415,7 +2415,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2483,7 +2483,7 @@
         "region"
       ],
       "metodo": "regionalOpportunity",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2498,7 +2498,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -2853,7 +2853,7 @@
         "region"
       ],
       "metodo": "priorityIndex",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2868,7 +2868,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -3986,7 +3986,7 @@
         "region"
       ],
       "metodo": "strategicCompetitorRanking",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
@@ -4001,7 +4001,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -4029,7 +4029,7 @@
         "region"
       ],
       "metodo": "competitiveTrend",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
@@ -4044,7 +4044,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -4072,7 +4072,7 @@
         "region"
       ],
       "metodo": "candidateCompetitiveContext",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "deterministic_pending_runtime",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
@@ -4087,7 +4087,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     }
   ]
