@@ -72,7 +72,7 @@ export function assertElectoralContext(context: ElectoralContext): void {
     if (typeof value !== 'string' && key !== 'round') {
       throw new Error(`Contexto eleitoral inválido: ${key} é obrigatório.`);
     }
-    if (key === 'round' && (!Number.isInteger(value) || value < 1)) {
+    if (key === 'round' && (typeof value !== 'number' || !Number.isInteger(value) || value < 1)) {
       throw new Error('Contexto eleitoral inválido: round deve ser um inteiro positivo.');
     }
   }
