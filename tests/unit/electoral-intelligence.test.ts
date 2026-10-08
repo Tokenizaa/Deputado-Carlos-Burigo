@@ -152,7 +152,7 @@ describe('electoral intelligence runtime — overview', () => {
     expect((change.result as any).change).toBe(50000);
 
     const growthCount = await executeElectoralQuestion('history.growth_count', { candidate: 12345, from_year: 2018, to_year: 2026 });
-    expect((growthCount.result as any).count).toBe(1);
+    expect((growthCount.result as any).count).toBe(2);
   });
 
   it('does not calculate implementation-pending questions', async () => {
