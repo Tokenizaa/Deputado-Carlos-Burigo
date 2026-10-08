@@ -53,15 +53,15 @@ vi.mock('../../server/supabase', () => ({
 
       if (table === 'electoral_analytics_municipalities') {
         return chain([
-          { year: 2018, municipality_code: 1, municipality_name: 'Alpha', total_nominal_votes: 100000, municipalities_rank: 1 },
-          { year: 2018, municipality_code: 2, municipality_name: 'Beta', total_nominal_votes: 100000, municipalities_rank: 2 },
-          { year: 2018, municipality_code: 3, municipality_name: 'Gamma', total_nominal_votes: 100000, municipalities_rank: 3 },
-          { year: 2022, municipality_code: 1, municipality_name: 'Alpha', total_nominal_votes: 100000, municipalities_rank: 1 },
-          { year: 2022, municipality_code: 2, municipality_name: 'Beta', total_nominal_votes: 100000, municipalities_rank: 2 },
-          { year: 2022, municipality_code: 3, municipality_name: 'Gamma', total_nominal_votes: 100000, municipalities_rank: 3 },
-          { year: 2022, municipality_code: 4, municipality_name: 'Delta', total_nominal_votes: 100000, municipalities_rank: 4 },
-          { year: 2026, municipality_code: 1, municipality_name: 'Alpha', total_nominal_votes: 100000, municipalities_rank: 1 },
-          { year: 2026, municipality_code: 2, municipality_name: 'Beta', total_nominal_votes: 100000, municipalities_rank: 2 },
+          { year: 2018, municipality_code: 1, municipality_name: 'Alpha', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 1 },
+          { year: 2018, municipality_code: 2, municipality_name: 'Beta', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 2 },
+          { year: 2018, municipality_code: 3, municipality_name: 'Gamma', region_code: 'R2', region_name: 'Região B', total_nominal_votes: 100000, municipalities_rank: 3 },
+          { year: 2022, municipality_code: 1, municipality_name: 'Alpha', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 1 },
+          { year: 2022, municipality_code: 2, municipality_name: 'Beta', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 2 },
+          { year: 2022, municipality_code: 3, municipality_name: 'Gamma', region_code: 'R2', region_name: 'Região B', total_nominal_votes: 100000, municipalities_rank: 3 },
+          { year: 2022, municipality_code: 4, municipality_name: 'Delta', region_code: 'R2', region_name: 'Região B', total_nominal_votes: 100000, municipalities_rank: 4 },
+          { year: 2026, municipality_code: 1, municipality_name: 'Alpha', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 1 },
+          { year: 2026, municipality_code: 2, municipality_name: 'Beta', region_code: 'R1', region_name: 'Região A', total_nominal_votes: 100000, municipalities_rank: 2 },
         ]);
       }
 
@@ -120,6 +120,26 @@ describe('electoral intelligence runtime — overview', () => {
     expect(result.intent).toBe('EA-021');
     expect(result.method).toBe('conditionalMean');
     expect((result.result as any).byYear[0].averageVotesWherePositive).toBeCloseTo(50000);
+  });
+
+  it('closes the first regional runtime intents using the IBGE region dimension', async () => {
+    const best = await executeElectoralQuestion('overview.regional_best', { candidate: 12345, year: 2018 });
+    const worst = await executeElectoralQuestion('overview.regional_worst', { candidate: 12345, year: 2018 });
+    const strongest = await executeElectoralQuestion('overview.strongest_region', { candidate: 12345, year: 2018 });
+    const attention = await executeElectoralQuestion('overview.attention_region', { candidate: 12345, year: 2018 });
+    expect((best.result as any).byYear[0].regions[0].region).toBe('R1');
+    expect((worst.result as any).byYear[0].regions[0].region).toBe('R2');
+    expect((strongest.result as any).byYear[0].regions[0].region).toBe('R1');
+    expect((attention.result as any).byYear[0].regions[0].region).toBe('R2');
+  });
+
+  it('closes regional historical evolution and decline intents', async () => {
+    const growth = await executeElectoralQuestion('history.regional_evolution', { candidate: 12345, from_year: 2018, to_year: 2026 });
+    const decline = await executeElectoralQuestion('history.regional_decline', { candidate: 12345, from_year: 2018, to_year: 2026 });
+    expect((growth.result as any).regions[0].region).toBe('R1');
+    expect((growth.result as any).regions[0].absoluteChange).toBe(70000);
+    expect((decline.result as any).regions[0].region).toBe('R2');
+    expect((decline.result as any).regions[0].absoluteChange).toBe(-20000);
   });
 
   it('closes average and median municipality intents', async () => {
