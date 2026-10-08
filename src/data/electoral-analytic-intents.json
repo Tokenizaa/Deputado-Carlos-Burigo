@@ -1,0 +1,992 @@
+{
+  "version": 1,
+  "scope": {
+    "office": "Deputado Estadual",
+    "uf": "RS",
+    "years": [
+      2018,
+      2022,
+      2026
+    ],
+    "round": 1
+  },
+  "area": "overview",
+  "total_intents": 25,
+  "intents": [
+    {
+      "id": "EA-001",
+      "area": "overview",
+      "order": 1,
+      "pergunta_id": "overview.total_votes",
+      "pergunta": "Quantos votos o candidato teve na eleição selecionada?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "totalVotes",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "totalVotes",
+      "funcao_analitica": "sumVotes",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "votos",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-002",
+      "area": "overview",
+      "order": 2,
+      "pergunta_id": "overview.state_share",
+      "pergunta": "Qual foi a participação do candidato no total de votos nominais do cargo?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "voteShare",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "voteShare",
+      "funcao_analitica": "shareOfTotal",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": "total de votos nominais do cargo no mesmo ano e escopo",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-003",
+      "area": "overview",
+      "order": 3,
+      "pergunta_id": "overview.municipalities_with_votes",
+      "pergunta": "Em quantos municípios o candidato recebeu votos?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "territorialCoverage",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "territorialCoverage",
+      "funcao_analitica": "countPositiveMunicipalities",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "municipios",
+      "denominador": "497 municípios do RS no universo eleitoral",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-004",
+      "area": "overview",
+      "order": 4,
+      "pergunta_id": "overview.best_municipality",
+      "pergunta": "Qual município teve a maior votação do candidato?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalMaximum",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalMaximum",
+      "funcao_analitica": "maxMunicipality",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "object",
+      "unidade": "municipio",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-005",
+      "area": "overview",
+      "order": 5,
+      "pergunta_id": "overview.worst_municipality",
+      "pergunta": "Qual município teve a menor votação entre os municípios onde recebeu votos?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalMinimumPositive",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalMinimumPositive",
+      "funcao_analitica": "minPositiveMunicipality",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "object",
+      "unidade": "municipio",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-006",
+      "area": "overview",
+      "order": 6,
+      "pergunta_id": "overview.average_votes",
+      "pergunta": "Qual foi a média de votos por município?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalMean",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalMean",
+      "funcao_analitica": "averageVotes",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "votos_por_municipio",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-007",
+      "area": "overview",
+      "order": 7,
+      "pergunta_id": "overview.median_votes",
+      "pergunta": "Qual foi a mediana de votos por município?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalMedian",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalMedian",
+      "funcao_analitica": "medianVotes",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "votos_por_municipio",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-008",
+      "area": "overview",
+      "order": 8,
+      "pergunta_id": "overview.top10_concentration",
+      "pergunta": "Quanto dos votos ficou concentrado nos 10 maiores municípios?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "topKMunicipalConcentration",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "topKMunicipalConcentration",
+      "funcao_analitica": "topKConcentration",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": "votos nominais totais do candidato no mesmo ano",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-009",
+      "area": "overview",
+      "order": 9,
+      "pergunta_id": "overview.top20_concentration",
+      "pergunta": "Quanto dos votos ficou concentrado nos 20 maiores municípios?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "topKMunicipalConcentration",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "topKMunicipalConcentration",
+      "funcao_analitica": "topKConcentration",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": "votos nominais totais do candidato no mesmo ano",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-010",
+      "area": "overview",
+      "order": 10,
+      "pergunta_id": "overview.municipal_rank",
+      "pergunta": "Qual foi o ranking do candidato no estado?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "candidateRanking",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "candidateRanking",
+      "funcao_analitica": "candidateRank",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "posicao",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-011",
+      "area": "overview",
+      "order": 11,
+      "pergunta_id": "overview.municipal_leads",
+      "pergunta": "Em quantos municípios o candidato foi o mais votado?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalLeadership",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalLeadership",
+      "funcao_analitica": "countMunicipalLeads",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "municipios",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-012",
+      "area": "overview",
+      "order": 12,
+      "pergunta_id": "overview.above_average",
+      "pergunta": "Em quais municípios o desempenho ficou acima da média?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "aboveAverage",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "aboveAverage",
+      "funcao_analitica": "municipalitiesAboveAverage",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "array",
+      "unidade": "lista",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-013",
+      "area": "overview",
+      "order": 13,
+      "pergunta_id": "overview.below_average",
+      "pergunta": "Em quais municípios o desempenho ficou abaixo da média?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "belowAverage",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "belowAverage",
+      "funcao_analitica": "municipalitiesBelowAverage",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "array",
+      "unidade": "lista",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-014",
+      "area": "overview",
+      "order": 14,
+      "pergunta_id": "overview.regional_best",
+      "pergunta": "Qual região apresentou melhor desempenho?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "regionalRanking",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "regionalRanking",
+      "funcao_analitica": "PENDING",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "regiao",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "EA-015",
+      "area": "overview",
+      "order": 15,
+      "pergunta_id": "overview.regional_worst",
+      "pergunta": "Qual região apresentou pior desempenho?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "regionalRanking",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "regionalRanking",
+      "funcao_analitica": "PENDING",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "regiao",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "EA-016",
+      "area": "overview",
+      "order": 16,
+      "pergunta_id": "overview.vote_distribution",
+      "pergunta": "Como a votação está distribuída pelo estado?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "distributionSummary",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "distributionSummary",
+      "funcao_analitica": "distributionSummary",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "object",
+      "unidade": "objeto",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-017",
+      "area": "overview",
+      "order": 17,
+      "pergunta_id": "overview.territorial_concentration",
+      "pergunta": "A votação está concentrada ou distribuída territorialmente?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "topKMunicipalConcentration",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "topKMunicipalConcentration",
+      "funcao_analitica": "topKConcentration",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": "votos nominais totais do candidato no mesmo ano",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-018",
+      "area": "overview",
+      "order": 18,
+      "pergunta_id": "overview.active_municipalities",
+      "pergunta": "Qual é a cobertura territorial da votação?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "territorialCoveragePercentage",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "territorialCoveragePercentage",
+      "funcao_analitica": "coveragePercentage",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": "497 municípios do RS no universo eleitoral",
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-019",
+      "area": "overview",
+      "order": 19,
+      "pergunta_id": "overview.top_contributors",
+      "pergunta": "Quais municípios mais contribuíram para o resultado estadual?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalRanking",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalRanking",
+      "funcao_analitica": "topContributors",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "array",
+      "unidade": "lista",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-020",
+      "area": "overview",
+      "order": 20,
+      "pergunta_id": "overview.low_contributors",
+      "pergunta": "Quais municípios menos contribuíram para o resultado estadual?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "municipalRanking",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "municipalRanking",
+      "funcao_analitica": "lowContributors",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "array",
+      "unidade": "lista",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-021",
+      "area": "overview",
+      "order": 21,
+      "pergunta_id": "overview.participation_average",
+      "pergunta": "Qual é a participação média nos municípios com votação?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "conditionalMean",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "conditionalMean",
+      "funcao_analitica": "PENDING",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "percentual",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "EA-022",
+      "area": "overview",
+      "order": 22,
+      "pergunta_id": "overview.strongest_region",
+      "pergunta": "Onde está o principal núcleo territorial de força?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "regionalStrength",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "regionalStrength",
+      "funcao_analitica": "PENDING",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "regiao",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "EA-023",
+      "area": "overview",
+      "order": 23,
+      "pergunta_id": "overview.attention_region",
+      "pergunta": "Qual região merece maior atenção?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "regionalAttention",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "regionalAttention",
+      "funcao_analitica": "PENDING",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "regiao",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTATION_PENDING"
+    },
+    {
+      "id": "EA-024",
+      "area": "overview",
+      "order": 24,
+      "pergunta_id": "overview.growth_count",
+      "pergunta": "Quantos municípios apresentam crescimento no período comparado?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "growthCount",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "growthCount",
+      "funcao_analitica": "countGrowingMunicipalities",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "municipios",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    },
+    {
+      "id": "EA-025",
+      "area": "overview",
+      "order": 25,
+      "pergunta_id": "overview.decline_count",
+      "pergunta": "Quantos municípios apresentam queda no período comparado?",
+      "objetivo_analitico": "Responder à pergunta com indicador determinístico e parâmetros explícitos.",
+      "intent": "declineCount",
+      "parametros": [
+        "year",
+        "from_year",
+        "to_year",
+        "candidate",
+        "municipality",
+        "limit"
+      ],
+      "dimensoes": [
+        "year",
+        "candidate",
+        "municipality"
+      ],
+      "metodo": "declineCount",
+      "funcao_analitica": "countDecliningMunicipalities",
+      "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
+      "saida": "number",
+      "unidade": "municipios",
+      "denominador": null,
+      "restricoes": [
+        "Deputado Estadual",
+        "RS",
+        "turno 1",
+        "somente anos oficiais 2018, 2022 e 2026"
+      ],
+      "evidencia": [
+        "TSE",
+        "baselines oficiais validadas"
+      ],
+      "estado": "IMPLEMENTADO"
+    }
+  ]
+}
