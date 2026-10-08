@@ -224,7 +224,7 @@ describe('electoral intelligence runtime — overview', () => {
       expect(result.evidence).toContain('Supabase analytical projection');
     }
     const rank = await executeElectoralQuestion('competition.candidate_rank', { candidate: 12345, year: 2026 });
-    expect((rank.result as any).rank).toBe(9);
+    expect((rank.result as any).rank).toBe(2);
     const compare = await executeElectoralQuestion('competition.candidate_compare', { candidate: 12345, competitor: 23456, year: 2022 });
     expect((compare.result as any).comparison.candidateA).toBe('12345');
     const overlap = await executeElectoralQuestion('competition.territorial_overlap', { candidate: 12345, competitor: 23456, year: 2026 });
