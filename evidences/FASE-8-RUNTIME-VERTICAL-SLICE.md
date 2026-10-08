@@ -96,3 +96,12 @@ npm run lint
 ```
 
 O lint possui falhas preexistentes e não relacionadas ao runtime eleitoral; a rodada não altera essas pendências.
+
+
+## Rodada 2 — History
+
+A implementação do bloco History foi adicionada ao runtime determinístico, cobrindo os 19 intents implementados do catálogo (EA-026–EA-033, EA-036–EA-045 e EA-048). Os seis intents pendentes permanecem explicitamente fora do runtime.
+
+A suíte unitária recebeu cobertura específica do bloco, incluindo seleção de intervalo histórico, evolução, variações absolutas/percentuais, crescimento/queda municipal, estabilidade, reversões, extremos, comparação com crescimento estadual, concentração e cobertura.
+
+A rodada aguarda execução local para validação final.
