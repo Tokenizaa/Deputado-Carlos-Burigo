@@ -544,3 +544,12 @@ A implementação deve então construir as duas superfícies sobre o mesmo motor
 ## 22. Contrato de UX visual e interação — 2026-10-08
 
 Consultar `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md` e ADR-0004. O dashboard é a superfície principal de análise; o chat é flutuante, independente e compartilha contexto explicitamente. A seleção de candidato/eleição atualiza o cenário; filtros, gráficos, mapas e tabelas devem permitir exploração e drill-down. Insights e relatórios apresentam evidências, método e limitações em linguagem clara. Reutilizar a arquitetura e o dashboard de gabinete existentes. Não usar dados fictícios nem declarar implementado o que não foi validado. A auditoria preparatória pode começar imediatamente; as visualizações ligadas a dados respeitam os gates de cobertura do roadmap.
+
+
+## 23. Auditoria do frontend — IE-05.0 (2026-10-08)
+
+A auditoria do código em `main` confirma que a Inteligência Eleitoral já está inserida no Dashboard de Gabinete existente por `AdminLayout` → `AdminWorkspace` → `AdminElectoralIntelligenceTab`, com consulta ao Worker existente e projeção analítica no Supabase. A interface atual aceita número do candidato e segundo número para comparação, mantém RS / Deputado Estadual / 1º turno fixos, apresenta perguntas por área e resultados em tabela/JSON, e oferece CSV, relatório imprimível e síntese de voz.
+
+Os contratos `src/contracts/electoralContext.ts` e `src/contracts/electoralPresentation.ts` já existem e têm testes. A interface ainda não os integra em estado compartilhado de candidato/eleição/filtros; não oferece busca por nome, modal de candidatos, seletor de eleição, painel de chat flutuante nem renderer de gráficos/mapas. A presença de templates de apresentação não comprova que essas visualizações estejam operacionais.
+
+A decisão nesta fase é não criar um segundo contrato nem antecipar componentes funcionais sem necessidade comprovada. A fase seguinte conectará a interface aos contratos existentes. O gate IE-03.7 permanece vigente e a auditoria de código não equivale a validação da cobertura física em produção. Ver o mapa detalhado e a evidência de testes em `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md`.
