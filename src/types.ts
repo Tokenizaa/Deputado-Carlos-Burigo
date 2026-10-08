@@ -38,6 +38,7 @@ export interface SiteSettings {
   social_whatsapp: string;
   seo_default_title: string;
   seo_default_description: string;
+  seo_default_image_url?: string;
   privacy_policy_text: string;
   mandate_slogan: string;
   bio_highlights: string[];
@@ -142,6 +143,10 @@ export interface News {
   seoTitle?: string;
   seoDescription?: string;
   socialImage?: string;
+  publishDate?: string;
+  sourceName?: string;
+  imageCredit?: string;
+  sourceUrl?: string;
 }
 
 export interface EventItem {
@@ -175,6 +180,7 @@ export interface Municipality {
   region: string;
   population?: string;
   keyDeliveries: string[];
+  notes?: string;
 }
 
 export interface VideoItem {
@@ -200,6 +206,8 @@ export interface MediaItem {
   altText: string;
   description?: string;
   credit?: string;
+  photographer?: string;
+  sourceName?: string;
   category: 'fotos' | 'documentos' | 'banners' | 'campanha';
   url: string;
   size: number;
