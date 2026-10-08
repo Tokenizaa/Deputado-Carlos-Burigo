@@ -385,10 +385,20 @@ export async function executeElectoralQuestion(
           const municipalityCatalog = await supabaseAdmin.from('electoral_analytics_municipalities').select('year,municipality_code,region_code,total_nominal_votes').order('year',{ascending:true});
           if (municipalityCatalog.error) throw municipalityCatalog.error;
           const catalog = municipalityCatalog.data ?? [];
-          const regionalFor = (year:number) => aggregateRegionalVotes(catalog.filter(r=>Number(r.year)===year && r.region_code).map(r=>({year:year as 2018|2022|2026,municipality:Number(r.municipality_code),votes_nominal:0})).map((r,i)=>({ ...r, votes_nominal:Number(catalog.filter(x=>Number(x.year)===year&&Number(x.municipality_code)===r.municipality)[0]?.total_nominal_votes??0) })), new Map(catalog.filter(r=>Number(r.year)===year&&r.region_code).map(r=>[Number(r.municipality_code),String(r.region_code)])));
-          const candidateRegionalFor = (year:number) => aggregateRegionalVotes(rowsFor(year), new Map(catalog.filter(r=>Number(r.year)===year&&r.region_code).map(r=>[Number(r.municipality_code),String(r.region_code)])));
-          const fromRegional = candidateRegionalFor(fromYear), toRegional = candidateRegionalFor(toYear);
-          const changes = regionalEvolution(fromRegional,toRegional);
+          const regionMapFor = (year:number) => new Map(catalog.filter(r=>Number(r.year)===year&&r.region_code).map(r=>[Number(r.municipality_code),String(r.region_code)]));
+          const candidateRegionalFor = (year:number) => aggregateRegionalVotes(rowsFor(year), regionMapFor(year));
+          const fromRegional = candidateRegionalFor(fromYear);
+          const toRegional = candidateRegionalFor(toYear);
+          const allRegions = new Set([...fromRegional.map(r=>r.region), ...toRegional.map(r=>r.region)]);
+          const fromMap = new Map(fromRegional.map(r=>[r.region,r.votes_nominal]));
+          const toMap = new Map(toRegional.map(r=>[r.region,r.votes_nominal]));
+          const changes = [...allRegions].map(region => ({
+            region,
+            fromVotes: fromMap.get(region) ?? 0,
+            toVotes: toMap.get(region) ?? 0,
+            absoluteChange: (toMap.get(region) ?? 0) - (fromMap.get(region) ?? 0),
+            percentageChange: (fromMap.get(region) ?? 0) === 0 ? null : (((toMap.get(region) ?? 0) - (fromMap.get(region) ?? 0)) / (fromMap.get(region) ?? 0)) * 100,
+          }));
           const ordered = questionId==='history.regional_decline' ? changes.filter(x=>x.absoluteChange<0).sort((x,y)=>x.absoluteChange-y.absoluteChange) : changes.filter(x=>x.absoluteChange>0).sort((x,y)=>y.absoluteChange-x.absoluteChange);
           return {candidate:candidateNumber,fromYear,toYear,regions:ordered.slice(0,limit)};
         }
