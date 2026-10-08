@@ -155,6 +155,43 @@ describe('electoral intelligence runtime — overview', () => {
     expect((growthCount.result as any).count).toBe(2);
   });
 
+
+  it('closes the Territory runtime block and preserves insufficient regional data explicitly', async () => {
+    const implemented = [
+      'territory.strongholds','territory.weakholds','territory.growing','territory.declining',
+      'territory.top_rankings','territory.low_rankings','territory.concentration','territory.dispersion',
+      'territory.coverage','territory.growth_low_base','territory.high_base_decline','territory.high_growth',
+      'territory.high_share','territory.low_share','territory.compare',
+    ];
+
+    for (const id of implemented) {
+      const result = await executeElectoralQuestion(id, {
+        candidate: 12345,
+        year: 2022,
+        from_year: 2018,
+        to_year: 2026,
+        limit: 2,
+      });
+      expect(result.status).toBe('ok');
+      expect(result.evidence).toContain('Supabase analytical projection');
+    }
+
+    const strongholds = await executeElectoralQuestion('territory.strongholds', { candidate: 12345, year: 2022, limit: 2 });
+    expect((strongholds.result as any).municipalities[0].municipalityName).toBe('Alpha');
+
+    const growing = await executeElectoralQuestion('territory.growing', { candidate: 12345, from_year: 2018, to_year: 2026, limit: 2 });
+    expect((growing.result as any).municipalities[0].municipality).toBe(1);
+
+    const compare = await executeElectoralQuestion('territory.compare', { candidate: 12345, year: 2022, municipality: [1, 2] });
+    expect((compare.result as any).municipalities).toHaveLength(2);
+
+    for (const id of ['territory.region_strength', 'territory.regional_profile']) {
+      const result = await executeElectoralQuestion(id, { candidate: 12345, year: 2022 });
+      expect(result.status).toBe('insufficient_data');
+      expect(result.result).toBeNull();
+    }
+  });
+
   it('does not calculate implementation-pending questions', async () => {
     const result = await executeElectoralQuestion('overview.regional_best');
     expect(result.status).toBe('pending');
