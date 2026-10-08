@@ -403,8 +403,8 @@
         "historical-comparison"
       ],
       "method": "regionalRanking",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -433,8 +433,8 @@
         "historical-comparison"
       ],
       "method": "regionalRanking",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -637,8 +637,8 @@
         "historical-comparison"
       ],
       "method": "regionalStrength",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "regionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -667,8 +667,8 @@
         "historical-comparison"
       ],
       "method": "regionalAttention",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "rankRegionalStrength",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1379,8 +1379,8 @@
         "comparability-check"
       ],
       "method": "regionalEvolution",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "regionalEvolution",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1411,8 +1411,8 @@
         "comparability-check"
       ],
       "method": "regionalDecline",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "regionalEvolution",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
