@@ -359,7 +359,7 @@ export async function executeElectoralQuestion(
     const limit = Number.isInteger(params.limit) && Number(params.limit)>0 ? Number(params.limit) : 10;
     const changes = () => b.map(r=>{const f=a.find(x=>x.municipality===r.municipality)?.votes_nominal??0; return {municipality:r.municipality,fromVotes:f,toVotes:r.votes_nominal,absoluteChange:r.votes_nominal-f,percentageChange:f===0?null:((r.votes_nominal-f)/f)*100};});
     const ch = changes();
-    const resultByQuestion = (() => {
+    const resultByQuestion = (async () => {
       switch(questionId) {
         case 'history.total_evolution':
         case 'history.trajectory': return { candidate:candidateNumber, byYear:candidates.map(r=>({year:Number(r.year),votes:Number(r.votes),voteSharePct:Number(r.vote_share),rank:Number(r.rank)})) };
@@ -396,7 +396,7 @@ export async function executeElectoralQuestion(
         default: throw new Error('Intent eleitoral está implementado no catálogo, mas ainda não está disponível no runtime.');
       }
     })();
-    return {status:'ok',question:questionId,intent:plan.intent_id,agent:plan.agent,skills:plan.skills,method:plan.method,function:plan.function,scope:{office:'Deputado Estadual',uf:'RS',round:1,years},result:resultByQuestion,evidence:[...plan.evidence,'Supabase analytical projection'],limitations:['Comparações históricas usam os anos oficiais selecionados e mantêm o escopo Deputado Estadual / RS / turno 1.']};
+    return {status:'ok',question:questionId,intent:plan.intent_id,agent:plan.agent,skills:plan.skills,method:plan.method,function:plan.function,scope:{office:'Deputado Estadual',uf:'RS',round:1,years},result:await resultByQuestion,evidence:[...plan.evidence,'Supabase analytical projection'],limitations:['Comparações históricas usam os anos oficiais selecionados e mantêm o escopo Deputado Estadual / RS / turno 1.']};
   }
 
   if (questionId.startsWith('territory.')) {
