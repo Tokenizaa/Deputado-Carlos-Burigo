@@ -3,14 +3,18 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../server/supabase', () => ({
   supabaseAdmin: {
     from: vi.fn((table: string) => {
-      const chain = (data: unknown[]) => ({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            order: vi.fn(async () => ({ data, error: null })),
-          })),
+      const chain = (sourceData: unknown[]) => {
+        let data = [...sourceData] as any[];
+        const builder = {
+          select: vi.fn(() => builder),
+          eq: vi.fn((field: string, value: unknown) => {
+            data = data.filter((row) => row[field] === value);
+            return builder;
+          }),
           order: vi.fn(async () => ({ data, error: null })),
-        })),
-      });
+        };
+        return builder;
+      };
 
       if (table === 'electoral_analytics_candidates') {
         return chain([
