@@ -145,3 +145,50 @@ Essas capacidades não foram improvisadas: a projeção atual não possui dimens
 - O stderr exibido pelo teste de bootstrap-admin é esperado pelo cenário e não representa falha.
 
 A execução permanece server-side, determinística e baseada na projeção analítica do Supabase.
+
+
+## Rodada 4 — Competition
+
+**Status: CONCLUÍDA**
+
+Runtime competitivo validado no branch `fase8-runtime-vertical-slice`.
+
+### Capacidade executável
+
+- competition.top_candidates
+- competition.candidate_rank
+- competition.vote_gap
+- competition.vote_lead
+- competition.growth_leaders
+- competition.growth_losers
+- competition.local_winners
+- competition.local_challengers
+- competition.overlap
+- competition.municipal_leaders
+- competition.candidate_compare
+- competition.rank_evolution
+- competition.vote_share_compare
+- competition.growth_compare
+- competition.loss_compare
+- competition.gain_where_burigo_lost
+- competition.loss_where_burigo_gained
+- competition.dominant_competitor
+- competition.emerging_competitor
+- competition.territorial_overlap
+- competition.competitive_municipalities
+- competition.low_competition
+
+### Insufficient data preservado
+
+- competition.territorial_leaders
+- competition.regional_competition
+
+Essas capacidades permanecem bloqueadas quando dependem de dimensão regional que não existe na projeção atual. O runtime não inventa agrupamentos ou limiares.
+
+### Validação
+
+- Unit: **70/70 PASS**
+- Integration: **12/12 PASS**
+- O stderr exibido pelo teste de bootstrap-admin é esperado pelo cenário e não representa falha.
+
+A execução permanece server-side, determinística e baseada na projeção analítica do Supabase. A semântica de concorrência exclui o próprio candidato das listas de concorrentes.
