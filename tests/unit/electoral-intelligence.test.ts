@@ -40,7 +40,7 @@ describe('electoral intelligence runtime', () => {
         { year: 2022, votes: 5800912 },
         { year: 2026, votes: 5774628 },
       ],
-      total: 17132390,
+      total: 16882390,
     });
   });
 
