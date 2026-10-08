@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "purpose": "Recuperar conhecimento metodológico para explicar resultados já calculados.",
+  "source_of_truth": "versioned_knowledge_items",
+  "retrieval_flow": [
+    "question",
+    "ontology_resolution",
+    "intent_resolution",
+    "skill_resolution",
+    "method_resolution",
+    "structured_filters",
+    "semantic_retrieval",
+    "evidence_selection",
+    "deterministic_result",
+    "interpretation"
+  ],
+  "filters": [
+    "scope",
+    "area",
+    "concept",
+    "method",
+    "source_type",
+    "source_id",
+    "language",
+    "version"
+  ],
+  "knowledge_items": [
+    "vote-share",
+    "growth-rate",
+    "top-k-concentration",
+    "hhi-fragmentation",
+    "effective-number",
+    "competition-margin",
+    "territorial-overlap",
+    "historical-comparison",
+    "comparability-check"
+  ],
+  "confidence_hierarchy": [
+    "official_validated_electoral_data",
+    "deterministic_analytic_function",
+    "project_methodology",
+    "academic_or_institutional_source",
+    "llm_interpretation"
+  ],
+  "hard_rules": [
+    "rag_does_not_calculate",
+    "rag_does_not_supply_electoral_truth_numbers",
+    "llm_cannot_override_deterministic_result",
+    "method_must_match_intent",
+    "denominator_must_be_preserved",
+    "pending_intent_cannot_be_completed_by_llm",
+    "source_provenance_is_required"
+  ],
+  "output_contract": {
+    "retrieved_items": "array",
+    "method": "string|null",
+    "formulas": "array",
+    "assumptions": "array",
+    "limitations": "array",
+    "source_ids": "array",
+    "confidence": "enum"
+  }
+}
