@@ -539,12 +539,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalRanking",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -557,7 +557,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -579,12 +579,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalRanking",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -597,7 +597,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -853,12 +853,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalStrength",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "regionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -871,7 +871,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -893,12 +893,12 @@
       "dimensoes": [
         "year",
         "candidate",
-        "municipality"
+        "region"
       ],
       "metodo": "regionalAttention",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "rankRegionalStrength",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
-      "saida": "number",
+      "saida": "object",
       "unidade": "regiao",
       "denominador": null,
       "restricoes": [
@@ -911,7 +911,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -1820,10 +1820,10 @@
         "region"
       ],
       "metodo": "regionalEvolution",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "regionalEvolution",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
-      "unidade": "a definir",
+      "unidade": "regiao",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
@@ -1835,7 +1835,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
@@ -1862,10 +1862,10 @@
         "region"
       ],
       "metodo": "regionalDecline",
-      "funcao_analitica": "PENDING",
+      "funcao_analitica": "regionalEvolution",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
-      "unidade": "a definir",
+      "unidade": "regiao",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
@@ -1877,7 +1877,7 @@
         "TSE",
         "baselines oficiais validadas"
       ],
-      "estado": "IMPLEMENTATION_PENDING",
+      "estado": "IMPLEMENTADO",
       "metodologia_ref": "docs/knowledge/FASE-8-METODOLOGIA-PENDENTES.md"
     },
     {
