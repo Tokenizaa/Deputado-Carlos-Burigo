@@ -83,7 +83,7 @@ describe("electoral analytics — overview", () => {
   it("computes reusable territory capabilities", () => {
     expect(territorialStrength(rows,2).map(r=>r.municipality)).toEqual([3,2]);
     expect(territorialWeakness(rows,2).map(r=>r.municipality)).toEqual([1,2]);
-    expect(territoryConcentration(rows,2)).toBeCloseTo(50);
+    expect(territoryConcentration(rows,2)).toBeCloseTo(83.3333333333);
     expect(municipalVoteShare(rows).find(r=>r.municipality===3)?.votes_nominal).toBeCloseTo(50);
     expect(territorialDispersion(rows).positiveMunicipalities).toBe(3);
     expect(growthWithLowBase(rows,[{year:2026,municipality:1,votes_nominal:15},{year:2026,municipality:2,votes_nominal:25},{year:2026,municipality:3,votes_nominal:31}],20,2).length).toBe(2);
