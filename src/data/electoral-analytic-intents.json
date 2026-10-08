@@ -1378,7 +1378,7 @@
         "region"
       ],
       "metodo": "lostTerritorialStrength",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "lostTerritorialStrength",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -1944,7 +1944,7 @@
         "region"
       ],
       "metodo": "territorialTurningPoints",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "territorialTurningPoints",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -1986,7 +1986,7 @@
         "region"
       ],
       "metodo": "priorityChange",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "priorityChange",
       "entrada": "dados históricos municipais e/ou regionais",
       "saida": "object",
       "unidade": "a definir",
@@ -2110,7 +2110,7 @@
         "region"
       ],
       "metodo": "opportunityIndex",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "opportunityIndex",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2316,7 +2316,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "territorialMap",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2358,7 +2358,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "territorialMap",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2400,7 +2400,7 @@
         "region"
       ],
       "metodo": "territorialMap",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "territorialMap",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2483,7 +2483,7 @@
         "region"
       ],
       "metodo": "regionalOpportunity",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "regionalOpportunity",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -2853,7 +2853,7 @@
         "region"
       ],
       "metodo": "priorityIndex",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "priorityIndex",
       "entrada": "dados territoriais",
       "saida": "object",
       "unidade": "a definir",
@@ -3986,7 +3986,7 @@
         "region"
       ],
       "metodo": "strategicCompetitorRanking",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "strategicCompetitorRanking",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
@@ -4029,7 +4029,7 @@
         "region"
       ],
       "metodo": "competitiveTrend",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "competitiveTrend",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
@@ -4072,7 +4072,7 @@
         "region"
       ],
       "metodo": "candidateCompetitiveContext",
-      "funcao_analitica": "newTerritorialStrength",
+      "funcao_analitica": "candidateCompetitiveContext",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "object",
       "unidade": "a definir",
