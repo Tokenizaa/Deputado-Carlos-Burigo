@@ -72,7 +72,7 @@ describe("electoral analytics — overview", () => {
     const one = [{ year: 2026 as const, municipality: 1, votes_nominal: 10 }];
     expect(countStableMunicipalities(rows, rows, 0)).toBe(3);
     expect(maxPercentageGain(zero, one)).toBeNull();
-    expect(maxPercentageLoss(rows, one)).not.toBeNull();
+    expect(maxPercentageLoss(rows, [{ year: 2026 as const, municipality: 1, votes_nominal: 5 }])).not.toBeNull();
     expect(concentrationChange(rows, one, 1)).toBeDefined();
     expect(coverageChange(rows, one)).toBeDefined();
   });
