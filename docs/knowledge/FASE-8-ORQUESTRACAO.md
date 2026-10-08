@@ -177,3 +177,14 @@ As capacidades que dependem de dimensão regional não publicada permanecem expl
 A semântica competitiva preserva a exclusão do próprio candidato como concorrente e utiliza funções analíticas determinísticas para ranking, comparação, crescimento, sobreposição territorial e competição municipal.
 
 Validação final: `npm run test:unit` — **70/70**; `npm run test:integration` — **12/12**. O stderr de `bootstrap-admin` é esperado pelo cenário de teste e não representa falha.
+
+
+## Rodada 5 — Runtime Overview: participation_average
+
+**Status: CONCLUÍDA**
+
+EA-021 — `overview.participation_average` foi ligado ao runtime determinístico usando a função canônica `averageVotesWherePositive`. O cálculo considera exclusivamente municípios com votação nominal positiva do candidato, sem introduzir denominador ou limiar novo.
+
+A capacidade utiliza a projeção analítica do Supabase e mantém o escopo Deputado Estadual / RS / turno 1. Com a rodada, o catálogo passa a ter **81 intents implementados** e **19 intents pendentes**, sem alterar as capacidades que dependem de dimensão regional ou metodologia ainda não definida.
+
+Validação: teste unitário específico de EA-021 adicionado; execução final deve ocorrer localmente após o pull.
