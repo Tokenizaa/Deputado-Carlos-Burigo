@@ -1,0 +1,3405 @@
+{
+  "version": 1,
+  "intents": [
+    {
+      "id": "EA-001",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-002",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-003",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-004",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-005",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-006",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-007",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-008",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-009",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-010",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-011",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-012",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-013",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-014",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-015",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-016",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-017",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-018",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-019",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-020",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-021",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-022",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-023",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-024",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-025",
+      "area": "overview",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-026",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-027",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-028",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-029",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-030",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-031",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-032",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-033",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-034",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-035",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-036",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-037",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-038",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-039",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-040",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-041",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-042",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-043",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-044",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-045",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-046",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-047",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-048",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-049",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-050",
+      "area": "history",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-051",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-052",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-053",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-054",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-055",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-056",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-057",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-058",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-059",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-060",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-061",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-062",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-063",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-064",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-065",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-066",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-067",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-068",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-069",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-070",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-071",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-072",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-073",
+      "area": "territory",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-074",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-075",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-076",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-077",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-078",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-079",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-080",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-081",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-082",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-083",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-084",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-085",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-086",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-087",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-088",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-089",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-090",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-091",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-092",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-093",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-094",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-095",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-096",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-097",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-098",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-099",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    },
+    {
+      "id": "EA-100",
+      "area": "competition",
+      "pergunta": null,
+      "objetivo_analitico": "responder à pergunta com indicador determinístico",
+      "parametros": [
+        "year",
+        "limit",
+        "municipality",
+        "region",
+        "candidate"
+      ],
+      "fonte/modelo": [
+        "electoral_results_nominal",
+        "electoral_candidates",
+        "electoral_municipalities",
+        "electoral_elections"
+      ],
+      "granularidade": "municipio/estado",
+      "formula/regra": "usar funções puras de src/lib/electoral-analytics.ts",
+      "funcao_responsavel": "computeFromCatalog",
+      "formato_esperado": "number|object",
+      "unidade": "unidade apropriada",
+      "periodo/anos": [
+        2018,
+        2022,
+        2026
+      ],
+      "filtros": [],
+      "validacao_esperada": "valores coerentes com baselines oficiais",
+      "comparabilidade_entre_anos": true,
+      "aplicavel_dashboard": true,
+      "aplicavel_chatbot": true
+    }
+  ]
+}
