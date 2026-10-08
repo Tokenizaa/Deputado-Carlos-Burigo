@@ -80,4 +80,18 @@ describe("electoral analytics — overview", () => {
     expect(compareCandidateToStateGrowth(100,120,1000,1100).relativePerformancePctPoints).toBe(10);
     expect(historicalEvolution([{year:2026,votes:3},{year:2018,votes:1},{year:2022,votes:2}]).map(x=>x.year)).toEqual([2018,2022,2026]);
   });
+  it("computes reusable territory capabilities", () => {
+    expect(territorialStrength(rows,2).map(r=>r.municipality)).toEqual([3,2]);
+    expect(territorialWeakness(rows,2).map(r=>r.municipality)).toEqual([1,2]);
+    expect(territoryConcentration(rows,2)).toBeCloseTo(50);
+    expect(municipalVoteShare(rows).find(r=>r.municipality===3)?.votes_nominal).toBeCloseTo(50);
+    expect(territorialDispersion(rows).positiveMunicipalities).toBe(3);
+    expect(growthWithLowBase(rows,[{year:2026,municipality:1,votes_nominal:15},{year:2026,municipality:2,votes_nominal:25},{year:2026,municipality:3,votes_nominal:31}],20,2).length).toBe(2);
+    expect(strongAndDeclining(rows,[{year:2026,municipality:1,votes_nominal:5},{year:2026,municipality:2,votes_nominal:25},{year:2026,municipality:3,votes_nominal:20}],10,2).length).toBe(2);
+    expect(highAbsoluteGrowth(rows,[{year:2026,municipality:1,votes_nominal:15},{year:2026,municipality:2,votes_nominal:25},{year:2026,municipality:3,votes_nominal:31}],2)[0].municipality).toBe(1);
+    expect(compareMunicipalities(rows,[3,1]).map(r=>r.municipality)).toEqual([3,1]);
+    expect(regionalTotals([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}])).toEqual({N:40,S:20});
+    expect(regionalStrength([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}],1)[0].region).toBe("N");
+    expect(priorityScore(rows,2).length).toBe(2);
+  });
 });
