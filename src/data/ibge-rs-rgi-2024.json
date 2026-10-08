@@ -1,0 +1,3166 @@
+{
+  "version": "2024",
+  "source": "IBGE Malha Municipal 2024 / Regiões Geográficas Imediatas 2024",
+  "uf": "RS",
+  "region_type": "IBGE_RGI",
+  "municipality_count": 497,
+  "region_count": 43,
+  "regions": [
+    {
+      "code": "430028",
+      "name": "Carazinho"
+    },
+    {
+      "code": "430030",
+      "name": "Marau"
+    },
+    {
+      "code": "430024",
+      "name": "Cerro Largo"
+    },
+    {
+      "code": "430034",
+      "name": "Palmeira das Missões"
+    },
+    {
+      "code": "430017",
+      "name": "São Borja"
+    },
+    {
+      "code": "430037",
+      "name": "Bento Gonçalves"
+    },
+    {
+      "code": "430041",
+      "name": "Lajeado"
+    },
+    {
+      "code": "430031",
+      "name": "Soledade"
+    },
+    {
+      "code": "430036",
+      "name": "Caxias do Sul"
+    },
+    {
+      "code": "430029",
+      "name": "Frederico Westphalen"
+    },
+    {
+      "code": "430033",
+      "name": "Lagoa Vermelha"
+    },
+    {
+      "code": "430022",
+      "name": "São Luiz Gonzaga"
+    },
+    {
+      "code": "430001",
+      "name": "Porto Alegre"
+    },
+    {
+      "code": "430010",
+      "name": "Bagé"
+    },
+    {
+      "code": "430009",
+      "name": "Pelotas"
+    },
+    {
+      "code": "430007",
+      "name": "Montenegro"
+    },
+    {
+      "code": "430008",
+      "name": "Torres"
+    },
+    {
+      "code": "430021",
+      "name": "Três Passos"
+    },
+    {
+      "code": "430043",
+      "name": "Encantado"
+    },
+    {
+      "code": "430042",
+      "name": "Sobradinho"
+    },
+    {
+      "code": "430005",
+      "name": "Camaquã"
+    },
+    {
+      "code": "430018",
+      "name": "Ijuí"
+    },
+    {
+      "code": "430035",
+      "name": "Nonoai"
+    },
+    {
+      "code": "430019",
+      "name": "Santa Rosa"
+    },
+    {
+      "code": "430032",
+      "name": "Tapejara - Sananduva"
+    },
+    {
+      "code": "430040",
+      "name": "Santa Cruz do Sul"
+    },
+    {
+      "code": "430012",
+      "name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "code": "430026",
+      "name": "Erechim"
+    },
+    {
+      "code": "430006",
+      "name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "code": "430038",
+      "name": "Nova Prata - Guaporé"
+    },
+    {
+      "code": "430020",
+      "name": "Santo Ângelo"
+    },
+    {
+      "code": "430011",
+      "name": "Santa Maria"
+    },
+    {
+      "code": "430014",
+      "name": "Santiago"
+    },
+    {
+      "code": "430003",
+      "name": "Tramandaí - Osório"
+    },
+    {
+      "code": "430039",
+      "name": "Vacaria"
+    },
+    {
+      "code": "430027",
+      "name": "Cruz Alta"
+    },
+    {
+      "code": "430002",
+      "name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "code": "430013",
+      "name": "Cachoeira do Sul"
+    },
+    {
+      "code": "430004",
+      "name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "code": "430016",
+      "name": "Santana do Livramento"
+    },
+    {
+      "code": "430023",
+      "name": "Três de Maio"
+    },
+    {
+      "code": "430025",
+      "name": "Passo Fundo"
+    },
+    {
+      "code": "430015",
+      "name": "Uruguaiana"
+    }
+  ],
+  "municipalities": [
+    {
+      "municipality_code": "4316204",
+      "municipality_name": "Rondinha",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4317558",
+      "municipality_name": "Santo Antônio do Palma",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4319307",
+      "municipality_name": "São Paulo das Missões",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4311429",
+      "municipality_name": "Lajeado do Bugre",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4318002",
+      "municipality_name": "São Borja",
+      "region_code": "430017",
+      "region_name": "São Borja"
+    },
+    {
+      "municipality_code": "4308607",
+      "municipality_name": "Garibaldi",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4311403",
+      "municipality_name": "Lajeado",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4312757",
+      "municipality_name": "Nova Alvorada",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4301404",
+      "municipality_name": "Arvorezinha",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4318051",
+      "municipality_name": "São Domingos do Sul",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4313201",
+      "municipality_name": "Nova Petrópolis",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4320206",
+      "municipality_name": "Seberi",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4303202",
+      "municipality_name": "Cacique Doble",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4308656",
+      "municipality_name": "Garruchos",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4307708",
+      "municipality_name": "Esteio",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4314506",
+      "municipality_name": "Pinheiro Machado",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4319372",
+      "municipality_name": "São Pedro do Butiá",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4304507",
+      "municipality_name": "Canguçu",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4319356",
+      "municipality_name": "São Pedro da Serra",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4309951",
+      "municipality_name": "Ibirapuitã",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4319364",
+      "municipality_name": "São Pedro das Missões",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4314548",
+      "municipality_name": "Pinto Bandeira",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4314555",
+      "municipality_name": "Pirapó",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4321501",
+      "municipality_name": "Torres",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4320230",
+      "municipality_name": "Sede Nova",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4307302",
+      "municipality_name": "Erval Seco",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4315800",
+      "municipality_name": "Roca Sales",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4320263",
+      "municipality_name": "Segredo",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4306007",
+      "municipality_name": "Crissiumal",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4309100",
+      "municipality_name": "Gramado",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4322806",
+      "municipality_name": "Veranópolis",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4306072",
+      "municipality_name": "Cristal do Sul",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4318903",
+      "municipality_name": "São Luiz Gonzaga",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4306056",
+      "municipality_name": "Cristal",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4322855",
+      "municipality_name": "Vespasiano Corrêa",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4310207",
+      "municipality_name": "Ijuí",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4323309",
+      "municipality_name": "Vila Flores",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4309126",
+      "municipality_name": "Gramado dos Loureiros",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4300208",
+      "municipality_name": "Ajuricaba",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4315008",
+      "municipality_name": "Porto Lucena",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4305009",
+      "municipality_name": "Catuípe",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4315057",
+      "municipality_name": "Porto Mauá",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4323358",
+      "municipality_name": "Vila Lângaro",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4317608",
+      "municipality_name": "Santo Antônio da Patrulha",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4309159",
+      "municipality_name": "Gramado Xavier",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4306908",
+      "municipality_name": "Encruzilhada do Sul",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4316303",
+      "municipality_name": "Roque Gonzales",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4311502",
+      "municipality_name": "Lavras do Sul",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4315073",
+      "municipality_name": "Porto Vera Cruz",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4301503",
+      "municipality_name": "Augusto Pestana",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4306957",
+      "municipality_name": "Entre Rios do Sul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4322004",
+      "municipality_name": "Triunfo",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "municipality_code": "4320701",
+      "municipality_name": "Sobradinho",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4312807",
+      "municipality_name": "Nova Araçá",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4306924",
+      "municipality_name": "Engenho Velho",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4314605",
+      "municipality_name": "Piratini",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4302808",
+      "municipality_name": "Caçapava do Sul",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4306932",
+      "municipality_name": "Entre-Ijuís",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4304606",
+      "municipality_name": "Canoas",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4319406",
+      "municipality_name": "São Pedro do Sul",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4318101",
+      "municipality_name": "São Francisco de Assis",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4308706",
+      "municipality_name": "Gaurama",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4304614",
+      "municipality_name": "Canudos do Vale",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4306973",
+      "municipality_name": "Erebango",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4313300",
+      "municipality_name": "Nova Prata",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4301552",
+      "municipality_name": "Áurea",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4313359",
+      "municipality_name": "Nova Roma do Sul",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4303301",
+      "municipality_name": "Caibaté",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4304655",
+      "municipality_name": "Capão do Cipó",
+      "region_code": "430014",
+      "region_name": "Santiago"
+    },
+    {
+      "municipality_code": "4304622",
+      "municipality_name": "Capão Bonito do Sul",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4323804",
+      "municipality_name": "Xangri-lá",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4315909",
+      "municipality_name": "Rodeio Bonito",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4307401",
+      "municipality_name": "Esmeralda",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4313334",
+      "municipality_name": "Nova Ramada",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4304630",
+      "municipality_name": "Capão da Canoa",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4306106",
+      "municipality_name": "Cruz Alta",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4304689",
+      "municipality_name": "Capela de Santana",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4313391",
+      "municipality_name": "Novo Cabrais",
+      "region_code": "430013",
+      "region_name": "Cachoeira do Sul"
+    },
+    {
+      "municipality_code": "4304697",
+      "municipality_name": "Capitão",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4304663",
+      "municipality_name": "Capão do Leão",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4304671",
+      "municipality_name": "Capivari do Sul",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4313375",
+      "municipality_name": "Nova Santa Rita",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4310702",
+      "municipality_name": "Itatiba do Sul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4312005",
+      "municipality_name": "Mariano Moro",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4300703",
+      "municipality_name": "Anta Gorda",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4315107",
+      "municipality_name": "Porto Xavier",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4306130",
+      "municipality_name": "Cruzaltense",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4302006",
+      "municipality_name": "Barros Cassal",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4305587",
+      "municipality_name": "Colinas",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4315958",
+      "municipality_name": "Rolador",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4307450",
+      "municipality_name": "Esperança do Sul",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4309209",
+      "municipality_name": "Gravataí",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4322509",
+      "municipality_name": "Vacaria",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4309258",
+      "municipality_name": "Guabiju",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4312054",
+      "municipality_name": "Marques de Souza",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4310751",
+      "municipality_name": "Ivorá",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4322541",
+      "municipality_name": "Vale Real",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4321204",
+      "municipality_name": "Taquara",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4322558",
+      "municipality_name": "Vanini",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4322525",
+      "municipality_name": "Vale Verde",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4313805",
+      "municipality_name": "Palmitinho",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4303806",
+      "municipality_name": "Campinas do Sul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4323002",
+      "municipality_name": "Viamão",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4316428",
+      "municipality_name": "Sagrada Família",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4322533",
+      "municipality_name": "Vale do Sol",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4320800",
+      "municipality_name": "Soledade",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4317707",
+      "municipality_name": "Santo Antônio das Missões",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4316436",
+      "municipality_name": "Saldanha Marinho",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4318622",
+      "municipality_name": "São José dos Ausentes",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4316402",
+      "municipality_name": "Rosário do Sul",
+      "region_code": "430016",
+      "region_name": "Santana do Livramento"
+    },
+    {
+      "municipality_code": "4317756",
+      "municipality_name": "Santo Antônio do Planalto",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4308805",
+      "municipality_name": "General Câmara",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "municipality_code": "4320859",
+      "municipality_name": "Tabaí",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4312500",
+      "municipality_name": "Mostardas",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4302501",
+      "municipality_name": "Bossoroca",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4317301",
+      "municipality_name": "Santa Vitória do Palmar",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4316006",
+      "municipality_name": "Rolante",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4319109",
+      "municipality_name": "São Martinho",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4309704",
+      "municipality_name": "Humaitá",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4308409",
+      "municipality_name": "Formigueiro",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4311205",
+      "municipality_name": "Júlio de Castilhos",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4301206",
+      "municipality_name": "Arroio do Tigre",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4311254",
+      "municipality_name": "Lagoão",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4313003",
+      "municipality_name": "Nova Bréscia",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4310801",
+      "municipality_name": "Ivoti",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4320008",
+      "municipality_name": "Sapucaia do Sul",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4311239",
+      "municipality_name": "Lagoa Bonita do Sul",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4319125",
+      "municipality_name": "São Martinho da Serra",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4300802",
+      "municipality_name": "Antônio Prado",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4308458",
+      "municipality_name": "Fortaleza dos Valos",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4314308",
+      "municipality_name": "Pejuçara",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4302584",
+      "municipality_name": "Bozano",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4305603",
+      "municipality_name": "Colorado",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4304309",
+      "municipality_name": "Cândido Godói",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4313037",
+      "municipality_name": "Nova Esperança do Sul",
+      "region_code": "430014",
+      "region_name": "Santiago"
+    },
+    {
+      "municipality_code": "4308433",
+      "municipality_name": "Forquetinha",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4319158",
+      "municipality_name": "São Miguel das Missões",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4309753",
+      "municipality_name": "Ibarama",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4313011",
+      "municipality_name": "Nova Candelária",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4316907",
+      "municipality_name": "Santa Maria",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4311270",
+      "municipality_name": "Lagoa dos Três Cantos",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4310850",
+      "municipality_name": "Jaboticaba",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4300851",
+      "municipality_name": "Arambaré",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4313086",
+      "municipality_name": "Nova Pádua",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4304358",
+      "municipality_name": "Candiota",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4321303",
+      "municipality_name": "Taquari",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4303004",
+      "municipality_name": "Cachoeira do Sul",
+      "region_code": "430013",
+      "region_name": "Cachoeira do Sul"
+    },
+    {
+      "municipality_code": "4313060",
+      "municipality_name": "Nova Hartz",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4307104",
+      "municipality_name": "Herval",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4315602",
+      "municipality_name": "Rio Grande",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4316956",
+      "municipality_name": "Santa Maria do Herval",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4310876",
+      "municipality_name": "Jacuizinho",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4322608",
+      "municipality_name": "Venâncio Aires",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4300877",
+      "municipality_name": "Araricá",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4321329",
+      "municipality_name": "Taquaruçu do Sul",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4318705",
+      "municipality_name": "São Leopoldo",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4310009",
+      "municipality_name": "Ibirubá",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4316972",
+      "municipality_name": "Santa Margarida do Sul",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4313904",
+      "municipality_name": "Panambi",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4303905",
+      "municipality_name": "Campo Bom",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4321352",
+      "municipality_name": "Tavares",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4323101",
+      "municipality_name": "Vicente Dutra",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4313953",
+      "municipality_name": "Pantano Grande",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4320909",
+      "municipality_name": "Tapejara",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4317400",
+      "municipality_name": "Santiago",
+      "region_code": "430014",
+      "region_name": "Santiago"
+    },
+    {
+      "municipality_code": "4316105",
+      "municipality_name": "Ronda Alta",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4306700",
+      "municipality_name": "Dona Francisca",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4300059",
+      "municipality_name": "Água Santa",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4311304",
+      "municipality_name": "Lagoa Vermelha",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4301305",
+      "municipality_name": "Arroio Grande",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4300034",
+      "municipality_name": "Aceguá",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4312625",
+      "municipality_name": "Muliterno",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4306759",
+      "municipality_name": "Doutor Ricardo",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4320503",
+      "municipality_name": "Sertão",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4312609",
+      "municipality_name": "Muçum",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4312617",
+      "municipality_name": "Muitos Capões",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4302600",
+      "municipality_name": "Braga",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4314407",
+      "municipality_name": "Pelotas",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4305702",
+      "municipality_name": "Condor",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4306734",
+      "municipality_name": "Doutor Maurício Cardoso",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4304408",
+      "municipality_name": "Canela",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4319208",
+      "municipality_name": "São Nicolau",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4309803",
+      "municipality_name": "Ibiaçá",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4320578",
+      "municipality_name": "Sete de Setembro",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4312674",
+      "municipality_name": "Nicolau Vergueiro",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4308508",
+      "municipality_name": "Frederico Westphalen",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4306767",
+      "municipality_name": "Eldorado do Sul",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4312658",
+      "municipality_name": "Não-Me-Toque",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4302659",
+      "municipality_name": "Brochier",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4320552",
+      "municipality_name": "Sertão Santana",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4313102",
+      "municipality_name": "Nova Palma",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4314456",
+      "municipality_name": "Pinhal",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4314423",
+      "municipality_name": "Picada Café",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4321808",
+      "municipality_name": "Três de Maio",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4321857",
+      "municipality_name": "Três Palmeiras",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4323606",
+      "municipality_name": "Vista Alegre do Prata",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4307203",
+      "municipality_name": "Erval Grande",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4315701",
+      "municipality_name": "Rio Pardo",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4304002",
+      "municipality_name": "Campo Novo",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4314498",
+      "municipality_name": "Pinheirinho do Vale",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4321832",
+      "municipality_name": "Três Forquilhas",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4314464",
+      "municipality_name": "Pinhal da Serra",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4314472",
+      "municipality_name": "Pinhal Grande",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4318804",
+      "municipality_name": "São Lourenço do Sul",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4314050",
+      "municipality_name": "Parobé",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4310538",
+      "municipality_name": "Itaara",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4303103",
+      "municipality_name": "Cachoeirinha",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4300505",
+      "municipality_name": "Alpestre",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4310504",
+      "municipality_name": "Iraí",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4305371",
+      "municipality_name": "Charrua",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4314027",
+      "municipality_name": "Paraíso do Sul",
+      "region_code": "430013",
+      "region_name": "Cachoeira do Sul"
+    },
+    {
+      "municipality_code": "4314035",
+      "municipality_name": "Pareci Novo",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4309001",
+      "municipality_name": "Giruá",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4315750",
+      "municipality_name": "Riozinho",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4305355",
+      "municipality_name": "Charqueadas",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "municipality_code": "4322301",
+      "municipality_name": "Tuparendi",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4310579",
+      "municipality_name": "Itapuca",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4300570",
+      "municipality_name": "Alto Feliz",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4314068",
+      "municipality_name": "Passa Sete",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4314076",
+      "municipality_name": "Passo do Sobrado",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4300554",
+      "municipality_name": "Alto Alegre",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4309050",
+      "municipality_name": "Glorinha",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4310553",
+      "municipality_name": "Itacurubi",
+      "region_code": "430014",
+      "region_name": "Santiago"
+    },
+    {
+      "municipality_code": "4318408",
+      "municipality_name": "São Jerônimo",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "municipality_code": "4322343",
+      "municipality_name": "Ubiretama",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4321006",
+      "municipality_name": "Tapera",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4301800",
+      "municipality_name": "Barracão",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4311809",
+      "municipality_name": "Marau",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4322350",
+      "municipality_name": "União da Serra",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4322327",
+      "municipality_name": "Turuçu",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4319737",
+      "municipality_name": "São Valério do Sul",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4301859",
+      "municipality_name": "Barra do Guarita",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4303608",
+      "municipality_name": "Cambará do Sul",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4313607",
+      "municipality_name": "Paim Filho",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4318440",
+      "municipality_name": "São Jorge",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4320602",
+      "municipality_name": "Severiano de Almeida",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4317509",
+      "municipality_name": "Santo Ângelo",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4319711",
+      "municipality_name": "São Valentim do Sul",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4315354",
+      "municipality_name": "Quinze de Novembro",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4318457",
+      "municipality_name": "São José das Missões",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4306809",
+      "municipality_name": "Encantado",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4304903",
+      "municipality_name": "Casca",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4314902",
+      "municipality_name": "Porto Alegre",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4318424",
+      "municipality_name": "São João da Urtiga",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4309902",
+      "municipality_name": "Ibiraiaras",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4318432",
+      "municipality_name": "São João do Polêsine",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4319752",
+      "municipality_name": "São Vendelino",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4322376",
+      "municipality_name": "Unistalda",
+      "region_code": "430014",
+      "region_name": "Santiago"
+    },
+    {
+      "municipality_code": "4318481",
+      "municipality_name": "São José do Hortêncio",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4318499",
+      "municipality_name": "São José do Inhacorá",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4301875",
+      "municipality_name": "Barra do Quaraí",
+      "region_code": "430015",
+      "region_name": "Uruguaiana"
+    },
+    {
+      "municipality_code": "4320651",
+      "municipality_name": "Silveira Martins",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4318465",
+      "municipality_name": "São José do Herval",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4303673",
+      "municipality_name": "Campestre da Serra",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4304952",
+      "municipality_name": "Caseiros",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4321907",
+      "municipality_name": "Três Passos",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4313656",
+      "municipality_name": "Palmares do Sul",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4302303",
+      "municipality_name": "Bom Jesus",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4306429",
+      "municipality_name": "Dois Irmãos das Missões",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4312302",
+      "municipality_name": "Miraguaí",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4317103",
+      "municipality_name": "Sant'Ana do Livramento",
+      "region_code": "430016",
+      "region_name": "Santana do Livramento"
+    },
+    {
+      "municipality_code": "4306403",
+      "municipality_name": "Dois Irmãos",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4320677",
+      "municipality_name": "Sinimbu",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4309506",
+      "municipality_name": "Guarani das Missões",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4308201",
+      "municipality_name": "Flores da Cunha",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4301008",
+      "municipality_name": "Arroio do Meio",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4311007",
+      "municipality_name": "Jaguarão",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4302352",
+      "municipality_name": "Bom Princípio",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4312351",
+      "municipality_name": "Montauri",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4301057",
+      "municipality_name": "Arroio do Sal",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4308250",
+      "municipality_name": "Floriano Peixoto",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4306452",
+      "municipality_name": "Dois Lajeados",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4300604",
+      "municipality_name": "Alvorada",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4310603",
+      "municipality_name": "Itaqui",
+      "region_code": "430017",
+      "region_name": "São Borja"
+    },
+    {
+      "municipality_code": "4321956",
+      "municipality_name": "Trindade do Sul",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4323705",
+      "municipality_name": "Vista Gaúcha",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4312385",
+      "municipality_name": "Monte Belo do Sul",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4305405",
+      "municipality_name": "Chiapetta",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4314134",
+      "municipality_name": "Paulo Bento",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4309571",
+      "municipality_name": "Herveiras",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4304101",
+      "municipality_name": "Campos Borges",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4314100",
+      "municipality_name": "Passo Fundo",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4305454",
+      "municipality_name": "Cidreira",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4323754",
+      "municipality_name": "Vitória das Missões",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4302378",
+      "municipality_name": "Bom Progresso",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4309555",
+      "municipality_name": "Harmonia",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4312377",
+      "municipality_name": "Monte Alegre dos Campos",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4300646",
+      "municipality_name": "Ametista do Sul",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4316709",
+      "municipality_name": "Santa Bárbara do Sul",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4305439",
+      "municipality_name": "Chuí",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4301073",
+      "municipality_name": "Arroio do Padre",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4314175",
+      "municipality_name": "Pedras Altas",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4305447",
+      "municipality_name": "Chuvisca",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4310652",
+      "municipality_name": "Itati",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4300638",
+      "municipality_name": "Amaral Ferrador",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4314159",
+      "municipality_name": "Paverama",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4321105",
+      "municipality_name": "Tapes",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4301909",
+      "municipality_name": "Barra do Ribeiro",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4311908",
+      "municipality_name": "Marcelino Ramos",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4323770",
+      "municipality_name": "Westfália",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4315404",
+      "municipality_name": "Redentora",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4316758",
+      "municipality_name": "Santa Clara do Sul",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4300661",
+      "municipality_name": "André da Rocha",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4322400",
+      "municipality_name": "Uruguaiana",
+      "region_code": "430015",
+      "region_name": "Uruguaiana"
+    },
+    {
+      "municipality_code": "4315453",
+      "municipality_name": "Relvado",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4316733",
+      "municipality_name": "Santa Cecília do Sul",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4319802",
+      "municipality_name": "São Vicente do Sul",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4301925",
+      "municipality_name": "Barra do Rio Azul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4318507",
+      "municipality_name": "São José do Norte",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4311981",
+      "municipality_name": "Mariana Pimentel",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4301958",
+      "municipality_name": "Barra Funda",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4303707",
+      "municipality_name": "Campina das Missões",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4313706",
+      "municipality_name": "Palmeira das Missões",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4307807",
+      "municipality_name": "Estrela",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4317202",
+      "municipality_name": "Santa Rosa",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4306502",
+      "municipality_name": "Dom Feliciano",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4307831",
+      "municipality_name": "Eugênio de Castro",
+      "region_code": "430020",
+      "region_name": "Santo Ângelo"
+    },
+    {
+      "municipality_code": "4301107",
+      "municipality_name": "Arroio dos Ratos",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4311106",
+      "municipality_name": "Jaguari",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4320321",
+      "municipality_name": "Senador Salgado Filho",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4312427",
+      "municipality_name": "Mormaço",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4307815",
+      "municipality_name": "Estrela Velha",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4320305",
+      "municipality_name": "Selbach",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4306551",
+      "municipality_name": "Dom Pedro de Alcântara",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4302402",
+      "municipality_name": "Bom Retiro do Sul",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4312401",
+      "municipality_name": "Montenegro",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4311130",
+      "municipality_name": "Jari",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4305504",
+      "municipality_name": "Ciríaco",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4314209",
+      "municipality_name": "Pedro Osório",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4304200",
+      "municipality_name": "Candelária",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4317251",
+      "municipality_name": "Santa Tereza",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4319000",
+      "municipality_name": "São Marcos",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4322905",
+      "municipality_name": "Viadutos",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4309605",
+      "municipality_name": "Horizontina",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4308300",
+      "municipality_name": "Fontoura Xavier",
+      "region_code": "430031",
+      "region_name": "Soledade"
+    },
+    {
+      "municipality_code": "4309654",
+      "municipality_name": "Hulha Negra",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4311122",
+      "municipality_name": "Jaquirana",
+      "region_code": "430039",
+      "region_name": "Vacaria"
+    },
+    {
+      "municipality_code": "4312476",
+      "municipality_name": "Morro Reuter",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4307864",
+      "municipality_name": "Fagundes Varela",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4312443",
+      "municipality_name": "Morrinhos do Sul",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4321626",
+      "municipality_name": "Travesseiro",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4320354",
+      "municipality_name": "Sentinela do Sul",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4302451",
+      "municipality_name": "Boqueirão do Leão",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4312450",
+      "municipality_name": "Morro Redondo",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4311155",
+      "municipality_name": "Jóia",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4321600",
+      "municipality_name": "Tramandaí",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4323408",
+      "municipality_name": "Vila Maria",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4321667",
+      "municipality_name": "Três Cachoeiras",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4307005",
+      "municipality_name": "Erechim",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4305108",
+      "municipality_name": "Caxias do Sul",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4315503",
+      "municipality_name": "Restinga Sêca",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4321634",
+      "municipality_name": "Três Arroios",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4316808",
+      "municipality_name": "Santa Cruz do Sul",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4305132",
+      "municipality_name": "Cerro Branco",
+      "region_code": "430013",
+      "region_name": "Cachoeira do Sul"
+    },
+    {
+      "municipality_code": "4319901",
+      "municipality_name": "Sapiranga",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4318606",
+      "municipality_name": "São José do Ouro",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4302055",
+      "municipality_name": "Benjamin Constant do Sul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4305116",
+      "municipality_name": "Centenário",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4318614",
+      "municipality_name": "São José do Sul",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4310330",
+      "municipality_name": "Imbé",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4305124",
+      "municipality_name": "Cerrito",
+      "region_code": "430009",
+      "region_name": "Pelotas"
+    },
+    {
+      "municipality_code": "4310306",
+      "municipality_name": "Ilópolis",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4300307",
+      "municipality_name": "Alecrim",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4305173",
+      "municipality_name": "Cerro Grande do Sul",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4323457",
+      "municipality_name": "Vila Nova do Sul",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4307054",
+      "municipality_name": "Ernestina",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4322103",
+      "municipality_name": "Tucunduva",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4310363",
+      "municipality_name": "Imigrante",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4305157",
+      "municipality_name": "Cerro Grande",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4315552",
+      "municipality_name": "Rio dos Índios",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4312906",
+      "municipality_name": "Nova Bassano",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4302907",
+      "municipality_name": "Cacequi",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4315131",
+      "municipality_name": "Pouso Novo",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4319505",
+      "municipality_name": "São Sebastião do Caí",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4311627",
+      "municipality_name": "Lindolfo Collor",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4315149",
+      "municipality_name": "Presidente Lucena",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4318200",
+      "municipality_name": "São Francisco de Paula",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4322152",
+      "municipality_name": "Tunas",
+      "region_code": "430042",
+      "region_name": "Sobradinho"
+    },
+    {
+      "municipality_code": "4311601",
+      "municipality_name": "Liberato Salzano",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4312955",
+      "municipality_name": "Nova Boa Vista",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4316477",
+      "municipality_name": "Salvador das Missões",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4301602",
+      "municipality_name": "Bagé",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4315172",
+      "municipality_name": "Protásio Alves",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4313409",
+      "municipality_name": "Novo Hamburgo",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4320404",
+      "municipality_name": "Serafina Corrêa",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4316451",
+      "municipality_name": "Salto do Jacuí",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4301651",
+      "municipality_name": "Barão",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4303400",
+      "municipality_name": "Caiçara",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4322186",
+      "municipality_name": "Tupanci do Sul",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4315156",
+      "municipality_name": "Progresso",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4301636",
+      "municipality_name": "Balneário Pinhal",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4307906",
+      "municipality_name": "Farroupilha",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4308854",
+      "municipality_name": "Gentil",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4314704",
+      "municipality_name": "Planalto",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4311643",
+      "municipality_name": "Linha Nova",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4304705",
+      "municipality_name": "Carazinho",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4306601",
+      "municipality_name": "Dom Pedrito",
+      "region_code": "430010",
+      "region_name": "Bagé"
+    },
+    {
+      "municipality_code": "4313441",
+      "municipality_name": "Novo Tiradentes",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4304713",
+      "municipality_name": "Caraá",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4314779",
+      "municipality_name": "Pontão",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4320453",
+      "municipality_name": "Sério",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4313425",
+      "municipality_name": "Novo Machado",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4321709",
+      "municipality_name": "Três Coroas",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4314753",
+      "municipality_name": "Poço das Antas",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4312104",
+      "municipality_name": "Mata",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4302105",
+      "municipality_name": "Bento Gonçalves",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4313466",
+      "municipality_name": "Novo Xingu",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4307500",
+      "municipality_name": "Espumoso",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4314787",
+      "municipality_name": "Ponte Preta",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4317806",
+      "municipality_name": "Santo Augusto",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4306205",
+      "municipality_name": "Cruzeiro do Sul",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4307559",
+      "municipality_name": "Estação",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4309308",
+      "municipality_name": "Guaíba",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4308003",
+      "municipality_name": "Faxinal do Soturno",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4313490",
+      "municipality_name": "Novo Barreiro",
+      "region_code": "430034",
+      "region_name": "Palmeira das Missões"
+    },
+    {
+      "municipality_code": "4312153",
+      "municipality_name": "Mato Leitão",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4302154",
+      "municipality_name": "Boa Vista das Missões",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4308052",
+      "municipality_name": "Faxinalzinho",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4312138",
+      "municipality_name": "Mato Castelhano",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4310405",
+      "municipality_name": "Independência",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4323507",
+      "municipality_name": "Vista Alegre",
+      "region_code": "430029",
+      "region_name": "Frederico Westphalen"
+    },
+    {
+      "municipality_code": "4300406",
+      "municipality_name": "Alegrete",
+      "region_code": "430015",
+      "region_name": "Uruguaiana"
+    },
+    {
+      "municipality_code": "4310413",
+      "municipality_name": "Inhacorá",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4305207",
+      "municipality_name": "Cerro Largo",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4312179",
+      "municipality_name": "Mato Queimado",
+      "region_code": "430024",
+      "region_name": "Cerro Largo"
+    },
+    {
+      "municipality_code": "4316501",
+      "municipality_name": "Salvador do Sul",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4300455",
+      "municipality_name": "Alegria",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4308078",
+      "municipality_name": "Fazenda Vilanova",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4310439",
+      "municipality_name": "Ipê",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4311700",
+      "municipality_name": "Machadinho",
+      "region_code": "430033",
+      "region_name": "Lagoa Vermelha"
+    },
+    {
+      "municipality_code": "4301701",
+      "municipality_name": "Barão de Cotegipe",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4315206",
+      "municipality_name": "Putinga",
+      "region_code": "430043",
+      "region_name": "Encantado"
+    },
+    {
+      "municipality_code": "4305801",
+      "municipality_name": "Constantina",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4322202",
+      "municipality_name": "Tupanciretã",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4311734",
+      "municipality_name": "Mampituba",
+      "region_code": "430008",
+      "region_name": "Torres"
+    },
+    {
+      "municipality_code": "4310462",
+      "municipality_name": "Ipiranga do Sul",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4305850",
+      "municipality_name": "Coqueiros do Sul",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4314803",
+      "municipality_name": "Portão",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4300471",
+      "municipality_name": "Almirante Tamandaré do Sul",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4304804",
+      "municipality_name": "Carlos Barbosa",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4311718",
+      "municipality_name": "Maçambará",
+      "region_code": "430017",
+      "region_name": "São Borja"
+    },
+    {
+      "municipality_code": "4305835",
+      "municipality_name": "Coqueiro Baixo",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4319604",
+      "municipality_name": "São Sepé",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4318309",
+      "municipality_name": "São Gabriel",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4308904",
+      "municipality_name": "Getúlio Vargas",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4311775",
+      "municipality_name": "Maquiné",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4322251",
+      "municipality_name": "Tupandi",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4311759",
+      "municipality_name": "Manoel Viana",
+      "region_code": "430015",
+      "region_name": "Uruguaiana"
+    },
+    {
+      "municipality_code": "4313508",
+      "municipality_name": "Osório",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4305871",
+      "municipality_name": "Coronel Barros",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4303509",
+      "municipality_name": "Camaquã",
+      "region_code": "430005",
+      "region_name": "Camaquã"
+    },
+    {
+      "municipality_code": "4301750",
+      "municipality_name": "Barão do Triunfo",
+      "region_code": "430001",
+      "region_name": "Porto Alegre"
+    },
+    {
+      "municipality_code": "4304853",
+      "municipality_name": "Carlos Gomes",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4303558",
+      "municipality_name": "Camargo",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4307609",
+      "municipality_name": "Estância Velha",
+      "region_code": "430002",
+      "region_name": "Novo Hamburgo - São Leopoldo"
+    },
+    {
+      "municipality_code": "4317004",
+      "municipality_name": "Santana da Boa Vista",
+      "region_code": "430012",
+      "region_name": "São Gabriel - Caçapava do Sul"
+    },
+    {
+      "municipality_code": "4306304",
+      "municipality_name": "David Canabarro",
+      "region_code": "430030",
+      "region_name": "Marau"
+    },
+    {
+      "municipality_code": "4311791",
+      "municipality_name": "Maratá",
+      "region_code": "430007",
+      "region_name": "Montenegro"
+    },
+    {
+      "municipality_code": "4320107",
+      "municipality_name": "Sarandi",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4302220",
+      "municipality_name": "Boa Vista do Cadeado",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4306353",
+      "municipality_name": "Dezesseis de Novembro",
+      "region_code": "430022",
+      "region_name": "São Luiz Gonzaga"
+    },
+    {
+      "municipality_code": "4310900",
+      "municipality_name": "Jacutinga",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4302238",
+      "municipality_name": "Boa Vista do Incra",
+      "region_code": "430027",
+      "region_name": "Cruz Alta"
+    },
+    {
+      "municipality_code": "4306320",
+      "municipality_name": "Derrubadas",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4312203",
+      "municipality_name": "Maximiliano de Almeida",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4300901",
+      "municipality_name": "Aratiba",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4302204",
+      "municipality_name": "Boa Vista do Buricá",
+      "region_code": "430023",
+      "region_name": "Três de Maio"
+    },
+    {
+      "municipality_code": "4305306",
+      "municipality_name": "Chapada",
+      "region_code": "430028",
+      "region_name": "Carazinho"
+    },
+    {
+      "municipality_code": "4314001",
+      "municipality_name": "Paraí",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4322707",
+      "municipality_name": "Vera Cruz",
+      "region_code": "430040",
+      "region_name": "Santa Cruz do Sul"
+    },
+    {
+      "municipality_code": "4317905",
+      "municipality_name": "Santo Cristo",
+      "region_code": "430019",
+      "region_name": "Santa Rosa"
+    },
+    {
+      "municipality_code": "4309407",
+      "municipality_name": "Guaporé",
+      "region_code": "430038",
+      "region_name": "Nova Prata - Guaporé"
+    },
+    {
+      "municipality_code": "4308102",
+      "municipality_name": "Feliz",
+      "region_code": "430036",
+      "region_name": "Caxias do Sul"
+    },
+    {
+      "municipality_code": "4317954",
+      "municipality_name": "Santo Expedito do Sul",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4306379",
+      "municipality_name": "Dilermando de Aguiar",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4312252",
+      "municipality_name": "Minas do Leão",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    },
+    {
+      "municipality_code": "4302253",
+      "municipality_name": "Boa Vista do Sul",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4321402",
+      "municipality_name": "Tenente Portela",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4321451",
+      "municipality_name": "Teutônia",
+      "region_code": "430041",
+      "region_name": "Lajeado"
+    },
+    {
+      "municipality_code": "4323200",
+      "municipality_name": "Victor Graeff",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4321469",
+      "municipality_name": "Tio Hugo",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4315305",
+      "municipality_name": "Quaraí",
+      "region_code": "430016",
+      "region_name": "Santana do Livramento"
+    },
+    {
+      "municipality_code": "4321436",
+      "municipality_name": "Terra de Areia",
+      "region_code": "430003",
+      "region_name": "Tramandaí - Osório"
+    },
+    {
+      "municipality_code": "4305900",
+      "municipality_name": "Coronel Bicaco",
+      "region_code": "430018",
+      "region_name": "Ijuí"
+    },
+    {
+      "municipality_code": "4316600",
+      "municipality_name": "Sananduva",
+      "region_code": "430032",
+      "region_name": "Tapejara - Sananduva"
+    },
+    {
+      "municipality_code": "4321493",
+      "municipality_name": "Toropi",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4305934",
+      "municipality_name": "Coronel Pilar",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4319703",
+      "municipality_name": "São Valentim",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4321477",
+      "municipality_name": "Tiradentes do Sul",
+      "region_code": "430021",
+      "region_name": "Três Passos"
+    },
+    {
+      "municipality_code": "4315313",
+      "municipality_name": "Quatro Irmãos",
+      "region_code": "430026",
+      "region_name": "Erechim"
+    },
+    {
+      "municipality_code": "4310108",
+      "municipality_name": "Igrejinha",
+      "region_code": "430004",
+      "region_name": "Taquara - Parobé - Igrejinha"
+    },
+    {
+      "municipality_code": "4315321",
+      "municipality_name": "Quevedos",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4300109",
+      "municipality_name": "Agudo",
+      "region_code": "430011",
+      "region_name": "Santa Maria"
+    },
+    {
+      "municipality_code": "4305975",
+      "municipality_name": "Coxilha",
+      "region_code": "430025",
+      "region_name": "Passo Fundo"
+    },
+    {
+      "municipality_code": "4312708",
+      "municipality_name": "Nonoai",
+      "region_code": "430035",
+      "region_name": "Nonoai"
+    },
+    {
+      "municipality_code": "4305959",
+      "municipality_name": "Cotiporã",
+      "region_code": "430037",
+      "region_name": "Bento Gonçalves"
+    },
+    {
+      "municipality_code": "4302709",
+      "municipality_name": "Butiá",
+      "region_code": "430006",
+      "region_name": "Charqueadas - Triunfo - São Jerônimo"
+    }
+  ]
+}
