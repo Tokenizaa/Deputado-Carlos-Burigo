@@ -47,7 +47,7 @@ export function buildElectoralCsv(response: ElectoralReportResponse): string {
 }
 
 function csvCell(value: unknown): string {
-  const text = typeof value === 'object' ? JSON.stringify(value) : formatValue(value);
+  const text = value !== null && value !== undefined && typeof value === 'number' ? String(value) : typeof value === 'object' ? JSON.stringify(value) : formatValue(value);
   return '"' + text.replaceAll('"', '""') + '"';
 }
 
@@ -104,8 +104,9 @@ export function buildElectoralVoiceSummary(response: ElectoralReportResponse, qu
   const first = byYear[0] && typeof byYear[0] === 'object' ? byYear[0] as Record<string, unknown> : null;
   const last = byYear[byYear.length - 1] && typeof byYear[byYear.length - 1] === 'object' ? byYear[byYear.length - 1] as Record<string, unknown> : null;
   const parts = [question + '.'];
+  const formatYear = (value: unknown) => value === null || value === undefined || value === '' ? '—' : String(value);
   if (first && last && byYear.length > 1) {
-    parts.push(`Em ${formatValue(first.year)}, o resultado principal foi ${formatValue(first.votes ?? first.voteSharePct ?? first.rank)}; em ${formatValue(last.year)}, foi ${formatValue(last.votes ?? last.voteSharePct ?? last.rank)}.`);
+    parts.push(`Em ${formatYear(first.year)}, o resultado principal foi ${formatValue(first.votes ?? first.voteSharePct ?? first.rank)}; em ${formatYear(last.year)}, foi ${formatValue(last.votes ?? last.voteSharePct ?? last.rank)}.`);
   } else if (first) {
     parts.push(`O resultado principal é ${formatValue(first.votes ?? first.voteSharePct ?? first.rank)}.`);
   } else {
