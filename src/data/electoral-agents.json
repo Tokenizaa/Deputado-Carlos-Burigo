@@ -1,0 +1,646 @@
+{
+  "version": "1.0.0",
+  "scope": {
+    "office": "Deputado Estadual",
+    "uf": "RS",
+    "years": [
+      2018,
+      2022,
+      2026
+    ],
+    "round": 1
+  },
+  "agents": [
+    {
+      "id": "electoral-intelligence",
+      "role": "orchestrator",
+      "areas": [
+        "overview",
+        "history",
+        "territory",
+        "competition"
+      ],
+      "responsibilities": [
+        "resolve intent",
+        "validate scope",
+        "select specialist",
+        "select skills",
+        "enforce evidence chain"
+      ],
+      "must_not": [
+        "calculate metrics",
+        "invent formulas",
+        "query raw files directly"
+      ]
+    },
+    {
+      "id": "electoral-overview",
+      "role": "specialist",
+      "areas": [
+        "overview"
+      ],
+      "responsibilities": [
+        "state overview",
+        "candidate participation",
+        "rankings",
+        "distribution",
+        "concentration"
+      ],
+      "must_not": [
+        "change scope",
+        "calculate ad hoc"
+      ]
+    },
+    {
+      "id": "electoral-history",
+      "role": "specialist",
+      "areas": [
+        "history"
+      ],
+      "responsibilities": [
+        "historical comparison",
+        "growth and decline",
+        "trajectory",
+        "stability",
+        "comparability"
+      ],
+      "must_not": [
+        "call a three-election series a robust statistical trend"
+      ]
+    },
+    {
+      "id": "electoral-territory",
+      "role": "specialist",
+      "areas": [
+        "territory"
+      ],
+      "responsibilities": [
+        "municipal ranking",
+        "territorial strength",
+        "concentration",
+        "distribution",
+        "regional profile"
+      ],
+      "must_not": [
+        "confuse municipality and electoral zone"
+      ]
+    },
+    {
+      "id": "electoral-competition",
+      "role": "specialist",
+      "areas": [
+        "competition"
+      ],
+      "responsibilities": [
+        "candidate ranking",
+        "margins",
+        "competitors",
+        "territorial overlap",
+        "municipal and regional competition",
+        "fragmentation",
+        "effective number"
+      ],
+      "must_not": [
+        "include the target candidate as a competitor",
+        "treat competition as a single universal metric"
+      ]
+    }
+  ],
+  "routing": [
+    {
+      "pergunta_id": "overview.total_votes",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.state_share",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.municipalities_with_votes",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.best_municipality",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.worst_municipality",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.average_votes",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.median_votes",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.top10_concentration",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.top20_concentration",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.municipal_rank",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.municipal_leads",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.above_average",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.below_average",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.regional_best",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.regional_worst",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.vote_distribution",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.territorial_concentration",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.active_municipalities",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.top_contributors",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.low_contributors",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.participation_average",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.strongest_region",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.attention_region",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.growth_count",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "overview.decline_count",
+      "area": "overview",
+      "agent": "electoral-overview"
+    },
+    {
+      "pergunta_id": "history.total_evolution",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.absolute_change",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.percent_change",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.municipal_growth",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.municipal_decline",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.consistent_growth",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.consistent_decline",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.reversal",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.new_strengths",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.lost_strengths",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.growth_count",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.decline_count",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.stable_count",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.best_gain",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.best_loss",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.best_percent_gain",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.best_percent_loss",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.state_evolution_rank",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.concentration_change",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.coverage_change",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.regional_evolution",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.regional_decline",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.trajectory",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.turning_points",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "history.priority_changes",
+      "area": "history",
+      "agent": "electoral-history"
+    },
+    {
+      "pergunta_id": "territory.strongholds",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.weakholds",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.opportunities",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.growing",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.declining",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.top_rankings",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.low_rankings",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.map_strength",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.map_growth",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.map_decline",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.region_strength",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.region_opportunity",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.concentration",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.dispersion",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.coverage",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.growth_low_base",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.high_base_decline",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.high_growth",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.high_share",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.low_share",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.priority",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.compare",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "territory.regional_profile",
+      "area": "territory",
+      "agent": "electoral-territory"
+    },
+    {
+      "pergunta_id": "competition.top_candidates",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.candidate_rank",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.vote_gap",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.vote_lead",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.growth_leaders",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.growth_losers",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.local_winners",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.local_challengers",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.overlap",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.territorial_leaders",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.municipal_leaders",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.candidate_compare",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.rank_evolution",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.vote_share_compare",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.growth_compare",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.loss_compare",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.gain_where_burigo_lost",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.loss_where_burigo_gained",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.dominant_competitor",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.emerging_competitor",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.territorial_overlap",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.competitive_municipalities",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.low_competition",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.regional_competition",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.strategic_competitors",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.competitive_trend",
+      "area": "competition",
+      "agent": "electoral-competition"
+    },
+    {
+      "pergunta_id": "competition.candidate_context",
+      "area": "competition",
+      "agent": "electoral-competition"
+    }
+  ],
+  "flow": [
+    "question",
+    "orchestrator",
+    "ontology",
+    "intent",
+    "specialist",
+    "skill",
+    "method",
+    "deterministic_function",
+    "evidence",
+    "validation",
+    "interpretation",
+    "response"
+  ],
+  "guardrails": [
+    "no_agent_owns_data",
+    "no_ad_hoc_formula",
+    "no_raw_tse_files_in_response_path",
+    "no_mixed_office",
+    "no_mixed_round",
+    "no_implicit_year_comparison",
+    "rag_explains_method_only",
+    "llm_does_not_change_result"
+  ],
+  "output_contract": {
+    "status": "ok|pending|insufficient",
+    "question_id": "string",
+    "agent": "string",
+    "skill": "string",
+    "method": "string",
+    "scope": "object",
+    "result": "structured_result",
+    "evidence": "array",
+    "interpretation": "object"
+  }
+}
