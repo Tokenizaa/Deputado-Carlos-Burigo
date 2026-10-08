@@ -124,7 +124,7 @@ describe('electoral intelligence runtime — overview', () => {
     expect((above.result as any).byYear[0].municipalities).toHaveLength(1);
     expect((below.result as any).byYear[0].municipalities).toHaveLength(1);
     expect((above.result as any).byYear[0].municipalities[0].municipalityName).toBe('Alpha');
-    expect((below.result as any).byYear[0].municipalities[0].municipalityName).toBe('Delta');
+    expect((below.result as any).byYear[0].municipalities[0].municipalityName).toBe('Gamma');
   });
 
   it('does not calculate implementation-pending questions', async () => {
