@@ -11,7 +11,8 @@ import { AdminMediaTab } from './AdminMediaTab';
 import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
 import { AdminTasksTab } from './AdminTasksTab';
-import { AdminSettingsTab } from './AdminSettingsTab';\nimport { AdminElectoralIntelligenceTab } from './AdminElectoralIntelligenceTab';
+import { AdminSettingsTab } from './AdminSettingsTab';
+import { AdminElectoralIntelligenceTab } from './AdminElectoralIntelligenceTab';
 import { useApp } from '../../context/AppContext';
 import { can } from '../../config/adminPermissions';
 
@@ -78,7 +79,9 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
     }
   };
 
-  if (activeModule === 'inteligencia-eleitoral') return <AdminElectoralIntelligenceTab />;\n\n  if (activeModule === 'dashboard') {
+  if (activeModule === 'inteligencia-eleitoral') return <AdminElectoralIntelligenceTab />;
+
+  if (activeModule === 'dashboard') {
     return <AdminDashboardTab setActiveTab={setActiveModule} />;
   }
 
