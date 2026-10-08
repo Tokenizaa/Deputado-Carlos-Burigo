@@ -91,7 +91,12 @@ describe("electoral analytics — overview", () => {
     expect(highAbsoluteGrowth(rows,[{year:2026,municipality:1,votes_nominal:15},{year:2026,municipality:2,votes_nominal:25},{year:2026,municipality:3,votes_nominal:31}],2)[0].municipality).toBe(1);
     expect(compareMunicipalities(rows,[3,1]).map(r=>r.municipality)).toEqual([3,1]);
     expect(regionalTotals([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}])).toEqual({N:40,S:20});
-    expect(regionalStrength([{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}],1)[0].region).toBe("N");
+    const regionalRows = [{...rows[0],region:"N"},{...rows[1],region:"S"},{...rows[2],region:"N"}];
+    const regionTotals = [{region:"N",votes_nominal:50},{region:"S",votes_nominal:50}];
+    const regionMap = new Map([[1,"N"],[2,"S"],[3,"N"]]);
+    const strengths = regionalStrength(regionalRows, 60, regionTotals, 100, regionMap);
+    expect(strengths.find(r=>r.region==="N")?.candidateVotes).toBe(40);
+    expect(strengths.find(r=>r.region==="N")?.strengthRatio).toBeCloseTo(0.8);
     expect(priorityScore(rows,2).length).toBe(2);
   });
 });
