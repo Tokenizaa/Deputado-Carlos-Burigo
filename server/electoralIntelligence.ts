@@ -341,7 +341,7 @@ export async function executeElectoralQuestion(
       throw new Error(`candidate é obrigatório para executar ${questionId}.`);
     }
 
-    if (questionId === 'territory.region_strength' || questionId === 'territory.regional_profile') {
+    if (questionId === 'territory.region_strength' || questionId === 'territory.regional_profile' || questionId === 'territory.growth_low_base' || questionId === 'territory.high_base_decline') {
       return {
         status: 'insufficient_data',
         question: questionId,
@@ -353,7 +353,7 @@ export async function executeElectoralQuestion(
         scope: { office: 'Deputado Estadual', uf: 'RS', round: 1, years: [2018, 2022, 2026] },
         result: null,
         evidence: [...plan.evidence, 'Supabase analytical projection'],
-        limitations: ['A projeção analítica atual não possui dimensão regional por município; o runtime não inventa agrupamentos regionais.'],
+        limitations: ['A projeção analítica atual não possui dimensão regional por município nem um limiar canônico publicado para os indicadores de base baixa/base alta; o runtime não inventa agrupamentos ou limiares.'],
       };
     }
 
