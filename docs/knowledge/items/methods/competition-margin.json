@@ -1,0 +1,28 @@
+{
+  "id": "competition-margin",
+  "type": "method",
+  "title": "Margem competitiva",
+  "concept": "margin",
+  "definition": "Diferença entre o primeiro e o segundo colocado em uma distribuição competitiva.",
+  "method": "competitionMargin",
+  "formula": "leader_votes - runner_up_votes",
+  "inputs": [
+    "candidate_votes"
+  ],
+  "assumptions": [
+    "ranking definido por votos nominais"
+  ],
+  "limitations": [
+    "uma única margem não representa toda a estrutura competitiva"
+  ],
+  "interpretation": "Margem menor significa maior proximidade entre os dois primeiros.",
+  "related_concepts": [
+    "competition",
+    "rank"
+  ],
+  "source_ids": [
+    "cambridge-electoral-competitiveness",
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "territorial-overlap",
+  "type": "method",
+  "title": "Sobreposição territorial",
+  "concept": "territorial_overlap",
+  "definition": "Percentual de interseção entre os municípios onde dois candidatos possuem votação positiva, sobre a união desses municípios.",
+  "method": "territorialOverlap",
+  "formula": "intersection / union * 100",
+  "inputs": [
+    "candidate_a",
+    "candidate_b",
+    "municipal_votes"
+  ],
+  "assumptions": [
+    "presença territorial é definida por votos > 0"
+  ],
+  "limitations": [
+    "não mede intensidade da competição dentro do município"
+  ],
+  "interpretation": "Valor maior significa maior coincidência territorial de presença eleitoral.",
+  "related_concepts": [
+    "territorial_strength",
+    "competition"
+  ],
+  "source_ids": [
+    "ons-geography",
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}

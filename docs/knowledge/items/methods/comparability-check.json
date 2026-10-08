@@ -1,0 +1,34 @@
+{
+  "id": "comparability-check",
+  "type": "interpretation_rule",
+  "title": "Regra de comparabilidade",
+  "concept": "comparability",
+  "definition": "Condições mínimas para comparar duas observações eleitorais.",
+  "method": "comparability-check",
+  "formula": null,
+  "inputs": [
+    "office",
+    "round",
+    "year",
+    "territory",
+    "metric",
+    "denominator"
+  ],
+  "assumptions": [
+    "dimensões relevantes estão identificadas"
+  ],
+  "limitations": [
+    "comparabilidade estatística não prova equivalência substantiva"
+  ],
+  "interpretation": "Se dimensões essenciais divergem sem transformação documentada, a comparação deve ser bloqueada ou qualificada.",
+  "related_concepts": [
+    "historical_comparison",
+    "municipality",
+    "zone"
+  ],
+  "source_ids": [
+    "ons-geography",
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}

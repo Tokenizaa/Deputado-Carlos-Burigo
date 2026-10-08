@@ -1,10 +1,10 @@
-# Fase 6 — Knowledge Base Metodológica + RAG
+# FASE 4 — Knowledge Base Metodológica
 
-Status: canônico inicial
+Status: canônico — corpus metodológico e knowledge items em materialização
 
 ## Objetivo
 
-Transformar o corpus metodológico das Fases 3 e 4 em uma base de conhecimento recuperável pelo sistema de Inteligência Eleitoral.
+Transformar a ontologia da FASE 3 e as fontes metodológicas em uma base de conhecimento estruturada e recuperável. A implementação de RAG e indexação pertence à FASE 7.
 
 A Knowledge Base não é um segundo banco eleitoral.
 
@@ -187,7 +187,7 @@ Cada knowledge item deve possuir:
 
 Mudanças metodológicas devem ser auditáveis.
 
-## 11. Estrutura prevista
+## 11. Estrutura canônica
 
 ```text
 docs/knowledge/
@@ -233,7 +233,7 @@ A escolha do modelo de embeddings deve ocorrer na implementação da infraestrut
 
 O modelo de embedding não faz parte do contrato metodológico.
 
-## 14. Critério de conclusão
+## 14. Critério de conclusão da FASE 4
 
 A Fase 6 estará concluída quando:
 

@@ -1,0 +1,29 @@
+{
+  "id": "effective-number",
+  "type": "method",
+  "title": "Número efetivo de competidores",
+  "concept": "effective_number",
+  "definition": "Inverso do HHI para representar a diversidade efetiva de uma distribuição.",
+  "method": "effectiveNumberOfCandidates",
+  "formula": "1 / sum(p_i^2)",
+  "inputs": [
+    "candidate_votes"
+  ],
+  "assumptions": [
+    "p_i representam participações normalizadas"
+  ],
+  "limitations": [
+    "não é contagem literal de candidatos",
+    "muda conforme o universo analisado"
+  ],
+  "interpretation": "Maior valor indica distribuição menos concentrada entre os competidores.",
+  "related_concepts": [
+    "fragmentation",
+    "concentration",
+    "competition"
+  ],
+  "source_ids": [
+    "laakso-taagepera-effective-number"
+  ],
+  "version": "1.0.0"
+}

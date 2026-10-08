@@ -1,0 +1,28 @@
+{
+  "id": "hhi-fragmentation",
+  "type": "method",
+  "title": "Fragmentação via HHI",
+  "concept": "fragmentation",
+  "definition": "Complemento do índice Herfindahl-Hirschman aplicado à distribuição de participação.",
+  "method": "fragmentationIndex",
+  "formula": "1 - sum(p_i^2)",
+  "inputs": [
+    "candidate_votes"
+  ],
+  "assumptions": [
+    "p_i são participações na mesma distribuição"
+  ],
+  "limitations": [
+    "resultado depende do universo e da unidade escolhidos"
+  ],
+  "interpretation": "Valores maiores representam distribuição mais fragmentada.",
+  "related_concepts": [
+    "concentration",
+    "effective_number"
+  ],
+  "source_ids": [
+    "laakso-taagepera-effective-number",
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}
