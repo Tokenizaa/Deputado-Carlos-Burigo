@@ -11,7 +11,8 @@ const arg = (name) => {
 };
 
 const year = Number(arg("year"));
-const file = arg("file") || `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`;\nconst sourceFileName = basename(file);
+const file = arg("file") || `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`;
+const sourceFileName = basename(file);
 const supabaseUrl = arg("url") || process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const serviceKey =
   arg("service-key") ||
