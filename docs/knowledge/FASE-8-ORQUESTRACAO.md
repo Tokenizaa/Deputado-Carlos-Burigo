@@ -81,3 +81,64 @@ O campo `result` deve vir exclusivamente do motor determinístico.
 A FASE 8 está contratualmente fechada quando as 100 perguntas possuem plano de execução rastreável e os estados pendentes não podem ser executados como se fossem implementados.
 
 A conexão do plano com a interface conversacional pertence à FASE 9.
+
+
+## Rodada 1 — Runtime Overview
+
+**Status: CONCLUÍDA**
+
+A primeira rodada do runtime determinístico fechou o bloco funcional **Overview**, sem criar nova camada de catálogo, nova ontologia ou novo mecanismo analítico.
+
+### Intents fechados no runtime
+
+- EA-001 — `overview.total_votes`
+- EA-002 — `overview.state_share`
+- EA-003 — `overview.municipalities_with_votes`
+- EA-004 — `overview.best_municipality`
+- EA-005 — `overview.worst_municipality`
+- EA-006 — `overview.average_votes`
+- EA-007 — `overview.median_votes`
+- EA-008 — `overview.top10_concentration`
+- EA-009 — `overview.top20_concentration`
+- EA-010 — `overview.municipal_rank`
+- EA-011 — `overview.municipal_leads`
+- EA-012 — `overview.above_average`
+- EA-013 — `overview.below_average`
+
+Todos utilizam o plano existente em `electoral-orchestration.json`, a função analítica declarada pelo intent e a projeção analítica de produção no Supabase.
+
+### Contrato de execução
+
+A API `POST /api/admin/electoral/intelligence` aceita agora:
+
+```json
+{
+  "questionId": "overview.state_share",
+  "params": {
+    "candidate": 12345,
+    "year": 2026,
+    "limit": 10
+  }
+}
+```
+
+O runtime mantém as regras:
+
+- autenticação e permissão existentes do gabinete;
+- escopo fixo: Deputado Estadual / RS / turno 1;
+- dados de produção somente pela projeção analítica do Supabase;
+- nenhum acesso do navegador ao PostgreSQL local;
+- nenhum cálculo eleitoral pelo LLM;
+- intents `IMPLEMENTATION_PENDING` permanecem pendentes;
+- ausência de candidato obrigatório produz erro explícito;
+- resultados retornam status, intent, agente, skill, método, função, escopo, resultado, evidência e limitações.
+
+### Evidência da rodada
+
+A suíte unitária específica do runtime cobre os 13 intents da rodada, incluindo parâmetros de candidato, seleção de ano, limite e tratamento de intents pendentes.
+
+A rodada não altera os 20 intents `IMPLEMENTADO` do catálogo fora deste bloco e não resolve artificialmente os 5 intents `IMPLEMENTATION_PENDING` do Overview.
+
+### Próxima rodada
+
+**Rodada 2 — History**, mantendo o mesmo padrão: fechar o bloco funcional inteiro antes de avançar para Territory.
