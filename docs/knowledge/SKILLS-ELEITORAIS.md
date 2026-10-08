@@ -1,6 +1,6 @@
-# Fase 5 — Skills Eleitorais
+# FASE 5 — Skills Eleitorais
 
-Status: canônico inicial
+Status: CANÔNICO — catálogo e contratos alinhados ao motor analítico
 
 ## Objetivo
 
@@ -169,3 +169,17 @@ A fase será considerada concluída quando:
 6. a documentação canônica estiver versionada.
 
 A implementação de cada função computacional concreta deve ocorrer junto ao motor analítico e suas respectivas validações, sem criar uma segunda arquitetura de execução.
+
+
+## Registro operacional
+
+O contrato machine-readable está em `src/data/electoral-skills.json`.
+
+O arquivo contém:
+- as 19 skills reutilizáveis do catálogo;
+- referência às funções analíticas correspondentes;
+- estado de implementação;
+- contrato semântico de saída;
+- mapeamento das 100 perguntas para skills.
+
+A existência de uma skill não significa que toda pergunta associada já possua método implementado. Quando a capacidade ainda não existe, a intent permanece `IMPLEMENTATION_PENDING`.
