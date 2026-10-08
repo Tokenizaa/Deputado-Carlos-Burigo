@@ -33,6 +33,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 }) => {
 const { currentUser, signOut, demands } = useApp();
    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // toggle state: true = user opened sidebar
+   const [isElectoralMenuOpen, setIsElectoralMenuOpen] = useState(activeTab === 'inteligencia-eleitoral');
+
+   useEffect(() => {
+     if (activeTab === 'inteligencia-eleitoral') setIsElectoralMenuOpen(true);
+   }, [activeTab]);
    const [isMobile, setIsMobile] = useState(() => {
      return typeof window !== 'undefined' ? window.innerWidth < 768 : true;
 });
@@ -119,38 +124,68 @@ const navItems = [
     <nav className="space-y-1">
       {navItems.map((item) => {
         const Icon = item.icon;
+        const isElectoralItem = item.id === 'inteligencia-eleitoral';
         const active = activeTab === item.id;
         return (
-<button
-             key={item.id}
-             onClick={() => {
-  setActiveTab(item.id);
-  if (typeof window !== 'undefined') {
-    window.history.replaceState(null, '', `/admin#${item.id}`);
-  }
-  setIsSidebarOpen(false);
-}}
-             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-               active
-                 ? 'bg-[#00A550] text-white shadow-xs'
-                 : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
-             }`}
-          >
-            <div className="flex items-center gap-3">
-              <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-stone-500'}`} />
-              <span>{item.label}</span>
-            </div>
+          <div key={item.id}>
+            <button
+              type="button"
+              aria-expanded={isElectoralItem ? isElectoralMenuOpen : undefined}
+              onClick={() => {
+                if (isElectoralItem) {
+                  setIsElectoralMenuOpen((open) => !open);
+                  return;
+                }
+                setActiveTab(item.id);
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', `/admin#${item.id}`);
+                }
+                setIsSidebarOpen(false);
+              }}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+                active && isElectoralItem
+                  ? 'bg-emerald-50 text-emerald-900'
+                  : active
+                    ? 'bg-[#00A550] text-white shadow-xs'
+                    : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`w-4 h-4 ${active && !isElectoralItem ? 'text-white' : isElectoralItem && active ? 'text-emerald-700' : 'text-stone-500'}`} />
+                <span>{item.label}</span>
+              </div>
+              {isElectoralItem ? (
+                <ChevronDown className={`w-4 h-4 transition-transform ${isElectoralMenuOpen ? 'rotate-180' : ''}`} />
+              ) : item.badge ? (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  active ? 'bg-white text-[#00A550]' : 'bg-[#ED1C24] text-white'
+                }`}>{item.badge}</span>
+              ) : null}
+            </button>
 
-            {item.badge && (
-              <span
-className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                   active ? 'bg-white text-[#00A550]' : 'bg-[#ED1C24] text-white'
-                 }`}
-              >
-                {item.badge}
-              </span>
+            {isElectoralItem && isElectoralMenuOpen && (
+              <div className="ml-5 mt-1 border-l border-stone-200 pl-3">
+                <button
+                  type="button"
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => {
+                    setActiveTab('inteligencia-eleitoral');
+                    if (typeof window !== 'undefined') {
+                      window.history.replaceState(null, '', '/admin#inteligencia-eleitoral');
+                    }
+                    setIsSidebarOpen(false);
+                  }}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-xs font-bold transition-colors ${
+                    active
+                      ? 'bg-[#00A550] text-white'
+                      : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                  }`}
+                >
+                  Painel Eleitoral
+                </button>
+              </div>
             )}
-          </button>
+          </div>
         );
       })}
     </nav>
