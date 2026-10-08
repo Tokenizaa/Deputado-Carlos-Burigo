@@ -1,6 +1,6 @@
 # Agentes e Orquestração da Inteligência Eleitoral
 
-Fase 7: contrato de agentes e roteamento da Inteligência Eleitoral.
+FASE 6: contrato de agentes e roteamento da Inteligência Eleitoral.
 
 ## Arquitetura
 
@@ -50,3 +50,13 @@ O catálogo deve associar cada pergunta a um agente especialista conforme sua á
 ## Limite da fase
 
 A implementação operacional do chatbot, recuperação vetorial e chamada real de LLM pertence à Fase 8. Esta fase fecha o contrato de agentes e orquestração sem criar uma arquitetura paralela.
+
+## Registro operacional
+
+O contrato machine-readable está em `src/data/electoral-agents.json`.
+
+São cinco agentes no total:
+- 1 orquestrador transversal;
+- 4 especialistas, um por área analítica.
+
+As 100 perguntas são roteadas por área para esses especialistas. Não existe agente por pergunta.
