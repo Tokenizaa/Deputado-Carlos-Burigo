@@ -164,3 +164,16 @@ A rodada fechou o bloco Territory no runtime determinístico. Foram ligados ao e
 Quatro intents permanecem explicitamente como `insufficient_data`: `territory.region_strength`, `territory.regional_profile`, `territory.growth_low_base` e `territory.high_base_decline`. A decisão evita inventar dimensão regional ou limiares não publicados.
 
 Validação final: `npm run test:unit` — 69/69; `npm run test:integration` — 12/12. A cobertura permanece determinística e usa a projeção analítica do Supabase.
+
+
+## Rodada 4 — Runtime Competition
+
+**Status: CONCLUÍDA**
+
+A rodada fechou no runtime determinístico os intents de Competition com capacidade disponível na projeção analítica: `competition.top_candidates`, `competition.candidate_rank`, `competition.vote_gap`, `competition.vote_lead`, `competition.growth_leaders`, `competition.growth_losers`, `competition.local_winners`, `competition.local_challengers`, `competition.overlap`, `competition.municipal_leaders`, `competition.candidate_compare`, `competition.rank_evolution`, `competition.vote_share_compare`, `competition.growth_compare`, `competition.loss_compare`, `competition.gain_where_burigo_lost`, `competition.loss_where_burigo_gained`, `competition.dominant_competitor`, `competition.emerging_competitor`, `competition.territorial_overlap`, `competition.competitive_municipalities`, `competition.low_competition` e `competition.regional_competition`.
+
+As capacidades que dependem de dimensão regional não publicada permanecem explicitamente como `insufficient_data`: `competition.territorial_leaders` e `competition.regional_competition`. Não foram criadas regiões ou limiares artificiais.
+
+A semântica competitiva preserva a exclusão do próprio candidato como concorrente e utiliza funções analíticas determinísticas para ranking, comparação, crescimento, sobreposição territorial e competição municipal.
+
+Validação final: `npm run test:unit` — **70/70**; `npm run test:integration` — **12/12**. O stderr de `bootstrap-admin` é esperado pelo cenário de teste e não representa falha.
