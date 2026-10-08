@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "purpose": "Registro das fontes metodológicas usadas no corpus de Inteligência Eleitoral.",
+  "sources": [
+    {
+      "id": "cambridge-electoral-competitiveness",
+      "title": "A General Approach to Measuring Electoral Competitiveness for Parties and Governments",
+      "authors": ["Axel Cronert", "Pär Nyman"],
+      "publisher": "Cambridge University Press / Political Analysis",
+      "year": 2020,
+      "topics": ["competitiveness", "electoral-analysis", "measurement"],
+      "url": "https://www.cambridge.org/core/journals/political-analysis/article/general-approach-to-measuring-electoral-competitiveness-for-parties-and-governments/F263FAE4A2CB138FD155355F03897D93",
+      "status": "reviewed"
+    },
+    {
+      "id": "mit-election-analysis",
+      "title": "A Powerful Tool for Election Analysis",
+      "author": "Jesse Clark",
+      "publisher": "MIT Election Data + Science Lab",
+      "year": 2021,
+      "topics": ["election-data", "inference", "limitations", "geography"],
+      "url": "https://electionlab.mit.edu/articles/powerful-tool-election-analysis",
+      "status": "reviewed"
+    },
+    {
+      "id": "ace-electoral-quality",
+      "title": "Approaches to Measuring Electoral Quality",
+      "publisher": "ACE Electoral Knowledge Network",
+      "topics": ["electoral-methodology", "comparative-analysis", "measurement"],
+      "url": "https://aceproject.org/ace-en/focus/measuring-electoral-quality/approaches-to-measuring-electoral-quality",
+      "status": "reviewed"
+    },
+    {
+      "id": "ons-geography",
+      "title": "Geography",
+      "publisher": "UK Office for National Statistics",
+      "topics": ["statistical-geography", "territorial-comparability", "aggregation"],
+      "url": "https://www.ons.gov.uk/methodology/geography",
+      "status": "reviewed"
+    },
+    {
+      "id": "laakso-taagepera-effective-number",
+      "title": "Effective Number of Parties",
+      "authors": ["Markku Laakso", "Rein Taagepera"],
+      "year": 1979,
+      "topics": ["fragmentation", "effective-number-of-parties", "concentration"],
+      "url": "https://www.oxfordreference.com/display/10.1093/oi/authority.20110803095743432",
+      "status": "catalogued",
+      "note": "Fonte de referência secundária para a definição e fórmula; a versão original será adicionada ao corpus quando disponível em fonte primária acessível."
+    }
+  ]
+}
