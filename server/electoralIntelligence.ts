@@ -1,8 +1,9 @@
 import { supabaseAdmin } from './supabase';
+import orchestration from '../src/data/electoral-orchestration.json';
 
-const SUPPORTED_QUESTIONS = new Set([
-  'overview.total_votes',
-]);
+const plans = new Map(orchestration.plans.map((plan) => [plan.question_id, plan]));
+
+const RUNTIME_IMPLEMENTED = new Set(['overview.total_votes']);
 
 type ElectoralResponse = {
   status: 'ok' | 'error' | 'pending';
@@ -24,8 +25,34 @@ type ElectoralResponse = {
 };
 
 export async function executeElectoralQuestion(questionId: string): Promise<ElectoralResponse> {
-  if (!SUPPORTED_QUESTIONS.has(questionId)) {
-    throw new Error('Pergunta eleitoral ainda não está disponível no runtime.');
+  const plan = plans.get(questionId);
+  if (!plan) {
+    throw new Error('Pergunta eleitoral desconhecida no catálogo de orquestração.');
+  }
+
+  if (plan.state !== 'IMPLEMENTADO') {
+    return {
+      status: 'pending',
+      question: plan.question_id,
+      intent: plan.intent_id,
+      agent: plan.agent,
+      skills: plan.skills,
+      method: plan.method,
+      function: plan.function,
+      scope: {
+        office: 'Deputado Estadual',
+        uf: 'RS',
+        round: 1,
+        years: plan.scope.years,
+      },
+      result: null,
+      evidence: plan.evidence,
+      limitations: ['Implementação determinística ainda pendente para este intent.'],
+    };
+  }
+
+  if (!RUNTIME_IMPLEMENTED.has(questionId)) {
+    throw new Error('Intent eleitoral está implementado no catálogo, mas ainda não está disponível no runtime.');
   }
 
   const { data, error } = await supabaseAdmin
@@ -41,11 +68,11 @@ export async function executeElectoralQuestion(questionId: string): Promise<Elec
   return {
     status: 'ok',
     question: questionId,
-    intent: 'EA-001',
-    agent: 'electoral-overview',
-    skills: ['vote-share', 'ranking', 'distribution-summary', 'historical-comparison'],
-    method: 'totalVotes',
-    function: 'sumVotes',
+    intent: plan.intent_id,
+    agent: plan.agent,
+    skills: plan.skills,
+    method: plan.method,
+    function: plan.function,
     scope: {
       office: 'Deputado Estadual',
       uf: 'RS',
@@ -59,7 +86,7 @@ export async function executeElectoralQuestion(questionId: string): Promise<Elec
       })),
       total: rows.reduce((sum, row) => sum + Number(row.total_nominal_votes), 0),
     },
-    evidence: ['TSE', 'baselines oficiais validadas', 'Supabase analytical projection'],
+    evidence: [...plan.evidence, 'Supabase analytical projection'],
     limitations: [],
   };
 }
