@@ -51,3 +51,48 @@ Perguntas não implementadas no runtime retornam erro explícito e não são res
 A validação remota da projeção foi executada diretamente no Supabase.
 
 Ainda não foi declarado PASS de lint/Vitest/E2E nesta evidência; a execução desses testes precisa ocorrer no ambiente do projeto.
+
+
+## Rodada 1 — Overview
+
+Implementação concluída no branch `fase8-runtime-vertical-slice`.
+
+### Intents
+
+EA-001 a EA-013 foram ligados ao runtime determinístico:
+
+- total_votes
+- state_share
+- municipalities_with_votes
+- best_municipality
+- worst_municipality
+- average_votes
+- median_votes
+- top10_concentration
+- top20_concentration
+- municipal_rank
+- municipal_leads
+- above_average
+- below_average
+
+### API
+
+`POST /api/admin/electoral/intelligence` agora encaminha `params` ao executor.
+
+### Segurança
+
+O runtime continua usando `supabaseAdmin` no servidor e a projeção analítica de produção. Nenhum segredo ou acesso ao banco local é exposto ao navegador.
+
+### Validação
+
+A validação final deve ser executada localmente após o pull do branch, pois este repositório não possui workflow GitHub Actions disponível para executar a suíte neste momento.
+
+Comandos:
+
+```bash
+npm run test:unit
+npm run test:integration
+npm run lint
+```
+
+O lint possui falhas preexistentes e não relacionadas ao runtime eleitoral; a rodada não altera essas pendências.
