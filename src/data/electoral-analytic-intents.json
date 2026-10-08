@@ -3196,7 +3196,7 @@
       "pergunta_id": "competition.local_winners",
       "pergunta": "Quem venceu nos municípios onde o candidato não venceu?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "Quem venceu nos municípios onde o candidato não venceu?",
+      "intent": "municipalLeadersAgainstCandidate",
       "parametros": [
         "year",
         "from_year",
@@ -3213,8 +3213,8 @@
         "municipality",
         "region"
       ],
-      "metodo": "municipalLeadership",
-      "funcao_analitica": "municipalLeaders",
+      "metodo": "municipalLeadersAgainstCandidate",
+      "funcao_analitica": "municipalLeadersAgainstCandidate",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "array",
       "unidade": "municípios",
@@ -3700,7 +3700,7 @@
       "pergunta_id": "competition.dominant_competitor",
       "pergunta": "Qual concorrente é mais relevante no território analisado?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "Qual concorrente é mais relevante no território analisado?",
+      "intent": "rankCompetitors",
       "parametros": [
         "year",
         "from_year",
@@ -3717,8 +3717,8 @@
         "municipality",
         "region"
       ],
-      "metodo": "candidateRanking",
-      "funcao_analitica": "rankCandidates",
+      "metodo": "rankCompetitors",
+      "funcao_analitica": "rankCompetitors",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "array",
       "unidade": "candidatos",
@@ -3742,7 +3742,7 @@
       "pergunta_id": "competition.emerging_competitor",
       "pergunta": "Qual concorrente apresenta crescimento relevante?",
       "objetivo_analitico": "Responder à pergunta competitiva com indicador determinístico e parâmetros explícitos.",
-      "intent": "Qual concorrente apresenta crescimento relevante?",
+      "intent": "candidateGrowthExcluding",
       "parametros": [
         "year",
         "from_year",
@@ -3759,8 +3759,8 @@
         "municipality",
         "region"
       ],
-      "metodo": "candidateGrowth",
-      "funcao_analitica": "candidateGrowth",
+      "metodo": "candidateGrowthExcluding",
+      "funcao_analitica": "candidateGrowthExcluding",
       "entrada": "dados nominais municipais por candidato no escopo eleitoral selecionado",
       "saida": "array",
       "unidade": "candidatos",
