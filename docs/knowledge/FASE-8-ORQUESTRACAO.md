@@ -188,3 +188,48 @@ EA-021 — `overview.participation_average` foi ligado ao runtime determinístic
 A capacidade utiliza a projeção analítica do Supabase e mantém o escopo Deputado Estadual / RS / turno 1. Com a rodada, o catálogo passa a ter **81 intents implementados** e **19 intents pendentes**, sem alterar as capacidades que dependem de dimensão regional ou metodologia ainda não definida.
 
 Validação: teste unitário específico de EA-021 adicionado; execução final deve ocorrer localmente após o pull.
+
+
+## Triagem dos 19 intents pendentes
+
+Após a conclusão da Rodada 5, os 19 intents restantes foram reavaliados contra o contrato da Fase 8.
+
+### Bloqueados por dimensão regional ausente
+
+- EA-014 `overview.regional_best`
+- EA-015 `overview.regional_worst`
+- EA-022 `overview.strongest_region`
+- EA-023 `overview.attention_region`
+- EA-046 `history.regional_evolution`
+- EA-047 `history.regional_decline`
+- EA-062 `territory.region_opportunity`
+
+A projeção analítica atual trabalha com município e candidato, mas não publica uma dimensão regional canônica para este produto. Não serão criadas regiões artificiais.
+
+### Bloqueados por método/critério ainda não definido
+
+- EA-034 `history.new_strengths`
+- EA-035 `history.lost_strengths`
+- EA-049 `history.turning_points`
+- EA-050 `history.priority_changes`
+- EA-053 `territory.opportunities`
+- EA-071 `territory.priority`
+- EA-098 `competition.strategic_competitors`
+- EA-099 `competition.competitive_trend`
+- EA-100 `competition.candidate_context`
+
+Essas perguntas exigem definição explícita de regra, limiar, composição de indicadores ou método comparativo antes de qualquer implementação. O LLM não pode preencher essa lacuna.
+
+### Bloqueados por dimensão/apresentação geográfica
+
+- EA-058 `territory.map_strength`
+- EA-059 `territory.map_growth`
+- EA-060 `territory.map_decline`
+
+A análise municipal necessária pode existir em funções determinísticas, mas a pergunta de mapa exige uma camada geográfica/presentacional que não faz parte da projeção analítica atual. Não será criada uma falsa capacidade de mapa apenas renomeando rankings municipais.
+
+### Decisão para a próxima rodada
+
+Não há, neste conjunto de 19, outro intent que possa ser promovido com segurança apenas por ligar uma função já existente. A próxima implementação deve primeiro fechar os contratos metodológicos/dimensionais necessários, começando pela dimensão regional canônica e pelas regras de priorização/oportunidade/pressão competitiva.
+
+A única correção semântica adicional da Rodada 5 foi aplicada ao EA-021: sua unidade de saída passa a ser `votos_por_municipio`, coerente com `averageVotesWherePositive`.
