@@ -1,0 +1,31 @@
+{
+  "id": "historical-comparison",
+  "type": "method",
+  "title": "Comparação histórica",
+  "concept": "historical_comparison",
+  "definition": "Comparação de uma mesma unidade analítica entre eleições compatíveis.",
+  "method": "compareMunicipalHistory",
+  "formula": "absolute_change = to - from; percentage_change = (to-from)/from*100",
+  "inputs": [
+    "from_rows",
+    "to_rows"
+  ],
+  "assumptions": [
+    "mesmo cargo, turno, UF e unidade territorial"
+  ],
+  "limitations": [
+    "mudanças territoriais ou de definição podem quebrar comparabilidade"
+  ],
+  "interpretation": "Descreve mudança observada, não causalidade.",
+  "related_concepts": [
+    "growth_absolute",
+    "growth_rate",
+    "trend"
+  ],
+  "source_ids": [
+    "ons-geography",
+    "sage-time-series-political-science",
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}
