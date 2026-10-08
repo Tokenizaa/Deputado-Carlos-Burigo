@@ -105,3 +105,43 @@ A implementação do bloco History foi adicionada ao runtime determinístico, co
 A suíte unitária recebeu cobertura específica do bloco, incluindo seleção de intervalo histórico, evolução, variações absolutas/percentuais, crescimento/queda municipal, estabilidade, reversões, extremos, comparação com crescimento estadual, concentração e cobertura.
 
 A rodada aguarda execução local para validação final.
+
+
+## Rodada 3 — Territory
+
+**Status: CONCLUÍDA**
+
+Runtime territorial validado no branch `fase8-runtime-vertical-slice`.
+
+### Capacidade executável
+
+- territory.strongholds
+- territory.weakholds
+- territory.growing
+- territory.declining
+- territory.top_rankings
+- territory.low_rankings
+- territory.concentration
+- territory.dispersion
+- territory.coverage
+- territory.high_growth
+- territory.high_share
+- territory.low_share
+- territory.compare
+
+### Insufficient data preservado
+
+- territory.region_strength
+- territory.regional_profile
+- territory.growth_low_base
+- territory.high_base_decline
+
+Essas capacidades não foram improvisadas: a projeção atual não possui dimensão regional explícita e não há limiares canônicos publicados para as funções de baixa/alta base.
+
+### Validação
+
+- Unit: **69/69 PASS**
+- Integration: **12/12 PASS**
+- O stderr exibido pelo teste de bootstrap-admin é esperado pelo cenário e não representa falha.
+
+A execução permanece server-side, determinística e baseada na projeção analítica do Supabase.
