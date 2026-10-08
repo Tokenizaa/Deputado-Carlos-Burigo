@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   UserCircle,
+  BrainCircuit,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -72,7 +73,8 @@ const { currentUser, signOut, demands } = useApp();
   ).length;
 
 const navItems = [
-  { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },\n  { id: 'inteligencia-eleitoral', label: 'Inteligência Eleitoral', icon: BrainCircuit, badge: null },
+  { id: 'dashboard', label: 'Início', icon: LayoutDashboard, badge: null },
+  { id: 'inteligencia-eleitoral', label: 'Inteligência Eleitoral', icon: BrainCircuit, badge: null },
   { id: 'cidadão', label: 'Atendimento', icon: Inbox, badge: pendingDemandsCount > 0 ? pendingDemandsCount : null },
   { id: 'agenda', label: 'Agenda', icon: CalendarDays, badge: null },
   { id: 'gestao-documental', label: 'Gestão Documental', icon: FileCode2, badge: null },
