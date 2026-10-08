@@ -60,7 +60,6 @@ const INITIAL_SETTINGS: SiteSettings = {
   social_whatsapp: 'https://wa.me/5554999151515',
   seo_default_title: 'Carlos Búrigo | Deputado Estadual e Candidato 15140 MDB Rio Grande do Sul',
   seo_default_description: 'Plataforma oficial de Carlos Búrigo. Conheça a trajetória de quem foi Prefeito de São José dos Ausentes, Secretário da Fazenda de Caxias do Sul, Secretário de Estado e atual Líder do MDB na Assembleia Legislativa do RS.',
-  seo_default_image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
   mandate_slogan: 'Trabalho sério, presença e resultados reais para o Rio Grande.',
   bio_highlights: [
     'Ex-prefeito de São José dos Ausentes (2 mandatos)',
