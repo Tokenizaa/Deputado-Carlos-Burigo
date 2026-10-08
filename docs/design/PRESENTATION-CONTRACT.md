@@ -121,3 +121,16 @@ Exportadores não devem reconstruir a análise.
 ## Consistência
 
 Dashboard e chatbot recebem o mesmo `AnalyticalResult` ou uma projeção semanticamente idêntica gerada pelo mesmo runtime. Divergência de valores é defeito de arquitetura, não diferença de UX.
+
+
+## Relatório e voz — Fase 9.3
+
+A exportação reutiliza o `AnalyticalResult` já produzido pelo runtime. O renderer transforma o resultado em relatório estruturado para impressão/Salvar como PDF e em CSV tabular quando houver linhas tabulares.
+
+A voz segue o mesmo pipeline da pergunta textual:
+
+microfone/STT do navegador → texto da pergunta → mesmo resolver/runtime determinístico → AnalyticalResult → resumo curto → TTS do navegador.
+
+O TTS não lê tabelas extensas nem calcula valores. O resumo é construído a partir dos valores já retornados pelo runtime.
+
+A geração de PDF não cria uma segunda representação analítica: o HTML de impressão contém pergunta, resultado, metodologia, evidências e limitações, e o navegador realiza a etapa final de impressão/Salvar como PDF.
