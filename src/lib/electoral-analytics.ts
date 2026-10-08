@@ -290,11 +290,6 @@ export function regionalTotals(rows: MunicipalVoteRow[]): Record<string, number>
     return acc;
   }, {});
 }
-export function regionalStrength(rows: MunicipalVoteRow[], k: number): Array<{ region: string; votes: number; sharePct: number | null }> {
-  const totals = regionalTotals(rows);
-  const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
-  return Object.entries(totals).map(([region, votes]) => ({ region, votes, sharePct: shareOfTotal(votes, total) })).sort((a,b)=>b.votes-a.votes).slice(0, Math.max(0,k));
-}
 export function priorityScore(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
   return rankByVotes(rows).slice(0, Math.max(0,k));
 }
