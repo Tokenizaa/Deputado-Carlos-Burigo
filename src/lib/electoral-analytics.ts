@@ -390,12 +390,27 @@ export function municipalLeaders(rows: CandidateMunicipalVoteRow[], excludeCandi
 }
 
 export function municipalChallengers(rows: CandidateMunicipalVoteRow[], candidateId: string, k: number): CandidateVoteRow[] {
+  const candidateMunicipalities = new Set(
+    rows.filter(row => row.candidateId === candidateId && row.votes_nominal > 0).map(row => row.municipality),
+  );
   const totals = new Map<string, number>();
   for (const row of rows) {
-    if (row.candidateId === candidateId) continue;
+    if (row.candidateId === candidateId || !candidateMunicipalities.has(row.municipality)) continue;
     totals.set(row.candidateId, (totals.get(row.candidateId) ?? 0) + row.votes_nominal);
   }
   return rankCandidates([...totals.entries()].map(([id, votes]) => ({ candidateId: id, votes }))).slice(0, Math.max(0, k));
+}
+
+export function municipalLeadersAgainstCandidate(rows: CandidateMunicipalVoteRow[], candidateId: string, k: number): MunicipalCompetition[] {
+  return municipalLeaders(rows).filter(item => item.leader !== candidateId).slice(0, Math.max(0, k));
+}
+
+export function rankCompetitors(rows: CandidateVoteRow[], candidateId: string, k: number): CandidateVoteRow[] {
+  return rankCandidates(rows.filter(row => row.candidateId !== candidateId)).slice(0, Math.max(0, k));
+}
+
+export function candidateGrowthExcluding(fromRows: CandidateVoteRow[], toRows: CandidateVoteRow[], candidateId: string, k: number): CandidateGrowth[] {
+  return candidateGrowth(fromRows, toRows, toRows.length).filter(row => row.candidateId !== candidateId).slice(0, Math.max(0, k));
 }
 
 export function territorialOverlap(rows: CandidateMunicipalVoteRow[], candidateA: string, candidateB: string): number | null {
