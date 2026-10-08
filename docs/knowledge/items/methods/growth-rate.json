@@ -1,0 +1,29 @@
+{
+  "id": "growth-rate",
+  "type": "method",
+  "title": "Variação percentual",
+  "concept": "growth_rate",
+  "definition": "Mudança relativa entre valor inicial e final.",
+  "method": "variationPct",
+  "formula": "(to - from) / from * 100",
+  "inputs": [
+    "from",
+    "to"
+  ],
+  "assumptions": [
+    "from representa o período inicial"
+  ],
+  "limitations": [
+    "indefinida quando from=0",
+    "não implica causalidade"
+  ],
+  "interpretation": "Percentual positivo indica crescimento e negativo indica queda.",
+  "related_concepts": [
+    "growth_absolute",
+    "historical_comparison"
+  ],
+  "source_ids": [
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}
