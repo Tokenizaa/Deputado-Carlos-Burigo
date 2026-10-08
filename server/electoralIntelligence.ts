@@ -1,6 +1,6 @@
 import { supabaseAdmin } from './supabase';
 import orchestration from '../src/data/electoral-orchestration.json';
-import { countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
+import { averageVotesWherePositive, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
 
 const plans = new Map(orchestration.plans.map((plan) => [plan.question_id, plan]));
 
@@ -18,6 +18,7 @@ const RUNTIME_IMPLEMENTED = new Set([
   'overview.municipal_leads',
   'overview.above_average',
   'overview.below_average',
+  'overview.participation_average',
   'history.total_evolution',
   'history.absolute_change',
   'history.percent_change',
@@ -243,6 +244,8 @@ export async function executeElectoralQuestion(
           return sorted.length ? { year, municipality: item(sorted[sorted.length - 1]) } : { year, municipality: null };
         case 'overview.average_votes':
           return { year, averageVotes: average };
+        case 'overview.participation_average':
+          return { year, averageVotesWherePositive: averageVotesWherePositive(rows.map((row) => ({ year, municipality: Number(row.municipality_code), votes_nominal: Number(row.votes) }))) };
         case 'overview.median_votes': {
           if (!votes.length) return { year, medianVotes: null };
           const middle = Math.floor(votes.length / 2);
