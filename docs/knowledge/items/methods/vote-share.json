@@ -1,0 +1,29 @@
+{
+  "id": "vote-share",
+  "type": "method",
+  "title": "Participação relativa",
+  "concept": "vote_share",
+  "definition": "Participação de uma unidade em um universo explicitamente definido.",
+  "method": "shareOfTotal",
+  "formula": "parte / total * 100",
+  "inputs": [
+    "value",
+    "total"
+  ],
+  "assumptions": [
+    "numerador e denominador pertencem ao mesmo escopo"
+  ],
+  "limitations": [
+    "não substitui quantidade absoluta de votos",
+    "denominador deve ser explicitado"
+  ],
+  "interpretation": "Percentual maior significa maior participação no denominador escolhido.",
+  "related_concepts": [
+    "nominal_votes",
+    "territorial_dependence"
+  ],
+  "source_ids": [
+    "project-methodology"
+  ],
+  "version": "1.0.0"
+}
