@@ -24,6 +24,7 @@ interface AdminWorkspaceProps {
 type ModuleId = 'dashboard' | 'inteligencia-eleitoral' | 'cidadão' | 'agenda' | 'gestao-documental' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
 
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
+  'inteligencia-eleitoral': [],
   'gestao-documental': [
     { id: 'documentos', label: 'Documentos' },
   ],
