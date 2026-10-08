@@ -96,7 +96,7 @@ describe("electoral analytics — overview", () => {
     const regionMap = new Map([[1,"N"],[2,"S"],[3,"N"]]);
     const strengths = regionalStrength(regionalRows, 60, regionTotals, 100, regionMap);
     expect(strengths.find(r=>r.region==="N")?.candidateVotes).toBe(40);
-    expect(strengths.find(r=>r.region==="N")?.strengthRatio).toBeCloseTo(0.8);
+    expect(strengths.find(r=>r.region==="N")?.candidateSharePct).toBeCloseTo(80);\n    expect(strengths.find(r=>r.region==="N")?.strengthRatio).toBeCloseTo(4 / 3);
     expect(priorityScore(rows,2).length).toBe(2);
   });
 });
