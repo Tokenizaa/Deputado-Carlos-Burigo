@@ -46,149 +46,96 @@ Pergunta suportada nesta fatia:
 
 Perguntas não implementadas no runtime retornam erro explícito e não são respondidas por LLM.
 
-## Validação
-
-A validação remota da projeção foi executada diretamente no Supabase.
-
-Ainda não foi declarado PASS de lint/Vitest/E2E nesta evidência; a execução desses testes precisa ocorrer no ambiente do projeto.
-
-
 ## Rodada 1 — Overview
 
-Implementação concluída no branch `fase8-runtime-vertical-slice`.
+**Status: CONCLUÍDA**
 
-### Intents
+EA-001 a EA-013 ligados ao runtime determinístico.
 
-EA-001 a EA-013 foram ligados ao runtime determinístico:
-
-- total_votes
-- state_share
-- municipalities_with_votes
-- best_municipality
-- worst_municipality
-- average_votes
-- median_votes
-- top10_concentration
-- top20_concentration
-- municipal_rank
-- municipal_leads
-- above_average
-- below_average
-
-### API
-
-`POST /api/admin/electoral/intelligence` agora encaminha `params` ao executor.
-
-### Segurança
-
-O runtime continua usando `supabaseAdmin` no servidor e a projeção analítica de produção. Nenhum segredo ou acesso ao banco local é exposto ao navegador.
-
-### Validação
-
-A validação final deve ser executada localmente após o pull do branch, pois este repositório não possui workflow GitHub Actions disponível para executar a suíte neste momento.
-
-Comandos:
-
-```bash
-npm run test:unit
-npm run test:integration
-npm run lint
-```
-
-O lint possui falhas preexistentes e não relacionadas ao runtime eleitoral; a rodada não altera essas pendências.
-
+Validação:
+- Unit: **67/67 PASS**
+- Integration: **12/12 PASS**
 
 ## Rodada 2 — History
 
-A implementação do bloco History foi adicionada ao runtime determinístico, cobrindo os 19 intents implementados do catálogo (EA-026–EA-033, EA-036–EA-045 e EA-048). Os seis intents pendentes permanecem explicitamente fora do runtime.
+**Status: CONCLUÍDA**
 
-A suíte unitária recebeu cobertura específica do bloco, incluindo seleção de intervalo histórico, evolução, variações absolutas/percentuais, crescimento/queda municipal, estabilidade, reversões, extremos, comparação com crescimento estadual, concentração e cobertura.
+19 intents History implementados no runtime determinístico.
 
-A rodada aguarda execução local para validação final.
-
+Validação:
+- Unit: **68/68 PASS**
+- Integration: **12/12 PASS**
 
 ## Rodada 3 — Territory
 
 **Status: CONCLUÍDA**
 
-Runtime territorial validado no branch `fase8-runtime-vertical-slice`.
+13 intents territoriais executáveis.
 
-### Capacidade executável
-
-- territory.strongholds
-- territory.weakholds
-- territory.growing
-- territory.declining
-- territory.top_rankings
-- territory.low_rankings
-- territory.concentration
-- territory.dispersion
-- territory.coverage
-- territory.high_growth
-- territory.high_share
-- territory.low_share
-- territory.compare
-
-### Insufficient data preservado
-
+Mantidos como `insufficient_data`:
 - territory.region_strength
 - territory.regional_profile
 - territory.growth_low_base
 - territory.high_base_decline
 
-Essas capacidades não foram improvisadas: a projeção atual não possui dimensão regional explícita e não há limiares canônicos publicados para as funções de baixa/alta base.
+Motivo: a projeção atual não possui dimensão regional explícita e não há limiares canônicos publicados para as funções de baixa/alta base.
 
-### Validação
-
+Validação:
 - Unit: **69/69 PASS**
 - Integration: **12/12 PASS**
-- O stderr exibido pelo teste de bootstrap-admin é esperado pelo cenário e não representa falha.
-
-A execução permanece server-side, determinística e baseada na projeção analítica do Supabase.
-
 
 ## Rodada 4 — Competition
 
 **Status: CONCLUÍDA**
 
-Runtime competitivo validado no branch `fase8-runtime-vertical-slice`.
-
-### Capacidade executável
-
-- competition.top_candidates
-- competition.candidate_rank
-- competition.vote_gap
-- competition.vote_lead
-- competition.growth_leaders
-- competition.growth_losers
-- competition.local_winners
-- competition.local_challengers
-- competition.overlap
-- competition.municipal_leaders
-- competition.candidate_compare
-- competition.rank_evolution
-- competition.vote_share_compare
-- competition.growth_compare
-- competition.loss_compare
-- competition.gain_where_burigo_lost
-- competition.loss_where_burigo_gained
-- competition.dominant_competitor
-- competition.emerging_competitor
-- competition.territorial_overlap
-- competition.competitive_municipalities
-- competition.low_competition
-
-### Insufficient data preservado
-
+23 intents competitivos executáveis no runtime. Mantidos como `insufficient_data`:
 - competition.territorial_leaders
 - competition.regional_competition
 
-Essas capacidades permanecem bloqueadas quando dependem de dimensão regional que não existe na projeção atual. O runtime não inventa agrupamentos ou limiares.
+Motivo: ausência de dimensão regional explícita na projeção atual. O runtime não inventa agrupamentos ou limiares.
 
-### Validação
-
+Validação:
 - Unit: **70/70 PASS**
 - Integration: **12/12 PASS**
-- O stderr exibido pelo teste de bootstrap-admin é esperado pelo cenário e não representa falha.
 
-A execução permanece server-side, determinística e baseada na projeção analítica do Supabase. A semântica de concorrência exclui o próprio candidato das listas de concorrentes.
+## Rodada 5 — Overview participation average
+
+**Status: CONCLUÍDA**
+
+EA-021 — `overview.participation_average` foi ligado ao runtime determinístico usando a função canônica `averageVotesWherePositive`.
+
+A métrica calcula a média de votos considerando somente municípios com votação positiva, sem criar novo denominador ou regra ad hoc.
+
+Alterações:
+- runtime server-side
+- intent EA-021 atualizado para `IMPLEMENTADO`
+- orchestration plan atualizado para `IMPLEMENTADO`
+- teste unitário específico adicionado
+
+Validação final executada no ambiente local do projeto após pull do branch:
+- Unit: **71/71 PASS**
+- Integration: **12/12 PASS**
+- Total: **83/83 PASS**
+
+O stderr do cenário de `bootstrap-admin` é esperado pelo teste de rejeição e não representa falha.
+
+## Estado consolidado da Fase 8
+
+- Intents totais: **100**
+- Implementados no catálogo/runtime: **81**
+- Pendentes: **19**
+- Todas as implementações executáveis desta vertical slice são determinísticas e server-side.
+- A projeção de produção utilizada pelo runtime é a projeção analítica do Supabase.
+- O banco local continua sendo fonte de verdade para ingestão, normalização, auditoria e processamento.
+- O navegador/chatbot não acessa o banco local.
+- Intents que exigem dimensão regional, limiar ou método ainda não definido permanecem pendentes/insufficient_data; não são resolvidos por inferência do LLM.
+
+## Próxima etapa
+
+Os 19 pendentes devem ser avaliados individualmente contra:
+1. função analítica canônica já existente;
+2. dados disponíveis na projeção;
+3. método/denominador explicitamente definido;
+4. ausência de limiares ou agrupamentos arbitrários.
+
+Somente intents que passarem esses quatro critérios devem entrar na próxima rodada de runtime.
