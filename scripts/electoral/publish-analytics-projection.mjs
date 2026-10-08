@@ -16,7 +16,9 @@ const chunkSize = Number(arg("chunk") || 1000);
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const regionalDimension = JSON.parse(readFileSync(new URL("../../src/data/ibge-rs-rgi-2024.json", import.meta.url), "utf8"));
+const normalizeMunicipalityName = (value) => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 const regionByMunicipality = new Map(regionalDimension.municipalities.map(row => [Number(row.municipality_code), row]));
+const regionByName = new Map(regionalDimension.municipalities.map(row => [normalizeMunicipalityName(row.municipality_name), row]));
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são obrigatórios e devem existir somente no ambiente local de publicação.");
@@ -152,15 +154,17 @@ from totals
 order by year, municipalities_rank, tse_municipality_code;
 `), ["year","municipality_code","municipality_name","total_nominal_votes","municipalities_rank"]).map(x => ({
   year:num(x.year), municipality_code:num(x.municipality_code), municipality_name:x.municipality_name,
-  region_code: regionByMunicipality.get(num(x.municipality_code))?.region_code ?? null,
-  region_name: regionByMunicipality.get(num(x.municipality_code))?.region_name ?? null,
+  region_code: regionByName.get(normalizeMunicipalityName(x.municipality_name))?.region_code ?? null,
+  region_name: regionByName.get(normalizeMunicipalityName(x.municipality_name))?.region_name ?? null,
   region_type: "IBGE_RGI",
   region_source_version: regionalDimension.version,
+  ibge_municipality_code: regionByName.get(normalizeMunicipalityName(x.municipality_name))?.municipality_code ?? null,
   total_nominal_votes:num(x.total_nominal_votes), municipalities_rank:num(x.municipalities_rank)
 }));
 
-if (municipalityRows.some(row => !row.region_code)) {
-  throw new Error("Dimensão regional IBGE incompleta: existe município sem RGI.");
+if (municipalityRows.some(row => !row.region_code || !row.ibge_municipality_code)) {
+  const missing = municipalityRows.filter(row => !row.region_code || !row.ibge_municipality_code).map(row => row.municipality_name);
+  throw new Error(`Dimensão regional IBGE incompleta: municípios sem RGI: ${missing.join(", ")}`);
 }
 
 const candidateMunicipalRows = parse(psql(`
@@ -198,6 +202,15 @@ await clearProjection();
 await upsert("electoral_analytics_elections", electionRows, "year");
 await upsert("electoral_analytics_candidates", candidateRows, "year,candidate_number");
 await upsert("electoral_analytics_municipalities", municipalityRows, "year,municipality_code");
+const regionalMunicipalityRows = [...new Map(municipalityRows.map(row => [row.municipality_code, {
+  municipality_code: row.municipality_code,
+  ibge_municipality_code: row.ibge_municipality_code,
+  region_code: row.region_code,
+  region_name: row.region_name,
+  region_type: row.region_type,
+  source_version: regionalDimension.version
+}])).values()];
+await upsert("electoral_analytics_municipality_regions", regionalMunicipalityRows, "municipality_code");
 await upsert("electoral_analytics_candidate_municipal", candidateMunicipalRows, "year,municipality_code,candidate_number");
 
 console.log("\nPUBLICAÇÃO CONCLUÍDA");
