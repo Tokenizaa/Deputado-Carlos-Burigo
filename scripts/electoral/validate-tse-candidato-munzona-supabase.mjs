@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { createClient } from "@supabase/supabase-js";\n
+import { createClient } from "@supabase/supabase-js";
+
 const argv = process.argv.slice(2);
 const arg = (name) => {
   const i = argv.indexOf("--" + name);
@@ -28,7 +29,10 @@ for (const year of [2018, 2022, 2026]) {
   const { data: runs, error: runError } = await supabase
     .from("electoral_import_runs")
     .select("id,source_file_name,status,rows_loaded")
-    .in("source_file_name", [\n      `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`,\n      `votacao_candidato_munzona_${year}.zip`,\n    ])
+    .in("source_file_name", [
+      `artifacts/electoral/raw/votacao_candidato_munzona_${year}.zip`,
+      `votacao_candidato_munzona_${year}.zip`,
+    ])
     .order("started_at", { ascending: false })
     .limit(1);
 
