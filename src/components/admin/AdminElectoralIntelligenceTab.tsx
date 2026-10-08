@@ -11,6 +11,7 @@ import {
 } from '../../lib/electoral-report';
 import {
   ELECTORAL_YEARS,
+  filterHistoricalRows,
   getElectionYearResult,
   normalizeCandidateQuery,
   toFiniteNumber,
@@ -191,9 +192,11 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   const questions = useMemo(() => QUESTIONS.filter(question => question.area === area), [area]);
   const overviewResult = overview?.result as { byYear?: unknown } | undefined;
   const selectedSnapshot = getElectionYearResult(overviewResult?.byYear, selectedYear);
-  const historicalRows = Array.isArray(overviewResult?.byYear)
-    ? (overviewResult.byYear as Array<Record<string, unknown>>).filter(row => toFiniteNumber(row.votes) !== null)
-    : [];
+  const historicalRows = filterHistoricalRows(
+    overviewResult?.byYear,
+    selectedCandidate?.candidate_name,
+    selectedCandidate?.candidate_number ?? 0,
+  );
   const maxHistoricalVotes = Math.max(0, ...historicalRows.map(row => toFiniteNumber(row.votes) ?? 0));
   const territoryResult = territory?.result as { municipalities?: Array<Record<string, unknown>> } | undefined;
   const topMunicipalities = Array.isArray(territoryResult?.municipalities) ? territoryResult.municipalities.slice(0, 6) : [];
