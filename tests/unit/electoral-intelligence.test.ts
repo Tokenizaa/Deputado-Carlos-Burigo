@@ -20,7 +20,7 @@ vi.mock('../../server/supabase', () => ({
         return chain([
           { year: 2018, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 100000, vote_share: 1.88309968, rank: 10, municipalities_with_votes: 3 },
           { year: 2022, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 200000, vote_share: 3.44773549, rank: 8, municipalities_with_votes: 4 },
-          { year: 2026, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 150000, vote_share: 2.59756885, rank: 2, municipalities_with_votes: 2 },
+          { year: 2026, candidate_number: 12345, candidate_name: 'Candidato Teste', votes: 150000, vote_share: 2.59756885, rank: 9, municipalities_with_votes: 2 },
           { year: 2018, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 90000, vote_share: 1.69, rank: 20, municipalities_with_votes: 3 },
           { year: 2022, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 250000, vote_share: 4.31, rank: 5, municipalities_with_votes: 4 },
           { year: 2026, candidate_number: 23456, candidate_name: 'Concorrente A', votes: 220000, vote_share: 3.81, rank: 1, municipalities_with_votes: 3 },
@@ -224,7 +224,7 @@ describe('electoral intelligence runtime — overview', () => {
       expect(result.evidence).toContain('Supabase analytical projection');
     }
     const rank = await executeElectoralQuestion('competition.candidate_rank', { candidate: 12345, year: 2026 });
-    expect((rank.result as any).rank).toBe(2);
+    expect((rank.result as any).rank).toBe(9);
     const compare = await executeElectoralQuestion('competition.candidate_compare', { candidate: 12345, competitor: 23456, year: 2022 });
     expect((compare.result as any).comparison.candidateA).toBe('12345');
     const overlap = await executeElectoralQuestion('competition.territorial_overlap', { candidate: 12345, competitor: 23456, year: 2026 });
