@@ -247,3 +247,12 @@ Observação: o ambiente local reportou 6 vulnerabilidades de dependências e um
 ## Atualização 2026-10-08 — UX e refatoração da Inteligência Eleitoral
 
 O contrato visual está em `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md`; a decisão arquitetural está em ADR-0004. A auditoria do frontend pode iniciar imediatamente. O trabalho é limitado a cinco fases: (1) auditoria/contrato, (2) fundação/seletor, (3) dashboard analítico, (4) chat/relatórios, (5) validação/entrega. Agrupar tarefas relacionadas; evitar microfases. Toda fase precisa de testes, evidências, commit e integração em main, sem branches concluídas abandonadas. Dashboard funcional e insights ligados aos dados permanecem condicionados aos gates de cobertura eleitoral, incluindo IE-03.7. Não mascarar lacunas com dados simulados.
+
+
+## Inteligência Eleitoral — auditoria preparatória IE-05.0 (2026-10-08)
+
+**Fase 1 — Auditoria e contrato: CONCLUÍDA documentalmente.** A auditoria estática de `main` foi registrada em `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md`. O ponto de entrada, a navegação administrativa, a tela existente, o endpoint do Worker, a projeção Supabase, os contratos compartilhados e as lacunas de UX foram identificados. O ADR-0004 já existe e formaliza dashboard analítico principal + chat flutuante independente; não foi criado um ADR duplicado.
+
+A fase não alterou código funcional: os contratos de contexto/apresentação já existem e têm testes, e criar um estado concorrente antes de definir sua integração seria duplicação. A próxima etapa é **Fase 2 — Fundação e seleção**, integrando os contratos existentes ao seletor e ao estado compartilhado. O gate IE-03.7 segue bloqueando visualizações e insights que dependam de cobertura não validada. Não classificar a cobertura como completa com base apenas na auditoria do frontend.
+
+Evidência disponível antes desta atualização documental: em 2026-10-08, no commit `e883c21`, o teste de relatório passou (4/4), a suíte completa passou (12 arquivos / 96 testes) e o deploy Cloudflare foi concluído. Esta atualização documental não afirma execução de testes após o novo commit.

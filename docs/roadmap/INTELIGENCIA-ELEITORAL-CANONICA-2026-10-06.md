@@ -373,3 +373,40 @@ Nenhuma tela será criada enquanto a cobertura mínima da base eleitoral não es
 ## Aditivo de experiência visual — 2026-10-08
 
 Seguir `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md` e ADR-0004. Dashboard analítico principal e chat flutuante independente compartilham contexto e resultados estruturados. A seleção de candidato/eleição atualiza o cenário; gráficos, mapas, tabelas e filtros permitem drill-down. A auditoria pode começar já; as visualizações reais devem respeitar os gates de cobertura existentes. Refatoração agrupada em até cinco fases, com testes, evidências, commits e merge em main.
+
+
+## Auditoria de implementação — FASE IE-05.0 (2026-10-08)
+
+Auditoria estática do código publicado em `main` no commit `e883c21`. Este registro descreve o código inspecionado; não afirma validação visual em navegador nem cobertura completa do dataset.
+
+### Mapa real do frontend
+
+- `src/App.tsx` mantém a entrada administrativa existente por meio de `AdminLayout` e `AdminWorkspace`; não há justificativa para criar outro dashboard ou roteador.
+- `src/components/admin/AdminLayout.tsx` já inclui Inteligência Eleitoral na sidebar e um submenu para “Painel Eleitoral”.
+- `src/components/admin/AdminWorkspace.tsx` verifica a permissão do módulo e encaminha para `AdminElectoralIntelligenceTab`.
+- `src/components/admin/AdminElectoralIntelligenceTab.tsx` é a superfície atual: entrada numérica de candidato, segundo candidato para comparação, escopo fixo RS / Deputado Estadual / 1º turno, quatro áreas de perguntas, formulário de consulta embutido, visualização tabular/JSON, metodologia e evidências, CSV, relatório imprimível e síntese de voz.
+- As consultas da interface usam `POST /api/admin/electoral/intelligence`; o handler existente em `src/worker.ts` delega para `server/electoralIntelligence.ts`, que consulta a projeção eleitoral do Supabase. Esta auditoria não valida a cobertura física atual dessa projeção em produção.
+
+### Contratos e lacunas confirmadas
+
+- `src/contracts/electoralContext.ts` já define o contexto de workspace, candidato, eleições e cargos autorizados; `src/contracts/electoralPresentation.ts` já define artefatos de apresentação e famílias de templates. Os testes de apresentação exercitam esses contratos.
+- A interface atual não conecta esses contratos a um seletor compartilhado de candidato/eleição/filtros.
+- A seleção atual aceita número, não oferece busca por nome nem modal de candidatos e não oferece seletor de eleição; o escopo eleitoral aparece fixo.
+- O chat/perguntas está incorporado à página, não em painel flutuante independente.
+- A apresentação atual mostra tabelas ou JSON conforme o formato retornado. Não há renderer de gráficos ou mapas conectado ao contrato de apresentação nessa tela; os templates definidos, isoladamente, não comprovam visualizações operacionais.
+- Há exportação CSV e relatório HTML imprimível, além de síntese de voz. Isso não equivale a uma experiência completa de relatório compartilhado nem a dashboard visual interativo.
+- A autorização de módulo reutiliza `can(..., 'inteligencia-eleitoral')`; o endpoint e a política de dados devem continuar submetidos às verificações de autenticação/autorização existentes. Esta auditoria não altera nem substitui a validação de segurança.
+
+### Decisão de preparação
+
+Nenhuma alteração funcional foi antecipada nesta fase. Os contratos compartilhados já existem e estão testados; criar outro estado/contrato antes de mapear sua integração duplicaria conceitos. A próxima fase deve conectar a interface ao contrato existente e definir um único estado de contexto para candidato, eleição, turno, cargo, UF e filtros. O seletor e as visualizações devem usar apenas registros e resultados reais disponíveis, com estados explícitos para cobertura ausente ou parcial.
+
+O gate IE-03.7 permanece obrigatório. A auditoria de código não autoriza afirmar que a cobertura histórica/territorial está completa e não autoriza preencher lacunas com dados simulados.
+
+### Validação observada
+
+Após sincronizar `main` no commit `e883c21`, a execução local registrada em 2026-10-08 passou no teste específico de relatório (4/4) e na suíte completa (12 arquivos, 96 testes). O deploy Cloudflare também foi concluído nessa execução. Essas evidências precedem esta atualização documental; nenhum teste novo é alegado para a alteração de documentação.
+
+### Próxima fase do contrato visual
+
+**Fase 2 — Fundação e seleção:** integrar o contexto compartilhado já definido, criar seleção pesquisável de candidato e seleção de eleição/turno dentro do shell atual, preservar RBAC e acrescentar testes. Não iniciar gráficos, mapas ou insights que dependam de cobertura ainda não validada.
