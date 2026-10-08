@@ -1,5 +1,6 @@
 import { supabaseAdmin } from './supabase';
 import orchestration from '../src/data/electoral-orchestration.json';
+import { countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth } from '../src/lib/electoral-analytics';
 
 const plans = new Map(orchestration.plans.map((plan) => [plan.question_id, plan]));
 
@@ -301,16 +302,16 @@ export async function executeElectoralQuestion(
         case 'history.consistent_growth': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&v[1]>v[0]&&v[2]>v[1];}).slice(0,limit)};
         case 'history.consistent_decline': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&v[1]<v[0]&&v[2]<v[1];}).slice(0,limit)};
         case 'history.reversal': return {candidate:candidateNumber,municipalities:municipal.filter(r=>Number(r.year)===years[0]).map(r=>Number(r.municipality_code)).filter(id=>{const v=years.map(y=>municipal.find(r=>Number(r.year)===y&&Number(r.municipality_code)===id)?.votes??0);return v.length>=3&&((v[1]>v[0]&&v[2]<v[1])||(v[1]<v[0]&&v[2]>v[1]));}).slice(0,limit)};
-        case 'history.growth_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.absoluteChange>0).length};
-        case 'history.decline_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.absoluteChange<0).length};
-        case 'history.stable_count': return {candidate:candidateNumber,fromYear,toYear,count:ch.filter(x=>x.percentageChange!==null&&Math.abs(x.percentageChange)<=5).length};
+        case 'history.growth_count': return {candidate:candidateNumber,fromYear,toYear,count:countGrowingMunicipalities(a,b)};
+        case 'history.decline_count': return {candidate:candidateNumber,fromYear,toYear,count:countDecliningMunicipalities(a,b)};
+        case 'history.stable_count': return {candidate:candidateNumber,fromYear,toYear,count:countStableMunicipalities(a,b)};
         case 'history.best_gain': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.absoluteChange>0).sort((x,y)=>y.absoluteChange-x.absoluteChange)[0]??null};
         case 'history.best_loss': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.absoluteChange<0).sort((x,y)=>x.absoluteChange-y.absoluteChange)[0]??null};
         case 'history.best_percent_gain': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.percentageChange!==null&&x.percentageChange>0).sort((x,y)=>(y.percentageChange??0)-(x.percentageChange??0))[0]??null};
         case 'history.best_percent_loss': return {candidate:candidateNumber,fromYear,toYear,municipality:ch.filter(x=>x.percentageChange!==null&&x.percentageChange<0).sort((x,y)=>(x.percentageChange??0)-(y.percentageChange??0))[0]??null};
-        case 'history.state_evolution_rank': { const eFrom=elections.find(r=>Number(r.year)===fromYear),eTo=elections.find(r=>Number(r.year)===toYear); return {candidate:candidateNumber,fromYear,toYear,comparison:{candidateChangePct:from&&to&&Number(from.votes)!==0?((Number(to.votes)-Number(from.votes))/Number(from.votes))*100:null,stateChangePct:eFrom&&eTo&&Number(eFrom.total_nominal_votes)!==0?((Number(eTo.total_nominal_votes)-Number(eFrom.total_nominal_votes))/Number(eFrom.total_nominal_votes))*100:null}}; }
-        case 'history.concentration_change': return {candidate:candidateNumber,fromYear,toYear,changePct: (()=>{const calc=(r:any[])=>{const s=[...r].sort((x,y)=>y.votes_nominal-x.votes_nominal);const total=s.reduce((z,x)=>z+x.votes_nominal,0);return total? s.slice(0,10).reduce((z,x)=>z+x.votes_nominal,0)/total*100:null};const x=calc(a),y=calc(b);return x===null||y===null?null:y-x;})()};
-        case 'history.coverage_change': return {candidate:candidateNumber,fromYear,toYear,changePct:((new Set(b.filter(x=>x.votes_nominal>0).map(x=>x.municipality)).size-new Set(a.filter(x=>x.votes_nominal>0).map(x=>x.municipality)).size)/497)*100};
+        case 'history.state_evolution_rank': { const eFrom=elections.find(r=>Number(r.year)===fromYear),eTo=elections.find(r=>Number(r.year)===toYear); return {candidate:candidateNumber,fromYear,toYear,comparison:(from&&to&&eFrom&&eTo)?compareCandidateToStateGrowth(Number(from.votes),Number(to.votes),Number(eFrom.total_nominal_votes),Number(eTo.total_nominal_votes)):null}; }
+        case 'history.concentration_change': return {candidate:candidateNumber,fromYear,toYear,changePct:concentrationChange(a,b,10)};
+        case 'history.coverage_change': return {candidate:candidateNumber,fromYear,toYear,changePct:coverageChange(a,b,497)};
         default: throw new Error('Intent eleitoral está implementado no catálogo, mas ainda não está disponível no runtime.');
       }
     })();
