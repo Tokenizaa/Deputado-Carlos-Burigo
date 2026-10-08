@@ -13,7 +13,7 @@ const years = (arg("years") || "2018,2022,2026").split(",").map(Number);
 const sourceVersion = arg("source-version") || "tse-rs-deputado-estadual-turno-1";
 const chunkSize = Number(arg("chunk") || 1000);
 const supabaseUrl = process.env.SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são obrigatórios e devem existir somente no ambiente local de publicação.");
