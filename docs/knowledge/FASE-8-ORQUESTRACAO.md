@@ -233,3 +233,43 @@ A análise municipal necessária pode existir em funções determinísticas, mas
 Não há, neste conjunto de 19, outro intent que possa ser promovido com segurança apenas por ligar uma função já existente. A próxima implementação deve primeiro fechar os contratos metodológicos/dimensionais necessários, começando pela dimensão regional canônica e pelas regras de priorização/oportunidade/pressão competitiva.
 
 A única correção semântica adicional da Rodada 5 foi aplicada ao EA-021: sua unidade de saída passa a ser `votos_por_municipio`, coerente com `averageVotesWherePositive`.
+
+## Rodada 6 — Dimensão regional IBGE e runtime regional
+
+**Status: IMPLEMENTAÇÃO CONCLUÍDA — validação local pendente**
+
+A dimensão regional canônica foi publicada como **Região Geográfica Imediata (RGI) do IBGE, versão 2024**, vinculada aos 497 municípios do RS. O TSE continua sendo a fonte dos votos; a RGI é uma dimensão geográfica externa e versionada.
+
+Implementados no runtime:
+- EA-014 overview.regional_best
+- EA-015 overview.regional_worst
+- EA-022 overview.strongest_region
+- EA-023 overview.attention_region
+- EA-046 history.regional_evolution
+- EA-047 history.regional_decline
+
+Funções canônicas adicionadas:
+- aggregateRegionalVotes
+- regionalStrength
+- rankRegionalStrength
+- regionalEvolution
+
+A projeção Supabase recebeu:
+- electoral_analytics_regions
+- electoral_analytics_municipality_regions
+- campos regionais em electoral_analytics_municipalities
+- crosswalk TSE → IBGE → RGI
+
+A dimensão possui **43 RGIs e 497 municípios**. O crosswalk usa o código municipal do TSE como chave da projeção e mantém o código IBGE como referência geográfica.
+
+EA-062 territory.region_opportunity permanece pendente: a dimensão regional agora existe, mas a implementação depende da composição municipal do índice de oportunidade definido na metodologia.
+
+Validação remota da dimensão:
+- 43 regiões
+- 497 municípios no crosswalk
+- 1.491 linhas municipais da projeção com dimensão regional preenchida
+- nenhum município da projeção sem RGI após o tratamento do município Westfália
+
+A suíte local deve ser executada após o pull para fechar a rodada com evidência de testes.
+
+Estado do catálogo após a rodada: **87 implementados / 13 pendentes**.
