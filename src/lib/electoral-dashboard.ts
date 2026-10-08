@@ -46,3 +46,24 @@ export function toFiniteNumber(value: unknown): number | null {
 export function normalizeCandidateQuery(value: string): string {
   return value.trim().replace(/\s+/g, ' ').slice(0, 80);
 }
+
+export function filterHistoricalRows(
+  rows: unknown,
+  candidateName: string | null | undefined,
+  candidateNumber: number,
+): ElectionYearResult[] {
+  if (!Array.isArray(rows)) return [];
+  const normalizeName = (value: string) => value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+  const expectedName = candidateName ? normalizeName(candidateName) : '';
+  return rows.filter((row): row is ElectionYearResult => {
+    if (!row || typeof row !== 'object') return false;
+    const record = row as Record<string, unknown>;
+    if (toFiniteNumber(record.votes) === null) return false;
+    if (expectedName) return typeof record.candidateName === 'string' && normalizeName(record.candidateName) === expectedName;
+    return Number(record.candidate) === candidateNumber;
+  });
+}
