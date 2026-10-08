@@ -283,7 +283,8 @@ if (request.method !== 'POST') return methodNotAllowed();
       const questionId = typeof body?.questionId === 'string' ? body.questionId.trim() : '';
       if (!questionId) return Response.json({ error: 'questionId é obrigatório.' }, { status: 400 });
 
-      const result = await executeElectoralQuestion(questionId);
+      const params = body?.params && typeof body.params === 'object' && !Array.isArray(body.params) ? body.params : {};
+      const result = await executeElectoralQuestion(questionId, params);
       return Response.json(result);
     } catch (error) {
       console.error('[api/admin/electoral/intelligence]', error);
