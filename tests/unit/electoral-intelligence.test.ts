@@ -161,7 +161,7 @@ describe('electoral intelligence runtime — overview', () => {
       'territory.strongholds','territory.weakholds','territory.growing','territory.declining',
       'territory.top_rankings','territory.low_rankings','territory.concentration','territory.dispersion',
       'territory.coverage','territory.high_growth',
-      'territory.high_share','territory.low_share','territory.compare',
+      'territory.high_share','territory.low_share',
     ];
 
     for (const id of implemented) {
