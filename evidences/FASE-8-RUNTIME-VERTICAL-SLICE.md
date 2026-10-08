@@ -179,3 +179,7 @@ Validação remota da dimensão:
 A suíte local deve ser executada após o pull para fechar a rodada com evidência de testes.
 
 Estado do catálogo após a rodada: **87 implementados / 13 pendentes**.
+
+## Fechamento das 13 pendências — 2026-10-08
+
+O catálogo e a orquestração foram fechados em **100/100 intents IMPLEMENTADOS**. Foram implementados no runtime determinístico: EA-034, EA-035, EA-049, EA-050, EA-053, EA-058, EA-059, EA-060, EA-062, EA-071, EA-098, EA-099 e EA-100. A metodologia competitiva foi versionada como **competition-v1.1-equal-weight**, com cinco componentes em pesos iguais. Índices compostos são normalizados e descritivos. Os mapas retornam dados municipais enriquecidos com referência IBGE, sem criar nova métrica.
