@@ -142,3 +142,14 @@ A rodada não altera os 20 intents `IMPLEMENTADO` do catálogo fora deste bloco 
 ### Próxima rodada
 
 **Rodada 2 — History**, mantendo o mesmo padrão: fechar o bloco funcional inteiro antes de avançar para Territory.
+
+
+## Rodada 2 — Runtime History
+
+**Em execução**
+
+A Rodada 2 implementa em conjunto os 19 intents History marcados como `IMPLEMENTADO` no catálogo: EA-026–EA-033, EA-036–EA-045 e EA-048. Os seis intents `IMPLEMENTATION_PENDING` (EA-034, EA-035, EA-046, EA-047, EA-049 e EA-050) permanecem pendentes.
+
+O runtime recebe `candidate`, `from_year`, `to_year` e `limit`, utiliza exclusivamente a projeção analítica do Supabase e preserva o escopo Deputado Estadual / RS / turno 1.
+
+A validação final da rodada depende da execução local de `npm run test:unit` e `npm run test:integration`.
