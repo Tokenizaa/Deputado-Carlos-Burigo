@@ -160,7 +160,7 @@ describe('electoral intelligence runtime — overview', () => {
     const implemented = [
       'territory.strongholds','territory.weakholds','territory.growing','territory.declining',
       'territory.top_rankings','territory.low_rankings','territory.concentration','territory.dispersion',
-      'territory.coverage','territory.growth_low_base','territory.high_base_decline','territory.high_growth',
+      'territory.coverage','territory.high_growth',
       'territory.high_share','territory.low_share','territory.compare',
     ];
 
@@ -185,7 +185,7 @@ describe('electoral intelligence runtime — overview', () => {
     const compare = await executeElectoralQuestion('territory.compare', { candidate: 12345, year: 2022, municipality: [1, 2] });
     expect((compare.result as any).municipalities).toHaveLength(2);
 
-    for (const id of ['territory.region_strength', 'territory.regional_profile']) {
+    for (const id of ['territory.region_strength', 'territory.regional_profile', 'territory.growth_low_base', 'territory.high_base_decline']) {
       const result = await executeElectoralQuestion(id, { candidate: 12345, year: 2022 });
       expect(result.status).toBe('insufficient_data');
       expect(result.result).toBeNull();
