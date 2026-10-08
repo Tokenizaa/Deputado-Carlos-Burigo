@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 const argv = process.argv.slice(2);
@@ -14,6 +15,8 @@ const sourceVersion = arg("source-version") || "tse-rs-deputado-estadual-turno-1
 const chunkSize = Number(arg("chunk") || 1000);
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const regionalDimension = JSON.parse(readFileSync(new URL("../../src/data/ibge-rs-rgi-2024.json", import.meta.url), "utf8"));
+const regionByMunicipality = new Map(regionalDimension.municipalities.map(row => [Number(row.municipality_code), row]));
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são obrigatórios e devem existir somente no ambiente local de publicação.");
@@ -149,8 +152,16 @@ from totals
 order by year, municipalities_rank, tse_municipality_code;
 `), ["year","municipality_code","municipality_name","total_nominal_votes","municipalities_rank"]).map(x => ({
   year:num(x.year), municipality_code:num(x.municipality_code), municipality_name:x.municipality_name,
+  region_code: regionByMunicipality.get(num(x.municipality_code))?.region_code ?? null,
+  region_name: regionByMunicipality.get(num(x.municipality_code))?.region_name ?? null,
+  region_type: "IBGE_RGI",
+  region_source_version: regionalDimension.version,
   total_nominal_votes:num(x.total_nominal_votes), municipalities_rank:num(x.municipalities_rank)
 }));
+
+if (municipalityRows.some(row => !row.region_code)) {
+  throw new Error("Dimensão regional IBGE incompleta: existe município sem RGI.");
+}
 
 const candidateMunicipalRows = parse(psql(`
 with totals as (
