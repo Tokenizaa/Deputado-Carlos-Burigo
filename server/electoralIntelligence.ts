@@ -116,7 +116,7 @@ export async function executeElectoralQuestion(
       agent: plan.agent,
       skills: plan.skills,
       method: plan.method,
-      function: plan.function,
+      function: 'PENDING',
       scope: {
         office: 'Deputado Estadual',
         uf: 'RS',
