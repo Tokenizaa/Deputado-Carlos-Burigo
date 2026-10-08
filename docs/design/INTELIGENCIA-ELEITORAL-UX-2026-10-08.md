@@ -123,3 +123,22 @@ Após sincronizar `main` no commit `e883c21`, a execução local registrada em 2
 ### Próxima fase do contrato visual
 
 **Fase 2 — Fundação e seleção:** integrar o contexto compartilhado já definido, criar seleção pesquisável de candidato e seleção de eleição/turno dentro do shell atual, preservar RBAC e acrescentar testes. Não iniciar gráficos, mapas ou insights que dependam de cobertura ainda não validada.
+
+## Implementação IE-05.1 — fundação visual e seleção
+
+**Estado desta branch:** implementação submetida para validação; não considerar merged nem testada localmente até os checks confirmarem.
+
+A tela existente foi transformada em uma fundação de dashboard dentro do AdminWorkspace atual, sem criar rota, layout ou aplicação administrativa paralela. A primeira fatia implementa:
+
+- seleção de candidato por nome ou número, consultando apenas a projeção Supabase autenticada e filtrando pelo ano escolhido;
+- seletor explícito de eleição (2018, 2022, 2026), RS, Deputado Estadual e 1º turno;
+- indicadores de votos nominais, participação estadual, ranking e total nominal do cargo, preenchidos exclusivamente pelo runtime;
+- série histórica visual simples e ranking de municípios, renderizados somente quando há registros retornados;
+- chat flutuante independente, compartilhando candidato, ano, filtros e resultado atual com o dashboard;
+- preservação das perguntas existentes, exportação CSV, relatório imprimível, metodologia, evidências e voz;
+- verificação RBAC específica para Inteligência Eleitoral na rota de análise e na nova pesquisa de candidatos.
+
+A alteração não adiciona valores de exemplo ao produto nem habilita mapa fictício. O mapa continua explicitamente bloqueado até a validação da cobertura territorial do gate IE-03.7. A seleção do ano exige selecionar novamente o candidato, para não confundir registros eleitorais de anos diferentes.
+
+**Validação pendente:** executar lint, testes unitários, integração/API e build, revisar o fluxo de autenticação/RBAC e confirmar a consulta real no Supabase antes de considerar esta fatia concluída.
+
