@@ -127,6 +127,34 @@ describe('electoral intelligence runtime — overview', () => {
     expect((below.result as any).byYear[0].municipalities[0].municipalityName).toBe('Gamma');
   });
 
+  it('closes the implemented History intents as one runtime block', async () => {
+    const implemented = [
+      'history.total_evolution','history.absolute_change','history.percent_change',
+      'history.municipal_growth','history.municipal_decline','history.consistent_growth',
+      'history.consistent_decline','history.reversal','history.growth_count',
+      'history.decline_count','history.stable_count','history.best_gain','history.best_loss',
+      'history.best_percent_gain','history.best_percent_loss','history.state_evolution_rank',
+      'history.concentration_change','history.coverage_change','history.trajectory',
+    ];
+
+    for (const id of implemented) {
+      const result = await executeElectoralQuestion(id, { candidate: 12345, from_year: 2018, to_year: 2026, limit: 2 });
+      expect(result.status).toBe('ok');
+      expect(result.intent).toMatch(/^EA-0(2[6-9]|3[0-9]|4[0-5]|48)$/);
+      expect(result.scope.years).toEqual([2018, 2022, 2026]);
+      expect(result.evidence).toContain('Supabase analytical projection');
+    }
+
+    const evolution = await executeElectoralQuestion('history.total_evolution', { candidate: 12345 });
+    expect((evolution.result as any).byYear.map((row: any) => row.votes)).toEqual([100000, 200000, 150000]);
+
+    const change = await executeElectoralQuestion('history.absolute_change', { candidate: 12345, from_year: 2018, to_year: 2026 });
+    expect((change.result as any).change).toBe(50000);
+
+    const growthCount = await executeElectoralQuestion('history.growth_count', { candidate: 12345, from_year: 2018, to_year: 2026 });
+    expect((growthCount.result as any).count).toBe(1);
+  });
+
   it('does not calculate implementation-pending questions', async () => {
     const result = await executeElectoralQuestion('overview.regional_best');
     expect(result.status).toBe('pending');
