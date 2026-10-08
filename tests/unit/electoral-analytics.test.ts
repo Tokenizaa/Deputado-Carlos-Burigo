@@ -6,7 +6,7 @@ import {
   topKConcentration, variationPct, absoluteChange, percentChange, compareMunicipalHistory,
   municipalGrowth, municipalDecline, consistentGrowth, consistentDecline, trendReversals,
   countStableMunicipalities, maxPercentageGain, maxPercentageLoss, concentrationChange, coverageChange,
-  compareCandidateToStateGrowth, historicalEvolution, rankCandidates, candidateGap, candidateGrowth, compareCandidates, candidateShareRanking, candidateRankEvolution, municipalLeaders, municipalLeadersAgainstCandidate, municipalChallengers, rankCompetitors, candidateGrowthExcluding, territorialOverlap, effectiveNumberOfCandidates, fragmentationIndex, competitionMargin, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome
+  compareCandidateToStateGrowth, historicalEvolution, rankCandidates, candidateGap, candidateGrowth, compareCandidates, candidateShareRanking, candidateRankEvolution, municipalLeaders, municipalLeadersAgainstCandidate, municipalChallengers, rankCompetitors, candidateGrowthExcluding, territorialOverlap, effectiveNumberOfCandidates, fragmentationIndex, competitionMargin, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, territorialStrength, territorialWeakness, territoryConcentration, municipalVoteShare, territorialDispersion, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, compareMunicipalities, regionalTotals, regionalStrength, priorityScore
 } from "../../src/lib/electoral-analytics";
 
 const rows = [
@@ -32,7 +32,7 @@ describe("electoral analytics — overview", () => {
     expect(municipalitiesBelowAverage(rows).map(r => r.municipality)).toEqual([1]);
   });
   it("computes top-k concentration without sentinels", () => {
-    expect(topKConcentration(rows, 2)).toBeCloseTo(50);
+    expect(topKConcentration(rows, 2)).toBeCloseTo(83.3333333333);
     expect(topKConcentration(rows, 0)).toBeNull();
   });
   it("returns null for undefined percentage denominators", () => {
