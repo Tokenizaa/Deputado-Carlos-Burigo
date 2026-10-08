@@ -267,7 +267,7 @@ O termo será operacionalizado como ranking de concorrentes segundo combinação
 - sobreposição territorial;
 - crescimento recente.
 
-A composição será versionada. Não será implementada enquanto os pesos e o período padrão não estiverem registrados no catálogo de metodologia da competição.
+Versão 1.1: pesos iguais de 20% para posição estadual, diferença absoluta de votos, presença territorial, sobreposição territorial e crescimento absoluto no período padrão 2018→2026. O score final é a média dos cinco componentes normalizados em 0–100. O período e os pesos são parte do resultado.
 
 ## 16. EA-099 — tendência competitiva
 
@@ -308,7 +308,7 @@ O LLM apenas transforma esse objeto em linguagem natural.
 
 Após este contrato:
 
-### Podem avançar para implementação quando a dimensão regional estiver publicada
+### Implementados após publicação da dimensão regional
 - EA-014
 - EA-015
 - EA-022
@@ -317,7 +317,7 @@ Após este contrato:
 - EA-047
 - EA-062
 
-### Podem avançar após implementação/validação dos índices municipais
+### Implementados com os índices municipais canônicos
 - EA-034
 - EA-035
 - EA-049
@@ -328,7 +328,7 @@ Após este contrato:
 - EA-060
 - EA-071
 
-### Permanecem pendentes de versionamento específico da metodologia competitiva
+### Implementados na versão metodológica 1.1
 - EA-098
 - EA-099
 - EA-100
@@ -358,4 +358,4 @@ Toda mudança deve atualizar:
 - IBGE — Quadro Geográfico de Referência para Produção, Análise e Disseminação de Estatísticas.
 - IBGE — Malha Municipal Digital.
 
-Versão metodológica: 1.0.
+Versão metodológica: 1.1.
