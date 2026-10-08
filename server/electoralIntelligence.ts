@@ -1,6 +1,6 @@
 import { supabaseAdmin } from './supabase';
 import orchestration from '../src/data/electoral-orchestration.json';
-import { averageVotesWherePositive, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
+import { averageVotesWherePositive, aggregateRegionalVotes, regionalStrength, rankRegionalStrength, regionalEvolution, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
 
 const plans = new Map(orchestration.plans.map((plan) => [plan.question_id, plan]));
 
@@ -19,6 +19,10 @@ const RUNTIME_IMPLEMENTED = new Set([
   'overview.above_average',
   'overview.below_average',
   'overview.participation_average',
+  'overview.regional_best',
+  'overview.regional_worst',
+  'overview.strongest_region',
+  'overview.attention_region',
   'history.total_evolution',
   'history.absolute_change',
   'history.percent_change',
@@ -38,6 +42,8 @@ const RUNTIME_IMPLEMENTED = new Set([
   'history.concentration_change',
   'history.coverage_change',
   'history.trajectory',
+  'history.regional_evolution',
+  'history.regional_decline',
   'territory.strongholds',
   'territory.weakholds',
   'territory.growing',
@@ -183,6 +189,40 @@ export async function executeElectoralQuestion(
       evidence: [...plan.evidence, 'Supabase analytical projection'],
       limitations: ['Participação calculada sobre o total de votos nominais do cargo no mesmo ano.'],
     };
+  }
+
+  if (['overview.regional_best', 'overview.regional_worst', 'overview.strongest_region', 'overview.attention_region'].includes(questionId)) {
+    const candidateNumber = Number(params.candidate);
+    if (!Number.isInteger(candidateNumber) || candidateNumber <= 0) throw new Error(`candidate é obrigatório para executar ${questionId}.`);
+    const { data: candidateRows, error: candidateError } = await supabaseAdmin
+      .from('electoral_analytics_candidates').select('year,candidate_number,votes').eq('candidate_number', candidateNumber).order('year', { ascending: true });
+    if (candidateError) throw candidateError;
+    const { data: candidateMunicipalRows, error: candidateMunicipalError } = await supabaseAdmin
+      .from('electoral_analytics_candidate_municipal').select('year,municipality_code,candidate_number,votes').eq('candidate_number', candidateNumber).order('year', { ascending: true });
+    if (candidateMunicipalError) throw candidateMunicipalError;
+    const { data: municipalityRows, error: municipalityError } = await supabaseAdmin
+      .from('electoral_analytics_municipalities').select('year,municipality_code,region_code,total_nominal_votes').order('year', { ascending: true });
+    if (municipalityError) throw municipalityError;
+    const { data: electionRows, error: electionError } = await supabaseAdmin
+      .from('electoral_analytics_elections').select('year,total_nominal_votes').order('year', { ascending: true });
+    if (electionError) throw electionError;
+    const candidateData = candidateRows ?? [], candidateMunicipal = candidateMunicipalRows ?? [], municipalities = municipalityRows ?? [], elections = electionRows ?? [];
+    const years = [...new Set(candidateData.map(row => Number(row.year)))].sort((a,b)=>a-b);
+    const selectedYears = params.year ? years.filter(y => y === Number(params.year)) : years;
+    const limit = Number.isInteger(params.limit) && Number(params.limit)>0 ? Number(params.limit) : 10;
+    const byYear = selectedYears.map(year => {
+      const mapping = new Map(municipalities.filter(row => Number(row.year)===year && row.region_code).map(row => [Number(row.municipality_code), String(row.region_code)]));
+      const candidateMunicipalForYear = candidateMunicipal.filter(row => Number(row.year)===year).map(row => ({ year: year as 2018|2022|2026, municipality:Number(row.municipality_code), votes_nominal:Number(row.votes) }));
+      const regionTotals = aggregateRegionalVotes(municipalities.filter(row => Number(row.year)===year).map(row => ({ year:year as 2018|2022|2026, municipality:Number(row.municipality_code), votes_nominal:Number(row.total_nominal_votes) })), mapping);
+      const candidate = candidateData.find(row => Number(row.year)===year);
+      const election = elections.find(row => Number(row.year)===year);
+      const ranked = rankRegionalStrength(regionalStrength(candidateMunicipalForYear, Number(candidate?.votes ?? 0), regionTotals, Number(election?.total_nominal_votes ?? 0), mapping));
+      const descending = questionId !== 'overview.regional_worst' && questionId !== 'overview.attention_region';
+      const ordered = descending ? ranked : [...ranked].reverse();
+      const item = ordered.slice(0, limit).map(row => ({ region: row.region, candidateVotes: row.candidateVotes, regionVotes: row.regionVotes, candidateSharePct: row.candidateSharePct, stateSharePct: row.stateSharePct, strengthRatio: row.strengthRatio }));
+      return { year, regions: item };
+    });
+    return { status:'ok', question:questionId, intent:plan.intent_id, agent:plan.agent, skills:plan.skills, method:plan.method, function:plan.function, scope:{office:'Deputado Estadual',uf:'RS',round:1,years:selectedYears}, result:{candidate:candidateNumber,byYear}, evidence:[...plan.evidence,'Supabase analytical projection','IBGE RGI 2024'], limitations:['Região operacionalizada pela Região Geográfica Imediata (RGI) do IBGE; força regional é participação do candidato na região dividida pela participação estadual.'] };
   }
 
   if (questionId.startsWith('overview.') && questionId !== 'overview.total_votes' && questionId !== 'overview.state_share') {
@@ -340,6 +380,19 @@ export async function executeElectoralQuestion(
         case 'history.state_evolution_rank': { const eFrom=elections.find(r=>Number(r.year)===fromYear),eTo=elections.find(r=>Number(r.year)===toYear); return {candidate:candidateNumber,fromYear,toYear,comparison:(from&&to&&eFrom&&eTo)?compareCandidateToStateGrowth(Number(from.votes),Number(to.votes),Number(eFrom.total_nominal_votes),Number(eTo.total_nominal_votes)):null}; }
         case 'history.concentration_change': return {candidate:candidateNumber,fromYear,toYear,changePct:concentrationChange(a,b,10)};
         case 'history.coverage_change': return {candidate:candidateNumber,fromYear,toYear,changePct:coverageChange(a,b,497)};
+        case 'history.regional_evolution':
+        case 'history.regional_decline': {
+          const municipalityCatalog = await supabaseAdmin.from('electoral_analytics_municipalities').select('year,municipality_code,region_code,total_nominal_votes').order('year',{ascending:true});
+          if (municipalityCatalog.error) throw municipalityCatalog.error;
+          const catalog = municipalityCatalog.data ?? [];
+          const regionalFor = (year:number) => aggregateRegionalVotes(catalog.filter(r=>Number(r.year)===year && r.region_code).map(r=>({year:year as 2018|2022|2026,municipality:Number(r.municipality_code),votes_nominal:0})).map((r,i)=>({ ...r, votes_nominal:Number(catalog.filter(x=>Number(x.year)===year&&Number(x.municipality_code)===r.municipality)[0]?.total_nominal_votes??0) })), new Map(catalog.filter(r=>Number(r.year)===year&&r.region_code).map(r=>[Number(r.municipality_code),String(r.region_code)])));
+          const candidateRegionalFor = (year:number) => aggregateRegionalVotes(rowsFor(year), new Map(catalog.filter(r=>Number(r.year)===year&&r.region_code).map(r=>[Number(r.municipality_code),String(r.region_code)])));
+          const fromRegional = candidateRegionalFor(fromYear), toRegional = candidateRegionalFor(toYear);
+          const changes = regionalEvolution(fromRegional,toRegional);
+          const ordered = questionId==='history.regional_decline' ? changes.filter(x=>x.absoluteChange<0).sort((x,y)=>x.absoluteChange-y.absoluteChange) : changes.filter(x=>x.absoluteChange>0).sort((x,y)=>y.absoluteChange-x.absoluteChange);
+          return {candidate:candidateNumber,fromYear,toYear,regions:ordered.slice(0,limit)};
+        }
+
         default: throw new Error('Intent eleitoral está implementado no catálogo, mas ainda não está disponível no runtime.');
       }
     })();
