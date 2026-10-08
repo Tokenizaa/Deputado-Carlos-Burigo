@@ -818,7 +818,7 @@
       "funcao_analitica": "averageVotesWherePositive",
       "entrada": "linhas nominais municipais do candidato no escopo eleitoral selecionado",
       "saida": "number",
-      "unidade": "percentual",
+      "unidade": "votos_por_municipio",
       "denominador": null,
       "restricoes": [
         "Deputado Estadual",
