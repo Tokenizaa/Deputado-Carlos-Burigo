@@ -1005,8 +1005,8 @@
         "comparability-check"
       ],
       "method": "newTerritorialStrength",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1037,8 +1037,8 @@
         "comparability-check"
       ],
       "method": "lostTerritorialStrength",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1474,8 +1474,8 @@
         "comparability-check"
       ],
       "method": "territorialTurningPoints",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1506,8 +1506,8 @@
         "comparability-check"
       ],
       "method": "priorityChange",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1600,8 +1600,8 @@
         "growth-rate"
       ],
       "method": "opportunityIndex",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1756,8 +1756,8 @@
         "growth-rate"
       ],
       "method": "territorialMap",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1788,8 +1788,8 @@
         "growth-rate"
       ],
       "method": "territorialMap",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1820,8 +1820,8 @@
         "growth-rate"
       ],
       "method": "territorialMap",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -1883,8 +1883,8 @@
         "growth-rate"
       ],
       "method": "regionalOpportunity",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -2163,8 +2163,8 @@
         "growth-rate"
       ],
       "method": "priorityIndex",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -3001,8 +3001,8 @@
         "ranking"
       ],
       "method": "strategicCompetitorRanking",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -3033,8 +3033,8 @@
         "ranking"
       ],
       "method": "competitiveTrend",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
@@ -3065,8 +3065,8 @@
         "ranking"
       ],
       "method": "candidateCompetitiveContext",
-      "function": "PENDING",
-      "state": "IMPLEMENTATION_PENDING",
+      "function": "deterministic_pending_runtime",
+      "state": "IMPLEMENTADO",
       "scope": {
         "office": "Deputado Estadual",
         "uf": "RS",
