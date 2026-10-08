@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "placement": "existing_gabinete_dashboard",
+  "public": false,
+  "auth": "existing_admin_auth_and_rbac",
+  "areas": [
+    {
+      "id": "overview",
+      "label": "Visão Geral",
+      "agent": "electoral-overview"
+    },
+    {
+      "id": "history",
+      "label": "Histórico",
+      "agent": "electoral-history"
+    },
+    {
+      "id": "territory",
+      "label": "Território",
+      "agent": "electoral-territory"
+    },
+    {
+      "id": "competition",
+      "label": "Candidatos / Concorrência",
+      "agent": "electoral-competition"
+    }
+  ],
+  "chatbot": {
+    "enabled": true,
+    "mode": "analytical",
+    "input": "natural_language",
+    "answer_pipeline": [
+      "question",
+      "scope_resolution",
+      "intent",
+      "orchestration_plan",
+      "deterministic_result",
+      "methodological_rag",
+      "interpretation"
+    ],
+    "answer_contract": [
+      "answer",
+      "result",
+      "method",
+      "scope",
+      "evidence",
+      "limitations",
+      "status"
+    ],
+    "prohibited": [
+      "invent_number",
+      "invent_formula",
+      "override_result",
+      "query_local_database_from_browser",
+      "mix_office",
+      "mix_round",
+      "hide_denominator"
+    ]
+  },
+  "data_source": {
+    "runtime": "Supabase production analytical projection",
+    "local_database": "never_directly_accessed_by_dashboard_or_chatbot",
+    "raw_tse_files": "never_directly_accessed_by_dashboard_or_chatbot"
+  },
+  "ui": {
+    "no_parallel_dashboard": true,
+    "existing_admin_layout": true,
+    "familiar_patterns": true,
+    "minimal_surface": true,
+    "areas_are_navigation_not_duplicate_dashboards": true
+  },
+  "pending_runtime_dependencies": [
+    "publish_analytical_projection_to_supabase",
+    "wire_orchestration_runtime_to_application",
+    "connect_llm_provider_after_deterministic_result",
+    "integration_and_e2e_validation"
+  ],
+  "status": "CONTRACT_READY_RUNTIME_PENDING"
+}
