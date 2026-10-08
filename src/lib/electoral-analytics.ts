@@ -216,3 +216,301 @@ export function regionalStrength(rows: MunicipalVoteRow[], k: number): Array<{ r
 export function priorityScore(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
   return rankByVotes(rows).slice(0, Math.max(0,k));
 }
+
+
+export interface CandidateGrowth {
+  candidateId: string;
+  fromVotes: number;
+  toVotes: number;
+  absoluteChange: number;
+  percentageChange: number | null;
+}
+
+export interface CandidateGap {
+  candidateId: string;
+  rank: number;
+  votes: number;
+  above: CandidateVoteRow | null;
+  below: CandidateVoteRow | null;
+  gapAbove: number | null;
+  leadBelow: number | null;
+}
+
+export interface CandidateComparison {
+  candidateA: string;
+  candidateB: string;
+  votesA: number;
+  votesB: number;
+  absoluteGap: number;
+  shareA: number | null;
+  shareB: number | null;
+  shareGapPctPoints: number | null;
+  rankA: number | null;
+  rankB: number | null;
+}
+
+export interface MunicipalCompetition {
+  municipality: number;
+  leader: string;
+  leaderVotes: number;
+  runnerUp: string | null;
+  runnerUpVotes: number;
+  marginVotes: number;
+  leaderSharePct: number | null;
+  pressurePct: number | null;
+}
+
+export interface RegionalCompetition {
+  region: string;
+  leader: string;
+  leaderVotes: number;
+  runnerUp: string | null;
+  runnerUpVotes: number;
+  marginVotes: number;
+  leaderSharePct: number | null;
+  pressurePct: number | null;
+}
+
+export function rankCandidates(rows: CandidateVoteRow[]): CandidateVoteRow[] {
+  return [...rows].sort((a, b) => b.votes - a.votes || a.candidateId.localeCompare(b.candidateId));
+}
+
+export function candidateGap(rows: CandidateVoteRow[], candidateId: string): CandidateGap | null {
+  const ranked = rankCandidates(rows);
+  const index = ranked.findIndex(row => row.candidateId === candidateId);
+  if (index === -1) return null;
+  const current = ranked[index];
+  const above = ranked[index - 1] ?? null;
+  const below = ranked[index + 1] ?? null;
+  return {
+    candidateId,
+    rank: index + 1,
+    votes: current.votes,
+    above,
+    below,
+    gapAbove: above ? above.votes - current.votes : null,
+    leadBelow: below ? current.votes - below.votes : null,
+  };
+}
+
+export function candidateGrowth(fromRows: CandidateVoteRow[], toRows: CandidateVoteRow[], k: number): CandidateGrowth[] {
+  const from = new Map(fromRows.map(row => [row.candidateId, row.votes]));
+  return toRows
+    .map(row => {
+      const fromVotes = from.get(row.candidateId) ?? 0;
+      return {
+        candidateId: row.candidateId,
+        fromVotes,
+        toVotes: row.votes,
+        absoluteChange: row.votes - fromVotes,
+        percentageChange: variationPct(fromVotes, row.votes),
+      };
+    })
+    .sort((a, b) => b.absoluteChange - a.absoluteChange)
+    .slice(0, Math.max(0, k));
+}
+
+export function compareCandidates(rows: CandidateVoteRow[], candidateA: string, candidateB: string): CandidateComparison | null {
+  const a = rows.find(row => row.candidateId === candidateA);
+  const b = rows.find(row => row.candidateId === candidateB);
+  if (!a || !b) return null;
+  const total = sumCandidateVotes(rows);
+  return {
+    candidateA,
+    candidateB,
+    votesA: a.votes,
+    votesB: b.votes,
+    absoluteGap: a.votes - b.votes,
+    shareA: shareOfTotal(a.votes, total),
+    shareB: shareOfTotal(b.votes, total),
+    shareGapPctPoints: shareOfTotal(a.votes, total) === null || shareOfTotal(b.votes, total) === null
+      ? null
+      : shareOfTotal(a.votes, total)! - shareOfTotal(b.votes, total)!,
+    rankA: candidateRank(rows, candidateA),
+    rankB: candidateRank(rows, candidateB),
+  };
+}
+
+export function sumCandidateVotes(rows: CandidateVoteRow[]): number {
+  return rows.reduce((sum, row) => sum + row.votes, 0);
+}
+
+export function candidateShareRanking(rows: CandidateVoteRow[]): Array<CandidateVoteRow & { sharePct: number | null }> {
+  const total = sumCandidateVotes(rows);
+  return rankCandidates(rows).map(row => ({ ...row, sharePct: shareOfTotal(row.votes, total) }));
+}
+
+export function candidateRankEvolution(
+  yearlyRows: Array<{ year: Year; rows: CandidateVoteRow[] }>,
+  candidateId: string,
+): Array<{ year: Year; rank: number | null; votes: number | null }> {
+  return [...yearlyRows]
+    .sort((a, b) => a.year - b.year)
+    .map(({ year, rows }) => ({
+      year,
+      rank: candidateRank(rows, candidateId),
+      votes: rows.find(row => row.candidateId === candidateId)?.votes ?? null,
+    }));
+}
+
+export function municipalLeaders(rows: CandidateMunicipalVoteRow[], excludeCandidateId?: string): MunicipalCompetition[] {
+  const municipalities = [...new Set(rows.map(row => row.municipality))];
+  return municipalities.map(municipality => {
+    const ranked = rankCandidates(
+      rows
+        .filter(row => row.municipality === municipality && (!excludeCandidateId || row.candidateId !== excludeCandidateId))
+        .map(row => ({ candidateId: row.candidateId, votes: row.votes_nominal })),
+    );
+    const leader = ranked[0];
+    const runnerUp = ranked[1] ?? null;
+    if (!leader) {
+      return {
+        municipality,
+        leader: "",
+        leaderVotes: 0,
+        runnerUp: null,
+        runnerUpVotes: 0,
+        marginVotes: 0,
+        leaderSharePct: null,
+        pressurePct: null,
+      };
+    }
+    const total = sumCandidateVotes(ranked);
+    return {
+      municipality,
+      leader: leader.candidateId,
+      leaderVotes: leader.votes,
+      runnerUp: runnerUp?.candidateId ?? null,
+      runnerUpVotes: runnerUp?.votes ?? 0,
+      marginVotes: leader.votes - (runnerUp?.votes ?? 0),
+      leaderSharePct: shareOfTotal(leader.votes, total),
+      pressurePct: leader.votes === 0 ? null : ((runnerUp?.votes ?? 0) / leader.votes) * 100,
+    };
+  });
+}
+
+export function municipalChallengers(rows: CandidateMunicipalVoteRow[], candidateId: string, k: number): CandidateVoteRow[] {
+  const candidateMunicipalities = new Set(
+    rows.filter(row => row.candidateId === candidateId && row.votes_nominal > 0).map(row => row.municipality),
+  );
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    if (row.candidateId === candidateId || !candidateMunicipalities.has(row.municipality)) continue;
+    totals.set(row.candidateId, (totals.get(row.candidateId) ?? 0) + row.votes_nominal);
+  }
+  return rankCandidates([...totals.entries()].map(([id, votes]) => ({ candidateId: id, votes }))).slice(0, Math.max(0, k));
+}
+
+export function municipalLeadersAgainstCandidate(rows: CandidateMunicipalVoteRow[], candidateId: string, k: number): MunicipalCompetition[] {
+  return municipalLeaders(rows).filter(item => item.leader !== candidateId).slice(0, Math.max(0, k));
+}
+
+export function rankCompetitors(rows: CandidateVoteRow[], candidateId: string, k: number): CandidateVoteRow[] {
+  return rankCandidates(rows.filter(row => row.candidateId !== candidateId)).slice(0, Math.max(0, k));
+}
+
+export function candidateGrowthExcluding(fromRows: CandidateVoteRow[], toRows: CandidateVoteRow[], candidateId: string, k: number): CandidateGrowth[] {
+  return candidateGrowth(fromRows, toRows, toRows.length).filter(row => row.candidateId !== candidateId).slice(0, Math.max(0, k));
+}
+
+export function territorialOverlap(rows: CandidateMunicipalVoteRow[], candidateA: string, candidateB: string): number | null {
+  const a = new Set(rows.filter(row => row.candidateId === candidateA && row.votes_nominal > 0).map(row => row.municipality));
+  const b = new Set(rows.filter(row => row.candidateId === candidateB && row.votes_nominal > 0).map(row => row.municipality));
+  if (a.size === 0 && b.size === 0) return null;
+  const union = new Set([...a, ...b]);
+  const intersection = [...a].filter(id => b.has(id)).length;
+  return union.size === 0 ? null : (intersection / union.size) * 100;
+}
+
+export function effectiveNumberOfCandidates(rows: CandidateVoteRow[]): number | null {
+  const total = sumCandidateVotes(rows);
+  if (total === 0) return null;
+  const hhi = rows.reduce((sum, row) => sum + Math.pow(row.votes / total, 2), 0);
+  return hhi === 0 ? null : 1 / hhi;
+}
+
+export function fragmentationIndex(rows: CandidateVoteRow[]): number | null {
+  const total = sumCandidateVotes(rows);
+  if (total === 0) return null;
+  return 1 - rows.reduce((sum, row) => sum + Math.pow(row.votes / total, 2), 0);
+}
+
+export function competitionMargin(rows: CandidateVoteRow[]): { marginVotes: number; marginPct: number | null; leader: CandidateVoteRow | null; runnerUp: CandidateVoteRow | null } {
+  const ranked = rankCandidates(rows);
+  const leader = ranked[0] ?? null;
+  const runnerUp = ranked[1] ?? null;
+  const marginVotes = leader ? leader.votes - (runnerUp?.votes ?? 0) : 0;
+  return {
+    marginVotes,
+    marginPct: leader ? shareOfTotal(marginVotes, sumCandidateVotes(rows)) : null,
+    leader,
+    runnerUp,
+  };
+}
+
+export function municipalCompetition(rows: CandidateMunicipalVoteRow[], k: number, ascending = false): MunicipalCompetition[] {
+  const ranked = municipalLeaders(rows);
+  return ranked
+    .sort((a, b) => ascending
+      ? (a.pressurePct ?? -Infinity) - (b.pressurePct ?? -Infinity)
+      : (b.pressurePct ?? -Infinity) - (a.pressurePct ?? -Infinity))
+    .slice(0, Math.max(0, k));
+}
+
+export function regionalCompetition(rows: CandidateMunicipalVoteRow[], k: number): RegionalCompetition[] {
+  const byRegion = new Map<string, Map<string, number>>();
+  for (const row of rows) {
+    const region = row.region ?? "UNASSIGNED";
+    const candidates = byRegion.get(region) ?? new Map<string, number>();
+    candidates.set(row.candidateId, (candidates.get(row.candidateId) ?? 0) + row.votes_nominal);
+    byRegion.set(region, candidates);
+  }
+  return [...byRegion.entries()]
+    .map(([region, candidates]) => {
+      const ranked = rankCandidates([...candidates.entries()].map(([candidateId, votes]) => ({ candidateId, votes })));
+      const leader = ranked[0];
+      const runnerUp = ranked[1] ?? null;
+      const total = sumCandidateVotes(ranked);
+      return {
+        region,
+        leader: leader?.candidateId ?? "",
+        leaderVotes: leader?.votes ?? 0,
+        runnerUp: runnerUp?.candidateId ?? null,
+        runnerUpVotes: runnerUp?.votes ?? 0,
+        marginVotes: (leader?.votes ?? 0) - (runnerUp?.votes ?? 0),
+        leaderSharePct: leader ? shareOfTotal(leader.votes, total) : null,
+        pressurePct: leader && leader.votes > 0 ? ((runnerUp?.votes ?? 0) / leader.votes) * 100 : null,
+      };
+    })
+    .sort((a, b) => b.pressurePct! - a.pressurePct!)
+    .slice(0, Math.max(0, k));
+}
+
+export function comparativeMunicipalOutcome(
+  fromRows: CandidateMunicipalVoteRow[],
+  toRows: CandidateMunicipalVoteRow[],
+  candidateId: string,
+  k: number,
+): Array<{ municipality: number; candidateChange: number; competitorChanges: CandidateGrowth[] }> {
+  const candidateFrom = new Map(fromRows.filter(r => r.candidateId === candidateId).map(r => [r.municipality, r.votes_nominal]));
+  const candidateTo = new Map(toRows.filter(r => r.candidateId === candidateId).map(r => [r.municipality, r.votes_nominal]));
+  const municipalities = new Set([...candidateFrom.keys(), ...candidateTo.keys()]);
+  return [...municipalities].map(municipality => {
+    const candidateChange = (candidateTo.get(municipality) ?? 0) - (candidateFrom.get(municipality) ?? 0);
+    const from = new Map<string, number>();
+    const to = new Map<string, number>();
+    for (const row of fromRows.filter(r => r.municipality === municipality)) from.set(row.candidateId, row.votes_nominal);
+    for (const row of toRows.filter(r => r.municipality === municipality)) to.set(row.candidateId, row.votes_nominal);
+    const competitors = [...new Set([...from.keys(), ...to.keys()])]
+      .filter(id => id !== candidateId)
+      .map(id => ({
+        candidateId: id,
+        fromVotes: from.get(id) ?? 0,
+        toVotes: to.get(id) ?? 0,
+        absoluteChange: (to.get(id) ?? 0) - (from.get(id) ?? 0),
+        percentageChange: variationPct(from.get(id) ?? 0, to.get(id) ?? 0),
+      }))
+      .sort((a, b) => b.absoluteChange - a.absoluteChange);
+    return { municipality, candidateChange, competitorChanges: competitors.slice(0, Math.max(0, k)) };
+  }).sort((a, b) => b.candidateChange - a.candidateChange);
+}
