@@ -11,7 +11,7 @@ import { AdminMediaTab } from './AdminMediaTab';
 import { AdminUsersTab } from './AdminUsersTab';
 import { AdminAuditTab } from './AdminAuditTab';
 import { AdminTasksTab } from './AdminTasksTab';
-import { AdminSettingsTab } from './AdminSettingsTab';
+import { AdminSettingsTab } from './AdminSettingsTab';\nimport { AdminElectoralIntelligenceTab } from './AdminElectoralIntelligenceTab';
 import { useApp } from '../../context/AppContext';
 import { can } from '../../config/adminPermissions';
 
@@ -20,7 +20,7 @@ interface AdminWorkspaceProps {
   setActiveModule: (module: string) => void;
 }
 
-type ModuleId = 'dashboard' | 'cidadão' | 'agenda' | 'gestao-documental' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
+type ModuleId = 'dashboard' | 'inteligencia-eleitoral' | 'cidadão' | 'agenda' | 'gestao-documental' | 'conteúdo' | 'tarefas' | 'administração' | 'configurações';
 
 const moduleTabs: Record<Exclude<ModuleId, 'dashboard' | 'cidadão' | 'agenda' | 'tarefas'>, Array<{ id: string; label: string }>> = {
   'gestao-documental': [
@@ -78,7 +78,7 @@ export const AdminWorkspace: React.FC<AdminWorkspaceProps> = ({ activeModule, se
     }
   };
 
-  if (activeModule === 'dashboard') {
+  if (activeModule === 'inteligencia-eleitoral') return <AdminElectoralIntelligenceTab />;\n\n  if (activeModule === 'dashboard') {
     return <AdminDashboardTab setActiveTab={setActiveModule} />;
   }
 
