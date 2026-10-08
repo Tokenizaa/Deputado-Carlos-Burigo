@@ -1,272 +1,342 @@
-# Fase 4 — Linguagem Eleitoral e Ontologia
+# FASE 3 — Ontologia e Linguagem Eleitoral
 
-Status: canônico inicial  
-Objetivo: estabelecer o vocabulário semântico único utilizado pelo motor analítico, dashboard, RAG, skills e agentes.
+## Status
 
-## 1. Princípio
+CANÔNICO — alinhado ao catálogo de 100 perguntas e ao motor analítico implementado.
 
-A linguagem eleitoral não é uma segunda camada de dados. É um contrato semântico sobre os dados existentes.
+## 1. Objetivo
 
-Fluxo:
+Estabelecer o vocabulário semântico único usado por:
 
-`termo do usuário → conceito canônico → métrica/método → resultado`
+- catálogo de perguntas;
+- intents analíticos;
+- funções determinísticas;
+- Skills;
+- agentes;
+- RAG metodológico;
+- dashboard de Inteligência Eleitoral;
+- chatbot analítico.
 
-O LLM pode reconhecer sinônimos, mas a execução deve convergir para conceitos canônicos.
+A ontologia não cria uma segunda base de dados. Ela define o significado dos termos e como uma pergunta em linguagem natural converge para um conceito, método e função existentes.
 
-## 2. Fontes de referência
+Fluxo canônico:
 
-A terminologia administrativa deve ser compatível com fontes eleitorais reconhecidas. O NIST Election Terminology Glossary, por exemplo, define election, contest, candidate, office e municipality e explicita relações entre esses conceitos. A EAC mantém um glossário abrangente de terminologia eleitoral e ressalta que procedimentos podem variar entre jurisdições.
+`linguagem natural → conceito → dimensão → métrica → método → função → resultado`
 
-Fontes:
-- NIST Election Terminology Glossary: https://pages.nist.gov/ElectionGlossary/
-- U.S. Election Assistance Commission: https://www.eac.gov/election-officials/glossaries-election-terminology
+O LLM pode reconhecer sinônimos, mas não pode redefinir a fórmula ou inventar um indicador.
 
-Essas fontes orientam a terminologia administrativa; conceitos analíticos próprios do projeto devem permanecer explicitamente identificados como conceitos derivados.
+## 2. Fonte terminológica
 
-## 3. Classes canônicas
+A terminologia administrativa deve priorizar o Tribunal Superior Eleitoral (TSE). O Glossário Eleitoral do TSE diferencia, entre outros conceitos, zona eleitoral, seção eleitoral e circunscrição eleitoral. Para Deputado Estadual, a circunscrição eleitoral é o estado.
 
-### 3.1 Entidades eleitorais
+O Portal de Dados Abertos do TSE disponibiliza votação nominal por município e zona, que é a origem factual do escopo analítico atual.
 
-`election`
-- uma eleição identificada por ano, contexto e demais atributos oficiais.
+Fontes de referência:
 
-`office`
-- cargo disputado.
+- TSE — Glossário Eleitoral.
+- TSE — dados de resultados eleitorais.
+- TSE — normas eleitorais vigentes para o respectivo ciclo.
 
-`contest`
-- disputa eleitoral específica dentro de uma eleição.
+Conceitos analíticos como concentração, fragmentação, margem, sobreposição e número efetivo são conceitos derivados do projeto e devem permanecer identificados como métricas metodológicas, não como terminologia administrativa do TSE.
 
-`candidate`
-- candidato associado a um contest/office.
+## 3. Entidades canônicas
 
-`party`
-- partido político associado ao candidato quando disponível.
+### election
 
-### 3.2 Espaço
+Eleição identificada pelo ano e demais atributos oficiais.
 
-`territory`
-- unidade geográfica utilizada na análise.
+### office
 
-`municipality`
-- município.
+Cargo disputado. Escopo atual: `Deputado Estadual`.
 
-`zone`
-- zona eleitoral.
+### contest
 
-O projeto deve distinguir município de zona eleitoral. Uma zona pode abranger mais de um município.
+Disputa específica dentro da eleição/cargo.
 
-### 3.3 Observação eleitoral
+### candidate
 
-`electoral_result`
-- observação de resultado associada a eleição, cargo, candidato, território e demais dimensões aplicáveis.
+Candidatura individual participante do contest.
 
-`nominal_votes`
-- quantidade de votos nominais atribuída ao candidato na métrica definida pela fonte.
+### party
 
-`valid_nominal_votes`
-- quantidade nominal classificada como válida segundo a definição adotada pela fonte.
+Partido associado à candidatura quando disponível.
 
-### 3.4 Métricas derivadas
+### territory
 
-`vote_share`
-- participação dos votos de uma unidade no denominador explicitamente definido.
+Unidade territorial utilizada pela análise.
 
-`growth_absolute`
-- diferença absoluta entre períodos.
+### municipality
 
-`growth_rate`
-- diferença relativa entre períodos.
+Município. É a principal unidade territorial analítica atual.
 
-`rank`
-- posição ordenada segundo uma métrica.
+### zone
 
-`margin`
-- diferença entre unidades comparadas, com definição explícita do par e da escala.
+Zona eleitoral. Não é sinônimo de município. Uma zona pode abranger mais de um município ou parte dele.
 
-`concentration`
-- grau de concentração de uma distribuição segundo método especificado.
+### electoral_result
 
-`fragmentation`
-- grau de dispersão de uma distribuição segundo método especificado.
+Observação factual de votação vinculada às dimensões eleitorais e territoriais aplicáveis.
 
-`territorial_strength`
-- medida de desempenho relativo do candidato em um território em comparação com uma referência definida.
+### nominal_votes
 
-`territorial_dependence`
-- grau em que o resultado do candidato depende de determinado conjunto territorial.
-
-`competition`
-- propriedade analítica da distribuição de apoio/resultado entre competidores, sempre acompanhada do método.
-
-`volatility`
-- mudança de apoio entre períodos conforme definição metodológica explícita; não é sinônimo automático de qualquer variação percentual.
-
-`trend`
-- padrão temporal identificado por método definido; não deve ser usado como sinônimo de duas observações em direções diferentes.
+Quantidade de votos nominais atribuída ao candidato no escopo definido.
 
 ## 4. Dimensões obrigatórias
 
-Sempre que aplicável, uma consulta analítica deve identificar:
+Quando aplicáveis, as intenções devem explicitar:
 
-`election_year`
-`office`
-`contest`
-`turn`
-`candidate`
-`party`
-`territory`
-`municipality`
-`metric`
-`method`
+- `year`
+- `office`
+- `contest`
+- `round`
+- `candidate`
+- `party`
+- `municipality`
+- `region`
+- `metric`
+- `method`
 
-Ausências devem ser tratadas explicitamente. O sistema não deve inferir silenciosamente uma dimensão omitida quando houver ambiguidade.
+A ausência de uma dimensão só pode ser resolvida por uma regra canônica explícita.
 
-## 5. Unidade e denominador
+Escopo padrão atual:
 
-Toda métrica percentual deve carregar seu denominador semântico.
+- cargo: Deputado Estadual;
+- UF: RS;
+- turno: 1;
+- anos: 2018, 2022, 2026.
 
-Exemplos distintos:
+## 5. Métricas factuais e derivadas
 
-`candidate_vote_share`
-= votos do candidato / votos nominais do universo definido.
+### votes
 
-`municipality_contribution`
-= votos do município / votos totais do candidato.
+Quantidade absoluta de votos.
 
-Essas métricas não podem ser tratadas como equivalentes apenas porque ambas retornam percentual.
+### vote_share
 
-## 6. Absoluto versus relativo
+Participação percentual de uma unidade em um denominador explicitamente definido.
 
-O vocabulário diferencia:
+### growth_absolute
 
-- `votes`: quantidade;
-- `vote_share`: participação;
-- `growth_absolute`: mudança em unidades;
-- `growth_rate`: mudança proporcional.
+`to - from`.
 
-Regra: nenhuma resposta deve substituir silenciosamente uma métrica por outra.
+### growth_rate
 
-## 7. Tempo
+`(to - from) / from × 100`.
 
-`year` identifica o período eleitoral.
+Se o denominador for zero, o resultado é `null`.
 
-`period` representa o intervalo comparado.
+### rank
 
-`historical_comparison` compara observações entre eleições.
+Posição ordinal após ordenação pela métrica definida.
 
-`trend` exige método temporal.
+### margin
 
-`change_point` identifica possível alteração estrutural segundo método próprio.
+Diferença entre unidades comparadas, por exemplo líder menos segundo colocado.
 
-## 8. Território
+### concentration
 
-O sistema deve distinguir:
+Parcela do total concentrada em um subconjunto ordenado, como Top-K municípios.
 
-`territorial_performance`
-- desempenho observado no território.
+### fragmentation
 
-`territorial_strength`
-- desempenho relativo a uma referência.
+Dispersão da distribuição de votos entre competidores. No motor atual, quando operacionalizada como índice de fragmentação, é `1 - HHI`.
 
-`territorial_concentration`
-- concentração da distribuição territorial.
+### effective_number
 
-`territorial_dependence`
-- participação do resultado total proveniente do território/conjunto territorial.
+Número efetivo de competidores, operacionalizado como `1 / HHI`.
 
-Esses termos não são intercambiáveis.
+### territorial_strength
 
-## 9. Competição
+Desempenho territorial relativo segundo o método especificado.
 
-`competition` é uma categoria metodológica, não uma métrica única.
+### territorial_dependence
+
+Parcela do resultado total proveniente de determinado território ou conjunto territorial.
+
+### competition
+
+Categoria metodológica. Nunca é uma métrica única.
 
 Pode ser operacionalizada por:
+
 - margem;
+- pressão competitiva;
 - concentração;
 - fragmentação;
 - número efetivo de competidores;
-- outras métricas documentadas.
+- sobreposição territorial;
+- evolução competitiva.
 
-Toda resposta deve registrar qual operacionalização foi usada.
+Toda resposta deve informar a operacionalização utilizada.
 
-## 10. Sinônimos de linguagem natural
+## 6. Competição — vocabulário operacional
 
-O sistema pode mapear expressões como:
+### candidate_rank
 
-- “votos” → `nominal_votes`, quando o contexto exigir;
-- “percentual de votos” → `vote_share`;
-- “cresceu” → `growth_absolute` e/ou `growth_rate`, conforme a pergunta;
-- “mais forte” → `territorial_strength`, quando houver referência comparativa;
-- “onde depende mais” → `territorial_dependence`;
-- “mais concentrado” → `concentration`;
-- “mais dividido” → `fragmentation`;
-- “competição” → `competition`, exigindo método;
-- “evolução” → `historical_comparison`;
-- “tendência” → `trend`, exigindo validação metodológica.
+Posição do candidato entre os concorrentes pelo total de votos.
 
-O mapeamento nunca deve decidir uma métrica ambígua apenas por similaridade lexical.
+### gap_above
+
+Diferença entre o candidato e o concorrente imediatamente acima.
+
+### lead_below
+
+Vantagem do candidato sobre o concorrente imediatamente abaixo.
+
+### candidate_comparison
+
+Comparação direta de votos, participação e posição entre dois candidatos.
+
+### territorial_overlap
+
+Sobreposição dos municípios onde dois candidatos possuem votação positiva.
+
+Método atual: índice de Jaccard:
+
+`interseção / união × 100`.
+
+### municipal_competition
+
+Competição dentro de cada município.
+
+Pressão competitiva atual:
+
+`votos do segundo colocado / votos do líder × 100`.
+
+Quanto maior, mais próximos estão os dois primeiros colocados.
+
+### regional_competition
+
+Mesma lógica de competição, agregada por região.
+
+### competition_margin
+
+Margem absoluta e percentual do líder sobre o segundo colocado.
+
+## 7. Território
+
+Distinguir sempre:
+
+- `territorial_performance`: votação observada;
+- `territorial_strength`: desempenho relativo;
+- `territorial_concentration`: concentração dos votos;
+- `territorial_dependence`: dependência do resultado;
+- `territorial_overlap`: interseção territorial entre candidatos.
+
+“Mais forte”, “mais concentrado” e “mais dependente” não são equivalentes.
+
+## 8. Tempo
+
+- `year`: eleição específica;
+- `period`: intervalo comparado;
+- `historical_comparison`: comparação entre anos;
+- `trend`: padrão temporal segundo método definido;
+- `reversal`: mudança de direção entre ciclos;
+- `stability`: permanência dentro de tolerância definida.
+
+Não chamar uma simples diferença de “tendência” sem método temporal.
+
+## 9. Absoluto versus relativo
+
+Termos diferentes devem permanecer diferentes:
+
+| Linguagem | Conceito |
+|---|---|
+| votos | `votes` |
+| percentual de votos | `vote_share` |
+| ganhou 500 votos | `growth_absolute` |
+| cresceu 20% | `growth_rate` |
+| diferença para o segundo | `margin` |
+| posição | `rank` |
+
+O sistema não pode substituir silenciosamente uma métrica por outra.
+
+## 10. Sinônimos controlados
+
+| Linguagem natural | Conceito preferencial |
+|---|---|
+| votação | votes |
+| percentual | vote_share |
+| participação | vote_share |
+| cresceu em votos | growth_absolute |
+| cresceu em percentual | growth_rate |
+| maior votação | rank / maximum |
+| posição | rank |
+| vantagem | margin / lead_below |
+| diferença para quem está acima | gap_above |
+| concentração | concentration |
+| dispersão / fragmentação | fragmentation |
+| competição | competition + method |
+| disputa territorial | territorial_overlap / territorial_strength |
+| território forte | territorial_strength |
+| dependência territorial | territorial_dependence |
+| evolução | historical_comparison |
+| tendência | trend |
+
+Quando a expressão for ambígua, a intenção deve resolver a ambiguidade; não o LLM por similaridade lexical.
 
 ## 11. Contrato semântico
 
-Toda intenção analítica deve poder ser representada como:
+Toda intenção implementada deve convergir para:
 
-`intent`
-→ `concepts`
-→ `dimensions`
-→ `metric`
-→ `method`
-→ `function`
-→ `result`
+`pergunta_id → intent → concepts → dimensions → metric → method → function → structured result`
 
-Exemplo:
+O resultado estruturado é a fonte do número.
 
-`municipal_growth_ranking`
-→ candidate + municipality + year
-→ growth_rate
-→ percentage_growth
-→ rank_municipal_growth()
-→ ranking
+O RAG metodológico explica:
 
-## 12. Regras de integridade semântica
+- definição;
+- fórmula;
+- denominador;
+- premissas;
+- limitações;
+- interpretação.
 
-1. Não misturar cargos.
-2. Não misturar turnos.
-3. Não misturar anos sem declarar comparação.
-4. Não confundir votos absolutos com participação.
-5. Não confundir município com zona.
-6. Não chamar uma métrica de tendência sem método.
-7. Não chamar qualquer variação de volatilidade.
+O RAG não calcula o número.
+
+## 12. Integridade
+
+1. Nunca misturar cargos.
+2. Nunca misturar turnos.
+3. Nunca comparar anos sem declarar o período.
+4. Nunca confundir votos absolutos com percentual.
+5. Nunca confundir município com zona.
+6. Nunca usar sentinela numérica para denominador indefinido.
+7. Denominador zero produz `null`.
 8. Não declarar causalidade a partir de associação descritiva.
-9. Não permitir que o LLM redefina fórmulas canônicas.
-10. Toda resposta analítica deve ser rastreável a conceito, método e dados.
+9. Não permitir que o LLM altere uma fórmula canônica.
+10. Toda resposta deve ser rastreável ao dado, método e função.
+11. Perguntas compostas sem metodologia formalizada permanecem `IMPLEMENTATION_PENDING`.
 
-## 13. Relação com RAG e Skills
+## 13. Relação com as 100 perguntas
 
-A ontologia será a ponte entre linguagem natural, metodologia e execução:
+A distribuição efetiva do catálogo é:
 
-`pergunta`
-→ `ontologia`
-→ `intent`
-→ `skill`
-→ `método`
-→ `função analítica`
-→ `resultado`
-→ `RAG metodológico`
-→ `resposta`
+- Visão Geral: 25
+- Histórico: 25
+- Território: 23
+- Competição: 27
 
-O RAG explica conceitos e métodos. Não substitui o dado eleitoral.
+Total: 100.
 
-## 14. Escopo inicial
+Essa distribuição deve ser tratada como dado canônico. Não deve ser “corrigida” para uma distribuição artificialmente uniforme.
 
-A primeira versão deve cobrir os conceitos efetivamente necessários às quatro áreas:
+## 14. Relação com as próximas fases
 
-- Visão Geral;
-- Histórico;
-- Território;
-- Candidatos / Concorrência.
+A FASE 3 define o vocabulário.
 
-Não criar uma ontologia eleitoral universal. Expandir somente quando uma nova capacidade exigir um conceito adicional.
+A FASE 4 formaliza conhecimento metodológico.
 
-## 15. Próximo passo
+A FASE 5 transforma métodos em Skills reutilizáveis.
 
-Com a linguagem canônica estabelecida, a Fase 5 transforma os conceitos e métodos em **Skills Eleitorais reutilizáveis**, sem criar uma skill por pergunta.
+A FASE 6 organiza agentes especializados.
+
+A FASE 7 implementa o RAG metodológico.
+
+A FASE 8 implementa a orquestração.
+
+A FASE 9 conecta o chatbot à camada analítica.
+
+A regra estrutural permanece:
+
+`PERGUNTA → INTENT → MÉTODO → FUNÇÃO → RESULTADO → ONTOLOGIA → KNOWLEDGE → SKILL → AGENTE → RAG → INTERPRETAÇÃO`

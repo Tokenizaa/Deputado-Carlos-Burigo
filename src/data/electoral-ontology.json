@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "scope": {
+    "office": "Deputado Estadual",
+    "uf": "RS",
+    "round": 1,
+    "years": [
+      2018,
+      2022,
+      2026
+    ]
+  },
+  "entities": [
+    "election",
+    "office",
+    "contest",
+    "candidate",
+    "party",
+    "territory",
+    "municipality",
+    "zone",
+    "electoral_result",
+    "nominal_votes"
+  ],
+  "dimensions": [
+    "year",
+    "office",
+    "contest",
+    "round",
+    "candidate",
+    "party",
+    "municipality",
+    "region",
+    "metric",
+    "method"
+  ],
+  "metrics": {
+    "votes": {
+      "unit": "votes",
+      "type": "factual"
+    },
+    "vote_share": {
+      "unit": "percent",
+      "type": "derived",
+      "denominatorRequired": true
+    },
+    "growth_absolute": {
+      "unit": "votes",
+      "formula": "to-from",
+      "type": "derived"
+    },
+    "growth_rate": {
+      "unit": "percent",
+      "formula": "(to-from)/from*100",
+      "zeroDenominator": null,
+      "type": "derived"
+    },
+    "rank": {
+      "unit": "position",
+      "type": "derived"
+    },
+    "margin": {
+      "unit": "votes/percent",
+      "type": "derived"
+    },
+    "concentration": {
+      "unit": "percent",
+      "type": "derived"
+    },
+    "fragmentation": {
+      "unit": "index",
+      "formula": "1-HHI",
+      "type": "derived"
+    },
+    "effective_number": {
+      "unit": "count",
+      "formula": "1/HHI",
+      "type": "derived"
+    },
+    "territorial_strength": {
+      "unit": "relative_performance",
+      "type": "derived"
+    },
+    "territorial_dependence": {
+      "unit": "percent",
+      "type": "derived"
+    },
+    "territorial_overlap": {
+      "unit": "percent",
+      "formula": "Jaccard(intersection/union)*100",
+      "type": "derived"
+    },
+    "competition": {
+      "unit": "method_dependent",
+      "type": "category"
+    }
+  },
+  "competition_methods": [
+    "candidate_rank",
+    "gap_above",
+    "lead_below",
+    "candidate_comparison",
+    "competition_margin",
+    "municipal_competition",
+    "regional_competition",
+    "territorial_overlap",
+    "effective_number",
+    "fragmentation"
+  ],
+  "rules": [
+    "never_mix_offices",
+    "never_mix_rounds",
+    "declare_comparison_period",
+    "distinguish_absolute_and_relative_metrics",
+    "municipality_is_not_zone",
+    "undefined_denominator_is_null",
+    "llm_cannot_redefine_canonical_formula",
+    "pending_when_method_is_not_formalized"
+  ]
+}

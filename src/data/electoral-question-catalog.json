@@ -14,8 +14,8 @@
   "areas": {
     "overview": 25,
     "history": 25,
-    "territory": 25,
-    "competition": 25
+    "territory": 23,
+    "competition": 27
   },
   "questions": [
     {
