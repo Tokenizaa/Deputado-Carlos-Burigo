@@ -146,10 +146,21 @@ A rodada não altera os 20 intents `IMPLEMENTADO` do catálogo fora deste bloco 
 
 ## Rodada 2 — Runtime History
 
-**Em execução**
+**Status: CONCLUÍDA**
 
 A Rodada 2 implementa em conjunto os 19 intents History marcados como `IMPLEMENTADO` no catálogo: EA-026–EA-033, EA-036–EA-045 e EA-048. Os seis intents `IMPLEMENTATION_PENDING` (EA-034, EA-035, EA-046, EA-047, EA-049 e EA-050) permanecem pendentes.
 
 O runtime recebe `candidate`, `from_year`, `to_year` e `limit`, utiliza exclusivamente a projeção analítica do Supabase e preserva o escopo Deputado Estadual / RS / turno 1.
 
-A validação final da rodada depende da execução local de `npm run test:unit` e `npm run test:integration`.
+Validação final: `npm run test:unit` — 69/69; `npm run test:integration` — 12/12. O stderr de `bootstrap-admin` é esperado pelo cenário de teste e não representa falha.
+
+
+## Rodada 3 — Runtime Territory
+
+**Status: CONCLUÍDA**
+
+A rodada fechou o bloco Territory no runtime determinístico. Foram ligados ao executor os 13 intents territoriais com capacidade de cálculo disponível na projeção analítica: `territory.strongholds`, `territory.weakholds`, `territory.growing`, `territory.declining`, `territory.top_rankings`, `territory.low_rankings`, `territory.concentration`, `territory.dispersion`, `territory.coverage`, `territory.high_growth`, `territory.high_share`, `territory.low_share` e `territory.compare`.
+
+Quatro intents permanecem explicitamente como `insufficient_data`: `territory.region_strength`, `territory.regional_profile`, `territory.growth_low_base` e `territory.high_base_decline`. A decisão evita inventar dimensão regional ou limiares não publicados.
+
+Validação final: `npm run test:unit` — 69/69; `npm run test:integration` — 12/12. A cobertura permanece determinística e usa a projeção analítica do Supabase.
