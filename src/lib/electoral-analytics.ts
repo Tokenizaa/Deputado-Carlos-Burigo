@@ -171,3 +171,48 @@ export function maxPercentageLoss(a:MunicipalVoteRow[],b:MunicipalVoteRow[]):His
 export function concentrationChange(a:MunicipalVoteRow[],b:MunicipalVoteRow[],k:number):number|null{const x=topKConcentration(a,k),y=topKConcentration(b,k);return x===null||y===null?null:y-x;}
 export function coverageChange(a:MunicipalVoteRow[],b:MunicipalVoteRow[],universe=497):number|null{const x=coveragePercentage(a,universe),y=coveragePercentage(b,universe);return x===null||y===null?null:y-x;}
 export function compareCandidateToStateGrowth(candidateFrom:number,candidateTo:number,stateFrom:number,stateTo:number){const cc=variationPct(candidateFrom,candidateTo),sc=variationPct(stateFrom,stateTo);return {candidateChange:variationAbs(candidateFrom,candidateTo),candidateChangePct:cc,stateChange:variationAbs(stateFrom,stateTo),stateChangePct:sc,relativePerformancePctPoints:cc===null||sc===null?null:cc-sc};}
+
+export function territorialStrength(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
+  return topContributors(rows, k);
+}
+export function territorialWeakness(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
+  return lowContributors(rows, k);
+}
+export function municipalVoteShare(rows: MunicipalVoteRow[], totalVotes?: number): MunicipalVoteRow[] {
+  const total = totalVotes ?? sumVotes(rows);
+  return total === 0 ? [] : rankByVotes(rows).map(row => ({ ...row, votes_nominal: (row.votes_nominal / total) * 100 }));
+}
+export function territoryConcentration(rows: MunicipalVoteRow[], k: number): number | null {
+  return topKConcentration(rows, k);
+}
+export function territorialDispersion(rows: MunicipalVoteRow[]): { municipalities: number; positiveMunicipalities: number; coveragePct: number | null } {
+  return { municipalities: rows.length, positiveMunicipalities: countPositiveMunicipalities(rows), coveragePct: coveragePercentage(rows) };
+}
+export function growthWithLowBase(fromRows: MunicipalVoteRow[], toRows: MunicipalVoteRow[], maxBaseVotes: number, k: number): HistoricalMunicipalChange[] {
+  return municipalGrowth(fromRows, toRows, toRows.length).filter(row => row.fromVotes <= maxBaseVotes).slice(0, Math.max(0, k));
+}
+export function strongAndDeclining(fromRows: MunicipalVoteRow[], toRows: MunicipalVoteRow[], minBaseVotes: number, k: number): HistoricalMunicipalChange[] {
+  return municipalDecline(fromRows, toRows, toRows.length).filter(row => row.fromVotes >= minBaseVotes).slice(0, Math.max(0, k));
+}
+export function highAbsoluteGrowth(fromRows: MunicipalVoteRow[], toRows: MunicipalVoteRow[], k: number): HistoricalMunicipalChange[] {
+  return municipalGrowth(fromRows, toRows, k);
+}
+export function compareMunicipalities(rows: MunicipalVoteRow[], municipalities: number[]): MunicipalVoteRow[] {
+  const wanted = new Set(municipalities);
+  return rankByVotes(rows.filter(row => wanted.has(row.municipality)));
+}
+export function regionalTotals(rows: MunicipalVoteRow[]): Record<string, number> {
+  return rows.reduce<Record<string, number>>((acc, row) => {
+    const region = row.region ?? "UNASSIGNED";
+    acc[region] = (acc[region] ?? 0) + row.votes_nominal;
+    return acc;
+  }, {});
+}
+export function regionalStrength(rows: MunicipalVoteRow[], k: number): Array<{ region: string; votes: number; sharePct: number | null }> {
+  const totals = regionalTotals(rows);
+  const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
+  return Object.entries(totals).map(([region, votes]) => ({ region, votes, sharePct: shareOfTotal(votes, total) })).sort((a,b)=>b.votes-a.votes).slice(0, Math.max(0,k));
+}
+export function priorityScore(rows: MunicipalVoteRow[], k: number): MunicipalVoteRow[] {
+  return rankByVotes(rows).slice(0, Math.max(0,k));
+}
