@@ -6,7 +6,7 @@ import {
   topKConcentration, variationPct, absoluteChange, percentChange, compareMunicipalHistory,
   municipalGrowth, municipalDecline, consistentGrowth, consistentDecline, trendReversals,
   countStableMunicipalities, maxPercentageGain, maxPercentageLoss, concentrationChange, coverageChange,
-  compareCandidateToStateGrowth, historicalEvolution, rankCandidates, candidateGap, candidateGrowth, compareCandidates, candidateShareRanking, candidateRankEvolution, municipalLeaders, municipalChallengers, territorialOverlap, effectiveNumberOfCandidates, fragmentationIndex, competitionMargin, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome
+  compareCandidateToStateGrowth, historicalEvolution, rankCandidates, candidateGap, candidateGrowth, compareCandidates, candidateShareRanking, candidateRankEvolution, municipalLeaders, municipalLeadersAgainstCandidate, municipalChallengers, rankCompetitors, candidateGrowthExcluding, territorialOverlap, effectiveNumberOfCandidates, fragmentationIndex, competitionMargin, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome
 } from "../../src/lib/electoral-analytics";
 
 const rows = [
@@ -124,7 +124,10 @@ describe("electoral analytics — competition", () => {
   });
   it("measures territorial competition without hidden sentinels", () => {
     expect(municipalLeaders(municipal).map(x=>x.leader)).toEqual(["A","B"]);
+    expect(municipalLeadersAgainstCandidate(municipal,"A",2).map(x=>x.leader)).toEqual(["B"]);
     expect(municipalChallengers(municipal,"A",2)[0].candidateId).toBe("B");
+    expect(rankCompetitors(candidates,"A",2).map(x=>x.candidateId)).toEqual(["B","C"]);
+    expect(candidateGrowthExcluding(candidates,[{candidateId:"A",votes:70},{candidateId:"B",votes:20},{candidateId:"C",votes:15}],"A",2)[0].candidateId).toBe("C");
     expect(territorialOverlap(municipal,"A","B")).toBe(100);
     expect(effectiveNumberOfCandidates(candidates)).toBeGreaterThan(1);
     expect(fragmentationIndex(candidates)).toBeGreaterThan(0);
