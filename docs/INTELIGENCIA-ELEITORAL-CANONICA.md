@@ -8,19 +8,22 @@
 - Fonte factual: dados oficiais do TSE preservados e processados localmente
 - Runtime de produção: Supabase remoto
 - Destino: camada privada de Inteligência Eleitoral dentro do dashboard existente do gabinete
-- Última atualização: 2026-10-07
+- Modelo de produto: plataforma de inteligência parametrizável por candidato, eleição e contexto de cliente/workspace
+- Carlos Burigo: primeiro cliente/contexto de uso, não entidade fixa do motor
+- Última atualização: 2026-10-08
 
 ## 1. Objetivo
 
-Transformar os dados eleitorais oficiais em uma camada de inteligência para apoiar análise e decisão do gabinete.
+Transformar os dados eleitorais oficiais em uma camada de inteligência para apoiar análise e decisão.
 
-A Inteligência Eleitoral não é um dashboard público de resultados. É uma capacidade interna do dashboard existente do gabinete e combina:
+A Inteligência Eleitoral não é um dashboard público de resultados. É uma capacidade interna do dashboard existente e combina:
 
 1. dados factuais;
 2. indicadores calculados;
 3. análises territoriais e competitivas;
 4. visualizações;
-5. chatbot analítico.
+5. chatbot analítico;
+6. geração de relatórios e artefatos exportáveis.
 
 ## 2. Arquitetura canônica dos bancos
 
@@ -32,22 +35,7 @@ A arquitetura separa explicitamente origem/processamento de publicação/runtime
     +-----------------------------+
     | BANCO LOCAL                 |
     | fonte de processamento      |
-    |                             |
-    | RAW                         |
-    | - arquivos ZIP/CSV TSE     |
-    | - cópias preservadas        |
-    |                             |
-    | NORMALIZADO                 |
-    | - dados TSE estruturados    |
-    | - candidatos                |
-    | - municípios                |
-    | - resultados nominais       |
-    |                             |
-    | AUDITORIA                   |
-    | - importações               |
-    | - checksums                 |
-    | - validações                |
-    | - baselines                 |
+    | RAW / NORMALIZED / AUDIT    |
     +-------------+---------------+
                   |
                   | processamento determinístico
@@ -62,19 +50,11 @@ A arquitetura separa explicitamente origem/processamento de publicação/runtime
                   v
     +-----------------------------+
     | SUPABASE REMOTO             |
-    | banco de PRODUÇÃO           |
-    |                             |
     | PROJEÇÃO ANALÍTICA          |
-    | - indicadores               |
-    | - rankings                  |
-    | - séries comparativas       |
-    | - métricas territoriais     |
-    | - métricas de concorrência  |
-    | - metadados de atualização  |
     +-------------+---------------+
                   |
                   v
-          Dashboard + Chatbot
+       DASHBOARD + CHATBOT
 
 ### Regra fundamental
 
@@ -112,9 +92,7 @@ Os arquivos RAW são imutáveis depois de baixados.
 
 ### 3.2 NORMALIZED
 
-Responsável pela representação estruturada dos dados TSE para processamento.
-
-Para o escopo atual:
+Responsável pela representação estruturada dos dados TSE para processamento:
 
 - eleições;
 - municípios;
@@ -125,93 +103,50 @@ Para o escopo atual:
 - UF;
 - zona quando disponível.
 
-A normalização não altera o significado do dado oficial. Ela apenas transforma o formato de origem em estruturas consultáveis.
-
 ### 3.3 AUDIT
 
-Responsável por provar que o processamento está correto.
-
-Inclui:
+Responsável por provar que o processamento está correto:
 
 - execução de importação;
 - arquivo de origem;
 - checksum;
-- quantidade de registros lidos;
-- quantidade carregada;
-- quantidade rejeitada;
+- registros lidos/carregados/rejeitados;
 - validações;
-- baselines esperados;
+- baselines;
 - divergências;
-- status da execução.
+- status.
 
 ### 3.4 O que NÃO é responsabilidade do local
 
-O local não precisa reproduzir o modelo de produção do gabinete.
-
-Não deve conter:
-
-- dados de sessão de usuários;
-- permissões do dashboard;
-- estado de UI;
-- cópias de dados de negócio do gabinete;
-- APIs de produção;
-- dependência de runtime da aplicação.
+Não deve conter dependência de runtime da aplicação, sessão de usuários, permissões do dashboard ou estado de UI.
 
 ## 4. Banco REMOTO / SUPABASE — contrato
 
 O Supabase é o banco operacional da aplicação.
 
-Ele deve ser autônomo para a produção.
-
-### 4.1 O remoto NÃO é
-
-Não é:
+O remoto não é:
 
 - depósito dos ZIPs/CSVs TSE;
 - espelho integral do banco local;
 - warehouse bruto;
-- staging de importação TSE;
-- cópia dos resultados municipais/zona a zona apenas porque eles existem no local.
+- staging de importação TSE.
 
-As tabelas eleitorais remotas antigas orientadas a ingestão bruta — como electoral_results_nominal, electoral_results_totals, electoral_source_datasets e electoral_import_runs — não devem permanecer como arquitetura de runtime quando não forem necessárias à projeção final.
-
-### 4.2 O remoto DEVE conter
-
-Somente dados que sustentem diretamente:
+O remoto deve sustentar diretamente:
 
 - Visão Geral;
 - Histórico;
 - Território;
 - Candidatos / Concorrência;
-- chatbot analítico;
-- filtros e drill-down necessários;
-- rastreabilidade da versão publicada.
+- chatbot;
+- filtros e drill-down;
+- rastreabilidade da publicação.
 
-A projeção remota deve conter, conforme a necessidade analítica:
+Depois de publicada uma projeção:
 
-- identificação da eleição/ano;
-- identificação dos candidatos relevantes;
-- métricas consolidadas;
-- métricas por município;
-- rankings;
-- evolução entre eleições;
-- concentração;
-- participação;
-- crescimento/retração;
-- métricas comparativas de concorrência;
-- metadados da publicação.
-
-### 4.3 Regra de autonomia
-
-Depois que uma publicação analítica for feita no Supabase:
-
-- o dashboard consulta apenas o Supabase;
-- o chatbot consulta apenas o Supabase/camada analítica de produção;
-- nenhuma requisição do usuário executa consulta no banco local;
-- nenhuma tela depende de arquivo local;
-- nenhuma funcionalidade essencial exige que o computador de processamento esteja ligado.
-
-O banco local serve para reconstruir e atualizar a publicação, não para atender usuários.
+- dashboard consulta Supabase;
+- chatbot consulta Supabase/camada analítica de produção;
+- nenhuma requisição do usuário consulta banco local;
+- nenhuma tela depende de arquivo local.
 
 ## 5. Fluxo oficial de dados
 
@@ -223,7 +158,7 @@ O banco local serve para reconstruir e atualizar a publicação, não para atend
      ↓
     AUDIT LOCAL
      ↓
-    MOTOR ANALÍTICO LOCAL
+    MOTOR ANALÍTICO
      ↓
     VALIDAÇÃO
      ↓
@@ -231,144 +166,347 @@ O banco local serve para reconstruir e atualizar a publicação, não para atend
      ↓
     SUPABASE
      ↓
-    PRODUÇÃO
+    DASHBOARD + CHATBOT
 
 O fluxo é unidirecional.
 
-Não existe SUPABASE -> LOCAL e não existe DASHBOARD -> LOCAL.
-
-## 6. Separação entre dado bruto e inteligência
-
-### LOCAL
-
-Pergunta respondida:
-
-> O que o TSE publicou e como podemos provar que processamos corretamente?
-
-### REMOTO
-
-Pergunta respondida:
-
-> O que a aplicação precisa saber para analisar o cenário eleitoral?
-
-Essa separação evita dois problemas:
-
-1. transformar o Supabase em um depósito pesado de dados brutos;
-2. fazer a aplicação depender do ambiente de processamento.
-
-## 7. Camada analítica
-
-O motor analítico trabalha sobre o banco local e produz uma publicação determinística.
-
-Modelo:
-
-    DATA
-      ↓
-    INDICADOR
-      ↓
-    INTELIGÊNCIA
+## 6. Separação entre dado, indicador e inteligência
 
 ### DATA
 
 Fato oficial:
 
-- votos nominais;
+- votos;
 - candidato;
 - município;
 - zona;
 - eleição;
 - ano.
 
-### INDICADOR
+### INDICATOR
 
 Cálculo reproduzível:
 
 - total;
 - participação;
-- crescimento absoluto;
-- crescimento percentual;
+- crescimento;
 - ranking;
 - concentração;
-- diferença para concorrente.
+- diferença;
+- cobertura;
+- força territorial;
+- pressão competitiva.
 
-### INTELIGÊNCIA
+### INTELLIGENCE
 
-Interpretação:
+Interpretação estruturada:
 
 - força territorial;
 - perda territorial;
-- crescimento relevante;
+- crescimento;
 - oportunidade;
 - concentração;
-- concorrente dominante.
+- competição.
 
 A IA nunca substitui o cálculo.
 
-## 8. Quatro áreas funcionais
+## 7. Modelo de produto: candidato não é o sistema
 
-### 8.1 Visão Geral
+O sistema deve ser construído como plataforma de inteligência eleitoral, não como uma aplicação fixa para Carlos Burigo.
+
+Carlos Burigo é o primeiro cliente/contexto de uso.
+
+O motor deve aceitar, como contexto explícito:
+
+    workspace_id
+    candidate_id
+    election_id
+    office_id
+    state
+    round
+    period
+
+O candidato principal é uma configuração do contexto do cliente, não uma constante arquitetural.
+
+A mesma função analítica, skill, intent e template deve funcionar para qualquer candidato compatível com o escopo suportado.
+
+## 8. Comparação entre candidatos
+
+Comparação é capacidade nativa.
+
+Um candidato não deve ser codificado como “o concorrente” permanente de outro.
+
+A relação competitiva é calculada no contexto:
+
+    candidate A
+       ↓
+    comparação
+       ↓
+    candidate B / C / D
+
+O mesmo mecanismo deve permitir:
+
+- ranking;
+- gap de votos;
+- diferença de participação;
+- crescimento;
+- presença territorial;
+- sobreposição;
+- pressão competitiva;
+- contexto competitivo.
+
+## 9. Cliente / workspace / white label
+
+O white label é uma camada comercial acima do núcleo eleitoral.
+
+Exemplo:
+
+    CLIENTE / WORKSPACE
+        |
+        +-- identidade visual
+        +-- permissões
+        +-- candidato principal
+        +-- candidatos comparáveis
+        +-- eleições/escopos autorizados
+
+A plataforma pode atender hoje o gabinete de Carlos Burigo e amanhã outro cliente, por exemplo um gabinete de José da Silva, sem duplicar o motor analítico.
+
+### Regra
+
+Capacidade da plataforma ≠ permissão do cliente.
+
+A plataforma pode saber comparar candidatos; um workspace só pode consultar candidatos, eleições e escopos autorizados.
+
+Não implementar neste momento uma arquitetura SaaS multi-tenant complexa apenas por antecipação comercial. O requisito atual é manter o núcleo desacoplado de Carlos Burigo e preparado para parametrização futura.
+
+## 10. Quatro áreas funcionais
+
+### 10.1 Visão Geral
 
 Responder: qual é a situação eleitoral geral do candidato?
 
-### 8.2 Histórico
+### 10.2 Histórico
 
-Responder: como o desempenho mudou entre 2018, 2022 e 2026?
+Responder: como o desempenho mudou entre eleições?
 
-### 8.3 Território
+### 10.3 Território
 
-Responder: onde o candidato é forte, fraco, está crescendo, perdendo espaço ou apresenta oportunidade?
+Responder: onde o candidato é forte, fraco, cresce, perde espaço ou apresenta oportunidade?
 
-### 8.4 Candidatos / Concorrência
+### 10.4 Candidatos / Concorrência
 
 Responder: contra quem o candidato compete e como essa competição se distribui?
 
-## 9. Chatbot
+## 11. Duas superfícies de interface
 
-O chatbot usa exatamente a mesma camada analítica do dashboard.
+A Fase 9 possui duas superfícies sobre a mesma inteligência:
 
-As 100 perguntas são intents, não respostas estáticas.
+    INTELIGÊNCIA ELEITORAL
+             |
+       +-----+-----+
+       |           |
+   DASHBOARD      CHAT
+       |           |
+   relatórios    conversa
+   gráficos      voz
+   tabelas       artefatos
+   mapas         downloads
 
-    Pergunta
-       ↓
-    Intent
-       ↓
-    Parâmetros
-       ↓
-    Função analítica
-       ↓
-    Dados publicados no Supabase
-       ↓
-    Resposta
+### 11.1 Interface Visual
 
-A IA interpreta linguagem e parâmetros; ela não inventa números.
+Deve permitir:
 
-## 10. Baseline oficial validado
+- exploração;
+- comparação;
+- filtros;
+- drill-down;
+- gráficos;
+- tabelas;
+- mapas;
+- metodologia;
+- fontes;
+- exportação para PDF;
+- download de dados quando apropriado.
 
-Deputado Estadual — RS — 1º turno:
+O PDF deve ser relatório estruturado, não captura de tela.
 
-| Ano | Votos nominais |
-|---|---:|
-| 2018 | 5.306.850 |
-| 2022 | 5.800.912 |
-| 2026 | 5.774.628 |
+### 11.2 Chatbot
 
-Os três anos estão validados no PostgreSQL local.
+Deve permitir:
 
-## 11. Ordem obrigatória de implementação
+- linguagem natural;
+- conversa guiada;
+- contexto de sessão;
+- gráficos;
+- tabelas;
+- mapas;
+- metodologia;
+- fontes;
+- downloads;
+- voz.
 
-Antes dos 25 indicadores de Visão Geral:
+Dashboard e chatbot devem apresentar o mesmo resultado para o mesmo escopo.
 
-1. fechar o contrato do banco local;
-2. fechar o contrato do banco remoto;
-3. remover/aposentar estruturas remotas que representam ingestão bruta e não têm função de produção;
-4. definir a projeção analítica remota;
-5. criar o pipeline LOCAL -> PROJEÇÃO -> SUPABASE;
-6. validar publicação remota;
-7. somente então implementar os indicadores das quatro áreas.
+## 12. Presentation Contract
 
-Não será criado dashboard paralelo.
+Os resultados analíticos devem ser independentes da superfície de apresentação.
 
-## 12. Critério de qualidade
+Tipos de artefato:
+
+- text;
+- kpi;
+- chart;
+- table;
+- map;
+- comparison;
+- timeline;
+- report;
+- download.
+
+Fluxo:
+
+    RESULTADO ESTRUTURADO
+            ↓
+    PRESENTATION CONTRACT
+            ↓
+       +----+----+
+       |         |
+    DASHBOARD   CHATBOT
+       |         |
+     visual    visual
+       +----+----+
+            ↓
+       PDF / DADOS
+
+Não criar um template por pergunta. Criar uma biblioteca reutilizável de padrões analíticos.
+
+## 13. Templates e trabalho da LLM
+
+Como a maior parte dos dados é estável depois da publicação oficial, a plataforma deve pré-construir:
+
+- funções;
+- intents;
+- skills;
+- métodos;
+- templates;
+- estruturas de tabelas;
+- gráficos;
+- mapas;
+- relatórios;
+- contratos de resposta.
+
+A LLM deve fazer principalmente:
+
+1. compreender a linguagem;
+2. resolver intenção e parâmetros;
+3. explicar o resultado;
+4. conduzir o usuário;
+5. adaptar a linguagem ao nível do usuário;
+6. produzir síntese textual/voz.
+
+A LLM não deve ser responsável pelo cálculo eleitoral.
+
+## 14. Conversa guiada
+
+O usuário não precisa conhecer os 100 intents.
+
+Quando necessário, o chatbot deve oferecer caminhos:
+
+    "Quero entender o desempenho."
+
+    [Desempenho geral]
+    [Evolução]
+    [Municípios]
+    [Território]
+    [Concorrência]
+
+Depois:
+
+    [2018 → 2022]
+    [2022 → 2026]
+    [2018 → 2026]
+
+A conversa guiada é UX. O método continua determinístico.
+
+## 15. Voz
+
+Arquitetura:
+
+    VOZ
+     ↓
+    SPEECH-TO-TEXT
+     ↓
+    PERGUNTA
+     ↓
+    PIPELINE ELEITORAL
+     ↓
+    RESULTADO
+     ↓
+    RESPOSTA VISUAL
+     ↓
+    TEXT-TO-SPEECH
+
+O áudio não cria uma segunda inteligência.
+
+O resumo pode ser lido em voz alta; tabelas extensas não devem ser narradas linha por linha.
+
+Provedores de Speech-to-Text e Text-to-Speech devem permanecer desacoplados do motor eleitoral.
+
+## 16. Artefatos baixáveis
+
+Dashboard e chatbot devem poder produzir, quando aplicável:
+
+- PDF;
+- CSV;
+- outros formatos tabulares apropriados.
+
+A exportação nasce do resultado estruturado, não de captura da interface.
+
+## 17. Consistência
+
+Para o mesmo:
+
+- candidato;
+- eleição;
+- turno;
+- período;
+- método;
+- filtros;
+
+dashboard e chatbot devem usar o mesmo resultado determinístico, metodologia e evidência.
+
+## 18. Segurança
+
+O suporte a múltiplos candidatos não significa acesso irrestrito.
+
+Devem ser respeitados:
+
+- autenticação;
+- RBAC;
+- RLS;
+- workspace;
+- candidatos autorizados;
+- eleições autorizadas.
+
+Nenhuma interface pode expor dados de outro cliente apenas porque o motor consegue calculá-los.
+
+## 19. Questões judiciais e exceções
+
+Questões judiciais, alterações de situação de candidatura e outros eventos excepcionais podem exigir atualização ou reprocessamento.
+
+Esses casos não alteram a arquitetura:
+
+    FONTE OFICIAL ATUALIZADA
+             ↓
+        PROCESSAMENTO
+             ↓
+          VALIDAÇÃO
+             ↓
+         PUBLICAÇÃO
+             ↓
+     DASHBOARD + CHATBOT
+
+## 20. Critério de qualidade
 
 Nenhuma visualização ou resposta do chatbot pode depender de números digitados manualmente.
 
@@ -379,7 +517,26 @@ Toda métrica deve possuir:
 - origem;
 - período;
 - filtros;
-- teste de validação;
-- rastreabilidade da publicação.
+- teste;
+- rastreabilidade.
 
-Toda publicação remota deve poder ser reconstruída a partir dos dados locais oficiais.
+Toda publicação deve poder ser reconstruída a partir dos dados oficiais locais.
+
+## 21. Estado
+
+A Fase 8 fechou o runtime determinístico em 100/100 intents.
+
+A Fase 9 agora está em:
+
+**CONTRATO CONCEITUAL EXPANDIDO — IMPLEMENTAÇÃO PENDENTE**
+
+Antes da construção da UI, devem ser fechados os contratos técnicos de:
+
+1. Presentation Contract;
+2. Conversational Contract;
+3. Candidate / Election Context;
+4. Workspace / Permission Context;
+5. exportação de relatórios;
+6. Speech-to-Text / Text-to-Speech desacoplados.
+
+A implementação deve então construir as duas superfícies sobre o mesmo motor, sem duplicar cálculo ou metodologia.
