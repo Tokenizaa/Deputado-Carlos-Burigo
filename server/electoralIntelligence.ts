@@ -161,6 +161,7 @@ export async function executeElectoralQuestion(
       return {
         year: Number(election.year),
         candidate: candidateNumber,
+        candidateName: candidate?.candidate_name ?? null,
         votes,
         totalVotes,
         sharePct: totalVotes === 0 ? null : (votes / totalVotes) * 100,
