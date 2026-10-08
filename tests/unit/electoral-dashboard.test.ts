@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ELECTORAL_YEARS,
+  filterHistoricalRows,
   getElectionYearResult,
   isElectoralYear,
   normalizeCandidateQuery,
@@ -22,6 +23,15 @@ describe('electoral dashboard context helpers', () => {
     expect(getElectionYearResult(rows, 2022)).toEqual({ year: 2022, votes: 24 });
     expect(getElectionYearResult(rows, 2026)).toBeNull();
     expect(getElectionYearResult(null, 2022)).toBeNull();
+  });
+
+  it('does not mix different candidates that reused a number in historical charts', () => {
+    const rows = [
+      { year: 2018, candidate: 15140, candidateName: 'Outra Pessoa', votes: 500 },
+      { year: 2022, candidate: 15140, candidateName: 'Carlos Burigo', votes: 700 },
+      { year: 2026, candidate: 15140, candidateName: 'CARLOS BÚRIGO', votes: 900 },
+    ];
+    expect(filterHistoricalRows(rows, 'Carlos Búrigo', 15140)).toEqual([rows[1], rows[2]]);
   });
 
   it('does not coerce missing or non-finite metrics into numbers', () => {
