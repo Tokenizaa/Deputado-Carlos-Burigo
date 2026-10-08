@@ -114,6 +114,14 @@ describe('electoral intelligence runtime — overview', () => {
     expect((best.result as any).byYear[0].municipality.votes).toBe(80000);
   });
 
+  it('closes participation average using only municipalities with positive votes', async () => {
+    const result = await executeElectoralQuestion('overview.participation_average', { candidate: 12345, year: 2022 });
+    expect(result.status).toBe('ok');
+    expect(result.intent).toBe('EA-021');
+    expect(result.method).toBe('conditionalMean');
+    expect((result.result as any).byYear[0].averageVotesWherePositive).toBeCloseTo(50000);
+  });
+
   it('closes average and median municipality intents', async () => {
     const average = await executeElectoralQuestion('overview.average_votes', { candidate: 12345 });
     const median = await executeElectoralQuestion('overview.median_votes', { candidate: 12345 });
