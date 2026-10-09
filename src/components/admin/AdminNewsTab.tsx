@@ -17,7 +17,7 @@ export const AdminNewsTab: React.FC = () => {
   const [content, setContent] = useState('');
   const [mainImage, setMainImage] = useState('');
   const [featured, setFeatured] = useState(false);
-  const [status, setStatus] = useState<'rascunho' | 'publicado'>('publicado');
+  const [status, setStatus] = useState<'rascunho' | 'publicado' | 'arquivado'>('publicado');
   const [saving, setSaving] = useState(false);
 
   const categories: NewsCategory[] = [
