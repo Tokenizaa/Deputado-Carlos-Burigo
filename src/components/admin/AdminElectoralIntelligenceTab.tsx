@@ -26,6 +26,7 @@ import {
   buildInvestigationTitle,
   isSameInvestigationContext,
   lastAssistantMessage,
+  recommendNextQuestionIds,
   type ElectoralChatMessage,
   type ElectoralInvestigation,
   type ElectoralInvestigationContext,
@@ -304,6 +305,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   const maxHistoricalVotes = Math.max(0, ...historicalRows.map(row => toFiniteNumber(row.votes) ?? 0));
   const territoryResult = territory?.result as { municipalities?: Array<Record<string, unknown>> } | undefined;
   const topMunicipalities = Array.isArray(territoryResult?.municipalities) ? territoryResult.municipalities.slice(0, 6) : [];
+  const latestAssistantMessage = lastAssistantMessage(chatMessages);
+  const recommendedQuestions = (latestAssistantMessage?.questionId
+    ? recommendNextQuestionIds(latestAssistantMessage.questionId)
+    : []).map(id => QUESTIONS.find(question => question.id === id)).filter((question): question is Question => Boolean(question));
 
   useEffect(() => {
     if (!selectedCandidate) {
@@ -443,6 +448,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     context: ElectoralInvestigationContext;
     messages: ElectoralChatMessage[];
     summary: string;
+    next_steps: string[];
   }) => {
     const result = await fetch('/api/admin/electoral/investigations', {
       method: 'POST',
@@ -576,6 +582,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           context,
           messages: completeMessages,
           summary: assistantText,
+          next_steps: recommendNextQuestionIds(question.id),
         });
       } catch (error) {
         setMessage(error instanceof Error
@@ -783,6 +790,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           {historyError && <p role="status" className="mb-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">{historyError}</p>}
           {!chatMessages.length && <><p className="text-sm leading-6 text-stone-600">Pergunte sobre votos, evolução, municípios ou concorrência. As perguntas relacionadas ficam na mesma investigação, que você pode retomar pelo histórico.</p>{!selectedCandidate && <button type="button" onClick={() => { setChatOpen(false); setCandidateModalOpen(true); }} className="mt-3 min-h-10 rounded-lg bg-emerald-700 px-3 text-xs font-bold text-white">Selecionar candidato</button>}</>}
           <div className="space-y-4">{chatMessages.map(item => <div key={item.id} className={item.role === 'user' ? 'ml-8 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-950' : 'mr-2 min-w-0 rounded-xl border border-stone-200 bg-white p-3 text-sm text-stone-800'}><p className="whitespace-pre-wrap leading-6">{item.content}</p>{item.role === 'assistant' && item.response && <div className="mt-3 border-t border-stone-100 pt-3"><ResultView response={item.response as RuntimeResponse} /></div>}</div>)}</div>
+          {!loading && recommendedQuestions.length > 0 && <section className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3"><h3 className="text-xs font-bold uppercase tracking-wide text-emerald-900">Próximos caminhos sugeridos</h3><p className="mt-1 text-xs text-stone-600">Continue esta investigação com uma pergunta relacionada.</p><div className="mt-2 space-y-2">{recommendedQuestions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question, question.prompt)} className="flex min-h-10 w-full items-center justify-between gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-left text-xs font-semibold text-stone-800 hover:border-emerald-600"><span>{question.label}</span><ChevronRight className="h-3.5 w-3.5 shrink-0 text-emerald-700" /></button>)}</div></section>}
           {loading && <p className="mt-4 flex items-center text-xs text-stone-500"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Consultando o runtime eleitoral…</p>}
         </div>}
         {!historyOpen && <form onSubmit={askChat} className="border-t border-stone-200 p-3"><label htmlFor="electoral-chat-input" className="sr-only">Pergunta eleitoral</label><div className="flex gap-2"><input id="electoral-chat-input" value={chatInput} onChange={event => setChatInput(event.target.value)} placeholder="Continue esta investigação…" className="min-h-11 min-w-0 flex-1 rounded-xl border border-stone-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600" /><button type="button" onClick={startVoiceQuestion} disabled={listening || !canUseSpeechRecognition()} title={canUseSpeechRecognition() ? 'Perguntar por voz' : 'Voz não suportada'} aria-label="Perguntar por voz" className="min-h-11 rounded-xl border border-stone-300 px-3 text-stone-700 disabled:opacity-40"><Mic className="h-4 w-4" /></button><button type="submit" disabled={loading} aria-label="Enviar pergunta" className="min-h-11 rounded-xl bg-emerald-700 px-3 text-white hover:bg-emerald-800 disabled:opacity-40"><Send className="h-4 w-4" /></button></div></form>}
