@@ -644,14 +644,20 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
 
   return (
     <section className="relative space-y-6 pb-20" aria-labelledby="electoral-intelligence-title">
-      <header className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Inteligência eleitoral · análise privada</p>
-          <h1 id="electoral-intelligence-title" className="mt-2 text-3xl font-black tracking-tight text-stone-950">Painel eleitoral</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">Explore desempenho, evolução e território com resultados da projeção analítica. Selecione o recorte antes de investigar.</p>
+      <header className="relative overflow-hidden rounded-2xl bg-stone-950 px-5 py-6 text-white sm:px-7 sm:py-8">
+        <div className="absolute inset-y-0 right-0 hidden w-1/3 border-l border-white/10 lg:block" aria-hidden="true">
+          <div className="flex h-full items-center justify-center"><BarChart3 className="h-24 w-24 text-emerald-400/20" /></div>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900">
-          <ShieldCheck className="h-4 w-4" /> Acesso autenticado · RS
+        <div className="relative z-10 max-w-3xl">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300">
+            <span>Inteligência eleitoral</span><span className="text-stone-600">/</span><span className="text-stone-400">Ambiente de investigação</span>
+          </div>
+          <h1 id="electoral-intelligence-title" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Análise eleitoral</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-300">Desempenho, evolução histórica, território e concorrência em um único ambiente. Todos os indicadores dependem dos dados retornados pelo runtime eleitoral.</p>
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-stone-300">
+            <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" />Acesso autenticado</span>
+            <span className="text-stone-600" aria-hidden="true">|</span><span>RS · Deputado Estadual · 1º turno</span>
+          </div>
         </div>
       </header>
 
@@ -693,20 +699,44 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div><h2 className="text-lg font-bold text-stone-950">{selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`}</h2><p className="text-xs text-stone-500">Número {selectedCandidate.candidate_number} · {selectedYear} · RS · Deputado Estadual</p></div>
-            <button type="button" onClick={() => setCandidateModalOpen(true)} className="min-h-10 self-start rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 hover:bg-stone-50">Trocar candidato</button>
+          <div className="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-700">Recorte ativo</p>
+              <h2 className="mt-1 truncate text-xl font-black tracking-tight text-stone-950">{selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`}</h2>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs text-stone-600">
+                <span className="rounded-md bg-stone-100 px-2 py-1">Número {selectedCandidate.candidate_number}</span>
+                <span className="rounded-md bg-stone-100 px-2 py-1">Eleição {selectedYear}</span>
+                <span className="rounded-md bg-stone-100 px-2 py-1">RS · Deputado Estadual</span>
+              </div>
+            </div>
+            <button type="button" onClick={() => setCandidateModalOpen(true)} className="min-h-10 self-start rounded-lg border border-stone-300 bg-white px-3 text-xs font-bold text-stone-700 hover:border-emerald-700 hover:text-emerald-800">Trocar candidato</button>
           </div>
 
           {overviewLoading ? (
             <div className="flex min-h-36 items-center justify-center rounded-2xl border border-stone-200 bg-white text-sm text-stone-600"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Carregando dados reais do runtime…</div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl border border-stone-200 bg-white p-4"><p className="text-xs font-semibold text-stone-500">Votos nominais</p><p className="mt-2 text-2xl font-black tabular-nums text-stone-950">{formatVotes(selectedSnapshot?.votes)}</p><p className="mt-1 text-xs text-stone-500">No ano selecionado</p></div>
-              <div className="rounded-2xl border border-stone-200 bg-white p-4"><p className="text-xs font-semibold text-stone-500">Participação estadual</p><p className="mt-2 text-2xl font-black tabular-nums text-stone-950">{toFiniteNumber(selectedSnapshot?.sharePct) === null ? '—' : `${formatValue(selectedSnapshot?.sharePct)}%`}</p><p className="mt-1 text-xs text-stone-500">Sobre os votos nominais do cargo</p></div>
-              <div className="rounded-2xl border border-stone-200 bg-white p-4"><p className="text-xs font-semibold text-stone-500">Ranking estadual</p><p className="mt-2 text-2xl font-black tabular-nums text-stone-950">{formatValue(selectedSnapshot?.rank)}</p><p className="mt-1 text-xs text-stone-500">Posição retornada pela projeção</p></div>
-              <div className="rounded-2xl border border-stone-200 bg-white p-4"><p className="text-xs font-semibold text-stone-500">Total de votos do cargo</p><p className="mt-2 text-2xl font-black tabular-nums text-stone-950">{formatVotes(selectedSnapshot?.totalVotes)}</p><p className="mt-1 text-xs text-stone-500">No mesmo recorte eleitoral</p></div>
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-stone-200 bg-stone-200 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Votos nominais</p><BarChart3 className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{formatVotes(selectedSnapshot?.votes)}</p><p className="mt-1 text-xs text-stone-500">Eleição {selectedYear}</p></div>
+              <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Participação estadual</p><Target className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{toFiniteNumber(selectedSnapshot?.sharePct) === null ? '—' : `${formatValue(selectedSnapshot?.sharePct)}%`}</p><p className="mt-1 text-xs text-stone-500">Sobre os votos nominais do cargo</p></div>
+              <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Ranking estadual</p><Award className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{formatValue(selectedSnapshot?.rank)}</p><p className="mt-1 text-xs text-stone-500">Posição retornada pela projeção</p></div>
+              <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Votos do cargo</p><MapPin className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{formatVotes(selectedSnapshot?.totalVotes)}</p><p className="mt-1 text-xs text-stone-500">Total no mesmo recorte eleitoral</p></div>
             </div>
+
+            <section className="grid gap-3 rounded-2xl bg-stone-900 p-4 text-white sm:grid-cols-3 sm:p-5" aria-labelledby="data-coverage-title">
+              <div className="sm:col-span-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div><h3 id="data-coverage-title" className="text-sm font-bold">Cobertura deste recorte</h3><p className="mt-1 text-xs text-stone-400">Estado dos dados carregados para a análise selecionada.</p></div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-stone-300"><Database className="h-3.5 w-3.5 text-emerald-400" />Runtime eleitoral</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-xs text-stone-400">Série histórica</p><p className="mt-2 text-xl font-black tabular-nums">{historicalRows.length || '—'}</p><p className="mt-1 text-xs text-stone-400">{historicalRows.length ? 'registros disponíveis' : 'sem série validada'}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-xs text-stone-400">Ranking municipal</p><p className="mt-2 text-xl font-black tabular-nums">{topMunicipalities.length || '—'}</p><p className="mt-1 text-xs text-stone-400">{topMunicipalities.length ? 'municípios retornados' : 'sem ranking disponível'}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-xs text-stone-400">Resultado do ano</p><p className="mt-2 text-xl font-black">{selectedSnapshot ? 'Disponível' : '—'}</p><p className="mt-1 text-xs text-stone-400">{selectedSnapshot ? 'registro encontrado para o recorte' : 'sem registro compatível'}</p>
+              </div>
+            </section>
           )}
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.8fr)]">
