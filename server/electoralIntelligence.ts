@@ -160,9 +160,9 @@ export async function executeElectoralQuestion(
     );
     const normalizeCandidateName = (value: unknown) => String(value ?? '')
       .normalize('NFD')
-      .replace(/[\\u0300-\\u036f]/g, '')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/\\s+/g, ' ')
+      .replace(/\s+/g, ' ')
       .trim();
     const expectedName = normalizeCandidateName(params.candidate_name ?? selectedRecord?.candidate_name);
     const matchingCandidates = candidates.filter((row) => {
