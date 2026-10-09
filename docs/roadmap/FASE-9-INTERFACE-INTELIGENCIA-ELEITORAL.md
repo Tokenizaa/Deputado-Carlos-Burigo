@@ -163,3 +163,58 @@ A implementação seguirá quatro blocos coerentes:
 4. exportação e adaptadores de voz.
 
 Cada bloco exige teste e evidência antes do próximo.
+
+
+## Diretriz de reaproveitamento do benchmark — 2026-10-08
+
+**Decisão:** antes de iniciar novas alterações funcionais da Fase 9, usar o repositório [Tokenizaa/Intelig-ncia-Eleitoral](https://github.com/Tokenizaa/Intelig-ncia-Eleitoral) exclusivamente como benchmark de experiência visual, navegação e padrões de interação. O destino de toda implementação continua sendo este repositório, `Tokenizaa/Deputado-Carlos-Burigo`.
+
+### Princípio de execução
+
+Não reconstruir a experiência do zero quando já existem componentes e fluxos que podem orientar a implementação. Primeiro comparar o benchmark com o código atual; depois reaproveitar os padrões úteis, adaptando-os à arquitetura, aos contratos, aos dados e às permissões do projeto Carlos Búrigo.
+
+O benchmark não é fonte de verdade para regras eleitorais, dados, cálculos, segurança ou arquitetura do projeto de destino. A presença de um componente no benchmark não significa que ele possa ser copiado diretamente ou que suas dependências sejam compatíveis.
+
+### Referências identificadas no benchmark
+
+A inspeção da árvore publicada em `main` identificou, entre outros, os seguintes pontos de referência:
+
+- Componentes compartilhados: `src/components/Sidebar.tsx`, `Header.tsx`, `GlobalFiltersModal.tsx`, `ActiveFiltersBar.tsx`, `ElectoralMapLeaflet.tsx` e `MunicipalitySectionInspector.tsx`.
+- Visões analíticas: `src/views/OverviewView.tsx`, `ComparisonView.tsx`, `PerformanceView.tsx`, `TerritorialView.tsx`, `SpatialView.tsx`, `ConcentrationView.tsx`, `ZonesSectionsView.tsx`, `MethodologyView.tsx` e `ReportsView.tsx`.
+- Estado e utilitários de referência: `src/context/FilterContext.tsx`, `src/utils/electoralMath.ts` e `src/utils/csvExport.ts`.
+
+Esta lista é um inventário inicial para inspeção, não uma autorização para copiar código nem uma declaração de compatibilidade já verificada.
+
+### Mapeamento obrigatório para o destino
+
+| Área de experiência | Diretriz de adaptação no projeto Carlos Búrigo |
+|---|---|
+| Sidebar, cabeçalho e navegação | Manter `AdminLayout`, `AdminWorkspace` e a navegação administrativa existentes; incorporar somente padrões visuais úteis, sem criar shell paralelo. |
+| Filtros e contexto global | Integrar ao contexto compartilhado definido em `src/contracts/electoralContext.ts`; não criar uma segunda fonte de estado ou contrato concorrente. |
+| Visões, indicadores, gráficos e tabelas | Renderizar os resultados reais do runtime por meio de `src/contracts/electoralPresentation.ts`; selecionar componentes conforme o tipo de artefato e os dados disponíveis. |
+| Mapas e detalhamento territorial | Só habilitar quando a cobertura e a integridade territorial estiverem comprovadas pelo gate IE-03.7. |
+| Metodologia e relatórios | Preservar evidências, limitações, exportação e metodologia já implementadas, conectando a apresentação ao resultado analítico compartilhado. |
+| Chat e continuidade | Preservar o chat integrado ao módulo e evoluí-lo para contexto explícito, histórico consultável e continuidade por investigação, sem criar uma conversa nova para cada pergunta relacionada. |
+
+### Sequência de trabalho
+
+1. **Inventariar e comparar:** ler os componentes relevantes do benchmark e as implementações correspondentes no destino; registrar o que já existe, o que pode ser adaptado e o que realmente falta.
+2. **Definir reaproveitamento por componente:** para cada item, classificar como reutilizar padrão visual/interação, adaptar após inspeção de dependências ou não aproveitar. Não duplicar contratos, estado, cálculos ou componentes que já cumpram a função no destino.
+3. **Adaptar a experiência do dashboard:** trabalhar dentro do `AdminWorkspace` atual e conectar as visualizações aos contratos e ao runtime existentes, sem dados simulados apresentados como reais.
+4. **Adaptar chat e investigações:** vincular a conversa ao contexto ativo da página e manter mensagens dentro de investigações contínuas; persistência, retomada e memória devem respeitar autorização e infraestrutura existentes.
+5. **Validar antes de concluir:** executar testes relevantes, verificar responsividade e acessibilidade, confirmar consistência entre dashboard e chat e registrar evidências por commit. Não declarar uma etapa concluída sem os checks correspondentes.
+
+### Restrições não negociáveis
+
+- Não criar uma aplicação, dashboard, shell, roteador, autenticação, API, banco eleitoral ou motor analítico paralelo.
+- Não copiar arquitetura ou lógica do benchmark sem inspeção de compatibilidade e necessidade.
+- Não substituir os contratos canônicos do destino nem calcular métricas na LLM.
+- Não exibir dados mock como resultados eleitorais reais; ausência de dados não significa zero.
+- Não contornar RBAC/RLS nem os gates de cobertura e integridade, especialmente IE-03.7.
+- Não começar uma reconstrução integral antes de concluir o inventário comparativo.
+
+### Critério de aceite desta diretriz
+
+Antes da próxima implementação funcional, deve existir uma comparação objetiva entre benchmark e destino, com os componentes e fluxos relevantes classificados por reaproveitamento, adaptação ou descarte. A implementação seguinte deve modificar o projeto Carlos Búrigo a partir do estado publicado e preservar as entregas existentes.
+
+**Estado:** diretriz documentada; a comparação detalhada e as alterações funcionais ainda precisam ser executadas e validadas. Esta atualização documental, isoladamente, não comprova implementação nem execução de testes.
