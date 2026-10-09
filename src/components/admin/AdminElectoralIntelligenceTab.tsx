@@ -44,17 +44,9 @@ type SpeechRecognitionLike = {
   onend: (() => void) | null;
   onresult: ((event: { results?: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
 };
-type RuntimeResponse = {
-  status: 'ok' | 'pending' | 'insufficient_data' | 'error';
-  intent?: string;
-  method?: string;
-  function?: string;
-  result?: unknown;
-  evidence?: string[];
-  limitations?: string[];
-  error?: string;
-  scope?: { office?: string; uf?: string; round?: number; years?: number[] };
-};
+import type { ElectoralRuntimeResponse } from '../../contracts/electoralRuntime';
+
+type RuntimeResponse = ElectoralRuntimeResponse;
 type CandidateSearchResponse = { candidates?: CandidateOption[]; error?: string };
 
 const QUESTIONS: Question[] = [
