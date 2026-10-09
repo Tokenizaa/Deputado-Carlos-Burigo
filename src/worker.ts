@@ -78,6 +78,7 @@ import type { AdminModule, Permission } from '../src/config/adminPermissions';
 import { getEffectivePermissions, canEffective } from '../server/permissions';
 import { validatePassword } from './lib/passwordValidation';
 import { executeElectoralQuestion } from '../server/electoralIntelligence';
+import type { ElectoralQuestionRequest } from './contracts/electoralRuntime';
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -428,7 +429,7 @@ if (request.method !== 'POST') return methodNotAllowed();
     if (request.method !== 'POST') return methodNotAllowed();
 
     try {
-      const body = await request.json();
+      const body = await request.json() as Partial<ElectoralQuestionRequest>;
       const questionId = typeof body?.questionId === 'string' ? body.questionId.trim() : '';
       if (!questionId) return Response.json({ error: 'questionId é obrigatório.' }, { status: 400 });
 
