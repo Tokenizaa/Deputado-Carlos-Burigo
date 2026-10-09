@@ -289,7 +289,8 @@ export async function executeElectoralQuestion(
     const { data: municipalityRows, error: municipalityError } = await supabaseAdmin
       .from('electoral_analytics_municipalities')
       .select('year,municipality_code,municipality_name,total_nominal_votes,municipalities_rank')
-      .order('year', { ascending: true });
+      .order('year', { ascending: true })
+      .range(0, 5000);
     if (municipalityError) throw municipalityError;
 
     const candidateData = candidateRows ?? [];
