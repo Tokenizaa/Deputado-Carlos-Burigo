@@ -9,6 +9,7 @@ import {
   buildElectoralVoiceSummary,
   canUseSpeechRecognition,
 } from '../../lib/electoral-report';
+import { getSupabaseClient } from '../../lib/supabaseClient';
 import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
@@ -155,10 +156,23 @@ function ResultView({ response }: { response: RuntimeResponse }) {
   );
 }
 
+async function getElectoralAuthHeaders(includeContentType = false): Promise<Record<string, string>> {
+  const client = await getSupabaseClient();
+  const { data, error } = await client.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (error || !accessToken) {
+    throw new Error('Sua sessão do gabinete não está ativa. Entre novamente para usar a Inteligência Eleitoral.');
+  }
+  return {
+    ...(includeContentType ? { 'Content-Type': 'application/json' } : {}),
+    Authorization: `Bearer ${accessToken}`,
+  };
+}
+
 async function postElectoralQuestion(questionId: string, params: Record<string, unknown>): Promise<RuntimeResponse> {
   const response = await fetch('/api/admin/electoral/intelligence', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await getElectoralAuthHeaders(true),
     body: JSON.stringify({ questionId, params }),
   });
   const data = await response.json().catch(() => ({})) as RuntimeResponse;
@@ -226,9 +240,8 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     return () => { cancelled = true; };
   }, [selectedCandidate, selectedYear]);
 
-  const searchCandidates = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const query = normalizeCandidateQuery(candidateQuery);
+  const searchCandidates = async (queryInput = candidateQuery, signal?: AbortSignal) => {
+    const query = normalizeCandidateQuery(queryInput);
     if (query.length < 2) {
       setCandidateSearchError('Digite pelo menos dois caracteres ou o número eleitoral.');
       return;
@@ -236,17 +249,40 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setCandidateSearchLoading(true);
     setCandidateSearchError('');
     try {
-      const response = await fetch(`/api/admin/electoral/candidates?year=${selectedYear}&q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/admin/electoral/candidates?year=${selectedYear}&q=${encodeURIComponent(query)}`, {
+        headers: await getElectoralAuthHeaders(),
+        signal,
+      });
       const data = await response.json().catch(() => ({})) as CandidateSearchResponse;
       if (!response.ok) throw new Error(data.error || 'Não foi possível pesquisar candidatos.');
       setCandidateResults(Array.isArray(data.candidates) ? data.candidates : []);
       if (!data.candidates?.length) setCandidateSearchError('Nenhum candidato encontrado neste ano e escopo.');
     } catch (error) {
+      if (signal?.aborted) return;
       setCandidateSearchError(error instanceof Error ? error.message : 'Falha ao pesquisar candidatos.');
     } finally {
-      setCandidateSearchLoading(false);
+      if (!signal?.aborted) setCandidateSearchLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!candidateModalOpen) return;
+    const query = normalizeCandidateQuery(candidateQuery);
+    if (query.length < 2) {
+      setCandidateResults([]);
+      setCandidateSearchError('');
+      setCandidateSearchLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      void searchCandidates(query, controller.signal);
+    }, 300);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [candidateModalOpen, candidateQuery, selectedYear]);
 
   const chooseCandidate = (candidate: CandidateOption) => {
     setSelectedCandidate(candidate);
@@ -495,13 +531,13 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
       {candidateModalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCandidateModalOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="candidate-search-title" className="max-h-[min(85vh,760px)] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl">
           <header className="flex items-start justify-between gap-3"><div><h2 id="candidate-search-title" className="text-lg font-bold text-stone-950">Selecionar candidato</h2><p className="mt-1 text-sm text-stone-600">Pesquisa nos registros disponíveis de {selectedYear}, RS · Deputado Estadual.</p></div><button type="button" onClick={() => setCandidateModalOpen(false)} aria-label="Fechar pesquisa" className="rounded-lg p-2 text-stone-500 hover:bg-stone-100"><X className="h-4 w-4" /></button></header>
-          <form onSubmit={searchCandidates} className="mt-4 flex gap-2"><label htmlFor="candidate-search-query" className="sr-only">Nome ou número eleitoral</label><input id="candidate-search-query" autoFocus value={candidateQuery} onChange={event => setCandidateQuery(event.target.value)} placeholder="Nome ou número eleitoral" className="min-h-12 min-w-0 flex-1 rounded-xl border border-stone-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600" /><button type="submit" disabled={candidateSearchLoading} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-4 text-sm font-bold text-white disabled:opacity-50"><Search className="h-4 w-4" />Buscar</button></form>
+          <div className="mt-4 flex gap-2"><label htmlFor="candidate-search-query" className="sr-only">Nome ou número eleitoral</label><div className="relative min-w-0 flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" /><input id="candidate-search-query" role="combobox" aria-autocomplete="list" aria-expanded={candidateResults.length > 0} aria-controls="candidate-search-results" autoFocus value={candidateQuery} onChange={event => setCandidateQuery(event.target.value)} placeholder="Digite o nome ou número eleitoral" className="min-h-12 w-full rounded-xl border border-stone-300 py-3 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600" /></div><button type="button" onClick={() => void searchCandidates(candidateQuery)} disabled={candidateSearchLoading || normalizeCandidateQuery(candidateQuery).length < 2} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-4 text-sm font-bold text-white disabled:opacity-50"><Search className="h-4 w-4" />Buscar</button></div>
           {candidateSearchError && <p className="mt-3 text-sm text-amber-800" role="status">{candidateSearchError}</p>}
           {candidateSearchLoading && <p className="mt-4 flex items-center text-sm text-stone-600"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Pesquisando na projeção eleitoral…</p>}
-          <ul className="mt-4 divide-y divide-stone-100">
-            {candidateResults.map((candidate, index) => <li key={`${candidate.year}-${candidate.candidate_number}-${index}`}><button type="button" onClick={() => chooseCandidate(candidate)} className="flex min-h-16 w-full items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-xs font-bold text-stone-700">{candidate.candidate_number}</span><span className="min-w-0 flex-1"><strong className="block truncate text-sm text-stone-900">{candidate.candidate_name || `Candidato ${candidate.candidate_number}`}</strong><span className="block text-xs text-stone-500">{candidate.year} · {formatVotes(candidate.votes)} votos {candidate.rank ? `· posição ${candidate.rank}` : ''}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400" /></button></li>)}
+          <ul id="candidate-search-results" role="listbox" aria-label="Candidatos encontrados" className="mt-2 divide-y divide-stone-100 rounded-xl border border-stone-200">
+            {candidateResults.map((candidate, index) => <li key={`${candidate.year}-${candidate.candidate_number}-${index}`} role="option" aria-selected="false"><button type="button" onClick={() => chooseCandidate(candidate)} className="flex min-h-16 w-full items-center gap-3 rounded-lg px-3 py-3 text-left hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-xs font-bold text-stone-700">{candidate.candidate_number}</span><span className="min-w-0 flex-1"><strong className="block truncate text-sm text-stone-900">{candidate.candidate_name || `Candidato ${candidate.candidate_number}`}</strong><span className="block text-xs text-stone-500">{candidate.year} · {formatVotes(candidate.votes)} votos {candidate.rank ? `· posição ${candidate.rank}` : ''}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400" /></button></li>)}
           </ul>
-          {!candidateResults.length && !candidateSearchLoading && !candidateSearchError && <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">Digite pelo menos dois caracteres e clique em Buscar.</p>}
+          {!candidateResults.length && !candidateSearchLoading && !candidateSearchError && <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">Digite pelo menos dois caracteres para ver as sugestões automaticamente.</p>}
           <p className="mt-4 border-t border-stone-100 pt-3 text-xs leading-5 text-stone-500">A pesquisa não inventa candidatos: os resultados vêm da projeção publicada no Supabase. Um resultado ausente pode indicar que o ano ainda não está coberto.</p>
         </section>
       </div>}
