@@ -10,7 +10,7 @@ export const AdminAuditTab: React.FC = () => {
     (l) =>
       l.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
       l.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.entity.toLowerCase().includes(searchTerm.toLowerCase())
+      l.entityType.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -70,7 +70,7 @@ export const AdminAuditTab: React.FC = () => {
 
                 <td className="px-4 py-4 whitespace-nowrap">
                   <span className="font-mono text-xs font-semibold text-[#00A550] bg-emerald-50 px-2 py-0.5 rounded">
-                    {log.entity}
+                    {log.entityType}
                   </span>
                 </td>
 

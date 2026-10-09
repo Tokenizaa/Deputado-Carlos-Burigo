@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase';
+import type { Year } from '../src/lib/electoral-analytics';
 import orchestration from '../src/data/electoral-orchestration.json';
 import { averageVotesWherePositive, aggregateRegionalVotes, regionalStrength, rankRegionalStrength, regionalEvolution, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
 
@@ -161,6 +162,7 @@ export async function executeElectoralQuestion(
       return {
         year: Number(election.year),
         candidate: candidateNumber,
+        candidateName: candidate?.candidate_name ?? null,
         votes,
         totalVotes,
         sharePct: totalVotes === 0 ? null : (votes / totalVotes) * 100,
@@ -285,7 +287,7 @@ export async function executeElectoralQuestion(
         case 'overview.average_votes':
           return { year, averageVotes: average };
         case 'overview.participation_average':
-          return { year, averageVotesWherePositive: averageVotesWherePositive(rows.map((row) => ({ year, municipality: Number(row.municipality_code), votes_nominal: Number(row.votes) }))) };
+          return { year, averageVotesWherePositive: averageVotesWherePositive(rows.map((row) => ({ year: year as Year, municipality: Number(row.municipality_code), votes_nominal: Number(row.votes) }))) };
         case 'overview.median_votes': {
           if (!votes.length) return { year, medianVotes: null };
           const middle = Math.floor(votes.length / 2);
@@ -354,7 +356,7 @@ export async function executeElectoralQuestion(
     const toYear = Number(params.to_year) || years[years.length - 1];
     const from = candidates.find(r=>Number(r.year)===fromYear);
     const to = candidates.find(r=>Number(r.year)===toYear);
-    const rowsFor = (year:number) => municipal.filter(r=>Number(r.year)===year).map(r=>({ municipality:Number(r.municipality_code), votes_nominal:Number(r.votes) }));
+    const rowsFor = (year:number) => municipal.filter(r=>Number(r.year)===year).map(r=>({ year: year as Year, municipality:Number(r.municipality_code), votes_nominal:Number(r.votes) }));
     const a = rowsFor(fromYear), b = rowsFor(toYear), mid = rowsFor(years[1] ?? toYear);
     const limit = Number.isInteger(params.limit) && Number(params.limit)>0 ? Number(params.limit) : 10;
     const changes = () => b.map(r=>{const f=a.find(x=>x.municipality===r.municipality)?.votes_nominal??0; return {municipality:r.municipality,fromVotes:f,toVotes:r.votes_nominal,absoluteChange:r.votes_nominal-f,percentageChange:f===0?null:((r.votes_nominal-f)/f)*100};});
@@ -672,7 +674,7 @@ export async function executeElectoralQuestion(
       case 'territory.map_decline':{const base=rowsFor(toYear),prev=rowsFor(fromYear),pm=new Map(prev.map(r=>[r.municipality,r.votes])),items=base.map(r=>{const d=r.votes-(pm.get(r.municipality)??0),i=ibge.get(r.municipality),m=catalog.find(c=>Number(c.year)===toYear&&Number(c.municipality_code)===r.municipality);return{municipality:r.municipality,municipalityName:names(r.municipality,toYear),ibgeMunicipalityCode:i?.municipality_code??null,regionCode:m?.region_code??null,votes:r.votes,absoluteChange:d,percentageChange:(pm.get(r.municipality)??0)>0?d/(pm.get(r.municipality)??0)*100:null};}),filtered=questionId==='territory.map_strength'?items:questionId==='territory.map_growth'?items.filter(x=>x.absoluteChange>0):items.filter(x=>x.absoluteChange<0);result={year:toYear,fromYear,items:filtered.slice(0,limit)};break;}
       case 'competition.strategic_competitors':{const target=String(candidateNumber),current=candidatesAt(toYear),base=candidatesAt(fromYear),targetVotes=current.find(x=>x.candidate===target)?.votes??0,targetSet=new Set(municipalAllAt(toYear).filter(x=>x.candidate===target&&x.votes>0).map(x=>x.municipality)),stateRank=new Map([...current].sort((a,b)=>a.rank-b.rank).map((r,i)=>[r.candidate,i+1])),scored=current.filter(x=>x.candidate!==target).map(r=>{const rr=municipalAllAt(toYear).filter(x=>x.candidate===r.candidate),presence=rr.filter(x=>x.votes>0).length/497*100,overlap=targetSet.size?rr.filter(x=>x.votes>0&&targetSet.has(x.municipality)).length/targetSet.size*100:0,gap=Math.abs(targetVotes-r.votes),gapScore=100/(1+gap),growth=r.votes-(base.find(x=>x.candidate===r.candidate)?.votes??0),positionScore=100/(stateRank.get(r.candidate)??999);return{candidate:Number(r.candidate),candidateName:r.name,rank:r.rank,votes:r.votes,gapVotes:gap,presencePct:presence,overlapPct:overlap,growthAbsolute:growth,positionScore,gapScore,growthScore:growth};}),ranks=scored.map(x=>x.positionScore),gaps=scored.map(x=>x.gapScore),pres=scored.map(x=>x.presencePct),ov=scored.map(x=>x.overlapPct),gr=scored.map(x=>x.growthScore),ranked=scored.map((x,i)=>({...x,strategicScore:(norm(ranks,x.positionScore)+norm(gaps,x.gapScore)+norm(pres,x.presencePct)+norm(ov,x.overlapPct)+norm(gr,x.growthScore))/5})).sort((a,b)=>b.strategicScore-a.strategicScore);result={year:toYear,fromYear,methodVersion:'competition-v1.1-equal-weight',weights:{position:0.2,gap:0.2,presence:0.2,overlap:0.2,growth:0.2},competitors:ranked.slice(0,limit)};break;}
       case 'competition.competitive_trend':{const pressure=(y:number)=>{const v=leaderRows(y).filter(x=>x.leader>0&&x.runnerUp>0),den=v.reduce((s,x)=>s+x.leader,0);return den?v.reduce((s,x)=>s+x.runnerUp,0)/den*100:null;},pf=pressure(fromYear),pt=pressure(toYear);result={fromYear,toYear,pressureFrom:pf,pressureTo:pt,competitiveTrend:pf===null||pt===null?null:pt-pf,unit:'percentage_points'};break;}
-      case 'competition.candidate_context':{const target=String(candidateNumber),current=candidatesAt(year),c=current.find(x=>x.candidate===target);if(!c){result={candidate:candidateNumber,year,context:null};break;}const sorted=[...current].sort((a,b)=>b.votes-a.votes),idx=sorted.findIndex(x=>x.candidate===target),above=idx>0?sorted[idx-1]:null,below=idx<sorted.length-1?sorted[idx+1]:null,tr=municipalAllAt(year).filter(x=>x.candidate===target),prev=candidatesAt(fromYear).find(x=>x.candidate===target),top=sorted.filter(x=>x.candidate!==target).slice(0,5).map(x=>({candidate:Number(x.candidate),name:x.name,votes:x.votes,overlapPct:territorialOverlap(municipalAllAt(year).map(r=>({year:r.year,municipality:r.municipality,candidateId:r.candidate,votes_nominal:r.votes})),target,x.candidate)})),lr=leaderRows(year).filter(x=>x.leader>0&&x.runnerUp>0),den=lr.reduce((s,x)=>s+x.leader,0);result={candidate:candidateNumber,year,votes:c.votes,rank:c.rank,sharePct:c.share,gapAbove:above?c.votes-above.votes:null,leadBelow:below?c.votes-below.votes:null,growthAbsolute:prev?c.votes-prev.votes:null,coverageMunicipalities:new Set(tr.filter(x=>x.votes>0).map(x=>x.municipality)).size,competitivePressurePct:den?lr.reduce((s,x)=>s+x.runnerUp,0)/den*100:null,topCompetitors:top};break;}
+      case 'competition.candidate_context':{const target=String(candidateNumber),current=candidatesAt(year),c=current.find(x=>x.candidate===target);if(!c){result={candidate:candidateNumber,year,context:null};break;}const sorted=[...current].sort((a,b)=>b.votes-a.votes),idx=sorted.findIndex(x=>x.candidate===target),above=idx>0?sorted[idx-1]:null,below=idx<sorted.length-1?sorted[idx+1]:null,tr=municipalAllAt(year).filter(x=>x.candidate===target),prev=candidatesAt(fromYear).find(x=>x.candidate===target),top=sorted.filter(x=>x.candidate!==target).slice(0,5).map(x=>({candidate:Number(x.candidate),name:x.name,votes:x.votes,overlapPct:territorialOverlap(municipalAllAt(year).map(r=>({year:r.year as Year,municipality:r.municipality,candidateId:r.candidate,votes_nominal:r.votes})),target,x.candidate)})),lr=leaderRows(year).filter(x=>x.leader>0&&x.runnerUp>0),den=lr.reduce((s,x)=>s+x.leader,0);result={candidate:candidateNumber,year,votes:c.votes,rank:c.rank,sharePct:c.share,gapAbove:above?c.votes-above.votes:null,leadBelow:below?c.votes-below.votes:null,growthAbsolute:prev?c.votes-prev.votes:null,coverageMunicipalities:new Set(tr.filter(x=>x.votes>0).map(x=>x.municipality)).size,competitivePressurePct:den?lr.reduce((s,x)=>s+x.runnerUp,0)/den*100:null,topCompetitors:top};break;}
     }
     return {status:'ok',question:questionId,intent:plan.intent_id,agent:plan.agent,skills:plan.skills,method:plan.method,function:plan.function,scope:{office:'Deputado Estadual',uf:'RS',round:1,years:[2018,2022,2026]},result,evidence:[...plan.evidence,'Supabase analytical projection','IBGE RGI 2024'],limitations:['Índices compostos são descritivos, determinísticos e versionados; não representam causalidade nem recomendação política.']};
   }
@@ -713,24 +715,7 @@ export async function executeElectoralQuestion(
   };
 }
 
-type ElectoralResponse = {
-  status: 'ok' | 'error' | 'pending' | 'insufficient_data';
-  question: string;
-  intent: string;
-  agent: string;
-  skills: string[];
-  method: string;
-  function: string;
-  scope: {
-    office: 'Deputado Estadual';
-    uf: 'RS';
-    round: 1;
-    years: number[];
-  };
-  result: unknown;
-  evidence: string[];
-  limitations: string[];
-};
+
 
 export interface ElectoralQuestionParams {
   year?: number;

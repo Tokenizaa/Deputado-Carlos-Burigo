@@ -553,3 +553,12 @@ A auditoria do código em `main` confirma que a Inteligência Eleitoral já est�
 Os contratos `src/contracts/electoralContext.ts` e `src/contracts/electoralPresentation.ts` já existem e têm testes. A interface ainda não os integra em estado compartilhado de candidato/eleição/filtros; não oferece busca por nome, modal de candidatos, seletor de eleição, painel de chat flutuante nem renderer de gráficos/mapas. A presença de templates de apresentação não comprova que essas visualizações estejam operacionais.
 
 A decisão nesta fase é não criar um segundo contrato nem antecipar componentes funcionais sem necessidade comprovada. A fase seguinte conectará a interface aos contratos existentes. O gate IE-03.7 permanece vigente e a auditoria de código não equivale a validação da cobertura física em produção. Ver o mapa detalhado e a evidência de testes em `docs/design/INTELIGENCIA-ELEITORAL-UX-2026-10-08.md`.
+
+## 24. Implementação visual — IE-05.1
+
+A implementação inicial do dashboard está em validação na branch feat/ie-05-1-electoral-dashboard-foundation. A fatia substitui a apresentação antiga de perguntas por uma superfície analítica com contexto eleitoral, pesquisa autenticada de candidato, KPIs provenientes do runtime, evolução histórica, ranking territorial e chat flutuante que compartilha o resultado atual.
+
+A pesquisa utiliza a tabela de projeção existente electoral_analytics_candidates, sem criar catálogo paralelo. A seleção fica restrita ao ano escolhido, RS, Deputado Estadual e 1º turno. A mudança de ano limpa a seleção para exigir a escolha do registro correspondente à eleição e evitar confundir candidatos com números diferentes entre anos.
+
+Nenhum dado fictício foi incluído. O mapa permanece indisponível até IE-03.7 validar a cobertura territorial. Esta branch ainda precisa passar por lint, testes e build; a implementação não deve ser declarada concluída antes dessas evidências e do merge.
+

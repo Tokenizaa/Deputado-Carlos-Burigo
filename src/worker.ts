@@ -270,10 +270,49 @@ if (request.method !== 'POST') return methodNotAllowed();
       return Response.json({ error: 'Falha ao obter informações do usuário' }, { status: 500 });
     }
   },
+  '/api/admin/electoral/candidates': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'inteligencia-eleitoral', 'view'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+    if (request.method !== 'GET') return methodNotAllowed();
+
+    const url = new URL(request.url);
+    const query = (url.searchParams.get('q') ?? '').trim().replace(/[%,_()]/g, ' ').slice(0, 80);
+    const year = Number(url.searchParams.get('year'));
+    if (![2018, 2022, 2026].includes(year)) {
+      return Response.json({ error: 'Ano eleitoral inválido para o escopo atual.' }, { status: 400 });
+    }
+    if (query.length < 2) return Response.json({ candidates: [] });
+
+    try {
+      const baseQuery = supabaseAdmin
+        .from('electoral_analytics_candidates')
+        .select('year,candidate_number,candidate_name,votes,rank')
+        .eq('year', year);
+      const { data, error } = /^\d+$/.test(query)
+        ? await baseQuery.eq('candidate_number', Number(query)).order('candidate_name', { ascending: true }).limit(25)
+        : await baseQuery.ilike('candidate_name', `%${query}%`).order('candidate_name', { ascending: true }).limit(25);
+      if (error) throw error;
+      return Response.json({
+        candidates: (data ?? []).map((row) => ({
+          year: Number(row.year),
+          candidate_number: Number(row.candidate_number),
+          candidate_name: row.candidate_name ? String(row.candidate_name) : null,
+          votes: row.votes == null ? null : Number(row.votes),
+          rank: row.rank == null ? null : Number(row.rank),
+        })),
+      });
+    } catch (error) {
+      console.error('[api/admin/electoral/candidates]', error);
+      return Response.json({ error: 'Falha ao pesquisar candidatos eleitorais.' }, { status: 500 });
+    }
+  },
   '/api/admin/electoral/intelligence': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
-    if (!(await canEffective(authResult.userId, authResult.role, 'dashboard', 'view'))) {
+    if (!(await canEffective(authResult.userId, authResult.role, 'inteligencia-eleitoral', 'view'))) {
       return Response.json({ error: 'Acesso negado' }, { status: 403 });
     }
     if (request.method !== 'POST') return methodNotAllowed();
