@@ -270,6 +270,88 @@ if (request.method !== 'POST') return methodNotAllowed();
       return Response.json({ error: 'Falha ao obter informações do usuário' }, { status: 500 });
     }
   },
+  '/api/admin/electoral/investigations': async (request) => {
+    const authResult = await requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    if (!(await canEffective(authResult.userId, authResult.role, 'inteligencia-eleitoral', 'view'))) {
+      return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+
+    const columns = 'id,title,context,messages,summary,next_steps,status,created_at,updated_at';
+    if (request.method === 'GET') {
+      const { data, error } = await supabaseAdmin
+        .from('electoral_investigations')
+        .select(columns)
+        .eq('created_by', authResult.userId)
+        .order('updated_at', { ascending: false })
+        .limit(30);
+      if (error) {
+        console.error('[api/admin/electoral/investigations]', error);
+        return Response.json({ error: 'Não foi possível carregar o histórico de investigações.' }, { status: 500 });
+      }
+      return Response.json({ investigations: data ?? [] });
+    }
+
+    if (request.method !== 'POST') return methodNotAllowed();
+
+    try {
+      const body = await request.json();
+      const title = typeof body?.title === 'string' ? body.title.trim().slice(0, 160) : '';
+      const context = body?.context && typeof body.context === 'object' && !Array.isArray(body.context) ? body.context : null;
+      const rawMessages = Array.isArray(body?.messages) ? body.messages.slice(-80) : null;
+      const id = typeof body?.id === 'string' ? body.id : null;
+      if (!title || !context || !rawMessages) {
+        return Response.json({ error: 'title, context e messages são obrigatórios.' }, { status: 400 });
+      }
+      const messages = rawMessages.filter((message) =>
+        message &&
+        (message.role === 'user' || message.role === 'assistant') &&
+        typeof message.id === 'string' &&
+        typeof message.content === 'string' &&
+        message.content.length <= 5000 &&
+        typeof message.createdAt === 'string'
+      );
+      if (messages.length !== rawMessages.length || messages.length === 0) {
+        return Response.json({ error: 'A lista de mensagens contém itens inválidos.' }, { status: 400 });
+      }
+
+      const values = {
+        title,
+        context,
+        messages,
+        summary: typeof body?.summary === 'string' ? body.summary.slice(0, 4000) : '',
+        next_steps: Array.isArray(body?.next_steps)
+          ? body.next_steps.filter((step) => typeof step === 'string').slice(0, 10).map((step) => step.slice(0, 240))
+          : [],
+        status: body?.status === 'archived' ? 'archived' : 'active',
+        updated_at: new Date().toISOString(),
+      };
+
+      if (id) {
+        const { data, error } = await supabaseAdmin
+          .from('electoral_investigations')
+          .update(values)
+          .eq('id', id)
+          .eq('created_by', authResult.userId)
+          .select(columns)
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) return Response.json({ error: 'Investigação não encontrada ou sem acesso.' }, { status: 404 });
+        return Response.json({ investigation: data });
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('electoral_investigations')
+        .insert({ ...values, created_by: authResult.userId })
+        .select(columns)
+        .single();
+      if (error) throw error;
+      return Response.json({ investigation: data }, { status: 201 });
+    } catch (error) {
+      console.error('[api/admin/electoral/investigations]', error);
+      return Response.json({ error: 'Não foi possível salvar a investigação.' }, { status: 500 });
+    }
+  },
   '/api/admin/electoral/candidates': async (request) => {
     const authResult = await requireAuth(request);
     if (authResult instanceof Response) return authResult;
