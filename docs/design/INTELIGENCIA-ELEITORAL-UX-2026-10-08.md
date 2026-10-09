@@ -158,3 +158,7 @@ Esta implementação foi escrita na branch `feat/phase-9-benchmark-adaptation`. 
 
 
 As sugestões de continuidade são selecionadas por regras determinísticas a partir da intenção atual e aparecem no chat como ações para continuar a investigação existente. Elas não representam conclusões analíticas e não substituem a resposta do runtime.
+
+### Atualização visual do front-end — IE-05.2
+
+A tela recebeu uma atualização perceptível na hierarquia visual, sem trocar o shell administrativo: cabeçalho executivo em fundo escuro, metadados do recorte ativo em chips, indicadores com ícones e um painel de cobertura dos dados carregados. O painel mostra a quantidade de registros históricos e municípios retornados, e sinaliza a ausência de resultados sem inventar métricas. Os valores continuam vindo do runtime; o benchmark orienta a composição visual, não fornece dados ou cálculos. Esta mudança foi registrada na branch `feat/phase-9-benchmark-adaptation`; validação visual em navegador e checks automatizados continuam pendentes.
