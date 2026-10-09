@@ -728,14 +728,3 @@ export async function executeElectoralQuestion(
     limitations: [],
   };
 }
-
-
-
-export interface ElectoralQuestionParams {
-  year?: number;
-  from_year?: number;
-  to_year?: number;
-  candidate?: number | string;
-  municipality?: number | number[];
-  limit?: number;
-}
