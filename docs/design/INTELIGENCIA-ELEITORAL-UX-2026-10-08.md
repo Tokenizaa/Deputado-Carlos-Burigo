@@ -142,3 +142,16 @@ A alteração não adiciona valores de exemplo ao produto nem habilita mapa fict
 
 **Validação pendente:** executar lint, testes unitários, integração/API e build, revisar o fluxo de autenticação/RBAC e confirmar a consulta real no Supabase antes de considerar esta fatia concluída.
 
+
+
+## IE-05.2 — Dashboard analítico / drill-down municipal
+
+**Estado:** implementação inicial em branch, pendente de lint, testes, build e validação em produção.
+
+- O ranking de municípios permite abrir um detalhamento usando o identificador municipal retornado pelo runtime.
+- A consulta reutiliza o intent determinístico `overview.total_votes` e envia candidato, eleição e município no mesmo contexto.
+- Registros sem identificador municipal válido não permitem a ação; não se infere nem se inventa identificador.
+- O resultado continua sendo apresentado pelo componente de resultados existente, com método, evidências e limitações.
+- Nenhum mapa é habilitado: o gate IE-03.7 de cobertura territorial permanece vigente.
+
+Esta entrega é uma fatia da Fase 3, não declara a fase completa. A validação local e o teste do endpoint com sessão real são obrigatórios antes do merge/deploy.
