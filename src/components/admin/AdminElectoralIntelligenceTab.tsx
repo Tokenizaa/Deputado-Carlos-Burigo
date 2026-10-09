@@ -359,6 +359,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     };
     setLoading(true);
     setActiveQuestion(question);
+    setResponse(null);
     setMessage('');
     try {
       const data = await postElectoralQuestion('overview.total_votes', {
@@ -453,6 +454,11 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     };
     recognition.start();
   };
+
+  useEffect(() => {
+    if (!response || !activeQuestion?.label.startsWith('Detalhamento:')) return;
+    document.getElementById('electoral-intelligence-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [response, activeQuestion]);
 
   return (
     <section className="relative space-y-6 pb-20" aria-labelledby="electoral-intelligence-title">
@@ -584,7 +590,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           </section>
 
           {(loading || response) && (
-            <section className="rounded-2xl border border-stone-200 bg-white p-5" aria-live="polite">
+            <section id="electoral-intelligence-result" className="scroll-mt-6 rounded-2xl border border-stone-200 bg-white p-5" aria-live="polite">
               {loading ? <div className="flex min-h-36 items-center justify-center text-sm text-stone-600"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Consultando o runtime eleitoral…</div> : response ? <>
                 <div className="mb-5 flex flex-col gap-3 border-b border-stone-100 pb-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-700">{activeQuestion?.label || 'Análise'}</p><h3 className="mt-1 text-lg font-bold text-stone-950">{activeQuestion?.prompt}</h3></div><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCsv} disabled={response.status !== 'ok'} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Download className="h-4 w-4" />CSV</button><button type="button" onClick={printReport} disabled={response.status !== 'ok'} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Download className="h-4 w-4" />Relatório / PDF</button><button type="button" onClick={speakResult} disabled={response.status !== 'ok'} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 disabled:opacity-40"><Volume2 className="h-4 w-4" />Ouvir</button></div></div>
                 <ResultView response={response} />
