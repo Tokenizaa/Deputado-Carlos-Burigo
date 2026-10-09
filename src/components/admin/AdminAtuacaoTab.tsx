@@ -8,7 +8,10 @@ import { AdminAssetInput } from './AdminAssetInput';
 const DOCUMENT_TYPES = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO', 'INFORMATIVO'];
 const CATEGORIES = ['parlamentar', 'gabinete', 'comunicacao', 'outros'];
 const STATUSES = ['rascunho', 'publicado', 'arquivado'];
-const VISIBILITIES = ['publico', 'interno', 'restrito'];
+type DocumentVisibility = 'publico' | 'interno' | 'restrito';
+const VISIBILITIES: DocumentVisibility[] = ['publico', 'interno', 'restrito'];
+const isDocumentVisibility = (value: string): value is DocumentVisibility =>
+  VISIBILITIES.includes(value as DocumentVisibility);
 const DOCUMENT_TYPE_ORDER = ['TEXTO_JUSTIFICATIVA', 'PARECER', 'OFICIO', 'ANEXO', 'INFORMATIVO'];
 
 export const AdminAtuacaoTab: React.FC = () => {
@@ -28,7 +31,7 @@ export const AdminAtuacaoTab: React.FC = () => {
   const [category, setCategory] = useState('parlamentar');
   const [status, setStatus] = useState('publicado');
   const [tags, setTags] = useState('');
-  const [visibility, setVisibility] = useState<'publico' | 'interno' | 'restrito'>('publico');
+  const [visibility, setVisibility] = useState<DocumentVisibility>('publico');
   const [sourceName, setSourceName] = useState('');
   const [publishedAt, setPublishedAt] = useState('');
   const [notes, setNotes] = useState('');
@@ -140,7 +143,7 @@ export const AdminAtuacaoTab: React.FC = () => {
     setCategory(document.category || 'parlamentar');
     setStatus(document.status || 'publicado');
     setTags((document.tags || []).join(', '));
-    setVisibility(document.visibility || 'publico');
+    setVisibility(isDocumentVisibility(document.visibility || '') ? document.visibility as DocumentVisibility : 'publico');
     setSourceName(document.sourceName || '');
     setPublishedAt(document.publishedAt || '');
     setNotes(document.notes || '');
@@ -370,7 +373,7 @@ export const AdminAtuacaoTab: React.FC = () => {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label className="block text-xs font-bold text-stone-700">Categoria<select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
                 <label className="block text-xs font-bold text-stone-700">Status<select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-                <label className="block text-xs font-bold text-stone-700">Visibilidade<select value={visibility} onChange={(e) => setVisibility(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{VISIBILITIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <label className="block text-xs font-bold text-stone-700">Visibilidade<select value={visibility} onChange={(e) => { if (isDocumentVisibility(e.target.value)) setVisibility(e.target.value); }} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm">{VISIBILITIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
                 <label className="block text-xs font-bold text-stone-700">Data de publicação<input type="date" value={publishedAt} onChange={(e) => setPublishedAt(e.target.value)} className="mt-1 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></label>
               </div>
               <div><label className="mb-1 block text-xs font-bold text-stone-700">Tags</label><input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="ex.: PL, saúde, orçamento" className="w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm" /></div>
