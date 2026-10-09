@@ -28,7 +28,8 @@ describe('electoral investigation continuity', () => {
       office: 'Deputado Estadual' as const,
       round: 1 as const,
     };
-    expect(isSameInvestigationContext(base, { ...base, fromYear: 2018, toYear: 2026 })).toBe(true);
+    expect(isSameInvestigationContext(base, { ...base })).toBe(true);
+    expect(isSameInvestigationContext(base, { ...base, toYear: 2026 })).toBe(false);
     expect(isSameInvestigationContext(base, { ...base, year: 2018 })).toBe(false);
     expect(isSameInvestigationContext(base, { ...base, candidateNumber: 99999 })).toBe(false);
   });
