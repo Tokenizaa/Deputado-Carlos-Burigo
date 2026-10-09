@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  BarChart3, Bot, CalendarDays, ChevronRight, Download, Loader2, MapPin,
-  History, MessageSquare, Mic, Plus, Search, Send, ShieldCheck, UserRound, Volume2, X,
+  Award, BarChart3, Bot, CalendarDays, ChevronRight, Database, Download, Loader2, MapPin,
+  History, MessageSquare, Mic, Plus, Search, Send, ShieldCheck, Target, UserRound, Volume2, X,
 } from 'lucide-react';
 import {
   buildElectoralCsv,
