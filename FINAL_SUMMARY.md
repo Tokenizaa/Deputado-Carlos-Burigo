@@ -1,7 +1,7 @@
 # RESUMO FINAL DA MISSÃO DE PESQUISA E DOCUMENTAÇÃO
 
 ## Objetivo Concluído
-Completo todas as frentes de pesquisa solicitadas na Missão de Pesquisa e Documentação — Métodos Científicos, Inteligência Eleitoral e Visualização de Dados.
+Completo todas as frentes de pesquisa solicitadas na Missão de Pesquisa e Documentação — Métodos Científicos, Inteligência Eleitoral e Visualização de Dados, incluindo o contrato conceitual do modelo de dados conforme indicado na conclusão do documento fornecido pelo usuário.
 
 ## Documentos Criados/Atualizados
 
@@ -51,6 +51,18 @@ Completo todas as frentes de pesquisa solicitadas na Missão de Pesquisa e Docum
 - **Arquitetura de workspace e identidade visual**: Identidade visual como parte do contexto, regra de aplicação de identidade visual, exemplo de fluxo com identidade visual, benefícios desta abordagem
 - **Preparação para evolução futura (white label)**: Princípio de evolução gradual, separação obrigatória para preparação ao white label, exemplo de evolução para segundo cliente, indicadores de prontidão para white label
 - **Limitações da arquitetura proposta**: Limitações intencionais (por design) e limitações temporais (que podem ser evoluídas)
+
+### 7. FASE-9-MODELO-DADOS-E-ARQUITETURA.md (Nova criação - conforme indicado na conclusão)
+- **Definição funcional e metodológica**: O que a plataforma é e o que não é, princípio fundamental dos dados oficiais
+- **Fontes oficiais dos dados**: TSE como fonte primária, organização por finalidade, distinção entre dados de origem, normalizados e derivados
+- **Granularidade como decisão central**: Níveis de granularidade (município, zona, seção), tratamento de valores ausentes
+- **Arquitetura recomendada**: Local calcula, remoto serve (PostgreSQL local para análise, Supabase para serviço)
+- **Metodologia científica e confiabilidade**: Procedimento analítico explícito em 6 etapas
+- **Rastreabilidade e proveniência**: Mecanismos para reconstruir resultados a partir da origem
+- **Sequência correta para o projeto**: 6 etapas de trabalho antes da implementação
+- **Contrato conceitual do modelo de dados**: Entidades principais (Eleição, Candidato, Território, Resultado eleitoral, Proveniência) e relacionamentos
+- **Indicadores derivados e suas definições**: Requisitos para indicadores derivados, exemplos de indicadores padrão
+- **Limitações da arquitetura proposta**: Limitações intencionais e temporais
 
 ## Principais Conclusões da Pesquisa
 
@@ -149,7 +161,7 @@ Os documentos criados estão coerentes com:
 5. **Integração no ciclo de desenvolvimento**: Incorporar as especificações no planejamento e implementação das próximas fases
 
 ## Conclusão
-A missão de pesquisa e documentação foi concluída com sucesso. Os seis documentos solicitados foram criados/atualizados com conteúdo abrangente, fundamentado em pesquisas de referências profissionais e metodologias estabelecidas. A documentação produzida fornece uma base sólida para a implementação da Fase 9 da plataforma de Inteligência Eleitoral, garantindo que ela seja cientificamente rigorosa, visualmente eficaz, acessível e reutilizável por diferentes clientes e contextos de uso.
+A missão de pesquisa e documentação foi concluída com sucesso. Os sete documentos solicitados/indicados foram criados/atualizados com conteúdo abrangente, fundamentado em pesquisas de referências profissionais e metodologias estabelecidas. A documentação produzida fornece uma base sólida para a implementação da Fase 9 da plataforma de Inteligência Eleitoral, garantindo que ela seja cientificamente rigorosa, visualmente eficaz, acessível e reutilizável por diferentes clientes e contextos de uso.
 
 A plataforma agora possui:
 - Uma base metodológica clara para análise eleitoral
@@ -158,5 +170,6 @@ A plataforma agora possui:
 - Estruturas de relatórios profissionais e formatos de exportação adequados
 - Diretrizes para acesso multimodal e acessibilidade
 - Uma arquitetura reutilizável que suporta múltiplos clientes sem duplicação do motor analítico
+- Um contrato conceitual do modelo de dados que define claramente entidades, relacionamentos e proveniência
 
 Esta fundação permitirá que a Fase 9 seja implementada sobre o runtime fechado da Fase 8, mantendo a integridade analítica enquanto expande as capacidades de interação e apresentação da plataforma.
