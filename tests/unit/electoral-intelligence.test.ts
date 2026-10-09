@@ -11,7 +11,13 @@ vi.mock('../../server/supabase', () => ({
             data = data.filter((row) => row[field] === value);
             return builder;
           }),
-          order: vi.fn(async () => ({ data, error: null })),
+          order: vi.fn(() => builder),
+          range: vi.fn((from: number, to: number) => {
+            data = data.slice(from, to + 1);
+            return builder;
+          }),
+          then: (resolve: (value: { data: unknown[]; error: null }) => unknown, reject?: (reason: unknown) => unknown) =>
+            Promise.resolve({ data, error: null }).then(resolve, reject),
           maybeSingle: vi.fn(async () => ({ data: data[0] ?? null, error: null })),
         };
         return builder;
