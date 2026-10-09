@@ -11,7 +11,11 @@ import {
 } from '../../lib/electoral-report';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { createPresentationSpec } from '../../lib/electoral-presentation';
-import type { ElectoralRuntimeResponse } from '../../contracts/electoralRuntime';
+import type {
+  ElectoralQuestionParams,
+  ElectoralQuestionRequest,
+  ElectoralRuntimeResponse,
+} from '../../contracts/electoralRuntime';
 import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
@@ -232,11 +236,11 @@ async function getElectoralAuthHeaders(includeContentType = false): Promise<Reco
   };
 }
 
-async function postElectoralQuestion(questionId: string, params: Record<string, unknown>): Promise<RuntimeResponse> {
+async function postElectoralQuestion(questionId: string, params: ElectoralQuestionParams): Promise<RuntimeResponse> {
   const response = await fetch('/api/admin/electoral/intelligence', {
     method: 'POST',
     headers: await getElectoralAuthHeaders(true),
-    body: JSON.stringify({ questionId, params }),
+    body: JSON.stringify({ questionId, params } satisfies ElectoralQuestionRequest),
   });
   const data = await response.json().catch(() => ({})) as RuntimeResponse;
   if (!response.ok) throw new Error(data.error || 'Falha ao consultar a inteligência eleitoral.');
@@ -557,7 +561,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setActiveQuestion(question);
     setMessage('');
     try {
-      const params: Record<string, unknown> = {
+      const params: ElectoralQuestionParams = {
         candidate: selectedCandidate.candidate_number,
         candidate_name: selectedCandidate.candidate_name,
         candidate_year: selectedCandidate.year,
