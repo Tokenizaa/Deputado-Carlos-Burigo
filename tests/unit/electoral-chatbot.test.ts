@@ -43,3 +43,18 @@ describe('electoral investigation continuity', () => {
     expect(buildInvestigationTitle('  Como   evoluiu a votação?  ')).toBe('Como evoluiu a votação?');
   });
 });
+
+
+describe('electoral investigation follow-up suggestions', () => {
+  it('recommends relevant follow-up questions without invoking an LLM', async () => {
+    const { recommendNextQuestionIds } = await import('../../src/lib/electoral-investigations');
+    expect(recommendNextQuestionIds('history.total_evolution')).toEqual([
+      'history.trajectory',
+      'history.municipal_growth',
+    ]);
+    expect(recommendNextQuestionIds('unknown.intent')).toEqual([
+      'history.total_evolution',
+      'territory.top_rankings',
+    ]);
+  });
+});
