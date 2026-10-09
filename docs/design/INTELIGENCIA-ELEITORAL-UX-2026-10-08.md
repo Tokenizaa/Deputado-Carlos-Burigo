@@ -142,3 +142,16 @@ A alteração não adiciona valores de exemplo ao produto nem habilita mapa fict
 
 **Validação pendente:** executar lint, testes unitários, integração/API e build, revisar o fluxo de autenticação/RBAC e confirmar a consulta real no Supabase antes de considerar esta fatia concluída.
 
+
+
+## Implementação IE-05.2 — reaproveitamento orientado pelo benchmark (2026-10-09)
+
+O benchmark foi inspecionado como referência de interface, não como código-base. As visões `OverviewView`, `ComparisonView`, `PerformanceView`, `TerritorialView`, `SpatialView`, `ConcentrationView`, `ZonesSectionsView`, `MethodologyView` e `ReportsView` ajudam a identificar padrões de exploração, comparação, contexto e relatório. Porém, a implementação de referência utiliza `FilterContext` e dados de `mockElections`, com IDs/candidatos predefinidos e cálculos próprios. Esses dados e cálculos não devem ser transportados.
+
+No destino, foram preservados `AdminLayout`, `AdminWorkspace`, o runtime, os contratos e as consultas autenticadas. O chat recebeu histórico de investigações persistido no Supabase por meio da migração `20261009000000_electoral_investigations.sql` e das rotas protegidas `/api/admin/electoral/investigations`. Cada investigação armazena título, contexto eleitoral, mensagens, resumo, próximos passos e estado; leitura e atualização são restritas ao usuário proprietário e a usuários com permissão de acesso ao módulo.
+
+O painel de histórico permite retomar uma investigação, recuperar seu contexto e continuar adicionando perguntas relacionadas. O agrupamento usa candidato, eleição, UF, cargo e turno, evitando que cada pergunta gere uma conversa isolada. Uma mudança de candidato ou ano inicia um novo agrupamento na próxima pergunta. A resposta visual do chat usa o mesmo `ResultView` da página, com uma visualização de barras quando os dados retornados permitem.
+
+### Estado de validação
+
+Esta implementação foi escrita na branch `feat/phase-9-benchmark-adaptation`. A migração foi adicionada ao repositório, mas sua aplicação no Supabase ainda deve ser confirmada. Lint, testes, build, teste autenticado das rotas e validação visual em navegador permanecem pendentes. A cobertura territorial não foi ampliada e os mapas continuam bloqueados pelo gate IE-03.7.
