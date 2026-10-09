@@ -11,6 +11,7 @@ import {
 } from '../../lib/electoral-report';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { createPresentationSpec } from '../../lib/electoral-presentation';
+import type { ElectoralRuntimeResponse } from '../../contracts/electoralRuntime';
 import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
@@ -44,8 +45,6 @@ type SpeechRecognitionLike = {
   onend: (() => void) | null;
   onresult: ((event: { results?: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
 };
-import type { ElectoralRuntimeResponse } from '../../contracts/electoralRuntime';
-
 type RuntimeResponse = ElectoralRuntimeResponse;
 type CandidateSearchResponse = { candidates?: CandidateOption[]; error?: string };
 
