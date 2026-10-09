@@ -75,3 +75,26 @@ export function lastAssistantMessage(messages: ElectoralChatMessage[]): Electora
   }
   return null;
 }
+
+
+const NEXT_QUESTION_IDS: Record<string, string[]> = {
+  'overview.total_votes': ['history.total_evolution', 'territory.top_rankings'],
+  'overview.state_share': ['history.trajectory', 'competition.candidate_rank'],
+  'overview.municipalities_with_votes': ['territory.top_rankings', 'territory.concentration'],
+  'overview.best_municipality': ['territory.top_rankings', 'territory.concentration'],
+  'history.total_evolution': ['history.trajectory', 'history.municipal_growth'],
+  'history.trajectory': ['history.municipal_growth', 'history.municipal_decline'],
+  'history.municipal_growth': ['territory.concentration', 'competition.top_candidates'],
+  'history.municipal_decline': ['territory.concentration', 'competition.top_candidates'],
+  'territory.top_rankings': ['territory.concentration', 'history.municipal_growth'],
+  'territory.concentration': ['territory.regional_profile', 'competition.top_candidates'],
+  'territory.regional_profile': ['territory.concentration', 'competition.candidate_compare'],
+  'competition.top_candidates': ['competition.candidate_rank', 'competition.vote_gap'],
+  'competition.candidate_rank': ['competition.vote_gap', 'territory.top_rankings'],
+  'competition.vote_gap': ['competition.candidate_compare', 'history.trajectory'],
+  'competition.candidate_compare': ['competition.vote_gap', 'territory.top_rankings'],
+};
+
+export function recommendNextQuestionIds(questionId: string): string[] {
+  return [...(NEXT_QUESTION_IDS[questionId] ?? ['history.total_evolution', 'territory.top_rankings'])];
+}
