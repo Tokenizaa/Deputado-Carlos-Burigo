@@ -715,6 +715,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           {overviewLoading ? (
             <div className="flex min-h-36 items-center justify-center rounded-2xl border border-stone-200 bg-white text-sm text-stone-600"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Carregando dados reais do runtime…</div>
           ) : (
+            <>
             <div className="grid gap-px overflow-hidden rounded-2xl border border-stone-200 bg-stone-200 sm:grid-cols-2 xl:grid-cols-4">
               <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Votos nominais</p><BarChart3 className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{formatVotes(selectedSnapshot?.votes)}</p><p className="mt-1 text-xs text-stone-500">Eleição {selectedYear}</p></div>
               <div className="min-w-0 bg-white p-4 sm:p-5"><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-stone-500">Participação estadual</p><Target className="h-4 w-4 text-emerald-700" /></div><p className="mt-3 text-2xl font-black tracking-tight tabular-nums text-stone-950">{toFiniteNumber(selectedSnapshot?.sharePct) === null ? '—' : `${formatValue(selectedSnapshot?.sharePct)}%`}</p><p className="mt-1 text-xs text-stone-500">Sobre os votos nominais do cargo</p></div>
@@ -737,6 +738,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
                 <p className="text-xs text-stone-400">Resultado do ano</p><p className="mt-2 text-xl font-black">{selectedSnapshot ? 'Disponível' : '—'}</p><p className="mt-1 text-xs text-stone-400">{selectedSnapshot ? 'registro encontrado para o recorte' : 'sem registro compatível'}</p>
               </div>
             </section>
+            </>
           )}
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.8fr)]">
