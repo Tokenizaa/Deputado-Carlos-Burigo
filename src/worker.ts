@@ -279,27 +279,43 @@ if (request.method !== 'POST') return methodNotAllowed();
     if (request.method !== 'GET') return methodNotAllowed();
 
     const url = new URL(request.url);
-    const query = (url.searchParams.get('q') ?? '').trim().replace(/[%,_()]/g, ' ').slice(0, 80);
+    const rawQuery = (url.searchParams.get('q') ?? '').trim().slice(0, 80);
+    const query = rawQuery.replace(/[%,_()]/g, ' ').replace(/\s+/g, ' ').trim();
+    const normalizedQuery = query
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9 ]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const queryTerms = normalizedQuery.split(' ').filter(Boolean).slice(0, 8);
     const year = Number(url.searchParams.get('year'));
     if (![2018, 2022, 2026].includes(year)) {
       return Response.json({ error: 'Ano eleitoral inválido para o escopo atual.' }, { status: 400 });
     }
-    if (query.length < 2) return Response.json({ candidates: [] });
+    if (normalizedQuery.length < 2) return Response.json({ candidates: [] });
 
     try {
       const baseQuery = supabaseAdmin
         .from('electoral_analytics_candidates')
-        .select('year,candidate_number,candidate_name,votes,rank')
+        .select('year,candidate_number,candidate_name,ballot_name,votes,rank')
         .eq('year', year);
-      const { data, error } = /^\d+$/.test(query)
-        ? await baseQuery.eq('candidate_number', Number(query)).order('candidate_name', { ascending: true }).limit(25)
-        : await baseQuery.ilike('candidate_name', `%${query}%`).order('candidate_name', { ascending: true }).limit(25);
+      let searchQuery = baseQuery;
+      if (/^\d+$/.test(normalizedQuery)) {
+        searchQuery = searchQuery.eq('candidate_number', Number(normalizedQuery));
+      } else {
+        for (const term of queryTerms) {
+          searchQuery = searchQuery.or('candidate_name.ilike.%' + term + '%,ballot_name.ilike.%' + term + '%');
+        }
+      }
+      const { data, error } = await searchQuery
+        .order('candidate_name', { ascending: true })
+        .limit(25);
       if (error) throw error;
       return Response.json({
         candidates: (data ?? []).map((row) => ({
           year: Number(row.year),
           candidate_number: Number(row.candidate_number),
-          candidate_name: row.candidate_name ? String(row.candidate_name) : null,
+          candidate_name: row.candidate_name ? String(row.candidate_name) : row.ballot_name ? String(row.ballot_name) : null,
           votes: row.votes == null ? null : Number(row.votes),
           rank: row.rank == null ? null : Number(row.rank),
         })),
