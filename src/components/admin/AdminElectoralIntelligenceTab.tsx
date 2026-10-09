@@ -314,9 +314,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     : []).map(id => QUESTIONS.find(question => question.id === id)).filter((question): question is Question => Boolean(question));
 
   useEffect(() => {
-    if (!selectedCandidate) {
+    if (!selectedCandidate || fromYear > toYear) {
       setOverview(null);
       setTerritory(null);
+      setOverviewLoading(false);
       return;
     }
     let cancelled = false;
