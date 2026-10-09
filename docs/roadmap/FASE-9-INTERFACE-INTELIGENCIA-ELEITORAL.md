@@ -215,9 +215,7 @@ Esta lista é um inventário inicial para inspeção, não uma autorização par
 
 ### Critério de aceite desta diretriz
 
-Antes da próxima implementação funcional, deve existir uma comparação objetiva entre benchmark e destino, com os componentes e fluxos relevantes classificados por reaproveitamento, adaptação ou descarte. A implementação seguinte deve modificar o projeto Carlos Búrigo a partir do estado publicado e preservar as entregas existentes.
-
-**Estado:** diretriz documentada; a comparação detalhada e as alterações funcionais ainda precisam ser executadas e validadas. Esta atualização documental, isoladamente, não comprova implementação nem execução de testes.
+A comparação inicial entre benchmark e destino foi realizada e registrada na seção “Execução da Fase 9 — IE-05.2”. O inventário é inicial e deve ser refinado à medida que cada componente for integrado. As alterações funcionais estão na branch de trabalho e ainda precisam passar por validação.
 
 
 ## Execução da Fase 9 — IE-05.2 (em validação)
