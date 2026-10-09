@@ -47,9 +47,12 @@ export function isSameInvestigationContext(
     left &&
     left.candidateNumber === right.candidateNumber &&
     left.year === right.year &&
+    left.fromYear === right.fromYear &&
+    left.toYear === right.toYear &&
     left.uf === right.uf &&
     left.office === right.office &&
-    left.round === right.round,
+    left.round === right.round &&
+    left.competitor === right.competitor,
   );
 }
 
