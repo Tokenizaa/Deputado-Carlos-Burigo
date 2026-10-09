@@ -12,6 +12,7 @@ vi.mock('../../server/supabase', () => ({
             return builder;
           }),
           order: vi.fn(async () => ({ data, error: null })),
+          maybeSingle: vi.fn(async () => ({ data: data[0] ?? null, error: null })),
         };
         return builder;
       };
@@ -91,6 +92,35 @@ describe('electoral intelligence runtime — overview', () => {
       ],
       total: 16882390,
     });
+  });
+
+  it('returns the selected candidate votes for a municipality and election', async () => {
+    const result = await executeElectoralQuestion('overview.total_votes', {
+      candidate: 12345,
+      year: 2022,
+      municipality: 2,
+    });
+    expect(result.status).toBe('ok');
+    expect(result.result).toEqual({
+      candidate: 12345,
+      year: 2022,
+      municipality: 2,
+      municipalityName: 'Beta',
+      votes: 60000,
+      voteSharePct: 2,
+      municipalRank: 2,
+    });
+  });
+
+  it('does not turn a missing municipal record into zero votes', async () => {
+    const result = await executeElectoralQuestion('overview.total_votes', {
+      candidate: 12345,
+      year: 2026,
+      municipality: 3,
+    });
+    expect(result.status).toBe('insufficient_data');
+    expect((result.result as any).votes).toBeNull();
+    expect(result.limitations.join(' ')).toContain('ausência não é interpretada como zero');
   });
 
   it('executes overview.state_share with historical deltas and a stable candidate identity', async () => {
