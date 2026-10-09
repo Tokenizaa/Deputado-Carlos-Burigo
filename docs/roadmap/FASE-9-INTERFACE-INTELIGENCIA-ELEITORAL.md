@@ -1,8 +1,8 @@
 # Fase 9 — Interface da Inteligência Eleitoral
 
-**Status:** CONTRATOS TÉCNICOS FORMALIZADOS — implementação iniciada em blocos  
+**Status:** IMPLEMENTAÇÃO EM CURSO — integração visual e continuidade de investigações em validação  
 **Base:** Fases 0–8 e runtime determinístico eleitoral já publicados  
-**Última atualização:** 2026-10-08
+**Última atualização:** 2026-10-09
 
 ## Objetivo
 
@@ -218,3 +218,45 @@ Esta lista é um inventário inicial para inspeção, não uma autorização par
 Antes da próxima implementação funcional, deve existir uma comparação objetiva entre benchmark e destino, com os componentes e fluxos relevantes classificados por reaproveitamento, adaptação ou descarte. A implementação seguinte deve modificar o projeto Carlos Búrigo a partir do estado publicado e preservar as entregas existentes.
 
 **Estado:** diretriz documentada; a comparação detalhada e as alterações funcionais ainda precisam ser executadas e validadas. Esta atualização documental, isoladamente, não comprova implementação nem execução de testes.
+
+
+## Execução da Fase 9 — IE-05.2 (em validação)
+
+**Branch de trabalho:** `feat/phase-9-benchmark-adaptation`  
+**Base de código:** `main` no commit `937b72c40603a0d7b35e1c59f306aef6743f495e`.
+
+### Comparação inicial entre benchmark e destino
+
+A inspeção do benchmark confirmou padrões de experiência úteis, mas também mostrou que o estado de filtros e as visões de referência dependem de `mockElections`, IDs fixos e cálculos próprios da aplicação de referência. Portanto, os padrões de composição e interação podem orientar a adaptação, mas a camada de dados e os cálculos não devem ser copiados.
+
+| Referência | Decisão | Motivo |
+|---|---|---|
+| `OverviewView.tsx` | Adaptar o padrão de resumo, gráficos e rankings | O destino já possui indicadores, série histórica e ranking ligados ao runtime; ampliar sem duplicar a fonte de dados. |
+| `FilterContext.tsx` | Não copiar; reaproveitar somente o princípio de contexto sincronizado | A implementação de referência depende de dados mock e filtros/candidatos predefinidos. O destino mantém o contexto eleitoral canônico e seu escopo autorizado. |
+| `Sidebar.tsx` e `Header.tsx` | Não substituir | O projeto de destino já possui `AdminLayout`, `AdminWorkspace` e RBAC; alterar o shell seria duplicação. |
+| `GlobalFiltersModal.tsx` e `ActiveFiltersBar.tsx` | Adaptar padrões somente quando necessários aos filtros reais | Os filtros devem operar sobre os parâmetros suportados pelo runtime, não sobre campos exclusivos do benchmark. |
+| `ElectoralMapLeaflet.tsx` e `MunicipalitySectionInspector.tsx` | Bloqueados até validação de cobertura | O gate IE-03.7 continua obrigatório; não transportar dados geográficos de demonstração para a aplicação real. |
+| `MethodologyView.tsx` e `ReportsView.tsx` | Reaproveitar padrões de apresentação | O destino já possui metodologia, evidências, CSV, relatório imprimível e síntese de voz; a evolução deve consumir os resultados estruturados existentes. |
+| `electoralMath.ts` e `csvExport.ts` | Não copiar lógica | O runtime e os exportadores do destino são a fonte de verdade para cálculos e arquivos. |
+
+### Entregas desta implementação
+
+- Criada migração para `electoral_investigations`, com mensagens/contexto em JSONB, dono por usuário autenticado, índice por proprietário/data e RLS.
+- Adicionadas rotas autenticadas de listagem e gravação do histórico. A API verifica a permissão de visualização do módulo e restringe leitura/alteração ao proprietário da investigação.
+- Adicionadas funções puras para título, compatibilidade de contexto, concatenação sem duplicação e limite de mensagens.
+- O chat flutuante passou a listar investigações anteriores, retomá-las com o contexto guardado e iniciar uma investigação explicitamente nova.
+- Perguntas relacionadas ao mesmo candidato e eleição são agrupadas; mudar o candidato ou ano inicia outro agrupamento na próxima consulta, em vez de criar uma conversa por pergunta.
+- O resultado é persistido junto da mensagem do assistente e reapresentado pelo mesmo componente de resultado usado na tela. Uma falha ao salvar o histórico é informada sem apagar a análise executada.
+- O componente de resultado usa `createPresentationSpec` para identificar a família de apresentação e acrescenta uma representação de barras para séries com votos disponíveis. Os valores analíticos continuam vindo do runtime.
+- Foram adicionados testes unitários para agrupamento por contexto, deduplicação, limite de mensagens e título.
+
+### Pendências antes de considerar a fase concluída
+
+1. Executar `npm run lint`, testes unitários, integração/API e build na branch.
+2. Confirmar que a migração foi aplicada ao Supabase do ambiente alvo.
+3. Testar o ciclo real de listar, criar, atualizar e retomar investigações com usuários autenticados de diferentes permissões.
+4. Validar a coerência visual em navegador, incluindo responsividade e acessibilidade.
+5. Completar a integração geral dos artefatos do Presentation Contract e revisar os fluxos de exportação/voz com o mesmo resultado estruturado.
+6. Manter mapas bloqueados até a aprovação explícita do gate IE-03.7.
+
+**Estado honesto:** código e documentação foram alterados na branch; testes locais, execução da migração no Supabase e validação visual ainda não foram confirmados. Esta entrega não fecha toda a Fase 9.
