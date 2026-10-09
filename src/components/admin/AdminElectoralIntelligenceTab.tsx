@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   BarChart3, Bot, CalendarDays, ChevronRight, Download, Loader2, MapPin,
-  MessageSquare, Mic, Search, Send, ShieldCheck, UserRound, Volume2, X,
+  History, MessageSquare, Mic, Plus, Search, Send, ShieldCheck, UserRound, Volume2, X,
 } from 'lucide-react';
 import {
   buildElectoralCsv,
@@ -14,11 +14,21 @@ import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
   getElectionYearResult,
+  isElectoralYear,
   normalizeCandidateQuery,
   toFiniteNumber,
   type CandidateOption,
   type ElectoralYear,
 } from '../../lib/electoral-dashboard';
+import {
+  appendInvestigationMessages,
+  buildInvestigationTitle,
+  isSameInvestigationContext,
+  lastAssistantMessage,
+  type ElectoralChatMessage,
+  type ElectoralInvestigation,
+  type ElectoralInvestigationContext,
+} from '../../lib/electoral-investigations';
 
 type Area = 'overview' | 'history' | 'territory' | 'competition';
 type Question = { id: string; area: Area; label: string; prompt: string; needsCompetitor?: boolean };
@@ -202,6 +212,31 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [listening, setListening] = useState(false);
+  const [investigations, setInvestigations] = useState<ElectoralInvestigation[]>([]);
+  const [activeInvestigationId, setActiveInvestigationId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+  const [chatMessages, setChatMessages] = useState<ElectoralChatMessage[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setHistoryLoading(true);
+    void (async () => {
+      try {
+        const headers = await getElectoralAuthHeaders();
+        const result = await fetch('/api/admin/electoral/investigations', { headers });
+        const data = await result.json().catch(() => ({})) as { investigations?: ElectoralInvestigation[]; error?: string };
+        if (!result.ok) throw new Error(data.error || 'Não foi possível carregar o histórico.');
+        if (!cancelled) setInvestigations(Array.isArray(data.investigations) ? data.investigations : []);
+      } catch (error) {
+        if (!cancelled) setHistoryError(error instanceof Error ? error.message : 'Falha ao carregar o histórico.');
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const questions = useMemo(() => QUESTIONS.filter(question => question.area === area), [area]);
   const overviewResult = overview?.result as { byYear?: unknown } | undefined;
@@ -297,6 +332,8 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setCandidateResults([]);
     setResponse(null);
     setActiveQuestion(null);
+    setActiveInvestigationId(null);
+    setChatMessages([]);
     setMessage('');
   };
 
@@ -307,6 +344,8 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setCandidateResults([]);
     setResponse(null);
     setActiveQuestion(null);
+    setActiveInvestigationId(null);
+    setChatMessages([]);
     setMessage('O ano mudou. Selecione o candidato correspondente à eleição escolhida.');
   };
 
@@ -343,7 +382,82 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const runQuestion = async (question: Question) => {
+  const persistInvestigation = async (payload: {
+    id?: string;
+    title: string;
+    context: ElectoralInvestigationContext;
+    messages: ElectoralChatMessage[];
+    summary: string;
+  }) => {
+    const result = await fetch('/api/admin/electoral/investigations', {
+      method: 'POST',
+      headers: await getElectoralAuthHeaders(true),
+      body: JSON.stringify(payload),
+    });
+    const data = await result.json().catch(() => ({})) as { investigation?: ElectoralInvestigation; error?: string };
+    if (!result.ok || !data.investigation) throw new Error(data.error || 'Não foi possível salvar a investigação.');
+    const saved = data.investigation;
+    setActiveInvestigationId(saved.id);
+    setInvestigations(current => [saved, ...current.filter(item => item.id !== saved.id)].slice(0, 30));
+    return saved;
+  };
+
+  const resumeInvestigation = (investigation: ElectoralInvestigation) => {
+    const context = investigation.context;
+    if (!context || !isElectoralYear(Number(context.year)) || !Number.isInteger(Number(context.candidateNumber))) {
+      setHistoryError('Esta investigação tem um contexto incompleto e não pode ser retomada com segurança.');
+      return;
+    }
+    setSelectedYear(Number(context.year) as ElectoralYear);
+    setFromYear(isElectoralYear(Number(context.fromYear)) ? Number(context.fromYear) as ElectoralYear : 2018);
+    setToYear(isElectoralYear(Number(context.toYear)) ? Number(context.toYear) as ElectoralYear : Number(context.year) as ElectoralYear);
+    setSelectedCandidate({
+      year: Number(context.year),
+      candidate_number: Number(context.candidateNumber),
+      candidate_name: context.candidateName || null,
+      votes: null,
+      rank: null,
+    });
+    setCompetitor(context.competitor ? String(context.competitor) : '');
+    setActiveInvestigationId(investigation.id);
+    setChatMessages(Array.isArray(investigation.messages) ? investigation.messages : []);
+    const last = lastAssistantMessage(Array.isArray(investigation.messages) ? investigation.messages : []);
+    setResponse(last?.response as RuntimeResponse | undefined ?? null);
+    setActiveQuestion(QUESTIONS.find(question => question.id === last?.questionId) ?? null);
+    setHistoryOpen(false);
+    setHistoryError('');
+    setChatOpen(true);
+    setMessage('Investigação retomada. Continue perguntando para manter o mesmo histórico.');
+  };
+
+  const startNewInvestigation = () => {
+    setActiveInvestigationId(null);
+    setChatMessages([]);
+    setResponse(null);
+    setActiveQuestion(null);
+    setChatInput('');
+    setHistoryOpen(false);
+    setHistoryError('');
+    setMessage('Nova investigação. As próximas perguntas relacionadas serão agrupadas nesta conversa.');
+  };
+
+  const createChatMessage = (
+    role: 'user' | 'assistant',
+    content: string,
+    questionId: string,
+    messageResponse?: RuntimeResponse,
+  ): ElectoralChatMessage => ({
+    id: typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    role,
+    content,
+    questionId,
+    ...(messageResponse ? { response: messageResponse } : {}),
+    createdAt: new Date().toISOString(),
+  });
+
+  const runQuestion = async (question: Question, questionText = question.prompt) => {
     if (!selectedCandidate) {
       setMessage('Selecione um candidato antes de consultar uma análise.');
       setCandidateModalOpen(true);
@@ -357,6 +471,22 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
       setMessage('O ano inicial da comparação precisa ser menor ou igual ao ano final.');
       return;
     }
+    const context: ElectoralInvestigationContext = {
+      candidateNumber: selectedCandidate.candidate_number,
+      candidateName: selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`,
+      year: selectedYear,
+      fromYear,
+      toYear,
+      uf: 'RS',
+      office: 'Deputado Estadual',
+      round: 1,
+      ...(question.needsCompetitor ? { competitor: Number(competitor) } : {}),
+    };
+    const current = investigations.find(item => item.id === activeInvestigationId);
+    const target = current && isSameInvestigationContext(current.context, context) ? current : null;
+    const userMessage = createChatMessage('user', questionText.trim() || question.prompt, question.id);
+    const pendingMessages = appendInvestigationMessages(target ? chatMessages : [], [userMessage]);
+    setChatMessages(pendingMessages);
     setLoading(true);
     setActiveQuestion(question);
     setMessage('');
@@ -371,10 +501,32 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
         limit: 10,
       };
       if (question.needsCompetitor) params.competitor = Number(competitor);
-      const data = await postElectoralQuestion(question.id, params);
+      let data: RuntimeResponse;
+      try {
+        data = await postElectoralQuestion(question.id, params);
+      } catch (error) {
+        data = { status: 'error', error: error instanceof Error ? error.message : 'Falha ao consultar a inteligência eleitoral.' };
+      }
       setResponse(data);
-    } catch (error) {
-      setResponse({ status: 'error', error: error instanceof Error ? error.message : 'Falha ao consultar a inteligência eleitoral.' });
+      const assistantText = data.status === 'ok'
+        ? `Análise concluída: ${question.prompt}`
+        : data.error || (data.limitations || []).join(' ') || 'A análise não retornou dados suficientes para este recorte.';
+      const assistantMessage = createChatMessage('assistant', assistantText, question.id, data);
+      const completeMessages = appendInvestigationMessages(pendingMessages, [assistantMessage]);
+      setChatMessages(completeMessages);
+      try {
+        await persistInvestigation({
+          ...(target ? { id: target.id } : {}),
+          title: target?.title || buildInvestigationTitle(questionText || question.prompt),
+          context,
+          messages: completeMessages,
+          summary: assistantText,
+        });
+      } catch (error) {
+        setMessage(error instanceof Error
+          ? `A análise foi executada, mas o histórico não foi salvo: ${error.message}`
+          : 'A análise foi executada, mas o histórico não foi salvo.');
+      }
     } finally {
       setLoading(false);
     }
@@ -382,13 +534,14 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
 
   const askChat = async (event: React.FormEvent) => {
     event.preventDefault();
-    const question = resolveElectoralQuestion(chatInput);
+    const text = chatInput.trim();
+    const question = resolveElectoralQuestion(text);
     if (!question) {
       setMessage('Não identifiquei a análise. Escolha uma opção do painel ou reformule a pergunta.');
       return;
     }
     setChatInput('');
-    await runQuestion(question);
+    await runQuestion(question, text);
   };
 
   const startVoiceQuestion = () => {
@@ -414,7 +567,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
         setMessage('Não identifiquei a análise. Reformule a pergunta ou escolha uma opção do painel.');
         return;
       }
-      void runQuestion(question);
+      void runQuestion(question, transcript);
     };
     recognition.start();
   };
@@ -560,10 +713,24 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
       )}
 
       <button type="button" onClick={() => setChatOpen(open => !open)} aria-expanded={chatOpen} aria-label={chatOpen ? 'Fechar chat eleitoral' : 'Abrir chat eleitoral'} className="fixed bottom-5 right-5 z-40 inline-flex min-h-12 items-center gap-2 rounded-full bg-emerald-800 px-5 text-sm font-bold text-white shadow-lg hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"><MessageSquare className="h-4 w-4" />Investigar{chatOpen ? <X className="h-4 w-4" /> : null}</button>
-      {chatOpen && <aside className="fixed bottom-20 right-4 z-40 flex max-h-[min(70vh,620px)] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl" aria-label="Chat de investigação eleitoral">
-        <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3"><div className="flex items-center gap-2"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-800"><Bot className="h-4 w-4" /></span><span><strong className="block text-sm text-stone-900">Investigação eleitoral</strong><span className="block text-[11px] text-stone-500">{selectedCandidate ? `${selectedCandidate.candidate_name || selectedCandidate.candidate_number} · ${selectedYear}` : 'Selecione um candidato para começar'}</span></span></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Fechar chat" className="rounded-lg p-2 text-stone-500 hover:bg-stone-100"><X className="h-4 w-4" /></button></header>
-        <div className="flex-1 overflow-y-auto p-4"><p className="text-sm leading-6 text-stone-600">Pergunte sobre votos, evolução, municípios ou concorrência. O chat usa o mesmo candidato e os mesmos filtros do painel.</p>{!selectedCandidate && <button type="button" onClick={() => { setChatOpen(false); setCandidateModalOpen(true); }} className="mt-3 min-h-10 rounded-lg bg-emerald-700 px-3 text-xs font-bold text-white">Selecionar candidato</button>}{response && <div className="mt-4 border-t border-stone-200 pt-4"><p className="mb-3 text-xs font-bold uppercase tracking-wide text-emerald-800">{activeQuestion?.label || "Resultado atual"}</p><ResultView response={response} /></div>}</div>
-        <form onSubmit={askChat} className="border-t border-stone-200 p-3"><label htmlFor="electoral-chat-input" className="sr-only">Pergunta eleitoral</label><div className="flex gap-2"><input id="electoral-chat-input" value={chatInput} onChange={event => setChatInput(event.target.value)} placeholder="Ex.: como evoluiu a votação?" className="min-h-11 min-w-0 flex-1 rounded-xl border border-stone-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600" /><button type="button" onClick={startVoiceQuestion} disabled={listening || !canUseSpeechRecognition()} title={canUseSpeechRecognition() ? 'Perguntar por voz' : 'Voz não suportada'} aria-label="Perguntar por voz" className="min-h-11 rounded-xl border border-stone-300 px-3 text-stone-700 disabled:opacity-40"><Mic className="h-4 w-4" /></button><button type="submit" aria-label="Enviar pergunta" className="min-h-11 rounded-xl bg-emerald-700 px-3 text-white hover:bg-emerald-800"><Send className="h-4 w-4" /></button></div></form>
+      {chatOpen && <aside className="fixed bottom-20 right-4 z-40 flex max-h-[min(78vh,720px)] w-[min(460px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl" aria-label="Chat de investigação eleitoral">
+        <header className="flex items-center justify-between gap-2 border-b border-stone-200 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-2"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-800"><Bot className="h-4 w-4" /></span><span className="min-w-0"><strong className="block text-sm text-stone-900">Investigação eleitoral</strong><span className="block truncate text-[11px] text-stone-500">{selectedCandidate ? `${selectedCandidate.candidate_name || selectedCandidate.candidate_number} · ${selectedYear}` : 'Selecione um candidato para começar'}</span></span></div>
+          <div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => setHistoryOpen(open => !open)} aria-expanded={historyOpen} aria-label="Abrir histórico de investigações" title="Histórico" className="rounded-lg p-2 text-stone-600 hover:bg-stone-100"><History className="h-4 w-4" /></button><button type="button" onClick={startNewInvestigation} aria-label="Nova investigação" title="Nova investigação" className="rounded-lg p-2 text-stone-600 hover:bg-stone-100"><Plus className="h-4 w-4" /></button><button type="button" onClick={() => setChatOpen(false)} aria-label="Fechar chat" className="rounded-lg p-2 text-stone-500 hover:bg-stone-100"><X className="h-4 w-4" /></button></div>
+        </header>
+        {historyOpen ? <div className="flex-1 overflow-y-auto p-3">
+          <div className="mb-3 flex items-center justify-between"><h3 className="text-sm font-bold text-stone-900">Investigações anteriores</h3><button type="button" onClick={startNewInvestigation} className="text-xs font-bold text-emerald-800">Nova</button></div>
+          {historyLoading && <p className="p-3 text-sm text-stone-500">Carregando histórico…</p>}
+          {historyError && <p role="status" className="mb-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">{historyError}</p>}
+          {!historyLoading && !investigations.length && <p className="rounded-xl bg-stone-50 p-4 text-sm text-stone-600">As investigações salvas aparecerão aqui. Perguntas relacionadas permanecem na mesma investigação.</p>}
+          <div className="space-y-2">{investigations.map(item => <button key={item.id} type="button" onClick={() => resumeInvestigation(item)} className={`block w-full rounded-xl border p-3 text-left hover:border-emerald-600 hover:bg-emerald-50/40 ${activeInvestigationId === item.id ? 'border-emerald-700 bg-emerald-50' : 'border-stone-200 bg-white'}`}><strong className="block text-sm text-stone-900">{item.title}</strong><span className="mt-1 block text-xs text-stone-500">{item.context?.candidateName || 'Candidato'} · {item.context?.year || 'Ano não informado'} · {(item.messages || []).length} mensagens</span><span className="mt-1 block text-[11px] text-stone-400">{item.updated_at ? new Date(item.updated_at).toLocaleString('pt-BR') : ''}</span></button>)}</div>
+        </div> : <div className="flex-1 overflow-y-auto p-4">
+          {historyError && <p role="status" className="mb-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">{historyError}</p>}
+          {!chatMessages.length && <><p className="text-sm leading-6 text-stone-600">Pergunte sobre votos, evolução, municípios ou concorrência. As perguntas relacionadas ficam na mesma investigação, que você pode retomar pelo histórico.</p>{!selectedCandidate && <button type="button" onClick={() => { setChatOpen(false); setCandidateModalOpen(true); }} className="mt-3 min-h-10 rounded-lg bg-emerald-700 px-3 text-xs font-bold text-white">Selecionar candidato</button>}</>}
+          <div className="space-y-4">{chatMessages.map(item => <div key={item.id} className={item.role === 'user' ? 'ml-8 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-950' : 'mr-2 min-w-0 rounded-xl border border-stone-200 bg-white p-3 text-sm text-stone-800'}><p className="whitespace-pre-wrap leading-6">{item.content}</p>{item.role === 'assistant' && item.response && <div className="mt-3 border-t border-stone-100 pt-3"><ResultView response={item.response as RuntimeResponse} /></div>}</div>)}</div>
+          {loading && <p className="mt-4 flex items-center text-xs text-stone-500"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Consultando o runtime eleitoral…</p>}
+        </div>}
+        {!historyOpen && <form onSubmit={askChat} className="border-t border-stone-200 p-3"><label htmlFor="electoral-chat-input" className="sr-only">Pergunta eleitoral</label><div className="flex gap-2"><input id="electoral-chat-input" value={chatInput} onChange={event => setChatInput(event.target.value)} placeholder="Continue esta investigação…" className="min-h-11 min-w-0 flex-1 rounded-xl border border-stone-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600" /><button type="button" onClick={startVoiceQuestion} disabled={listening || !canUseSpeechRecognition()} title={canUseSpeechRecognition() ? 'Perguntar por voz' : 'Voz não suportada'} aria-label="Perguntar por voz" className="min-h-11 rounded-xl border border-stone-300 px-3 text-stone-700 disabled:opacity-40"><Mic className="h-4 w-4" /></button><button type="submit" disabled={loading} aria-label="Enviar pergunta" className="min-h-11 rounded-xl bg-emerald-700 px-3 text-white hover:bg-emerald-800 disabled:opacity-40"><Send className="h-4 w-4" /></button></div></form>}
       </aside>}
 
       {candidateModalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCandidateModalOpen(false); }}>
