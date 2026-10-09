@@ -71,36 +71,12 @@ const RUNTIME_IMPLEMENTED = new Set([
   'competition.low_competition', 'competition.regional_competition',
 ]);
 
-type ElectoralResponse = {
-  status: 'ok' | 'error' | 'pending' | 'insufficient_data';
-  question: string;
-  intent: string;
-  agent: string;
-  skills: string[];
-  method: string;
-  function: string;
-  scope: {
-    office: 'Deputado Estadual';
-    uf: 'RS';
-    round: 1;
-    years: number[];
-  };
-  result: unknown;
-  evidence: string[];
-  limitations: string[];
-};
+import type {
+  ElectoralQuestionParams,
+  ElectoralRuntimeResponse,
+} from '../src/contracts/electoralRuntime';
 
-export interface ElectoralQuestionParams {
-  year?: number;
-  from_year?: number;
-  to_year?: number;
-  candidate?: number | string;
-  candidate_name?: string;
-  candidate_year?: number;
-  competitor?: number | string;
-  municipality?: number | number[];
-  limit?: number;
-}
+type ElectoralResponse = ElectoralRuntimeResponse;
 
 export async function executeElectoralQuestion(
   questionId: string,
