@@ -718,6 +718,63 @@ export async function executeElectoralQuestion(
     return {status:'ok',question:questionId,intent:plan.intent_id,agent:plan.agent,skills:plan.skills,method:plan.method,function:plan.function,scope:{office:'Deputado Estadual',uf:'RS',round:1,years:[2018,2022,2026]},result,evidence:[...plan.evidence,'Supabase analytical projection','IBGE RGI 2024'],limitations:['Índices compostos são descritivos, determinísticos e versionados; não representam causalidade nem recomendação política.']};
   }
 
+  if (questionId === 'overview.total_votes' && params.municipality !== undefined) {
+    const candidateNumber = Number(params.candidate);
+    const year = Number(params.year);
+    const municipalityCode = Number(params.municipality);
+    if (!Number.isInteger(candidateNumber) || candidateNumber <= 0) {
+      throw new Error('candidate é obrigatório para detalhar votos por município.');
+    }
+    if (!Number.isInteger(year) || year <= 0) {
+      throw new Error('year é obrigatório para detalhar votos por município.');
+    }
+    if (!Number.isInteger(municipalityCode) || municipalityCode <= 0 || Array.isArray(params.municipality)) {
+      throw new Error('municipality deve conter um único código municipal válido.');
+    }
+
+    const { data: municipalVote, error: municipalVoteError } = await supabaseAdmin
+      .from('electoral_analytics_candidate_municipal')
+      .select('year,municipality_code,candidate_number,votes,vote_share,candidate_rank')
+      .eq('year', year)
+      .eq('candidate_number', candidateNumber)
+      .eq('municipality_code', municipalityCode)
+      .maybeSingle();
+    if (municipalVoteError) throw municipalVoteError;
+
+    const { data: municipalityRecord, error: municipalityRecordError } = await supabaseAdmin
+      .from('electoral_analytics_municipalities')
+      .select('year,municipality_code,municipality_name')
+      .eq('year', year)
+      .eq('municipality_code', municipalityCode)
+      .maybeSingle();
+    if (municipalityRecordError) throw municipalityRecordError;
+
+    const hasRecord = municipalVote !== null;
+    return {
+      status: hasRecord ? 'ok' : 'insufficient_data',
+      question: questionId,
+      intent: plan.intent_id,
+      agent: plan.agent,
+      skills: plan.skills,
+      method: plan.method,
+      function: plan.function,
+      scope: { office: 'Deputado Estadual', uf: 'RS', round: 1, years: [year] },
+      result: {
+        candidate: candidateNumber,
+        year,
+        municipality: municipalityCode,
+        municipalityName: municipalityRecord?.municipality_name ?? null,
+        votes: hasRecord ? Number(municipalVote.votes) : null,
+        voteSharePct: hasRecord && municipalVote.vote_share !== null ? Number(municipalVote.vote_share) : null,
+        municipalRank: hasRecord && municipalVote.candidate_rank !== null ? Number(municipalVote.candidate_rank) : null,
+      },
+      evidence: [...plan.evidence, 'Supabase analytical projection: electoral_analytics_candidate_municipal'],
+      limitations: hasRecord
+        ? ['O resultado corresponde aos votos nominais do candidato no município e ano selecionados.']
+        : ['Não foi encontrado registro compatível para candidato, município e ano; ausência não é interpretada como zero.'],
+    };
+  }
+
   const { data, error } = await supabaseAdmin
     .from('electoral_analytics_elections')
     .select('year,uf,office_name,round,total_nominal_votes,municipalities,candidates')
