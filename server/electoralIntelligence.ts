@@ -95,6 +95,8 @@ export interface ElectoralQuestionParams {
   from_year?: number;
   to_year?: number;
   candidate?: number | string;
+  candidate_name?: string;
+  candidate_year?: number;
   competitor?: number | string;
   municipality?: number | number[];
   limit?: number;
