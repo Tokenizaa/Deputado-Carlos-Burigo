@@ -303,6 +303,18 @@ if (request.method !== 'POST') return methodNotAllowed();
       if (!title || !context || !rawMessages) {
         return Response.json({ error: 'title, context e messages são obrigatórios.' }, { status: 400 });
       }
+      const contextIsValid =
+        [2018, 2022, 2026].includes(Number(context.year)) &&
+        Number.isInteger(Number(context.candidateNumber)) &&
+        Number(context.candidateNumber) > 0 &&
+        [2018, 2022, 2026].includes(Number(context.fromYear)) &&
+        [2018, 2022, 2026].includes(Number(context.toYear)) &&
+        context.uf === 'RS' &&
+        context.office === 'Deputado Estadual' &&
+        Number(context.round) === 1;
+      if (!contextIsValid) {
+        return Response.json({ error: 'O contexto eleitoral da investigação é inválido para o escopo habilitado.' }, { status: 400 });
+      }
       const messages = rawMessages.filter((message) =>
         message &&
         (message.role === 'user' || message.role === 'assistant') &&
