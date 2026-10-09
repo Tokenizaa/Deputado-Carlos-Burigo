@@ -225,7 +225,13 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setOverviewLoading(true);
     setMessage('');
     Promise.all([
-      postElectoralQuestion('overview.state_share', { candidate: selectedCandidate.candidate_number, limit: 10 }),
+      postElectoralQuestion('overview.state_share', {
+        candidate: selectedCandidate.candidate_number,
+        candidate_name: selectedCandidate.candidate_name,
+        candidate_year: selectedCandidate.year,
+        year: selectedYear,
+        limit: 10,
+      }),
       postElectoralQuestion('territory.top_rankings', { candidate: selectedCandidate.candidate_number, year: selectedYear, limit: 10 }),
     ]).then(([overviewResponse, territoryResponse]) => {
       if (cancelled) return;
@@ -357,6 +363,8 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     try {
       const params: Record<string, unknown> = {
         candidate: selectedCandidate.candidate_number,
+        candidate_name: selectedCandidate.candidate_name,
+        candidate_year: selectedCandidate.year,
         year: selectedYear,
         from_year: fromYear,
         to_year: toYear,
@@ -484,10 +492,38 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
               {historicalRows.length ? (
                 <div className="mt-5 space-y-4">
                   {historicalRows.map(row => {
-                    const votes = toFiniteNumber(row.votes) ?? 0;
-                    const width = maxHistoricalVotes > 0 ? Math.max(2, (votes / maxHistoricalVotes) * 100) : 0;
-                    return <div key={String(row.year)}><div className="mb-1.5 flex items-baseline justify-between gap-3 text-xs"><span className="font-bold text-stone-700">{formatValue(row.year)}</span><span className="font-semibold tabular-nums text-stone-900">{formatVotes(votes)} votos</span></div><div className="h-2.5 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-emerald-700" style={{ width: `${width}%` }} /></div></div>;
+                    const votes = toFiniteNumber(row.votes);
+                    const width = votes !== null && maxHistoricalVotes > 0 ? Math.max(2, (votes / maxHistoricalVotes) * 100) : 0;
+                    return <div key={String(row.year)}><div className="mb-1.5 flex items-baseline justify-between gap-3 text-xs"><span className="font-bold text-stone-700">{formatValue(row.year)}</span><span className="font-semibold tabular-nums text-stone-900">{votes === null ? 'Sem registro compatível' : `${formatVotes(votes)} votos`}</span></div><div className="h-2.5 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-emerald-700" style={{ width: `${width}%` }} /></div></div>;
                   })}
+                </div>
+                <div className="mt-6 overflow-x-auto border-t border-stone-100 pt-4">
+                  <h4 className="mb-2 text-sm font-bold text-stone-900">Comparação entre eleições</h4>
+                  <p className="mb-3 text-xs text-stone-500">As variações são calculadas no runtime. Δ posição positivo indica subida no ranking; Δ participação é expresso em pontos percentuais.</p>
+                  <table className="w-full min-w-[760px] text-left text-xs">
+                    <thead className="bg-stone-50 text-stone-500"><tr>
+                      <th className="px-3 py-2">Ano</th><th className="px-3 py-2">Votos</th><th className="px-3 py-2">Δ votos</th>
+                      <th className="px-3 py-2">Δ votos %</th><th className="px-3 py-2">Participação</th><th className="px-3 py-2">Δ participação</th>
+                      <th className="px-3 py-2">Posição</th><th className="px-3 py-2">Δ posição</th>
+                    </tr></thead>
+                    <tbody>{historicalRows.map(row => {
+                      const signed = (value: unknown, suffix = '') => {
+                        const number = toFiniteNumber(value);
+                        if (number === null) return '—';
+                        return `${number > 0 ? '+' : ''}${formatValue(number)}${suffix}`;
+                      };
+                      return <tr key={String(row.year)} className="border-t border-stone-100">
+                        <td className="px-3 py-2 font-bold">{formatValue(row.year)}</td>
+                        <td className="px-3 py-2 tabular-nums">{row.votes === null ? 'Sem dado' : formatVotes(row.votes)}</td>
+                        <td className="px-3 py-2 tabular-nums">{signed(row.absoluteChange)}</td>
+                        <td className="px-3 py-2 tabular-nums">{signed(row.percentChange, '%')}</td>
+                        <td className="px-3 py-2 tabular-nums">{row.sharePct == null ? '—' : `${formatValue(row.sharePct)}%`}</td>
+                        <td className="px-3 py-2 tabular-nums">{signed(row.shareChangePp, ' p.p.')}</td>
+                        <td className="px-3 py-2 tabular-nums">{formatValue(row.rank)}</td>
+                        <td className="px-3 py-2 tabular-nums">{signed(row.rankChange)}</td>
+                      </tr>;
+                    })}</tbody>
+                  </table>
                 </div>
               ) : <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">A série histórica não está disponível para este candidato na projeção atual.</p>}
             </section>
