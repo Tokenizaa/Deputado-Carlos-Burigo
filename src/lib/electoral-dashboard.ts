@@ -62,8 +62,10 @@ export function filterHistoricalRows(
   return rows.filter((row): row is ElectionYearResult => {
     if (!row || typeof row !== 'object') return false;
     const record = row as Record<string, unknown>;
-    if (toFiniteNumber(record.votes) === null) return false;
-    if (expectedName) return typeof record.candidateName === 'string' && normalizeName(record.candidateName) === expectedName;
+    if (toFiniteNumber(record.year) === null) return false;
+    if (expectedName && typeof record.candidateName === 'string') {
+      return normalizeName(record.candidateName) === expectedName;
+    }
     return Number(record.candidate) === candidateNumber;
   });
 }

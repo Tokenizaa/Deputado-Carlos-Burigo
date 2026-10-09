@@ -95,6 +95,8 @@ export interface ElectoralQuestionParams {
   from_year?: number;
   to_year?: number;
   candidate?: number | string;
+  candidate_name?: string;
+  candidate_year?: number;
   competitor?: number | string;
   municipality?: number | number[];
   limit?: number;
@@ -149,24 +151,61 @@ export async function executeElectoralQuestion(
     const { data: candidateRows, error: candidateError } = await supabaseAdmin
       .from('electoral_analytics_candidates')
       .select('year,candidate_number,candidate_name,votes,vote_share,rank')
-      .eq('candidate_number', candidateNumber)
       .order('year', { ascending: true });
     if (candidateError) throw candidateError;
 
     const elections = electionRows ?? [];
     const candidates = candidateRows ?? [];
-    const byYear = elections.map((election) => {
-      const candidate = candidates.find((row) => Number(row.year) === Number(election.year));
-      const votes = candidate ? Number(candidate.votes) : 0;
+    const candidateYear = Number(params.candidate_year) || Number(params.year) || Number(elections[0]?.year);
+    const selectedRecord = candidates.find((row) =>
+      Number(row.year) === candidateYear && Number(row.candidate_number) === candidateNumber
+    );
+    const normalizeCandidateName = (value: unknown) => String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+    const expectedName = normalizeCandidateName(params.candidate_name ?? selectedRecord?.candidate_name);
+    const matchingCandidates = candidates.filter((row) => {
+      if (expectedName) return normalizeCandidateName(row.candidate_name) === expectedName;
+      return Number(row.candidate_number) === candidateNumber;
+    });
+    const byYear = elections.map((election, index) => {
+      const year = Number(election.year);
+      const candidate = matchingCandidates.find((row) => Number(row.year) === year);
+      const previousElection = index > 0 ? elections[index - 1] : null;
+      const previous = previousElection
+        ? matchingCandidates.find((row) => Number(row.year) === Number(previousElection.year))
+        : null;
+      const votes = candidate ? Number(candidate.votes) : null;
+      const previousVotes = previous ? Number(previous.votes) : null;
       const totalVotes = Number(election.total_nominal_votes);
+      const sharePct = candidate
+        ? (totalVotes === 0 ? null : (Number(candidate.votes) / totalVotes) * 100)
+        : null;
+      const previousSharePct = previous && previousElection && Number(previousElection.total_nominal_votes) > 0
+        ? (Number(previous.votes) / Number(previousElection.total_nominal_votes)) * 100
+        : null;
       return {
-        year: Number(election.year),
-        candidate: candidateNumber,
+        year,
+        candidate: candidate ? Number(candidate.candidate_number) : candidateNumber,
         candidateName: candidate?.candidate_name ?? null,
         votes,
         totalVotes,
-        sharePct: totalVotes === 0 ? null : (votes / totalVotes) * 100,
+        sharePct,
         rank: candidate ? Number(candidate.rank) : null,
+        previousYear: previous ? Number(previous.year) : null,
+        absoluteChange: votes !== null && previousVotes !== null ? votes - previousVotes : null,
+        percentChange: votes !== null && previousVotes !== null && previousVotes > 0
+          ? ((votes - previousVotes) / previousVotes) * 100
+          : null,
+        shareChangePp: sharePct !== null && previousSharePct !== null
+          ? sharePct - previousSharePct
+          : null,
+        rankChange: candidate && previous
+          ? Number(previous.rank) - Number(candidate.rank)
+          : null,
       };
     });
 
