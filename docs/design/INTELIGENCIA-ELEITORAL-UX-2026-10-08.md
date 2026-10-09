@@ -142,3 +142,17 @@ A alteração não adiciona valores de exemplo ao produto nem habilita mapa fict
 
 **Validação pendente:** executar lint, testes unitários, integração/API e build, revisar o fluxo de autenticação/RBAC e confirmar a consulta real no Supabase antes de considerar esta fatia concluída.
 
+## Implementação IE-05.2 — navegação analítica ampliada
+
+**Commit:** `b70bbd06a7ca631a334215112d21ed74e97b5a05`  
+**Escopo:** completar a navegação da tela existente, sem criar um segundo dashboard.
+
+A navegação de investigação passou a organizar as capacidades existentes em oito áreas: Visão geral, Desempenho, Território, Comparação, Concentração, Zonas e seções, Relatórios e Metodologia.
+
+- **Concentração:** reúne intents já existentes no runtime para concentração nos principais municípios e dispersão territorial; os valores continuam vindo do runtime, não de fórmulas na interface.
+- **Zonas e seções:** apresenta explicitamente a indisponibilidade enquanto a projeção/fonte não comprovar granularidade de seção. Não cria dados sintéticos nem interpreta ausência como zero.
+- **Relatórios:** expõe os exportadores CSV e relatório imprimível já existentes e os habilita apenas quando há um resultado válido.
+- **Metodologia:** documenta, na própria interface, o protocolo de pergunta, recorte, cálculo determinístico, evidências e limitações, sem atribuir causalidade a diferenças descritivas.
+- Os fluxos existentes de seleção de candidato, indicadores, histórico, ranking territorial, perguntas, chat flutuante, autenticação e RBAC foram preservados.
+
+**Limite desta entrega:** não implementa dados sintéticos de demonstração, mapa, filtros geográficos interativos ou um inspetor real de zona/seção. Essas capacidades não devem ser simuladas dentro do dashboard de produção. A implementação foi gravada no GitHub, mas não foi possível executar lint, testes ou build neste ambiente; a validação automatizada continua pendente.
