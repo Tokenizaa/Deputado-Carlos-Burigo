@@ -32,7 +32,7 @@ import {
   type ElectoralInvestigationContext,
 } from '../../lib/electoral-investigations';
 
-type Area = 'overview' | 'history' | 'territory' | 'competition';
+type Area = 'overview' | 'history' | 'territory' | 'competition' | 'concentration' | 'zones' | 'reports' | 'methodology';
 type Question = { id: string; area: Area; label: string; prompt: string; needsCompetitor?: boolean };
 type SpeechRecognitionLike = {
   lang: string;
@@ -67,7 +67,9 @@ const QUESTIONS: Question[] = [
   { id: 'history.municipal_growth', area: 'history', label: 'Municípios que cresceram', prompt: 'Quais municípios mais cresceram?' },
   { id: 'history.municipal_decline', area: 'history', label: 'Municípios que caíram', prompt: 'Quais municípios mais perderam votos?' },
   { id: 'territory.top_rankings', area: 'territory', label: 'Ranking territorial', prompt: 'Quais são os municípios mais fortes?' },
-  { id: 'territory.concentration', area: 'territory', label: 'Concentração', prompt: 'Onde a votação está concentrada?' },
+  { id: 'territory.concentration', area: 'concentration', label: 'Concentração territorial', prompt: 'Onde a votação está concentrada?' },
+  { id: 'overview.top10_concentration', area: 'concentration', label: 'Concentração nos 10 principais', prompt: 'Qual percentual da votação está nos 10 municípios mais fortes?' },
+  { id: 'territory.dispersion', area: 'concentration', label: 'Dispersão territorial', prompt: 'Como a votação se distribui pelo território?' },
   { id: 'territory.regional_profile', area: 'territory', label: 'Perfil territorial', prompt: 'Qual é o perfil territorial da votação?' },
   { id: 'competition.top_candidates', area: 'competition', label: 'Principais candidatos', prompt: 'Quem são os principais candidatos?' },
   { id: 'competition.candidate_rank', area: 'competition', label: 'Ranking do candidato', prompt: 'Qual é o ranking do candidato?' },
@@ -77,9 +79,13 @@ const QUESTIONS: Question[] = [
 
 const AREA_LABELS: Record<Area, string> = {
   overview: 'Visão geral',
-  history: 'Evolução',
+  history: 'Desempenho',
   territory: 'Território',
-  competition: 'Concorrência',
+  competition: 'Comparação',
+  concentration: 'Concentração',
+  zones: 'Zonas e seções',
+  reports: 'Relatórios',
+  methodology: 'Metodologia',
 };
 
 function normalizeText(value: string): string {
@@ -800,7 +806,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
             <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="text-base font-bold text-stone-950">Investigar dados</h3><p className="mt-1 text-xs text-stone-500">Escolha uma pergunta pronta ou use o chat flutuante.</p></div><div className="flex flex-wrap items-center gap-2 text-xs text-stone-600"><label className="flex items-center gap-2">De <select value={fromYear} onChange={event => setFromYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label><label className="flex items-center gap-2">Até <select value={toYear} onChange={event => setToYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label></div></div>
             <nav className="mt-4 flex gap-1 overflow-x-auto border-b border-stone-200" aria-label="Áreas de investigação">{(Object.keys(AREA_LABELS) as Area[]).map(item => <button key={item} type="button" onClick={() => setArea(item)} className={`min-h-11 shrink-0 border-b-2 px-3 text-sm font-bold ${area === item ? 'border-emerald-700 text-emerald-800' : 'border-transparent text-stone-500 hover:text-stone-900'}`}>{AREA_LABELS[item]}</button>)}</nav>
             {area === 'competition' && <label className="mt-4 block max-w-sm text-xs font-bold text-stone-600">Número do segundo candidato<input value={competitor} onChange={event => setCompetitor(event.target.value.replace(/\D/g, '').slice(0, 8))} inputMode="numeric" placeholder="Para comparações" className="mt-1 min-h-10 w-full rounded-lg border border-stone-300 px-3 text-sm font-normal text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-600" /></label>}
-            <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex min-h-20 items-center justify-between gap-3 rounded-xl border bg-white p-3 text-left hover:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${activeQuestion?.id === question.id ? 'border-emerald-700 ring-1 ring-emerald-700' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs leading-5 text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-emerald-700" /></button>)}</div>
+            {(area === 'overview' || area === 'history' || area === 'territory' || area === 'competition' || area === 'concentration') && <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex min-h-20 items-center justify-between gap-3 rounded-xl border bg-white p-3 text-left hover:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${activeQuestion?.id === question.id ? 'border-emerald-700 ring-1 ring-emerald-700' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs leading-5 text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-emerald-700" /></button>)}</div>}
+            {area === 'zones' && <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4" role="status"><h4 className="text-sm font-bold text-amber-950">Detalhamento por zona/seção indisponível</h4><p className="mt-2 text-sm leading-6 text-amber-900">A projeção atual não comprova cobertura de seção eleitoral para este recorte. O arquivo de votação por município/zona não contém identificador de seção; portanto, não exibimos seção como se fosse dado observado nem criamos valores substitutos. Esta visão será habilitada somente quando uma fonte compatível estiver carregada e validada.</p></div>}
+            {area === 'reports' && <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-4"><h4 className="text-sm font-bold text-stone-900">Relatório do cenário atual</h4><p className="mt-2 text-sm leading-6 text-stone-600">Os arquivos são gerados a partir do último resultado retornado pelo runtime, com método, evidências e limitações. Execute uma análise antes de exportar.</p><div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={exportCsv} disabled={!response || response.status !== 'ok'} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 text-sm font-bold text-stone-700 disabled:cursor-not-allowed disabled:opacity-40"><Download className="h-4 w-4" />Exportar CSV</button><button type="button" onClick={printReport} disabled={!response || response.status !== 'ok'} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-800 px-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"><Download className="h-4 w-4" />Gerar relatório / PDF</button></div>{response?.status === 'ok' && <p className="mt-3 text-xs text-stone-500">Resultado selecionado: {activeQuestion?.label || response.intent || 'análise atual'} · contexto {selectedYear}, RS, Deputado Estadual, 1º turno.</p>}</div>}
+            {area === 'methodology' && <div className="mt-4 space-y-3"><article className="rounded-xl border border-stone-200 bg-white p-4"><h4 className="text-sm font-bold text-stone-900">Protocolo analítico</h4><ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-stone-600"><li>Definir pergunta, candidato, eleição, cargo, turno e território.</li><li>Consultar apenas registros disponíveis no runtime e preservar o recorte utilizado.</li><li>Executar métricas por funções determinísticas; a interface não estima valores ausentes.</li><li>Apresentar resultado junto de método, evidências, fonte e limitações.</li><li>Interpretar diferenças como observações descritivas, sem inferir causalidade ou transferência individual de votos.</li></ol></article><article className="rounded-xl border border-stone-200 bg-white p-4"><h4 className="text-sm font-bold text-stone-900">Fonte e cobertura</h4><p className="mt-2 text-sm leading-6 text-stone-600">Fonte desta tela: projeção analítica publicada no Supabase, alimentada por dados eleitorais oficiais conforme a cobertura disponível. O escopo exibido é RS · Deputado Estadual · 1º turno. A presença de um ano no seletor não garante que todos os candidatos, municípios ou níveis territoriais estejam cobertos.</p><p className="mt-2 text-sm leading-6 text-stone-600">Se uma análise retornar dados insuficientes, erro ou limitações, mantenha essa condição explícita; ausência de registro não deve ser interpretada como zero voto.</p></article></div>}
           </section>
 
           {(loading || response) && (
