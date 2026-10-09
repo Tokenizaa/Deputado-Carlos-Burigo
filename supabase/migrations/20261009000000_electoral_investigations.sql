@@ -16,6 +16,9 @@ create index if not exists electoral_investigations_owner_updated_idx
 
 alter table public.electoral_investigations enable row level security;
 
+revoke all on table public.electoral_investigations from anon, authenticated;
+grant select, insert, update, delete on table public.electoral_investigations to service_role;
+
 drop policy if exists electoral_investigations_owner_all on public.electoral_investigations;
 create policy electoral_investigations_owner_all
   on public.electoral_investigations
