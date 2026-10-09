@@ -93,13 +93,23 @@ describe('electoral intelligence runtime — overview', () => {
     });
   });
 
-  it('executes overview.state_share with the candidate and state denominator', async () => {
-    const result = await executeElectoralQuestion('overview.state_share', { candidate: 12345 });
+  it('executes overview.state_share with historical deltas and a stable candidate identity', async () => {
+    const result = await executeElectoralQuestion('overview.state_share', {
+      candidate: 12345,
+      candidate_name: 'Candidato Teste',
+      candidate_year: 2026,
+      year: 2026,
+    });
     expect(result.status).toBe('ok');
     expect(result.intent).toBe('EA-002');
     expect(result.method).toBe('voteShare');
     expect(result.result).toHaveProperty('candidate', 12345);
-    expect((result.result as any).byYear).toHaveLength(3);
+    const rows = (result.result as any).byYear;
+    expect(rows).toHaveLength(3);
+    expect(rows.map((row: any) => row.absoluteChange)).toEqual([null, 100000, -50000]);
+    expect(rows.map((row: any) => row.percentChange)).toEqual([null, 100, -25]);
+    expect(rows.map((row: any) => row.rankChange)).toEqual([null, 2, -1]);
+    expect(rows[2].shareChangePp).toBeCloseTo(rows[2].sharePct - rows[1].sharePct);
   });
 
   it('closes the municipal coverage and extremum intents', async () => {
