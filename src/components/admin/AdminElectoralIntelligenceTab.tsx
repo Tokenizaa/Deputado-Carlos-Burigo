@@ -426,6 +426,14 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setMessage('O ano mudou. Selecione o candidato correspondente à eleição escolhida.');
   };
 
+  const changeHistoricalRange = (start: ElectoralYear, end: ElectoralYear) => {
+    setFromYear(start);
+    setToYear(end);
+    setResponse(null);
+    setActiveQuestion(null);
+    setMessage('O intervalo histórico mudou. Execute novamente a análise para atualizar os resultados.');
+  };
+
   const exportCsv = () => {
     if (!response || response.status !== 'ok') return;
     const blob = new Blob([buildElectoralCsv(response)], { type: 'text/csv;charset=utf-8' });
@@ -805,7 +813,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           </div>
 
           <section className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="text-base font-bold text-stone-950">Investigar dados</h3><p className="mt-1 text-xs text-stone-500">Escolha uma pergunta pronta ou use o chat flutuante.</p></div><div className="flex flex-wrap items-center gap-2 text-xs text-stone-600"><label className="flex items-center gap-2">De <select value={fromYear} onChange={event => setFromYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label><label className="flex items-center gap-2">Até <select value={toYear} onChange={event => setToYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label></div></div>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="text-base font-bold text-stone-950">Investigar dados</h3><p className="mt-1 text-xs text-stone-500">Escolha uma pergunta pronta ou use o chat flutuante.</p></div><div className="flex flex-wrap items-center gap-2 text-xs text-stone-600"><label className="flex items-center gap-2">De <select value={fromYear} onChange={event => changeHistoricalRange(Number(event.target.value) as ElectoralYear, toYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label><label className="flex items-center gap-2">Até <select value={toYear} onChange={event => changeHistoricalRange(fromYear, Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label></div></div>
             <nav className="mt-4 flex gap-1 overflow-x-auto border-b border-stone-200" aria-label="Áreas de investigação">{(Object.keys(AREA_LABELS) as Area[]).map(item => <button key={item} type="button" onClick={() => setArea(item)} className={`min-h-11 shrink-0 border-b-2 px-3 text-sm font-bold ${area === item ? 'border-emerald-700 text-emerald-800' : 'border-transparent text-stone-500 hover:text-stone-900'}`}>{AREA_LABELS[item]}</button>)}</nav>
             {area === 'competition' && <label className="mt-4 block max-w-sm text-xs font-bold text-stone-600">Número do segundo candidato<input value={competitor} onChange={event => setCompetitor(event.target.value.replace(/\D/g, '').slice(0, 8))} inputMode="numeric" placeholder="Para comparações" className="mt-1 min-h-10 w-full rounded-lg border border-stone-300 px-3 text-sm font-normal text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-600" /></label>}
             {(area === 'overview' || area === 'history' || area === 'territory' || area === 'competition' || area === 'concentration') && <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex min-h-20 items-center justify-between gap-3 rounded-xl border bg-white p-3 text-left hover:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${activeQuestion?.id === question.id ? 'border-emerald-700 ring-1 ring-emerald-700' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs leading-5 text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-emerald-700" /></button>)}</div>}
