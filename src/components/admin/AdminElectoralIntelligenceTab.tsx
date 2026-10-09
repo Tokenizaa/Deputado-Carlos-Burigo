@@ -11,6 +11,7 @@ import {
 } from '../../lib/electoral-report';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { createPresentationSpec } from '../../lib/electoral-presentation';
+import { buildElectoralQuestionParams } from '../../lib/electoral-context';
 import type {
   ElectoralQuestionParams,
   ElectoralQuestionRequest,
@@ -322,14 +323,26 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setOverviewLoading(true);
     setMessage('');
     Promise.all([
-      postElectoralQuestion('overview.state_share', {
-        candidate: selectedCandidate.candidate_number,
-        candidate_name: selectedCandidate.candidate_name,
-        candidate_year: selectedCandidate.year,
+      postElectoralQuestion('overview.state_share', buildElectoralQuestionParams({
+        candidateNumber: selectedCandidate.candidate_number,
+        candidateName: selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`,
         year: selectedYear,
-        limit: 10,
-      }),
-      postElectoralQuestion('territory.top_rankings', { candidate: selectedCandidate.candidate_number, year: selectedYear, limit: 10 }),
+        fromYear,
+        toYear,
+        uf: 'RS',
+        office: 'Deputado Estadual',
+        round: 1,
+      })),
+      postElectoralQuestion('territory.top_rankings', buildElectoralQuestionParams({
+        candidateNumber: selectedCandidate.candidate_number,
+        candidateName: selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`,
+        year: selectedYear,
+        fromYear,
+        toYear,
+        uf: 'RS',
+        office: 'Deputado Estadual',
+        round: 1,
+      })),
     ]).then(([overviewResponse, territoryResponse]) => {
       if (cancelled) return;
       setOverview(overviewResponse);
@@ -341,7 +354,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
       if (!cancelled) setOverviewLoading(false);
     });
     return () => { cancelled = true; };
-  }, [selectedCandidate, selectedYear]);
+  }, [selectedCandidate, selectedYear, fromYear, toYear]);
 
   const searchCandidates = async (queryInput = candidateQuery, signal?: AbortSignal) => {
     const query = normalizeCandidateQuery(queryInput);
@@ -561,16 +574,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setActiveQuestion(question);
     setMessage('');
     try {
-      const params: ElectoralQuestionParams = {
-        candidate: selectedCandidate.candidate_number,
-        candidate_name: selectedCandidate.candidate_name,
-        candidate_year: selectedCandidate.year,
-        year: selectedYear,
-        from_year: fromYear,
-        to_year: toYear,
-        limit: 10,
-      };
-      if (question.needsCompetitor) params.competitor = Number(competitor);
+      const params: ElectoralQuestionParams = buildElectoralQuestionParams({
+        ...context,
+        ...(question.needsCompetitor ? { competitor: Number(competitor) } : {}),
+      });
       let data: RuntimeResponse;
       try {
         data = await postElectoralQuestion(question.id, params);
