@@ -10,6 +10,7 @@ import {
   canUseSpeechRecognition,
 } from '../../lib/electoral-report';
 import { getSupabaseClient } from '../../lib/supabaseClient';
+import { createPresentationSpec } from '../../lib/electoral-presentation';
 import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
@@ -128,6 +129,38 @@ function ResultView({ response }: { response: RuntimeResponse }) {
   const byYear = Array.isArray(result?.byYear) ? result.byYear as Array<Record<string, unknown>> : null;
   const rows = Array.isArray(result?.municipalities) ? result.municipalities as Array<Record<string, unknown>> : null;
   const candidates = Array.isArray(result?.candidates) ? result.candidates as Array<Record<string, unknown>> : null;
+  const presentation = createPresentationSpec(
+    response.intent || 'executive-summary',
+    result ?? null,
+    response.error || 'Resultado retornado pelo runtime determinístico.',
+  );
+  const seriesSource = byYear || rows || candidates || [];
+  const chartRows = seriesSource
+    .map((row, index) => ({
+      label: String(row.year ?? row.municipalityName ?? row.municipality ?? row.candidate_name ?? row.candidate_number ?? `Item ${index + 1}`),
+      value: toFiniteNumber(row.votes),
+    }))
+    .filter((row): row is { label: string; value: number } => row.value !== null)
+    .slice(0, 10);
+  const chartMax = Math.max(0, ...chartRows.map(row => row.value));
+  const templateLabels: Record<string, string> = {
+    ranking: 'Ranking',
+    'historical-series': 'Série histórica',
+    comparison: 'Comparação',
+    variation: 'Variação',
+    distribution: 'Distribuição',
+    concentration: 'Concentração',
+    'analytical-table': 'Tabela analítica',
+    'municipal-map': 'Mapa municipal',
+    'growth-map': 'Crescimento territorial',
+    'decline-map': 'Queda territorial',
+    'candidate-profile': 'Perfil do candidato',
+    'territorial-profile': 'Perfil territorial',
+    competition: 'Concorrência',
+    'territorial-evolution': 'Evolução territorial',
+    'composite-index': 'Índice composto',
+    'executive-summary': 'Resumo executivo',
+  };
 
   return (
     <div className="space-y-4">
@@ -135,6 +168,28 @@ function ResultView({ response }: { response: RuntimeResponse }) {
         <div className="flex items-center gap-2 text-sm font-bold text-emerald-950"><ShieldCheck className="h-4 w-4" />Resultado do runtime eleitoral</div>
         <p className="mt-1 text-xs text-emerald-900">Os valores são retornados pela camada analítica; a interface não recalcula os resultados.</p>
       </div>
+      {chartRows.length > 1 && chartMax > 0 && (
+        <section className="rounded-xl border border-stone-200 bg-white p-4" aria-label={`Visualização: ${templateLabels[presentation.template] || 'Análise eleitoral'}`}>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold text-stone-900">{templateLabels[presentation.template] || 'Visualização analítica'}</h4>
+              <p className="mt-1 text-xs text-stone-500">Representação visual dos valores retornados pelo runtime; não acrescenta métricas.</p>
+            </div>
+            <BarChart3 className="h-4 w-4 shrink-0 text-emerald-700" />
+          </div>
+          <div className="space-y-3">
+            {chartRows.map(row => <div key={row.label}>
+              <div className="mb-1 flex items-center justify-between gap-3 text-xs">
+                <span className="truncate font-medium text-stone-700">{row.label}</span>
+                <span className="shrink-0 tabular-nums text-stone-900">{formatVotes(row.value)}</span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-stone-100" role="img" aria-label={`${row.label}: ${formatVotes(row.value)} votos`}>
+                <div className="h-full rounded-full bg-emerald-700" style={{ width: `${Math.max(1, (row.value / chartMax) * 100)}%` }} />
+              </div>
+            </div>)}
+          </div>
+        </section>
+      )}
       {byYear && (
         <div className="overflow-x-auto rounded-xl border border-stone-200">
           <table className="w-full text-sm">
