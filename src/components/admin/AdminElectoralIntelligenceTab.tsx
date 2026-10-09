@@ -270,6 +270,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   const [listening, setListening] = useState(false);
   const [investigations, setInvestigations] = useState<ElectoralInvestigation[]>([]);
   const [activeInvestigationId, setActiveInvestigationId] = useState<string | null>(null);
+  const [activeInvestigationContext, setActiveInvestigationContext] = useState<ElectoralInvestigationContext | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState('');
@@ -393,6 +394,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setResponse(null);
     setActiveQuestion(null);
     setActiveInvestigationId(null);
+    setActiveInvestigationContext(null);
     setChatMessages([]);
     setMessage('');
   };
@@ -405,6 +407,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setResponse(null);
     setActiveQuestion(null);
     setActiveInvestigationId(null);
+    setActiveInvestigationContext(null);
     setChatMessages([]);
     setMessage('O ano mudou. Selecione o candidato correspondente à eleição escolhida.');
   };
@@ -481,6 +484,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     });
     setCompetitor(context.competitor ? String(context.competitor) : '');
     setActiveInvestigationId(investigation.id);
+    setActiveInvestigationContext(context);
     setChatMessages(Array.isArray(investigation.messages) ? investigation.messages : []);
     const last = lastAssistantMessage(Array.isArray(investigation.messages) ? investigation.messages : []);
     setResponse(last?.response as RuntimeResponse | undefined ?? null);
@@ -493,6 +497,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
 
   const startNewInvestigation = () => {
     setActiveInvestigationId(null);
+    setActiveInvestigationContext(null);
     setChatMessages([]);
     setResponse(null);
     setActiveQuestion(null);
@@ -519,6 +524,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
   });
 
   const runQuestion = async (question: Question, questionText = question.prompt) => {
+    if (loading) return;
     if (!selectedCandidate) {
       setMessage('Selecione um candidato antes de consultar uma análise.');
       setCandidateModalOpen(true);
@@ -545,8 +551,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     };
     const current = investigations.find(item => item.id === activeInvestigationId);
     const target = current && isSameInvestigationContext(current.context, context) ? current : null;
+    const continuingContext = isSameInvestigationContext(activeInvestigationContext, context);
     const userMessage = createChatMessage('user', questionText.trim() || question.prompt, question.id);
-    const pendingMessages = appendInvestigationMessages(target ? chatMessages : [], [userMessage]);
+    const pendingMessages = appendInvestigationMessages(continuingContext ? chatMessages : [], [userMessage]);
+    setActiveInvestigationContext(context);
     setChatMessages(pendingMessages);
     setLoading(true);
     setActiveQuestion(question);
