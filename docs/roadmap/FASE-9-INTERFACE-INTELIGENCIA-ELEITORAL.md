@@ -246,7 +246,9 @@ A inspeção do benchmark confirmou padrões de experiência úteis, mas também
 - Perguntas relacionadas ao mesmo candidato e eleição são agrupadas; mudar o candidato ou ano inicia outro agrupamento na próxima consulta, em vez de criar uma conversa por pergunta.
 - O resultado é persistido junto da mensagem do assistente e reapresentado pelo mesmo componente de resultado usado na tela. Uma falha ao salvar o histórico é informada sem apagar a análise executada.
 - O componente de resultado usa `createPresentationSpec` para identificar a família de apresentação e acrescenta uma representação de barras para séries com votos disponíveis. Os valores analíticos continuam vindo do runtime.
-- Foram adicionados testes unitários para agrupamento por contexto, deduplicação, limite de mensagens e título.
+- Foram adicionados testes unitários para agrupamento por contexto, deduplicação, limite de mensagens, título e sugestões de continuidade.
+- Foram adicionadas sugestões determinísticas de perguntas seguintes, exibidas como ações para continuar a investigação existente, sem pedir à LLM que invente métricas ou caminhos de análise.
+- A API valida o escopo de contexto permitido antes de persistir e não expõe a tabela diretamente ao cliente; a migração restringe privilégios SQL diretos a `service_role`, além de manter RLS como defesa adicional.
 
 ### Pendências antes de considerar a fase concluída
 
