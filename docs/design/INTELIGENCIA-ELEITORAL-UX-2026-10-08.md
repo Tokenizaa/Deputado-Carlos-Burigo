@@ -155,3 +155,6 @@ O painel de histórico permite retomar uma investigação, recuperar seu context
 ### Estado de validação
 
 Esta implementação foi escrita na branch `feat/phase-9-benchmark-adaptation`. A migração foi adicionada ao repositório, mas sua aplicação no Supabase ainda deve ser confirmada. Lint, testes, build, teste autenticado das rotas e validação visual em navegador permanecem pendentes. A cobertura territorial não foi ampliada e os mapas continuam bloqueados pelo gate IE-03.7.
+
+
+As sugestões de continuidade são selecionadas por regras determinísticas a partir da intenção atual e aparecem no chat como ações para continuar a investigação existente. Elas não representam conclusões analíticas e não substituem a resposta do runtime.
