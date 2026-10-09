@@ -11,6 +11,12 @@ import {
 } from '../../lib/electoral-report';
 import { getSupabaseClient } from '../../lib/supabaseClient';
 import { createPresentationSpec } from '../../lib/electoral-presentation';
+import { buildElectoralQuestionParams } from '../../lib/electoral-context';
+import type {
+  ElectoralQuestionParams,
+  ElectoralQuestionRequest,
+  ElectoralRuntimeResponse,
+} from '../../contracts/electoralRuntime';
 import {
   ELECTORAL_YEARS,
   filterHistoricalRows,
@@ -44,17 +50,7 @@ type SpeechRecognitionLike = {
   onend: (() => void) | null;
   onresult: ((event: { results?: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
 };
-type RuntimeResponse = {
-  status: 'ok' | 'pending' | 'insufficient_data' | 'error';
-  intent?: string;
-  method?: string;
-  function?: string;
-  result?: unknown;
-  evidence?: string[];
-  limitations?: string[];
-  error?: string;
-  scope?: { office?: string; uf?: string; round?: number; years?: number[] };
-};
+type RuntimeResponse = ElectoralRuntimeResponse;
 type CandidateSearchResponse = { candidates?: CandidateOption[]; error?: string };
 
 const QUESTIONS: Question[] = [
@@ -241,11 +237,11 @@ async function getElectoralAuthHeaders(includeContentType = false): Promise<Reco
   };
 }
 
-async function postElectoralQuestion(questionId: string, params: Record<string, unknown>): Promise<RuntimeResponse> {
+async function postElectoralQuestion(questionId: string, params: ElectoralQuestionParams): Promise<RuntimeResponse> {
   const response = await fetch('/api/admin/electoral/intelligence', {
     method: 'POST',
     headers: await getElectoralAuthHeaders(true),
-    body: JSON.stringify({ questionId, params }),
+    body: JSON.stringify({ questionId, params } satisfies ElectoralQuestionRequest),
   });
   const data = await response.json().catch(() => ({})) as RuntimeResponse;
   if (!response.ok) throw new Error(data.error || 'Falha ao consultar a inteligência eleitoral.');
@@ -318,23 +314,36 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     : []).map(id => QUESTIONS.find(question => question.id === id)).filter((question): question is Question => Boolean(question));
 
   useEffect(() => {
-    if (!selectedCandidate) {
+    if (!selectedCandidate || fromYear > toYear) {
       setOverview(null);
       setTerritory(null);
+      setOverviewLoading(false);
       return;
     }
     let cancelled = false;
     setOverviewLoading(true);
     setMessage('');
     Promise.all([
-      postElectoralQuestion('overview.state_share', {
-        candidate: selectedCandidate.candidate_number,
-        candidate_name: selectedCandidate.candidate_name,
-        candidate_year: selectedCandidate.year,
+      postElectoralQuestion('overview.state_share', buildElectoralQuestionParams({
+        candidateNumber: selectedCandidate.candidate_number,
+        candidateName: selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`,
         year: selectedYear,
-        limit: 10,
-      }),
-      postElectoralQuestion('territory.top_rankings', { candidate: selectedCandidate.candidate_number, year: selectedYear, limit: 10 }),
+        fromYear,
+        toYear,
+        uf: 'RS',
+        office: 'Deputado Estadual',
+        round: 1,
+      })),
+      postElectoralQuestion('territory.top_rankings', buildElectoralQuestionParams({
+        candidateNumber: selectedCandidate.candidate_number,
+        candidateName: selectedCandidate.candidate_name || `Candidato ${selectedCandidate.candidate_number}`,
+        year: selectedYear,
+        fromYear,
+        toYear,
+        uf: 'RS',
+        office: 'Deputado Estadual',
+        round: 1,
+      })),
     ]).then(([overviewResponse, territoryResponse]) => {
       if (cancelled) return;
       setOverview(overviewResponse);
@@ -346,7 +355,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
       if (!cancelled) setOverviewLoading(false);
     });
     return () => { cancelled = true; };
-  }, [selectedCandidate, selectedYear]);
+  }, [selectedCandidate, selectedYear, fromYear, toYear]);
 
   const searchCandidates = async (queryInput = candidateQuery, signal?: AbortSignal) => {
     const query = normalizeCandidateQuery(queryInput);
@@ -416,6 +425,14 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setActiveInvestigationContext(null);
     setChatMessages([]);
     setMessage('O ano mudou. Selecione o candidato correspondente à eleição escolhida.');
+  };
+
+  const changeHistoricalRange = (start: ElectoralYear, end: ElectoralYear) => {
+    setFromYear(start);
+    setToYear(end);
+    setResponse(null);
+    setActiveQuestion(null);
+    setMessage('O intervalo histórico mudou. Execute novamente a análise para atualizar os resultados.');
   };
 
   const exportCsv = () => {
@@ -566,16 +583,10 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     setActiveQuestion(question);
     setMessage('');
     try {
-      const params: Record<string, unknown> = {
-        candidate: selectedCandidate.candidate_number,
-        candidate_name: selectedCandidate.candidate_name,
-        candidate_year: selectedCandidate.year,
-        year: selectedYear,
-        from_year: fromYear,
-        to_year: toYear,
-        limit: 10,
-      };
-      if (question.needsCompetitor) params.competitor = Number(competitor);
+      const params: ElectoralQuestionParams = buildElectoralQuestionParams({
+        ...context,
+        ...(question.needsCompetitor ? { competitor: Number(competitor) } : {}),
+      });
       let data: RuntimeResponse;
       try {
         data = await postElectoralQuestion(question.id, params);
@@ -803,7 +814,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
           </div>
 
           <section className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="text-base font-bold text-stone-950">Investigar dados</h3><p className="mt-1 text-xs text-stone-500">Escolha uma pergunta pronta ou use o chat flutuante.</p></div><div className="flex flex-wrap items-center gap-2 text-xs text-stone-600"><label className="flex items-center gap-2">De <select value={fromYear} onChange={event => setFromYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label><label className="flex items-center gap-2">Até <select value={toYear} onChange={event => setToYear(Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label></div></div>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="text-base font-bold text-stone-950">Investigar dados</h3><p className="mt-1 text-xs text-stone-500">Escolha uma pergunta pronta ou use o chat flutuante.</p></div><div className="flex flex-wrap items-center gap-2 text-xs text-stone-600"><label className="flex items-center gap-2">De <select value={fromYear} onChange={event => changeHistoricalRange(Number(event.target.value) as ElectoralYear, toYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label><label className="flex items-center gap-2">Até <select value={toYear} onChange={event => changeHistoricalRange(fromYear, Number(event.target.value) as ElectoralYear)} className="min-h-9 rounded-lg border border-stone-300 bg-white px-2">{ELECTORAL_YEARS.map(year => <option key={year} value={year}>{year}</option>)}</select></label></div></div>
             <nav className="mt-4 flex gap-1 overflow-x-auto border-b border-stone-200" aria-label="Áreas de investigação">{(Object.keys(AREA_LABELS) as Area[]).map(item => <button key={item} type="button" onClick={() => setArea(item)} className={`min-h-11 shrink-0 border-b-2 px-3 text-sm font-bold ${area === item ? 'border-emerald-700 text-emerald-800' : 'border-transparent text-stone-500 hover:text-stone-900'}`}>{AREA_LABELS[item]}</button>)}</nav>
             {area === 'competition' && <label className="mt-4 block max-w-sm text-xs font-bold text-stone-600">Número do segundo candidato<input value={competitor} onChange={event => setCompetitor(event.target.value.replace(/\D/g, '').slice(0, 8))} inputMode="numeric" placeholder="Para comparações" className="mt-1 min-h-10 w-full rounded-lg border border-stone-300 px-3 text-sm font-normal text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-600" /></label>}
             {(area === 'overview' || area === 'history' || area === 'territory' || area === 'competition' || area === 'concentration') && <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">{questions.map(question => <button key={question.id} type="button" onClick={() => void runQuestion(question)} className={`group flex min-h-20 items-center justify-between gap-3 rounded-xl border bg-white p-3 text-left hover:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${activeQuestion?.id === question.id ? 'border-emerald-700 ring-1 ring-emerald-700' : 'border-stone-200'}`}><span><strong className="block text-sm text-stone-900">{question.label}</strong><span className="mt-1 block text-xs leading-5 text-stone-500">{question.prompt}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-emerald-700" /></button>)}</div>}

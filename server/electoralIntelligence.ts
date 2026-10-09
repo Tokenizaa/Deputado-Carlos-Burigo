@@ -1,4 +1,8 @@
 import { supabaseAdmin } from './supabase';
+import type {
+  ElectoralQuestionParams,
+  ElectoralRuntimeResponse,
+} from '../src/contracts/electoralRuntime';
 import type { Year } from '../src/lib/electoral-analytics';
 import orchestration from '../src/data/electoral-orchestration.json';
 import { averageVotesWherePositive, aggregateRegionalVotes, regionalStrength, rankRegionalStrength, regionalEvolution, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
@@ -71,36 +75,7 @@ const RUNTIME_IMPLEMENTED = new Set([
   'competition.low_competition', 'competition.regional_competition',
 ]);
 
-type ElectoralResponse = {
-  status: 'ok' | 'error' | 'pending' | 'insufficient_data';
-  question: string;
-  intent: string;
-  agent: string;
-  skills: string[];
-  method: string;
-  function: string;
-  scope: {
-    office: 'Deputado Estadual';
-    uf: 'RS';
-    round: 1;
-    years: number[];
-  };
-  result: unknown;
-  evidence: string[];
-  limitations: string[];
-};
-
-export interface ElectoralQuestionParams {
-  year?: number;
-  from_year?: number;
-  to_year?: number;
-  candidate?: number | string;
-  candidate_name?: string;
-  candidate_year?: number;
-  competitor?: number | string;
-  municipality?: number | number[];
-  limit?: number;
-}
+type ElectoralResponse = ElectoralRuntimeResponse;
 
 export async function executeElectoralQuestion(
   questionId: string,
@@ -752,15 +727,4 @@ export async function executeElectoralQuestion(
     evidence: [...plan.evidence, 'Supabase analytical projection'],
     limitations: [],
   };
-}
-
-
-
-export interface ElectoralQuestionParams {
-  year?: number;
-  from_year?: number;
-  to_year?: number;
-  candidate?: number | string;
-  municipality?: number | number[];
-  limit?: number;
 }
