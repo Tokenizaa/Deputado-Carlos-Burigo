@@ -490,14 +490,15 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
             <section className="rounded-2xl border border-stone-200 bg-white p-5" aria-labelledby="history-chart-title">
               <div className="flex items-start justify-between gap-3"><div><h3 id="history-chart-title" className="text-base font-bold text-stone-950">Evolução da votação</h3><p className="mt-1 text-xs text-stone-500">Série retornada pela camada analítica, sem recálculo no navegador.</p></div><BarChart3 className="h-5 w-5 text-emerald-700" /></div>
               {historicalRows.length ? (
-                <div className="mt-5 space-y-4">
-                  {historicalRows.map(row => {
-                    const votes = toFiniteNumber(row.votes);
-                    const width = votes !== null && maxHistoricalVotes > 0 ? Math.max(2, (votes / maxHistoricalVotes) * 100) : 0;
-                    return <div key={String(row.year)}><div className="mb-1.5 flex items-baseline justify-between gap-3 text-xs"><span className="font-bold text-stone-700">{formatValue(row.year)}</span><span className="font-semibold tabular-nums text-stone-900">{votes === null ? 'Sem registro compatível' : `${formatVotes(votes)} votos`}</span></div><div className="h-2.5 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-emerald-700" style={{ width: `${width}%` }} /></div></div>;
-                  })}
-                </div>
-                <div className="mt-6 overflow-x-auto border-t border-stone-100 pt-4">
+                <>
+                  <div className="mt-5 space-y-4">
+                    {historicalRows.map(row => {
+                      const votes = toFiniteNumber(row.votes);
+                      const width = votes !== null && maxHistoricalVotes > 0 ? Math.max(2, (votes / maxHistoricalVotes) * 100) : 0;
+                      return <div key={String(row.year)}><div className="mb-1.5 flex items-baseline justify-between gap-3 text-xs"><span className="font-bold text-stone-700">{formatValue(row.year)}</span><span className="font-semibold tabular-nums text-stone-900">{votes === null ? 'Sem registro compatível' : `${formatVotes(votes)} votos`}</span></div><div className="h-2.5 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-emerald-700" style={{ width: `${width}%` }} /></div></div>;
+                    })}
+                  </div>
+                  <div className="mt-6 overflow-x-auto border-t border-stone-100 pt-4">
                   <h4 className="mb-2 text-sm font-bold text-stone-900">Comparação entre eleições</h4>
                   <p className="mb-3 text-xs text-stone-500">As variações são calculadas no runtime. Δ posição positivo indica subida no ranking; Δ participação é expresso em pontos percentuais.</p>
                   <table className="w-full min-w-[760px] text-left text-xs">
@@ -523,8 +524,9 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
                         <td className="px-3 py-2 tabular-nums">{signed(row.rankChange)}</td>
                       </tr>;
                     })}</tbody>
-                  </table>
-                </div>
+                    </table>
+                  </div>
+                </>
               ) : <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">A série histórica não está disponível para este candidato na projeção atual.</p>}
             </section>
 
