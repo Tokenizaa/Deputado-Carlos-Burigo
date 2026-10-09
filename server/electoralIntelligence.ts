@@ -1,4 +1,8 @@
 import { supabaseAdmin } from './supabase';
+import type {
+  ElectoralQuestionParams,
+  ElectoralRuntimeResponse,
+} from '../src/contracts/electoralRuntime';
 import type { Year } from '../src/lib/electoral-analytics';
 import orchestration from '../src/data/electoral-orchestration.json';
 import { averageVotesWherePositive, aggregateRegionalVotes, regionalStrength, rankRegionalStrength, regionalEvolution, countGrowingMunicipalities, countDecliningMunicipalities, countStableMunicipalities, concentrationChange, coverageChange, compareCandidateToStateGrowth, territorialStrength, territorialWeakness, municipalGrowth, municipalDecline, rankByVotes, lowContributors, territoryConcentration, territorialDispersion, countPositiveMunicipalities, growthWithLowBase, strongAndDeclining, highAbsoluteGrowth, municipalVoteShare, compareMunicipalities, rankCandidates, candidateRank, candidateGap, candidateGrowth, municipalLeadersAgainstCandidate, municipalChallengers, territorialOverlap, municipalLeaders, compareCandidates, candidateRankEvolution, candidateShareRanking, municipalCompetition, regionalCompetition, comparativeMunicipalOutcome, rankCompetitors, candidateGrowthExcluding } from '../src/lib/electoral-analytics';
@@ -70,11 +74,6 @@ const RUNTIME_IMPLEMENTED = new Set([
   'competition.emerging_competitor', 'competition.territorial_overlap', 'competition.competitive_municipalities',
   'competition.low_competition', 'competition.regional_competition',
 ]);
-
-import type {
-  ElectoralQuestionParams,
-  ElectoralRuntimeResponse,
-} from '../src/contracts/electoralRuntime';
 
 type ElectoralResponse = ElectoralRuntimeResponse;
 
