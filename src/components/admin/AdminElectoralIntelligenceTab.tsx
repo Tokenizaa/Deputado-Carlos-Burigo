@@ -343,6 +343,41 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
+  const drillDownMunicipality = async (row: Record<string, unknown>) => {
+    if (!selectedCandidate) return;
+    const municipality = row.municipality;
+    if (municipality === null || municipality === undefined || String(municipality).trim() === '') {
+      setMessage('Este registro não contém um identificador municipal válido para detalhamento.');
+      return;
+    }
+    const municipalityName = String(row.municipalityName || `Município ${municipality}`);
+    const question: Question = {
+      id: 'overview.total_votes',
+      area: 'overview',
+      label: `Detalhamento: ${municipalityName}`,
+      prompt: `Quantos votos o candidato recebeu em ${municipalityName} na eleição de ${selectedYear}?`,
+    };
+    setLoading(true);
+    setActiveQuestion(question);
+    setMessage('');
+    try {
+      const data = await postElectoralQuestion('overview.total_votes', {
+        candidate: selectedCandidate.candidate_number,
+        candidate_name: selectedCandidate.candidate_name,
+        candidate_year: selectedCandidate.year,
+        year: selectedYear,
+        municipality,
+        limit: 10,
+      });
+      setResponse(data);
+      setChatOpen(false);
+    } catch (error) {
+      setResponse({ status: 'error', error: error instanceof Error ? error.message : 'Falha ao detalhar o município.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const runQuestion = async (question: Question) => {
     if (!selectedCandidate) {
       setMessage('Selecione um candidato antes de consultar uma análise.');
@@ -534,7 +569,7 @@ export const AdminElectoralIntelligenceTab: React.FC = () => {
               <div className="flex items-start justify-between gap-3"><div><h3 id="territory-title" className="text-base font-bold text-stone-950">Municípios mais fortes</h3><p className="mt-1 text-xs text-stone-500">Top municípios do ano selecionado.</p></div><MapPin className="h-5 w-5 text-emerald-700" /></div>
               {topMunicipalities.length ? (
                 <ol className="mt-4 space-y-3">
-                  {topMunicipalities.map((row, index) => <li key={String(row.municipality ?? index)} className="flex items-start gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-xs font-bold text-stone-600">{index + 1}</span><span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-stone-900">{String(row.municipalityName || `Município ${row.municipality ?? 'sem identificação'}`)}</span><span className="text-xs text-stone-500">{formatVotes(row.votes)} votos</span></span></li>)}
+                  {topMunicipalities.map((row, index) => <li key={String(row.municipality ?? index)} className="flex items-start gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-xs font-bold text-stone-600">{index + 1}</span><div className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-stone-900">{String(row.municipalityName || `Município ${row.municipality ?? 'sem identificação'}`)}</span><span className="block text-xs text-stone-500">{formatVotes(row.votes)} votos</span><button type="button" onClick={() => void drillDownMunicipality(row)} disabled={row.municipality === null || row.municipality === undefined || String(row.municipality).trim() === '' || loading} className="mt-1 min-h-8 rounded-md px-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-40">Detalhar município</button></div></li>)}
                 </ol>
               ) : <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">O ranking territorial não retornou registros para este recorte.</p>}
               <p className="mt-4 border-t border-stone-100 pt-3 text-[11px] leading-5 text-stone-500">Mapa indisponível nesta etapa: a cobertura territorial precisa ser validada antes de exibir uma visualização geográfica.</p>
