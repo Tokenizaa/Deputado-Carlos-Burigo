@@ -46,9 +46,11 @@ def official(year):
             if r.get("SG_UF")!="RS" or r.get("CD_CARGO")!="7" or r.get("NR_TURNO")!="1": continue
             key=(num(r,"CD_MUNICIPIO"),num(r,"NR_ZONA"),num(r,"NR_SECAO"))
             v={"electorate":num(r,"QT_APTOS"),"comparecimento":num(r,"QT_COMPARECIMENTO"),"abstentions":num(r,"QT_ABSTENCOES"),
-               "blank_votes":num(r,"QT_VOTOS_BRANCOS"),"null_votes":num(r,"QT_VOTOS_NULOS"),"valid_votes":num(r,"QT_VOTOS_VALIDOS")}
+               "blank_votes":num(r,"QT_VOTOS_BRANCOS"),"null_votes":num(r,"QT_VOTOS_NULOS")}
+            # This TSE file does not expose QT_VOTOS_VALIDOS consistently. Derive the denominator from official attendance minus official blank/null votes.
+            v["valid_votes"]=v["comparecimento"]-v["blank_votes"]-v["null_votes"]
             if v["electorate"]!=v["comparecimento"]+v["abstentions"]: raise RuntimeError(f"{year}: aptos != comparecimento + abstenções at {key}")
-            if v["blank_votes"]+v["null_votes"]>v["comparecimento"]: raise RuntimeError(f"{year}: invalid blank/null totals at {key}")
+            if v["valid_votes"]<0: raise RuntimeError(f"{year}: derived valid votes are negative at {key}")
             if key in found and found[key]!=v: raise RuntimeError(f"{year}: conflicting official rows at {key}; refusing to guess which row is authoritative")
             found[key]=v
     if len(found)!=EXPECTED[year]: raise RuntimeError(f"{year}: expected {EXPECTED[year]} unique RS sections, found {len(found)}; no writes")
