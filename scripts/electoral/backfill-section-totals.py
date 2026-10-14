@@ -2,7 +2,7 @@
 import csv, hashlib, io, json, os, sys, urllib.parse, urllib.request, zipfile
 from datetime import datetime, timezone
 
-BASE=os.getenv("SUPABASE_URL","https://wktanxbpijurimdjgone.supabase.co").rstrip("/")
+BASE=(os.getenv("SUPABASE_URL") or "https://wktanxbpijurimdjgone.supabase.co").rstrip("/")
 KEY=os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_SERVICE_KEY","")
 YEARS=[int(x.strip()) for x in os.getenv("YEARS","2018,2022,2026").split(",") if x.strip()]
 DRY=os.getenv("DRY_RUN","true").lower()=="true"
@@ -68,7 +68,7 @@ def main():
     for s in sections:
         m=mun.get(s["municipality_id"]); z=zone.get(s["zone_id"])
         if m and z: secmap[(int(m["tse_municipality_code"]),int(z["zone_number"]),int(s["section_number"]))]=s
-    office=next((x for x in offices if str(x.get("tse_office_code"))=="7"),None)
+    office=next((x for x in offices if str(x.get("tse_office_code","")).lstrip("0")=="7"),None)
     if not office: raise RuntimeError("TSE office code 7 (Deputado Estadual) not found")
     for year in YEARS:
         url,sha,data=official(year)
