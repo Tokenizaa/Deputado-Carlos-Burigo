@@ -1,0 +1,49 @@
+name: Backfill official section totals
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Years to process (comma-separated)"
+        required: true
+        default: "2018,2022,2026"
+      dry_run:
+        description: "Validate and report only; do not write to Supabase"
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: electoral-section-totals-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate inputs
+        env:
+          YEARS: ${{ inputs.years }}
+        run: |
+          python - <<'PY'
+          import os
+          years = [x.strip() for x in os.environ["YEARS"].split(",") if x.strip()]
+          if not years or any(y not in {"2018", "2022", "2026"} for y in years):
+              raise SystemExit("Years must be a comma-separated subset of 2018,2022,2026")
+          print("Years:", ", ".join(years))
+          PY
+      - name: Run official section totals backfill
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_SERVICE_KEY }}
+          YEARS: ${{ inputs.years }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python scripts/electoral/backfill-section-totals.py
