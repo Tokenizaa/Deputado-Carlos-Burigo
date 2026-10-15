@@ -14,9 +14,13 @@ def api(method,table,params=None,body=None,prefer="return=representation"):
     if not KEY: raise RuntimeError("Configure SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY in GitHub Secrets")
     q=urllib.parse.urlencode(params or {},doseq=True)
     req=urllib.request.Request(BASE+"/rest/v1/"+table+("?"+q if q else ""),data=None if body is None else json.dumps(body).encode(),method=method,headers={"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":prefer})
-    with urllib.request.urlopen(req,timeout=90) as r:
-        raw=r.read()
-        return json.loads(raw) if raw else []
+    try:
+        with urllib.request.urlopen(req,timeout=90) as r:
+            raw=r.read()
+            return json.loads(raw) if raw else []
+    except urllib.error.HTTPError as e:
+        detail=e.read().decode("utf-8","replace")
+        raise RuntimeError(f"Supabase REST {method} {table} failed with HTTP {e.code}: {detail[:2000]}") from e
 
 def rows(table,filters=None):
     out=[]; offset=0
@@ -137,7 +141,7 @@ def main():
         url,sha,data=ctx["url"],ctx["sha"],ctx["data"]
         rnd=ctx["round"]
         print(f"{year}: preparing source dataset and import run...",flush=True)
-        ds=rows("electoral_source_datasets",{"dataset_year":f"eq.{year}","dataset_code":"eq.DETALHE_VOTACAO_SECAO"})
+        ds=rows("electoral_source_datasets",{"provider":"eq.TSE","dataset_code":"eq.DETALHE_VOTACAO_SECAO"})
         dataset_id=ds[0]["id"] if ds else api("POST","electoral_source_datasets",body={"provider":"TSE","dataset_code":"DETALHE_VOTACAO_SECAO","dataset_name":f"Detalhe votação por seção {year}","dataset_year":year,"source_url":url,"metadata":{"sha256":sha,"scope":"RS","office_code":"7","round":1}})[0]["id"]
 
         # Mark interrupted attempts for this operation as failed; rows already written
