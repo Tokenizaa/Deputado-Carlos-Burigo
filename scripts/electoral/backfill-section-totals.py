@@ -8,11 +8,12 @@ YEARS=[int(x.strip()) for x in os.getenv("YEARS","2018,2022,2026").split(",") if
 DRY=os.getenv("DRY_RUN","true").lower()=="true"
 EXPECTED={2018:27274,2022:27201,2026:27547}
 URL="https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_secao/detalhe_votacao_secao_{year}.zip"
+BATCH_SIZE=500
 
-def api(method,table,params=None,body=None):
+def api(method,table,params=None,body=None,prefer="return=representation"):
     if not KEY: raise RuntimeError("Configure SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY in GitHub Secrets")
     q=urllib.parse.urlencode(params or {},doseq=True)
-    req=urllib.request.Request(BASE+"/rest/v1/"+table+("?"+q if q else ""),data=None if body is None else json.dumps(body).encode(),method=method,headers={"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=representation"})
+    req=urllib.request.Request(BASE+"/rest/v1/"+table+("?"+q if q else ""),data=None if body is None else json.dumps(body).encode(),method=method,headers={"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":prefer})
     with urllib.request.urlopen(req,timeout=90) as r:
         raw=r.read()
         return json.loads(raw) if raw else []
@@ -45,9 +46,7 @@ def official(year):
             r={(k or "").strip().lstrip("\ufeff").upper():(v or "").strip() for k,v in raw.items() if k}
             if r.get("SG_UF")!="RS" or r.get("CD_CARGO")!="7" or r.get("NR_TURNO")!="1": continue
             key=(num(r,"CD_MUNICIPIO"),num(r,"NR_ZONA"),num(r,"NR_SECAO"))
-            v={"electorate":num(r,"QT_APTOS"),"comparecimento":num(r,"QT_COMPARECIMENTO"),"abstentions":num(r,"QT_ABSTENCOES"),
-               "blank_votes":num(r,"QT_VOTOS_BRANCOS"),"null_votes":num(r,"QT_VOTOS_NULOS")}
-            # This TSE file does not expose QT_VOTOS_VALIDOS consistently. Derive the denominator from official attendance minus official blank/null votes.
+            v={"electorate":num(r,"QT_APTOS"),"comparecimento":num(r,"QT_COMPARECIMENTO"),"abstentions":num(r,"QT_ABSTENCOES"),"blank_votes":num(r,"QT_VOTOS_BRANCOS"),"null_votes":num(r,"QT_VOTOS_NULOS")}
             v["valid_votes"]=v["comparecimento"]-v["blank_votes"]-v["null_votes"]
             if v["electorate"]!=v["comparecimento"]+v["abstentions"]: raise RuntimeError(f"{year}: aptos != comparecimento + abstenções at {key}")
             if v["valid_votes"]<0: raise RuntimeError(f"{year}: derived valid votes are negative at {key}")
@@ -56,12 +55,16 @@ def official(year):
     if len(found)!=EXPECTED[year]: raise RuntimeError(f"{year}: expected {EXPECTED[year]} unique RS sections, found {len(found)}; no writes")
     return url,sha,found
 
+def batched(items,size=BATCH_SIZE):
+    for i in range(0,len(items),size):
+        yield items[i:i+size]
+
 def main():
     if not YEARS or any(y not in EXPECTED for y in YEARS):
         raise RuntimeError("YEARS must be a subset of 2018,2022,2026")
-    print("MODE:", "DRY RUN" if DRY else "WRITE")
+    print("MODE:", "DRY RUN" if DRY else "WRITE", flush=True)
+    print("YEARS:", ",".join(map(str,YEARS)), flush=True)
 
-    # Read and validate all source files before any possible write.
     municipalities=rows("electoral_municipalities",{"uf":"eq.RS"})
     zones=rows("electoral_zones",{"uf":"eq.RS"})
     sections=rows("electoral_sections")
@@ -71,85 +74,98 @@ def main():
 
     mun_by_code={int(x["tse_municipality_code"]):x for x in municipalities}
     zone_by_num={int(x["zone_number"]):x for x in zones if x.get("uf")=="RS"}
-    secmap={}
     municipality_by_id={x["id"]:x for x in municipalities}
     zone_by_id={x["id"]:x for x in zones}
-    for s in sections:
-        m=municipality_by_id.get(s["municipality_id"])
-        z=zone_by_id.get(s["zone_id"])
-        if m and z:
-            key=(int(m["tse_municipality_code"]),int(z["zone_number"]),int(s["section_number"]))
-            if key in secmap and secmap[key]["id"] != s["id"]:
-                raise RuntimeError(f"Duplicate section dimension in database: {key}")
-            secmap[key]=s
+    secmap={}
+    def index_sections(section_rows):
+        for s in section_rows:
+            m=municipality_by_id.get(s["municipality_id"])
+            z=zone_by_id.get(s["zone_id"])
+            if m and z:
+                key=(int(m["tse_municipality_code"]),int(z["zone_number"]),int(s["section_number"]))
+                if key in secmap and secmap[key]["id"] != s["id"]:
+                    raise RuntimeError(f"Duplicate section dimension in database: {key}")
+                secmap[key]=s
+    index_sections(sections)
 
     office=next((x for x in offices if str(x.get("tse_office_code","")).lstrip("0")=="7"),None)
-    if not office:
-        raise RuntimeError("TSE office code 7 (Deputado Estadual) not found")
+    if not office: raise RuntimeError("TSE office code 7 (Deputado Estadual) not found")
 
-    source_by_year={year:official(year) for year in YEARS}
+    source_by_year={}
+    for year in YEARS:
+        print(f"{year}: downloading and validating official TSE ZIP...",flush=True)
+        source_by_year[year]=official(year)
+        print(f"{year}: source validated; sections={len(source_by_year[year][2])}; sha256={source_by_year[year][1]}",flush=True)
+
     planned_keys=set()
     year_context={}
     for year,(url,sha,data) in source_by_year.items():
         election=next((x for x in elections if int(x["year"])==year),None)
         rnd=next((x for x in rounds if election and x["election_id"]==election["id"] and int(x["round_number"])==1),None)
-        if not rnd:
-            raise RuntimeError(f"{year}: election or first round not found")
+        if not rnd: raise RuntimeError(f"{year}: election or first round not found")
         missing_municipalities=sorted({k[0] for k in data if k[0] not in mun_by_code})
         missing_zones=sorted({k[1] for k in data if k[1] not in zone_by_num})
         missing_dims=sorted(k for k in data if k not in secmap)
-        if missing_municipalities:
-            raise RuntimeError(f"{year}: municipality dimensions missing: {missing_municipalities[:10]}; refusing to guess")
-        if missing_zones:
-            raise RuntimeError(f"{year}: zone dimensions missing: {missing_zones[:10]}; refusing to guess")
+        if missing_municipalities: raise RuntimeError(f"{year}: municipality dimensions missing: {missing_municipalities[:10]}; refusing to guess")
+        if missing_zones: raise RuntimeError(f"{year}: zone dimensions missing: {missing_zones[:10]}; refusing to guess")
         existing=rows("electoral_results_totals",{"round_id":"eq."+rnd["id"],"office_id":"eq."+office["id"]})
-        bysec={x["section_id"]:x for x in existing}
-        missing_totals=sum(1 for key in data if key not in secmap or secmap[key]["id"] not in bysec)
-        print(f"{year}: SHA256={sha}; official sections={len(data)}; missing section dimensions={len(missing_dims)}; missing totals={missing_totals}")
+        existing_keys={x["section_id"] for x in existing}
+        missing_totals=sum(1 for key in data if key not in secmap or secmap[key]["id"] not in existing_keys)
+        print(f"{year}: official={len(data)}; missing dimensions={len(missing_dims)}; missing total rows={missing_totals}",flush=True)
         planned_keys.update(missing_dims)
         year_context[year]={"url":url,"sha":sha,"data":data,"round":rnd}
 
-    print(f"Unique missing section dimensions across requested years: {len(planned_keys)}")
+    print(f"Unique missing section dimensions: {len(planned_keys)}",flush=True)
     if DRY:
-        print("DRY RUN complete: no database writes performed. Missing section dimensions above are planned inserts, not a validation failure.")
+        print("DRY RUN complete: no database writes performed.",flush=True)
         return
 
-    # Create shared geographic dimensions only after all years and reference keys validate.
-    missing_rows=[]
-    for key in sorted(planned_keys):
-        missing_rows.append({"municipality_id":mun_by_code[key[0]]["id"],"zone_id":zone_by_num[key[1]]["id"],"section_number":key[2]})
-    for i in range(0,len(missing_rows),100):
-        created=api("POST","electoral_sections",body=missing_rows[i:i+100])
-        for s in created:
-            m=municipality_by_id[s["municipality_id"]]
-            z=zone_by_id[s["zone_id"]]
-            key=(int(m["tse_municipality_code"]),int(z["zone_number"]),int(s["section_number"]))
-            secmap[key]=s
-    if any(key not in secmap for key in planned_keys):
-        raise RuntimeError("Section dimensions were not all created; refusing to continue totals backfill")
+    # Idempotent dimension upsert. The conflict target is backed by the database's
+    # unique index on (zone_id, section_number, municipality_id).
+    missing_rows=[{"municipality_id":mun_by_code[k[0]]["id"],"zone_id":zone_by_num[k[1]]["id"],"section_number":k[2]} for k in sorted(planned_keys)]
+    for batch_no,batch in enumerate(batched(missing_rows),start=1):
+        api("POST","electoral_sections",{"on_conflict":"zone_id,section_number,municipality_id"},batch,"resolution=merge-duplicates,return=minimal")
+        print(f"Section dimensions batch {batch_no}: upserted {len(batch)}",flush=True)
+    if planned_keys:
+        sections=rows("electoral_sections")
+        secmap.clear()
+        index_sections(sections)
+    if any(k not in secmap for k in planned_keys):
+        raise RuntimeError("Section dimensions were not all available after upsert; refusing totals backfill")
 
     for year,ctx in year_context.items():
         url,sha,data=ctx["url"],ctx["sha"],ctx["data"]
         rnd=ctx["round"]
+        print(f"{year}: preparing source dataset and import run...",flush=True)
         ds=rows("electoral_source_datasets",{"dataset_year":f"eq.{year}","dataset_code":"eq.DETALHE_VOTACAO_SECAO"})
         dataset_id=ds[0]["id"] if ds else api("POST","electoral_source_datasets",body={"provider":"TSE","dataset_code":"DETALHE_VOTACAO_SECAO","dataset_name":f"Detalhe votação por seção {year}","dataset_year":year,"source_url":url,"metadata":{"sha256":sha,"scope":"RS","office_code":"7","round":1}})[0]["id"]
+
+        # Mark interrupted attempts for this operation as failed; rows already written
+        # are safely reconciled by the unique-key upsert below.
+        stale=rows("electoral_import_runs",{"dataset_id":"eq."+dataset_id,"status":"eq.RUNNING"})
+        for oldrun in stale:
+            if oldrun.get("source_file_name")==f"detalhe_votacao_secao_{year}.zip" and oldrun.get("metadata",{}).get("operation")=="section denominator backfill":
+                api("PATCH","electoral_import_runs",{"id":"eq."+oldrun["id"]},{"status":"FAILED","finished_at":datetime.now(timezone.utc).isoformat(),"error_message":"Interrupted previous run; safely superseded by idempotent batched retry."})
+                print(f"{year}: marked interrupted run {oldrun['id']} as FAILED",flush=True)
+
         run=api("POST","electoral_import_runs",body={"dataset_id":dataset_id,"source_file_name":f"detalhe_votacao_secao_{year}.zip","source_file_url":url,"status":"RUNNING","metadata":{"sha256":sha,"year":year,"operation":"section denominator backfill"}})[0]
-        existing=rows("electoral_results_totals",{"round_id":"eq."+rnd["id"],"office_id":"eq."+office["id"]})
-        bysec={x["section_id"]:x for x in existing}
-        count=0
+        payloads=[]
         for key,v in data.items():
             s=secmap[key]
-            payload={**v,"total_votes":v["comparecimento"],"source_dataset_id":dataset_id,"import_run_id":run["id"]}
-            old=bysec.get(s["id"])
-            if old: api("PATCH","electoral_results_totals",{"id":"eq."+old["id"]},payload)
-            else: api("POST","electoral_results_totals",body={"round_id":rnd["id"],"office_id":office["id"],"uf":"RS","municipality_id":s["municipality_id"],"zone_id":s["zone_id"],"section_id":s["id"],**payload})
-            count+=1
-        api("PATCH","electoral_import_runs",{"id":"eq."+run["id"]},{"status":"COMPLETED","finished_at":datetime.now(timezone.utc).isoformat(),"rows_read":len(data),"rows_loaded":count,"rows_rejected":0,"metadata":{"sha256":sha,"year":year,"source":"official TSE section detail"}})
+            payloads.append({"round_id":rnd["id"],"office_id":office["id"],"uf":"RS","municipality_id":s["municipality_id"],"zone_id":s["zone_id"],"section_id":s["id"],**v,"total_votes":v["comparecimento"],"source_dataset_id":dataset_id,"import_run_id":run["id"]})
+        # Bulk upsert uses the confirmed unique index, avoiding tens of thousands
+        # of individual HTTP calls and making retries safe after partial failures.
+        for batch_no,batch in enumerate(batched(payloads),start=1):
+            api("POST","electoral_results_totals",{"on_conflict":"round_id,office_id,municipality_id,section_id"},batch,"resolution=merge-duplicates,return=minimal")
+            done=min(batch_no*BATCH_SIZE,len(payloads))
+            print(f"{year}: totals batch {batch_no} — {done}/{len(payloads)}",flush=True)
+
+        api("PATCH","electoral_import_runs",{"id":"eq."+run["id"]},{"status":"COMPLETED","finished_at":datetime.now(timezone.utc).isoformat(),"rows_read":len(data),"rows_loaded":len(payloads),"rows_rejected":0,"metadata":{"sha256":sha,"year":year,"source":"official TSE section detail","write_mode":"batched upsert"}})
         api("PATCH","electoral_section_coverage_expectations",{"year":"eq."+str(year)},{"source_sha256":sha,"checked_at":datetime.now(timezone.utc).isoformat(),"notes":f"Official TSE detalhe_votacao_secao ZIP SHA-256={sha}; RS deputado estadual, first round."})
-        print(f"{year}: reconciled {count} section rows; candidate nominal results were not modified.")
-    print("Write pass complete. Validate readiness and coverage in Supabase before closing the phase.")
+        print(f"{year}: reconciled {len(payloads)} section rows; candidate nominal results were not modified.",flush=True)
+    print("Write pass complete. Validate readiness and coverage in Supabase before closing the phase.",flush=True)
 
 if __name__=="__main__":
     try: main()
     except Exception as e:
-        print("ERROR:",e,file=sys.stderr);sys.exit(1)
+        print("ERROR:",e,file=sys.stderr,flush=True);sys.exit(1)
